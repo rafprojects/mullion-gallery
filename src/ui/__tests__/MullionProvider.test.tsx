@@ -15,6 +15,7 @@ import { MullionProvider, useMullionPortal, useMullionScope, useMullionTheme } f
 import { BRAND_THEME_ID, getThemeEntry } from '../provider/registry';
 import { TOKEN_SHEET_ATTR } from '../provider/tokenSheet';
 import { SCOPE_ATTR } from '../provider/scope';
+import { UI_STYLES_ATTR, hasAdoptedUiStyles } from '../styles/uiStyles';
 
 const bg = (id: string) => `--mullion-color-background: ${getThemeEntry(id).resolved.background};`;
 
@@ -25,6 +26,12 @@ function sheetsIn(root: Document | ShadowRoot): string[] {
 
 function sheetFor(root: Document | ShadowRoot, selector: string): string | undefined {
   return sheetsIn(root).find((css) => css.startsWith(`${selector} {`));
+}
+
+/** P79-B: the component sheet's `<style>` fallback, one per adopted root. */
+function uiSheetsIn(root: Document | ShadowRoot): HTMLStyleElement[] {
+  const parent = root instanceof Document ? root.head : root;
+  return Array.from(parent.querySelectorAll(`style[${UI_STYLES_ATTR}]`));
 }
 
 function makeShadowHost(): { host: HTMLDivElement; shadow: ShadowRoot; mount: HTMLDivElement } {
@@ -68,6 +75,61 @@ beforeEach(() => {
 afterEach(() => {
   document.head.querySelectorAll(`style[${TOKEN_SHEET_ATTR}]`).forEach((n) => n.remove());
   document.body.querySelectorAll('[data-mullion-portal]').forEach((n) => n.remove());
+});
+
+// ---------------------------------------------------------------------------
+// The component sheet (P79-B): one list, adopted into every root painted
+// ---------------------------------------------------------------------------
+
+describe('MullionProvider component sheet', () => {
+  it('adopts the list into the scope root and the container root, once each', () => {
+    const gallery = makeShadowHost();
+    const overlay = makeShadowHost();
+    const { unmount } = render(
+      <MullionProvider theme="tokyo-night" scope={gallery.shadow} portal={overlay.mount}>
+        <MullionProvider mode="lock">
+          <Probe />
+        </MullionProvider>
+      </MullionProvider>,
+      { container: gallery.mount },
+    );
+    expect(uiSheetsIn(gallery.shadow), 'the gallery tree').toHaveLength(1);
+    expect(uiSheetsIn(overlay.shadow), 'the overlay root, where the nested container also lives').toHaveLength(1);
+    expect(uiSheetsIn(document), 'nothing in the document under a shadow mount').toHaveLength(0);
+    expect(uiSheetsIn(gallery.shadow)[0]?.textContent).toContain('@layer mullion.vendor, mullion.base, mullion.components;');
+
+    unmount();
+    expect(uiSheetsIn(gallery.shadow)).toHaveLength(0);
+    expect(uiSheetsIn(overlay.shadow)).toHaveLength(0);
+    expect(hasAdoptedUiStyles(gallery.shadow)).toBe(false);
+    gallery.host.remove();
+    overlay.host.remove();
+  });
+
+  it('adopts the list into the document under a light mount and shares it between two mounts', () => {
+    const hostA = document.createElement('div');
+    const hostB = document.createElement('div');
+    document.body.append(hostA, hostB);
+    const a = render(
+      <MullionProvider theme="tokyo-night" scope={hostA}>
+        <Probe id="a" />
+      </MullionProvider>,
+      { container: hostA },
+    );
+    const b = render(
+      <MullionProvider theme="github-light" scope={hostB}>
+        <Probe id="b" />
+      </MullionProvider>,
+      { container: hostB },
+    );
+    expect(uiSheetsIn(document), 'two providers, one sheet in the document').toHaveLength(1);
+    a.unmount();
+    expect(uiSheetsIn(document), 'the sheet stays while a provider still holds it').toHaveLength(1);
+    b.unmount();
+    expect(uiSheetsIn(document)).toHaveLength(0);
+    hostA.remove();
+    hostB.remove();
+  });
 });
 
 // ---------------------------------------------------------------------------

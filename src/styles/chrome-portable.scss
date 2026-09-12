@@ -3,20 +3,18 @@
 //
 // Why this file exists, separately from global.scss (P76-I-2):
 //
-// `global.scss` is loaded into the light DOM only when the app mounts WITHOUT
-// a shadow root (`main.tsx`: `if (!useShadowDom) import('./styles/global.scss')`).
-// In the shipped default — shadow DOM — it is concatenated into the shadow
-// root by `shadowStyles.ts` instead. But Mantine's `Portal` appends its target
-// to `document.body`, so every Drawer, Modal, Menu and Popover renders OUTSIDE
-// that shadow root. Rules in `global.scss` therefore never reach portaled
-// admin chrome in the configuration we actually ship.
+// Until P77-I, Mantine's `Portal` appended its target to `document.body`, so
+// every Drawer, Modal, Menu and Popover rendered OUTSIDE the gallery's shadow
+// root, where `global.scss` never reached it. Anything of ours that had to
+// override Mantine on portaled chrome needed to be in the document as well,
+// which is what this file is.
 //
-// Mantine's own stylesheet does reach it, because `main.tsx` imports
-// `@mantine/core/styles.css` unconditionally. Anything of ours that has to
-// override Mantine on portaled chrome needs the same treatment, which is what
-// this file is: imported unconditionally in `main.tsx` (so it is in the
-// document) and concatenated into `shadowStyles.ts` (so it is in the shadow
-// root too).
+// Since P79-B every sheet of ours reaches every tree through one registration
+// list (`src/appStyles.ts`), so the split no longer buys reach inside the
+// gallery. It stays because this file is also imported as a plain document
+// stylesheet in `main.tsx` for the wp-admin apps, which have no provider
+// until P81-B, and because Phase 81 deletes it with the Mantine overrides it
+// carries.
 //
 // Keep this file small and strictly scoped to Mantine class overrides. It is
 // the one stylesheet that leaks into the host WordPress page, so it must never
@@ -43,9 +41,8 @@
 // width, style and offset, so a future change to its geometry still lands.
 //
 // The doubled class is a specificity bump (0,3,0 vs Mantine's 0,2,0) so this
-// wins regardless of stylesheet order — the light-DOM path loads global.scss
-// via a dynamic import, where order is not guaranteed the way it is in
-// `shadowStyles.ts`.
+// wins regardless of stylesheet order, which matters in the wp-admin document
+// where Vite injects sheets in import order rather than list order.
 //
 // Inputs are deliberately absent: they carry no outline at all
 // (`.m_8fb7ebe7:focus { outline: none }`) and signal focus by swapping

@@ -1,0 +1,14 @@
+/*
+ * Framework base sheet (P79-B). First in the registration list, so the
+ * cascade layers are declared, in order, before any of them is used:
+ * `mullion.vendor` holds third-party sheets the app still registers,
+ * `mullion.components` is where P79-C's component sheets write. Consumer CSS
+ * is unlayered and therefore wins over any of them without specificity
+ * games (study 3.4).
+ *
+ * Nothing else lives here: a component sheet belongs to its component, and a
+ * per-theme value belongs in the token sheet. The three static tests in
+ * src/ui/__tests__/componentSheets.test.ts hold this file to the same rule
+ * as every other framework sheet.
+ */
+@layer mullion.vendor, mullion.base, mullion.components;

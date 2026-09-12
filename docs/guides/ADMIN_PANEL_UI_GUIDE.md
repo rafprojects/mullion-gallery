@@ -5,7 +5,7 @@ This guide explains the Admin Panel UI structure, the Mantine components in use,
 ## Where the Admin Panel lives
 - Primary component: `AdminPanel` in [src/components/Admin/AdminPanel.tsx](../../src/components/Admin/AdminPanel.tsx)
 - Mantine providers: [src/main.tsx](../../src/main.tsx)
-- Shadow DOM styles injection: [src/shadowStyles.ts](../../src/shadowStyles.ts)
+- Style registration list (every tree): [src/appStyles.ts](../../src/appStyles.ts)
 
 ## Structure overview (layout and control map)
 The admin UI is a single component composed of Mantine primitives. The layout flows like this:
@@ -172,7 +172,7 @@ If you prefer, you can keep Mantine defaults and only override specific componen
 
 ### Shadow DOM note
 
-If Shadow DOM is enabled, Mantine styles are injected via [src/shadowStyles.ts](../../src/shadowStyles.ts). Any global overrides should also be included there if they rely on CSS variables or resets.
+Every stylesheet the gallery needs is registered in [src/appStyles.ts](../../src/appStyles.ts) and `MullionProvider` adopts the list into each tree it paints (P79-B), so a shadow mount, the overlay root and a light mount all see the same sheets. A new sheet, module or override goes on that list; the registry test in `src/styles/__tests__/styleDelivery.test.ts` fails on a CSS module left off it.
 
 ## Component‑level overrides (localized styling)
 

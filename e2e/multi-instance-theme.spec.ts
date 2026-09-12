@@ -123,6 +123,26 @@ test.describe('two instances, two themes', () => {
       getComputedStyle(document.documentElement).getPropertyValue('--mullion-color-background').trim(),
     );
     expect(pageBackground).toBe('');
+
+    // P79-B: two mounts, four roots of ours, one parsed component sheet. The
+    // FUTURE_TASKS constructable-stylesheet entry named multi-shortcode pages
+    // as the case that pays for duplicated copies; this is that case.
+    const sharing = await page.evaluate(() => {
+      const roots = [
+        document.getElementById('gallery-a')?.shadowRoot,
+        document.getElementById('gallery-b')?.shadowRoot,
+        document.querySelector('[data-mullion-overlay-root="gallery-a"]')?.shadowRoot,
+        document.querySelector('[data-mullion-overlay-root="gallery-b"]')?.shadowRoot,
+      ];
+      const framework = roots.map((r) => r?.adoptedStyleSheets.find((s) => s.cssRules[0]?.constructor.name === 'CSSLayerStatementRule') ?? null);
+      return {
+        rootsFound: roots.filter(Boolean).length,
+        sheetsFound: framework.filter(Boolean).length,
+        distinctObjects: new Set(framework.filter(Boolean)).size,
+        handWrittenCopies: roots.reduce((n, r) => n + (r?.querySelectorAll('style[data-mullion]').length ?? 0), 0),
+      };
+    });
+    expect(sharing).toEqual({ rootsFound: 4, sheetsFound: 4, distinctObjects: 1, handWrittenCopies: 0 });
   });
 
   test('light mount: each host carries its own scope attribute and tokens, and the page is untouched', async ({ page }) => {

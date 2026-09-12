@@ -1,15 +1,15 @@
 # Phase 79 - Framework core and theme manager
 
-**Status:** In progress (P79-A landed)
+**Status:** In progress (P79-A and P79-B landed)
 **Created:** 2026-09-10
-**Last updated:** 2026-09-12 (P79-A landed)
+**Last updated:** 2026-09-12 (P79-B landed)
 
 ### Tracks
 
 | Track | Description | Status | Effort |
 |-------|-------------|--------|--------|
 | P79-A | `MullionProvider`: scope, portal container, lock and follow mode, persistence, runtime theme registration | **Done** (2026-09-12), see notes | Medium-Large |
-| P79-B | Style delivery and the token sheet: one registration list written into every tree the plugin owns | Planned | Medium |
+| P79-B | Style delivery and the token sheet: one registration list written into every tree the plugin owns | **Done** (2026-09-12), see notes | Medium |
 | P79-C | Layout and typography primitives, and the single focus rule | Planned | Medium |
 | P79-D | Theme manager merge: registry, catalogue, selector, scoping, lock and follow | Planned | Medium |
 
@@ -36,7 +36,7 @@
 | C | How does CSS reach three different trees? | **One registration list, written per scope, preferring `adoptedStyleSheets`.** The P77-A contract's four mechanisms collapse to one because there is no third-party stylesheet to override and no "portable" sheet distinct from the rest. |
 | D | Does `applyThemeEverywhere` stay a nested provider? | **No. It becomes a `mode` prop.** `AdminChromeProvider` exists because Mantine's scheme attribute and variable selector had to be re-declared for a subtree. A provider that takes `mode="lock"` needs no nesting trick and no hidden sentinel element, and it cannot drop focus by moving children between tree depths the way P76-F had to fix. |
 | E | Runtime theme editing in this phase? | **The API, yes; the editor UI, no.** `defineTheme` with the audits running at save is provider surface and belongs here. A user-facing theme editor is a product feature and is not scheduled. |
-| F | What happens to `adminChromeStyles()` and the builder bridge? | **Both retire when the overlay root carries the provider's own sheet.** That is this phase's P79-B, which is why P77-I flips the default first. Until then they stay load-bearing and are not touched. |
+| F | What happens to `adminChromeStyles()` and the builder bridge? | **Both retire when the overlay root carries the provider's own sheet.** That is this phase's P79-B, which is why P77-I flips the default first. Until then they stay load-bearing and are not touched. *P79-B note:* the precondition is now met, the overlay root carries both the token sheet and the component sheet by provider. What still keeps `adminChromeStyles()` alive is its `--mantine-*` half, which Mantine components read until Phase 81; the deletion stays homed there (Follow-On Candidates). |
 
 ## Execution Priority
 
@@ -241,6 +241,75 @@ Move them into the framework as provider surface, keeping the behaviour the plug
 | `defineTheme` registers and refuses on audit failure | `registry.test.ts` and the "runtime themes" block; mutation M5 |
 | No `[data-*-color-scheme]` ancestor selector, by static test | `noSchemeSelector.test.ts`; mutations M1 and M2 |
 
+
+### P79-B (2026-09-12)
+
+**Status: landed.** One registration list, [`src/ui/styles/uiStyles.ts`](../src/ui/styles/uiStyles.ts), with the app's entries in [`src/appStyles.ts`](../src/appStyles.ts). The list is built once per page into a constructable `CSSStyleSheet` that `MullionProvider` adopts into every root it paints, with a `<style data-mullion-ui-styles>` fallback where a tree has no `adoptedStyleSheets`. The three hand-written writers (`main.tsx` twice, `portalTarget.ts` once) and the two lists they read (`shadowStyles`, `overlayStyles`) are gone. The token sheet gained the study's one motion switch. Two unit suites, one static guard and three extended e2e specs cover it; the FUTURE_TASKS entry is deleted.
+
+**What delivery does, in one rule.** A sheet on the list reaches every tree the provider paints, and no sheet reaches a tree any other way. The provider already knew every root it painted (the scope's root and the portal container's root, from P79-A), so delivery is the same reconciliation with a second sheet: adopt the shared sheet into each root on first sight, reference-counted so nested providers in one tree adopt once, release on unmount. Registration after adoption calls `replaceSync` on the shared sheet and every root sees the change; a lazily loaded chunk can add to the list without touching a root.
+
+**What the measurement changed about the plan.**
+
+| Plan said | Built |
+|-----------|-------|
+| "One `uiStyles.ts` registration list concatenating the framework's component sheets and the gallery structural sheet" | The framework's list holds the framework's sheets (`styles/base.css` so far) and exposes `registerUiStyles`; the app registers the vendor, structural and module sheets in `src/appStyles.ts` at load. One list, two contributors, because the framework cannot import app CSS without inverting the dependency the P78-A boundary exists to hold. |
+| "building the sheet once with `replaceSync` and adopting it where `adoptedStyleSheets` is available, falling back to a `<style>` element" | As planned, and measured: the gallery root and the overlay root hold the same `CSSStyleSheet` object; on the two-instance page four roots hold one. Chromium never takes the fallback; jsdom always does, which is how the unit suite exercises it. |
+| "The token sheet is emitted per scope and is small" | Unchanged, plus the reduced-motion switch (below). |
+| Study 3.3: "no third-party CSS", so the list needs no notion of layers | **Mantine's two sheets are registered inside `@layer mullion.vendor`.** An adopted sheet cascades after every `<style>` in its tree, and Mantine's `styles.css` declares its default variables at `:root, :host` for its own runtime variables sheet to override at the same selector by coming later. Unlayered, the defaults won again: the full e2e run failed three axe contrast checks with the theme's dimmed text reverted to Mantine's `#828282` (`--mantine-color-dark-2`). Layered declarations lose to unlayered ones whatever the order, which is the one property that makes a vendor sheet adoptable. `registerUiStyles` takes a `layer` option for exactly this; the framework's own sheets do not use it. Phase 81 deletes both lines. |
+| The framework's first sheet | `base.css` declares `@layer mullion.vendor, mullion.base, mullion.components;` and nothing else. The layer order is a delivery concern (it must be declared before any layered rule, so it goes first on the list); the rules that fill the framework layers are P79-C's components. The static tests and the e2e reach checks run against it now, so P79-C's sheets land under guards that already exist. |
+
+**Design decisions taken while building.**
+
+- *Every sheet in every tree, including the ones nothing reads there.* Dockview and `builder.css` were overlay-only; the gallery tree now carries them too. With one parsed sheet per page the marginal cost is selector matching on unused rules, and the alternative is a second list with its own reach, which is the P77-A contract this track deletes.
+- *The document is a painted tree too.* Under a light mount the provider adopts the list into the document, where Vite has already injected most of the same sheets for the wp-admin apps. That is two copies in the document for the rest of the phase, one of them adopted, and it is deliberate: the provider's mechanism must be the same in every mount, and the Vite copies leave with Mantine in P81 rather than with a special case here. The light-mount `import('./styles/global.scss')` calls are gone because the list carries it.
+- *No document-only exemption for CSS modules.* The P77-A registry test allowed a module off the list when its only consumer portaled. Since P77-I "portaled" means the overlay root, which the list reaches and Vite's document injection does not, so the exemption named the one tree the module could not reach. `TemplatePickerModal.module.scss` is on the list and the exemption is deleted.
+- *Reduced motion is a token switch in the token sheet, not a rule in a component sheet.* Under `prefers-reduced-motion: reduce` the scope's three `--mullion-duration-*` tokens become `0ms`, on the same selector, so any reader of a duration token honours the preference without a rule of its own. It lives in the token sheet because a component-sheet override in a cascade layer would lose to the unlayered token declaration.
+- *`registerUiStyles` replaces by id.* A module that re-registers (hot reload, or the same chunk evaluated twice) does not append a second copy, and its position in the cascade is kept.
+
+**What was deleted or replaced, with its replacement.**
+
+| Removed | Replaced by |
+|---------|-------------|
+| `src/shadowStyles.ts` (`shadowStyles`, `overlayStyles`) | `src/appStyles.ts`, registrations into the framework list |
+| `main.tsx`: the `<style data-mullion>` writer in `mountWithShadow` and in `mountSharedRoot`, and three light-mount `import('./styles/global.scss')` calls | the provider adopting the list into the scope's root |
+| `portalTarget.ts`: the overlay root's `<style data-mullion>` copy of `overlayStyles` | the provider adopting the list into the portal container's root |
+| `styleDelivery.test.ts`: `DOCUMENT_ONLY_MODULES` and its two tests | "every module is registered", no exemptions, plus a check that the list names no missing file |
+| FUTURE_TASKS "Share One Constructable Stylesheet Between the Gallery Root and the Overlay Root" | this track; removal logged in the document's update log |
+
+**Two findings from the baseline measurement.**
+
+1. *A responsive style prop that set the same property as a Mantine core rule lost at the base breakpoint, until now.* Measured on the tree before this change: the gallery shadow root's children were four `style[data-precedence=mantine]` elements, then `style[data-mullion]`, then the mount point. React 19 inserts the first hoisted style of a precedence as the root's first child, so `Card` with `p={{ base: 'sm', md: 'md' }}` (four sites in `AccessTab`) resolved core's `padding: var(--card-padding)` at every width; `Container` and `Center` with `py={{ ... }}` were unaffected because their core rules set no padding. With Mantine's sheet in the vendor layer the hoisted rule wins, as Mantine intends, so those four cards now take `sm` padding below the `md` breakpoint. Desktop snapshots do not see it; a data point is recorded in P81-A, where the style props migrate.
+2. *`TemplatePickerModal.module.scss` was dead in the shipped mount from P77-I to P79-B.* Its hover glow rules were document-only by exemption while the modal painted in the overlay root. Measured on a worktree at the previous commit with the new e2e: the template card's computed `transition-property` was `all`, the initial value, where the module sets `box-shadow, transform, border-color`. Fixed by the list; the same test passes on this tree.
+
+**Rendered output.** The same rules reach the gallery tree and the overlay root as before, from an adopted sheet rather than a `<style>`. Two cascade relationships changed, both by the vendor layer: Mantine's core sheet now loses to every unlayered rule in the tree instead of to those that happened to follow it, which is what the runtime variables sheet, the hoisted responsive rules and `chrome-portable.scss` all wanted. Everything of ours that overrode Mantine already did so by specificity or by order and still does. The light-mount document additionally holds the adopted copy after Vite's; the Vite copy is unlayered and keeps beating host CSS there. `theme-qa`'s snapshot matrix and the axe contrast checks are the check, see validation.
+
+**Mutations.** Each applied alone against the guarding suite and restored byte-identical afterwards.
+
+| Guard | Mutation applied | Result |
+|-------|------------------|--------|
+| no colour literal (static) | `color: #fff` appended to `base.css` | fails naming `styles/base.css:16: #fff` |
+| no `!important` (static) | `!important` appended to `base.css` | fails naming the file and line |
+| no ancestor scheme selector (static, both guards) | `[data-mullion-color-scheme="dark"] .x` appended to `base.css` | the sheet guard and the P79-A source guard both fail, each naming the line |
+| every module registered | the template picker's registration removed from `appStyles.ts` | the registry test fails naming the module |
+| reference counting | release removes the sheet regardless of remaining holders | the fallback test and the light-mount two-provider test fail |
+| every painted root | the provider adopts only into the first root (the scope), not the container's | the "scope root and container root" test fails on the overlay root |
+| the motion switch | the reduced-motion block dropped from `buildTokenSheet` | the reduced-motion test fails on the missing block, and the token-sheet shape test fails |
+| one sheet per page | a new `CSSStyleSheet` per adopting root | the unit test fails on object identity; in the browser `style-delivery` fails on the shared object and `multi-instance` reports four distinct objects for four roots |
+
+**Validation.** Run at CI parity on the final tree: `npm run lint` clean, `npx tsc --noEmit` clean, `npm run ui:allowlist:check` green at 178 files (`appStyles.ts` replaces `shadowStyles.ts` on the list at the same count), `npm run test:coverage` 4,065 of 4,065 across 267 files with every threshold met (statements 86.32, branches 75.17, functions 82.66, lines 88.32), `npx playwright test` 51 of 51 with no snapshot differences, and `npm run build` clean apart from the pre-existing chunk-size warnings. The suite grew by 13 unit tests net (two new suites and the provider, token-sheet and registry additions, minus the two document-only tests retired from `styleDelivery.test.ts`) and by two e2e tests, with three existing e2e checks extended. The first full run, before the vendor layer, failed exactly the three axe contrast checks in `e2e/accessibility.spec.ts` and nothing else, which is how the Mantine defaults regression was found; the run after the layer passed all 51.
+
+**Acceptance criteria, checked.**
+
+| Criterion | Where it is proved |
+|-----------|--------------------|
+| Every framework stylesheet reaches the gallery tree, the overlay root and the document, proved in the browser | `e2e/style-delivery.spec.ts`: the layer statement from `base.css` is the first rule of exactly one adopted sheet in the gallery root and in the overlay root under a shadow mount, and in the document under a light mount; `global.scss` and `chrome-portable.scss` selectors present in each; Dockview rules present in both shadow trees |
+| The P77-A guards carry over | `styleDelivery.test.ts`: scope test unchanged, registry test re-pointed at `src/appStyles.ts` with the exemption removed, flatness test unchanged |
+| Three static tests: no colour literal, no `!important`, no ancestor scheme selector | `src/ui/__tests__/componentSheets.test.ts`, by file and line, over every `.css`/`.scss` under `src/ui/`; mutation M1 |
+| One parsed sheet per page rather than one per mount, measured | `style-delivery`: the gallery root and the overlay root hold the same `CSSStyleSheet` object, no hand-written copies, no fallback elements. `multi-instance-theme`: two mounts, four roots, one object. `uiStyles.test.ts`: `replaceSync` called once for two roots |
+| The FUTURE_TASKS entry is deleted in the same change | `docs/FUTURE_TASKS.md`, entry removed and logged |
+| Validation: `e2e/style-delivery.spec.ts` extended, both mount modes | Two new shadow-mount tests and the light-mount test extended; every reader of a tree's sheets now includes `adoptedStyleSheets` |
+| Validation: a colour literal in a component sheet fails the static test by file and line | mutation M1 |
+
 ## Outcome
 
-_P79-A landed 2026-09-12; B, C and D pending._
+_P79-A and P79-B landed 2026-09-12; C and D pending._

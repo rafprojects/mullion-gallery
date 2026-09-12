@@ -4,14 +4,16 @@ import { createRoot, type Root } from 'react-dom/client'
 import { createPortal } from 'react-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
-import { shadowStyles } from './shadowStyles'
+// P79-B: registers every sheet the gallery needs with the framework's style
+// list; MullionProvider adopts it into each tree it paints.
+import './appStyles'
 import { MantineProvider, mergeThemeOverrides } from '@mantine/core'
 import i18n from './i18n'
 import { Notifications } from '@mantine/notifications'
 import { ModalsProvider } from '@mantine/modals'
 import '@mantine/core/styles.css'
-// P76-I-2: must be unconditional. Portaled admin chrome (Drawer/Modal/Menu)
-// renders outside the shadow root, where global.scss never reaches it.
+// Also on the P79-B list; this document copy serves the wp-admin apps, which
+// have no provider until P81-B, and leaves with Mantine in Phase 81.
 import './styles/chrome-portable.scss'
 import '@mantine/notifications/styles.css'
 import 'dockview/dist/styles/dockview.css'
@@ -208,13 +210,6 @@ const mountWithShadow = (host: HTMLElement, props: MountProps, rootId: string, n
 
   const shadowRoot = host.shadowRoot ?? host.attachShadow({ mode: 'open' })
 
-  if (!shadowRoot.querySelector('style[data-mullion]')) {
-    const styleTag = document.createElement('style')
-    styleTag.setAttribute('data-mullion', 'true')
-    styleTag.textContent = shadowStyles
-    shadowRoot.appendChild(styleTag)
-  }
-
   const mountPoint = document.createElement('div')
   mountPoint.setAttribute('data-mullion-mount', 'true')
   shadowRoot.appendChild(mountPoint)
@@ -263,13 +258,6 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
     if (useShadowDom) {
       const shadowRoot = host.shadowRoot ?? host.attachShadow({ mode: 'open' })
 
-      if (!shadowRoot.querySelector('style[data-mullion]')) {
-        const styleTag = document.createElement('style')
-        styleTag.setAttribute('data-mullion', 'true')
-        styleTag.textContent = shadowStyles
-        shadowRoot.appendChild(styleTag)
-      }
-
       const mountPoint = document.createElement('div')
       mountPoint.setAttribute('data-mullion-mount', 'true')
       shadowRoot.appendChild(mountPoint)
@@ -282,11 +270,6 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
   })
 
   if (instances.length === 0) return
-
-  // Load global styles once for non-shadow-DOM mode.
-  if (!useShadowDom) {
-    import('./styles/global.scss')
-  }
 
   // Hidden container that anchors the single React root — reuse if it already exists.
   let container = document.getElementById('mullion-shared-root')

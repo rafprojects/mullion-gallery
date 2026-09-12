@@ -242,18 +242,6 @@ The codebase works around this per-consumer rather than structurally, and has al
 
 ---
 
-### Share One Constructable Stylesheet Between the Gallery Root and the Overlay Root
-
-**Origin:** [PHASE77_REPORT.md](PHASE77_REPORT.md) P77-B (2026-09-09).
-
-**Context:** The overlay root (`src/portalTarget.ts`) carries its own `<style>` copy of `overlayStyles`, about 315 KB of CSS text per mount, on top of the gallery root's copy of `shadowStyles`. `adoptedStyleSheets` with one `CSSStyleSheet` built once per page would share the parsed sheet between every root the plugin creates, including multi-shortcode pages.
-
-**What to implement:** Build the sheets once with `replaceSync`, adopt them in `mountWithShadow` and in the overlay root, and keep the `<style>` path as the fallback for browsers without constructable stylesheets. Do it only after the overlay root is the shipped default.
-
-**Effort:** Small | **Impact:** Low-Medium — memory and parse time on multi-mount pages.
-
----
-
 ### Host Decoupling: Run Mullion on Any Web App ("Mullion-next")
 
 **Origin:** User request, 2026-09-10, raised alongside the [UI dependency evaluation](UI_DEPENDENCY_EVALUATION.md). Supersedes the abandoned dual WP/non-WP experiment as the *approach*, not as the goal.
@@ -830,3 +818,5 @@ When promoting future tasks to an active phase:
 *Updated: September 10, 2026 (P77-E accepted, phases re-planned): No new entries. The user accepted the P77-E recommendation and chose to build the in-house component framework before release. The work is now [PHASE78_REPORT.md](PHASE78_REPORT.md) (boundary, primitive bake-off, token model), [PHASE79_REPORT.md](PHASE79_REPORT.md) (framework core and theme manager), [PHASE80_REPORT.md](PHASE80_REPORT.md) (behavioural components) and [PHASE81_REPORT.md](PHASE81_REPORT.md) (migration and Mantine removal). Release pipeline hygiene moved from Phase 79 to [PHASE82_REPORT.md](PHASE82_REPORT.md) and go-live from Phase 80 to [PHASE83_REPORT.md](PHASE83_REPORT.md); links above are corrected. Two backlog items are now owned by the new phases and stay here only until those phases land: "Share One Constructable Stylesheet Between the Gallery Root and the Overlay Root" becomes part of P79-B, and the WordPress admin bar covering the drawer header is closed by the host-safe layer token in P78-C.*
 
 *Updated: September 10, 2026 (P77-I, Phase 77 closed): No new entries. The portal default is now `overlay-root`, so the two accessibility entries that describe the old placement are re-scoped rather than removed: "Focus Return After Closing Portaled Chrome Lands on `body`" is unchanged and still real, because it is Mantine's `useFocusReturn` reading `document.activeElement` rather than a placement problem, and it is closed by the framework in Phase 80 where all three headless candidates resolve the active element through the shadow tree. "WordPress Admin Bar Covers the Settings Drawer Header" is likewise unchanged and is owned by the host-safe layer token in P78-C. One test-integrity fix landed with P77-I and is recorded there rather than here: `playwright.config.ts` defaulted to Vite's port 5173, another project on the machine was serving it, and `reuseExistingServer` ran the whole suite against that application, producing 45 phantom failures.*
+
+*Updated: September 12, 2026 (P79-B delivered): **Removed:** "Share One Constructable Stylesheet Between the Gallery Root and the Overlay Root" (Code Quality). It was owned by P79-B since the Phase 78 to 81 re-plan and is now built: one registration list (`src/ui/styles/uiStyles.ts`, with the app's entries in `src/appStyles.ts`) becomes one `CSSStyleSheet` per page that `MullionProvider` adopts into every root it paints, with a `<style>` fallback where constructable sheets are missing. The overlay root and the gallery root no longer carry hand-written copies, and the two-instance e2e measures four roots sharing one parsed sheet. Details in [PHASE79_REPORT.md](PHASE79_REPORT.md) P79-B.*

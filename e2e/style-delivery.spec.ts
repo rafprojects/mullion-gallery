@@ -1,21 +1,19 @@
 /**
- * P77-A: style-delivery contract, checked against the live page.
+ * P77-A, rewritten for P79-B: the style-delivery contract, checked against
+ * the live page.
  *
- * `chrome-portable.scss` is the one stylesheet the contract says must reach
- * BOTH trees: the document (for portaled Drawer / Modal / Menu chrome) and the
- * shadow root (for the same components rendered `withinPortal={false}`, and
- * for the gallery itself). It gets there by two independent imports, one in
- * main.tsx and one in shadowStyles.ts, and nothing else ties them together.
- * Losing either import is invisible in the source and only shows up as a
- * missing focus ring or checkbox border on one surface (the P76-I-2 class of
- * defect). This spec asserts, with the Settings drawer open, that every
- * selector compiled from that file is present in `document.styleSheets` and
- * in the shadow root's sheets. It compiles the file at test time, so there is
- * no hand-maintained selector list to drift.
+ * Since P79-B there is one registration list (`src/appStyles.ts` on top of
+ * the framework's `src/ui/styles/uiStyles.ts`), built once per page into a
+ * constructable stylesheet that `MullionProvider` adopts into every tree it
+ * paints. This spec proves, in the browser, that the list reaches the gallery
+ * shadow root, the overlay root and a light-mount document; that the three
+ * roots on a page share one parsed sheet object; and that the rules paint,
+ * not merely arrive: the drawer's active tab, the Theme select's checked
+ * option, and a CSS module whose only consumer portals into the overlay root.
  *
- * It also pins the contract's reach claims for `global.scss`: present in the
- * shadow root and absent from the document under the shipped mount, and the
- * reverse under `?shadow=0`.
+ * Reading note: `root.styleSheets` lists `<style>` and `<link>` sheets only.
+ * Adopted sheets live in `root.adoptedStyleSheets`, and a helper that forgets
+ * the second list reports every framework rule as missing.
  */
 
 import { test, expect, type Page } from '@playwright/test';
@@ -75,6 +73,8 @@ async function installAdminSession(page: Page) {
     applyThemeEverywhere: false,
   }));
   await page.route('**/wp-json/mullion-gallery/v1/campaigns**', json({ items: [] }));
+  await page.route('**/wp-json/mullion-gallery/v1/spaces', json(ONE_SPACE));
+  await page.route('**/wp-json/mullion-gallery/v1/**templates**', json([]));
 }
 
 async function openSettingsDrawer(page: Page) {
@@ -83,8 +83,10 @@ async function openSettingsDrawer(page: Page) {
   await expect(page.getByRole('tab', { name: 'Appearance' })).toBeVisible();
 }
 
-/** Every selector text reachable from a tree's stylesheets, whitespace-normalised. */
-async function selectorsIn(page: Page, tree: 'document' | 'shadow' | 'overlay'): Promise<string[]> {
+type Tree = 'document' | 'shadow' | 'overlay';
+
+/** Every selector text reachable from a tree's sheets, element-held and adopted alike, whitespace-normalised. */
+async function selectorsIn(page: Page, tree: Tree): Promise<string[]> {
   return page.evaluate((which) => {
     const out: string[] = [];
     const walk = (rules: CSSRuleList) => {
@@ -93,17 +95,54 @@ async function selectorsIn(page: Page, tree: 'document' | 'shadow' | 'overlay'):
         if ('cssRules' in r) walk((r as CSSGroupingRule).cssRules);
       }
     };
-    const sheets = which === 'document'
-      ? document.styleSheets
+    const root: Document | ShadowRoot | null | undefined = which === 'document'
+      ? document
       : which === 'overlay'
-        ? document.querySelector('[data-mullion-overlay-root]')?.shadowRoot?.styleSheets
-        : document.getElementById('root')?.shadowRoot?.styleSheets;
-    for (const s of sheets ?? []) {
+        ? document.querySelector('[data-mullion-overlay-root]')?.shadowRoot
+        : document.getElementById('root')?.shadowRoot;
+    for (const s of [...(root?.styleSheets ?? []), ...(root?.adoptedStyleSheets ?? [])]) {
       try { walk(s.cssRules); } catch { /* cross-origin sheet */ }
     }
     return out;
   }, tree);
 }
+
+/**
+ * The framework's shared sheet is recognisable by its first rule: the cascade
+ * layer statement from src/ui/styles/base.css. Per tree: how many adopted
+ * sheets start with it, whether any hand-written `<style data-mullion>` copy
+ * survives, and whether the fallback `<style>` was used instead.
+ */
+async function sheetShape(page: Page) {
+  return page.evaluate(() => {
+    const isFramework = (s: CSSStyleSheet) => {
+      const first = s.cssRules[0];
+      return !!first && first.constructor.name === 'CSSLayerStatementRule'
+        && Array.from((first as CSSLayerStatementRule).nameList).join(',') === 'mullion.vendor,mullion.base,mullion.components';
+    };
+    const describe = (root: Document | ShadowRoot | null | undefined) => {
+      if (!root) return null;
+      const frameworkSheets = root.adoptedStyleSheets.filter(isFramework);
+      const parent = root instanceof Document ? root.head : root;
+      return {
+        adopted: root.adoptedStyleSheets.length,
+        frameworkSheets: frameworkSheets.length,
+        legacyCopies: parent.querySelectorAll('style[data-mullion]').length,
+        fallbacks: parent.querySelectorAll('style[data-mullion-ui-styles]').length,
+      };
+    };
+    const gallery = document.getElementById('root')?.shadowRoot;
+    const overlay = document.querySelector('[data-mullion-overlay-root]')?.shadowRoot;
+    const sharedObject = !!gallery && !!overlay
+      && gallery.adoptedStyleSheets.some(isFramework)
+      && gallery.adoptedStyleSheets.filter(isFramework)[0] === overlay.adoptedStyleSheets.filter(isFramework)[0];
+    return { document: describe(document), gallery: describe(gallery), overlay: describe(overlay), sharedObject };
+  });
+}
+
+const ONE_SPACE = [{
+  id: 1, slug: 'main', name: 'Main', isolationMode: 'open', isDefault: true, archived: false, grantCount: 0, userLevel: 'admin',
+}];
 
 const missingFrom = (haystack: string[], needles: string[]) => needles.filter((n) => !haystack.includes(n));
 
@@ -145,15 +184,66 @@ test.describe('style delivery contract', () => {
     const shadow = await selectorsIn(page, 'shadow');
     const overlay = await selectorsIn(page, 'overlay');
 
-    expect(missingFrom(doc, CHROME_PORTABLE), 'chrome-portable.scss selectors missing from the document (main.tsx import)').toEqual([]);
-    expect(missingFrom(shadow, CHROME_PORTABLE), 'chrome-portable.scss selectors missing from the shadow root (shadowStyles.ts entry)').toEqual([]);
-    expect(missingFrom(overlay, CHROME_PORTABLE), 'chrome-portable.scss selectors missing from the overlay root, which is the tree the drawer now paints in').toEqual([]);
+    expect(missingFrom(doc, CHROME_PORTABLE), 'chrome-portable.scss selectors missing from the document (main.tsx import, kept for the wp-admin apps)').toEqual([]);
+    expect(missingFrom(shadow, CHROME_PORTABLE), 'chrome-portable.scss selectors missing from the shadow root (appStyles.ts entry)').toEqual([]);
+    expect(missingFrom(overlay, CHROME_PORTABLE), 'chrome-portable.scss selectors missing from the overlay root, which is the tree the drawer paints in').toEqual([]);
 
     expect(missingFrom(shadow, GLOBAL), 'global.scss selectors missing from the shadow root').toEqual([]);
     // What the overlay root bought: global.scss now reaches portaled chrome.
     // Before P77-B this was the defect class behind P76-I-2 and P77-C.
     expect(missingFrom(overlay, GLOBAL), 'global.scss selectors missing from the overlay root').toEqual([]);
     expect(GLOBAL.filter((s) => doc.includes(s)), 'global.scss must not be loaded into the document under a shadow mount').toEqual([]);
+  });
+
+  // P79-B: the acceptance criterion "one parsed sheet per page rather than
+  // one per mount", measured. The gallery root and the overlay root hold the
+  // same CSSStyleSheet object; neither carries a hand-written copy any more;
+  // Chromium has constructable sheets, so the `<style>` fallback is unused.
+  test('shadow mount: the gallery root and the overlay root adopt one shared framework sheet', async ({ page }) => {
+    await installAdminSession(page);
+    await page.goto('/');
+    await openSettingsDrawer(page);
+    const shape = await sheetShape(page);
+    expect(shape.gallery).toEqual({ adopted: expect.any(Number), frameworkSheets: 1, legacyCopies: 0, fallbacks: 0 });
+    expect(shape.overlay).toEqual({ adopted: expect.any(Number), frameworkSheets: 1, legacyCopies: 0, fallbacks: 0 });
+    expect(shape.sharedObject, 'both roots must hold the same parsed sheet').toBe(true);
+    expect(shape.document?.frameworkSheets, 'under a shadow mount the document is not a painted tree').toBe(0);
+
+    // Dockview's sheet was overlay-only until P79-B; one list means it is in
+    // the gallery tree too, where nothing reads it, and still in the overlay.
+    const shadow = await selectorsIn(page, 'shadow');
+    const overlay = await selectorsIn(page, 'overlay');
+    expect(shadow.filter((s) => s.includes('.dv-')).length).toBeGreaterThan(100);
+    expect(overlay.filter((s) => s.includes('.dv-')).length).toBeGreaterThan(100);
+  });
+
+  // P79-B finding: TemplatePickerModal.module.scss was listed as document-only
+  // because the modal used to portal to document.body. Since P77-I it paints
+  // in the overlay root, where that module never arrived: the hover glow on
+  // the template cards was dead in the shipped mount. One list fixes it; this
+  // measures the paint rather than the sheet list.
+  test('shadow mount: a CSS module consumed only by portaled chrome paints in the overlay root', async ({ page }) => {
+    await installAdminSession(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Admin menu' }).click();
+    await page.getByRole('button', { name: 'Admin Panel' }).click();
+    await expect(page.getByRole('tab', { name: 'Campaigns' })).toBeVisible();
+    await page.getByRole('combobox', { name: 'Active space' }).click();
+    await page.getByRole('option', { name: /Main/ }).click();
+    await page.getByRole('button', { name: 'Create new campaign' }).click();
+
+    const dialog = page.getByRole('dialog', { name: /starting point/i });
+    await expect(dialog).toBeVisible();
+    const card = dialog.locator('.mantine-Card-root').first();
+    const painted = await card.evaluate((el) => ({
+      inOverlay: el.getRootNode() === document.querySelector('[data-mullion-overlay-root]')?.shadowRoot,
+      moduleClass: /card/.test(el.className),
+      transitionProperty: getComputedStyle(el).transitionProperty,
+    }));
+    expect(painted.inOverlay, 'the picker must render inside the overlay root').toBe(true);
+    expect(painted.moduleClass, 'the card must carry the module class').toBe(true);
+    expect(painted.transitionProperty, 'the module rule must paint: transition from TemplatePickerModal.module.scss').toContain('box-shadow');
+    expect(painted.transitionProperty).toContain('transform');
   });
 
   // P77-C: the rules moved out of global.scss must not only be present in the
@@ -210,6 +300,12 @@ test.describe('style delivery contract', () => {
 
     const doc = await selectorsIn(page, 'document');
     expect(missingFrom(doc, CHROME_PORTABLE)).toEqual([]);
-    expect(missingFrom(doc, GLOBAL), 'global.scss is dynamically imported for light mounts in main.tsx').toEqual([]);
+    expect(missingFrom(doc, GLOBAL), 'global.scss reaches a light-mount document through the adopted framework sheet').toEqual([]);
+
+    // The document is the painted tree under a light mount, so it adopts the
+    // shared sheet exactly once; the Vite-injected document copies remain for
+    // the wp-admin apps until P81-B.
+    const shape = await sheetShape(page);
+    expect(shape.document).toEqual({ adopted: expect.any(Number), frameworkSheets: 1, legacyCopies: 0, fallbacks: 0 });
   });
 });

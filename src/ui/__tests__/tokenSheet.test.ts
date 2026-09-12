@@ -1,5 +1,6 @@
 /**
- * P79-A: the token sheet and its delivery. jsdom 25 has neither
+ * P79-A: the token sheet and its delivery; P79-B adds the reduced-motion
+ * switch. jsdom 25 has neither
  * `adoptedStyleSheets` nor `CSSStyleSheet.prototype.replaceSync`, so the
  * `<style>` fallback is what most of the suite exercises; the constructable
  * path is proved here against a stubbed root so both branches are covered.
@@ -18,13 +19,28 @@ describe('buildTokenSheet', () => {
     expect(css).toContain(`--mullion-color-primary-stroke: ${entry.resolved.primaryStroke};`);
     expect(css).toContain('--mullion-focus-ring-width: 2px;');
     expect(css).toContain('--mullion-color-scheme: light;');
-    expect(css).toMatch(/\[data-mullion-scope="x"\] \{\n {2}color-scheme: light;\n\}$/);
+    expect(css).toMatch(/\[data-mullion-scope="x"\] \{\n {2}color-scheme: light;\n\}\n@media/);
   });
 
   it('keys on :host for a shadow root and on :root for the document', () => {
     const entry = getThemeEntry('default-dark');
     expect(buildTokenSheet(entry, ':host')).toMatch(/^:host \{/);
     expect(buildTokenSheet(entry, ':root')).toMatch(/^:root \{/);
+  });
+
+  // P79-B: motion honours the preference through the duration tokens, on the
+  // same selector, so every reader of a duration token is covered at once.
+  it('zeroes every duration token under prefers-reduced-motion on the same selector', () => {
+    const css = buildTokenSheet(getThemeEntry('default-dark'), '[data-mullion-scope="m"]');
+    const block = /@media \(prefers-reduced-motion: reduce\) \{\n {2}\[data-mullion-scope="m"\] \{\n([\s\S]*?)\n {2}\}\n\}/.exec(css);
+    expect(block, 'the reduced-motion block is keyed on the scope selector').not.toBeNull();
+    const zeroed = block![1]!.split('\n').map((l) => l.trim());
+    expect(zeroed).toEqual([
+      '--mullion-duration-fast: 0ms;',
+      '--mullion-duration-base: 0ms;',
+      '--mullion-duration-slow: 0ms;',
+    ]);
+    expect(css.indexOf('--mullion-duration-fast: 150ms;'), 'the default stays above the override').toBeLessThan(css.indexOf('@media'));
   });
 });
 

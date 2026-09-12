@@ -26,8 +26,10 @@ construction.
 3. **The barrel re-exports; the framework lives in sibling directories.**
    Phase 78 shipped the barrel as re-exports only. Phase 79 adds the first
    code of our own: `provider/` holds `MullionProvider`, the theme registry
-   and the token sheet (P79-A). Interaction code arrives with the framework
-   components in Phase 80, never in the barrel itself.
+   and the token sheet (P79-A); `styles/` holds the style registration list,
+   its delivery and the framework's own sheets (P79-B). Interaction code
+   arrives with the framework components in Phase 80, never in the barrel
+   itself.
 
 ## The provider
 
@@ -50,6 +52,24 @@ Hooks: `useMullionTheme()` (switching API, always the root's),
 (where overlays go). `defineTheme()` registers a theme at runtime and refuses
 one that fails the contrast audits. A static test forbids any
 `[data-*-color-scheme]` ancestor selector under `src/ui`.
+
+## Style delivery
+
+`styles/uiStyles.ts` is the one registration list. `registerUiStyles(id, css)`
+appends a sheet in cascade order (or replaces one by id); the framework
+registers `styles/base.css` at load and the app registers everything it still
+needs in `src/appStyles.ts`. The provider calls `adoptUiStyles(root)` for every
+root it paints, so the list reaches the gallery shadow root, the overlay root
+and a light-mount document by the same mechanism: one `CSSStyleSheet` built
+once per page and adopted everywhere, or a `<style data-mullion-ui-styles>`
+element where the tree has no `adoptedStyleSheets`. Registering after adoption
+rewrites every root at once.
+
+A framework sheet is any `.css` or `.scss` under `src/ui/` outside tests. Three
+static tests hold each one to no colour literal, no `!important` and no
+ancestor scheme selector, reported by file and line. Component sheets write
+into `@layer mullion.components`, declared in `base.css`, so consumer CSS wins
+over them without specificity games.
 
 ## The allow-list
 

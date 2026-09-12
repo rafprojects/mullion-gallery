@@ -155,3 +155,16 @@ export {
   type MullionThemeEntry,
 } from './provider/registry';
 export { buildTokenSheet } from './provider/tokenSheet';
+
+// ── Framework: style delivery (P79-B) ──────────────────────────────────────
+// One registration list, adopted by the provider into every tree it paints.
+// The app registers the sheets it still needs in src/appStyles.ts.
+export {
+  adoptUiStyles,
+  hasAdoptedUiStyles,
+  listUiStyles,
+  registerUiStyles,
+  uiStylesText,
+  UI_STYLES_ATTR,
+  type UiStyleSheetOptions,
+} from './styles/uiStyles';

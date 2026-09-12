@@ -7,8 +7,9 @@
  * `AdminChromeProvider`, `adminChromeStyles()` and the `--mullion-builder-*`
  * bridge. The rule that makes it work is simple: every element the provider
  * paints, inline children and portaled overlays alike, sits under an element
- * carrying this provider's tokens, and those tokens arrive by stylesheet in
- * whichever tree that element is in. Nothing travels inline.
+ * carrying this provider's tokens, and both the tokens and the component
+ * sheet (P79-B, `../styles/uiStyles.ts`) arrive by stylesheet in whichever
+ * tree that element is in. Nothing travels inline.
  *
  * Nested providers merge scope, never theme objects. A nested provider under
  * `mode="lock"` paints the brand palette (or its own `theme`) and under
@@ -53,6 +54,7 @@ import {
 import { readStoredThemeId, storageKeyFor, writeStoredThemeId } from './persistence';
 import { PORTAL_ATTR, SCOPE_ATTR, createScopeId, isShadowRoot, scopeSelector } from './scope';
 import { attachSheet, buildTokenSheet, sheetRootOf, type SheetHandle, type SheetRoot } from './tokenSheet';
+import { adoptUiStyles } from '../styles/uiStyles';
 
 export type MullionScope = HTMLElement | ShadowRoot | 'document';
 export type MullionMode = 'lock' | 'follow';
@@ -207,8 +209,12 @@ export function MullionProvider({
     return () => scope.removeAttribute(SCOPE_ATTR);
   }, [scope, scopeId]);
 
-  // ── The token sheet, written into every tree this provider paints ──
+  // ── The sheets, written into every tree this provider paints ──
+  // The component sheet (P79-B) is one list shared by every root on the page;
+  // the token sheet is built per scope. Both go wherever the scope and the
+  // portal container live, so nothing the provider paints is left unstyled.
   const handlesRef = useRef<SheetHandle[]>([]);
+  const adoptedRef = useRef<Map<SheetRoot, () => void>>(new Map());
   useLayoutEffect(() => {
     const targets: Array<{ root: SheetRoot; selector: string }> = [];
     const add = (root: SheetRoot | null, sel: string) => {
@@ -219,6 +225,17 @@ export function MullionProvider({
     else if (scope) add(sheetRootOf(scope), selector);
     else if (wrapperRef.current) add(sheetRootOf(wrapperRef.current), selector);
     if (container) add(sheetRootOf(container), scopeSelector(scopeId));
+
+    const roots = new Set(targets.map((t) => t.root));
+    for (const root of roots) {
+      if (!adoptedRef.current.has(root)) adoptedRef.current.set(root, adoptUiStyles(root));
+    }
+    for (const [root, release] of adoptedRef.current) {
+      if (!roots.has(root)) {
+        release();
+        adoptedRef.current.delete(root);
+      }
+    }
 
     const cssBySelector = new Map<string, string>();
     const cssFor = (sel: string) => {
@@ -250,6 +267,8 @@ export function MullionProvider({
     () => () => {
       for (const h of handlesRef.current) h.remove();
       handlesRef.current = [];
+      for (const release of adoptedRef.current.values()) release();
+      adoptedRef.current.clear();
     },
     [],
   );

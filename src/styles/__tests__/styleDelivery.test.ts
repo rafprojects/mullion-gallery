@@ -11,10 +11,12 @@
  *     is not scoped under `.mullion-gallery` is either dead for portaled
  *     chrome or a leak into the host page, so every selector must carry that
  *     ancestor. P77-C moved the last unscoped rules to chrome-portable.scss.
- *  2. Every CSS module must be registered in `shadowStyles.ts` unless its
- *     consumer provably renders outside the shadow tree (portaled chrome).
- *     Vite injects module CSS into the document only; a module consumed inside
- *     the shadow tree and not registered is silently dead there.
+ *  2. Every CSS module must be registered in `src/appStyles.ts`, the app's
+ *     entries in the framework's one style list (P79-B). Vite injects module
+ *     CSS into the document only; a module not on the list is silently dead
+ *     in the gallery shadow root and in the overlay root. The document-only
+ *     exemption P77-A carried is gone: since P77-I portaled chrome paints in
+ *     the overlay root, so the one module it exempted was dead there too.
  *  3. Mantine's `styles` prop is inline style. Nested keys such as `'&:hover'`
  *     are dropped by the DOM without error (P76-I-1), so no component-level
  *     `styles={...}` may carry one. This extends the adapter-level guard in
@@ -87,48 +89,33 @@ describe('global.scss reaches only the gallery tree', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 2. CSS modules are registered for the shadow root unless document-only
+// 2. CSS modules are on the one style list
 // ---------------------------------------------------------------------------
 
-/**
- * Modules whose only consumers render outside the shadow tree. Keyed by path
- * relative to src/, value is the consumer that justifies it. A module listed
- * here that later gains a consumer inside the gallery tree becomes dead there
- * without any test noticing, so keep the justification specific.
- */
-const DOCUMENT_ONLY_MODULES: Record<string, string> = {
-  'components/Admin/TemplatePickerModal.module.scss':
-    'TemplatePickerModal is a Mantine Modal (withinPortal default), so its cards render under document.body',
-};
-
-describe('CSS modules are delivered to the tree that consumes them', () => {
+describe('CSS modules are registered on the style list', () => {
   const modules = walk(SRC)
     .filter((f) => f.endsWith('.module.scss'))
     .map((f) => path.relative(SRC, f).split(path.sep).join('/'))
     .sort();
-  const shadowStylesSource = readFileSync(path.join(SRC, 'shadowStyles.ts'), 'utf8');
-  const registered = (rel: string) => shadowStylesSource.includes(`'./${rel}?inline'`);
+  const appStylesSource = readFileSync(path.join(SRC, 'appStyles.ts'), 'utf8');
+  const registered = (rel: string) => appStylesSource.includes(`'./${rel}?inline'`);
 
   it('finds the module files', () => {
     expect(modules.length).toBeGreaterThan(3);
   });
 
-  it('registers every module in shadowStyles.ts unless it is document-only', () => {
-    const unaccounted = modules.filter((m) => !registered(m) && !(m in DOCUMENT_ONLY_MODULES));
+  it('registers every module in appStyles.ts', () => {
+    const unregistered = modules.filter((m) => !registered(m));
     expect(
-      unaccounted,
-      'a CSS module not concatenated into shadowStyles.ts never reaches the shadow tree; register it, or list it in DOCUMENT_ONLY_MODULES with the consumer that justifies it',
+      unregistered,
+      'a CSS module not registered in src/appStyles.ts reaches only the document, never the gallery shadow root or the overlay root',
     ).toEqual([]);
   });
 
-  it('does not list a registered module as document-only', () => {
-    const contradictions = Object.keys(DOCUMENT_ONLY_MODULES).filter(registered);
-    expect(contradictions).toEqual([]);
-  });
-
-  it('keeps the allowlist pointing at files that exist', () => {
-    const missing = Object.keys(DOCUMENT_ONLY_MODULES).filter((m) => !modules.includes(m));
-    expect(missing).toEqual([]);
+  it('registers no module that does not exist', () => {
+    const referenced = Array.from(appStylesSource.matchAll(/'\.\/([^']+\.module\.scss)\?inline'/g), (m) => m[1]!);
+    expect(referenced.length).toBeGreaterThan(3);
+    expect(referenced.filter((m) => !modules.includes(m))).toEqual([]);
   });
 });
 

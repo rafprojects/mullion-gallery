@@ -141,6 +141,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    // P79-B: vitest hands back an empty string for CSS it does not process.
+    // The framework's own sheets are imported `?inline` and asserted on, so
+    // they are processed; everything else stays off for speed.
+    css: { include: [/src\/ui\/styles\/.*\.s?css/] },
     include: ['src/**/*.test.{ts,tsx}', 'packages/**/*.test.{ts,tsx}'],
     exclude: ['e2e/**', 'node_modules/**'],
     testTimeout: 60000,

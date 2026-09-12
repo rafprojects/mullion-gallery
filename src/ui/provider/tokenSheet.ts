@@ -1,5 +1,5 @@
 /**
- * The token sheet and how it reaches a tree (P79-A).
+ * The token sheet (P79-A, P79-B).
  *
  * `buildTokenSheet` turns a registry entry into one CSS rule block for a scope
  * selector: every `--mullion-*` custom property the engine emits plus the
@@ -7,78 +7,35 @@
  * the scope, never an ancestor attribute (study principle 4), which is what
  * makes the P76-D/H class of defect impossible for a portaled subtree.
  *
- * `attachSheet` writes CSS into a document or shadow root, preferring a
- * constructable stylesheet where the tree supports `adoptedStyleSheets` and
- * falling back to a `<style>` element. P79-B generalises this to the
- * component sheets; the token sheet is per scope and small.
+ * P79-B adds the one motion switch the study asks for: under
+ * `prefers-reduced-motion: reduce` the scope's duration tokens become zero,
+ * so every component honours the preference by reading the token it already
+ * reads. Delivery lives in `../styles/sheets.ts`; the token sheet is per
+ * scope and small, the component sheet is per page (`../styles/uiStyles.ts`).
  */
 
-import { generateCssVariables } from '@mullion/theme-engine';
+import { frameworkConstants, generateCssVariables } from '@mullion/theme-engine';
 import type { MullionThemeEntry } from './registry';
+import { attachSheet as attachAny, type SheetHandle, type SheetRoot } from '../styles/sheets';
 
-export type SheetRoot = Document | ShadowRoot;
-
-export interface SheetHandle {
-  readonly root: SheetRoot;
-  readonly selector: string;
-  update(css: string): void;
-  remove(): void;
-}
+export { sheetRootOf, type SheetHandle, type SheetRoot } from '../styles/sheets';
 
 /** Data attribute carried by the `<style>` fallback so a tree can be inspected. */
 export const TOKEN_SHEET_ATTR = 'data-mullion-tokens';
 
+const PREFIX = '--mullion';
+const DURATION_TOKENS = Object.keys(frameworkConstants(PREFIX)).filter((name) => name.startsWith('duration-'));
+
 export function buildTokenSheet(entry: MullionThemeEntry, selector: string): string {
   const vars = generateCssVariables(entry.resolved, entry.definition, selector);
-  return `${vars}\n${selector} {\n  color-scheme: ${entry.colorScheme};\n}`;
-}
-
-function supportsAdoptedSheets(root: SheetRoot): boolean {
-  return (
-    'adoptedStyleSheets' in root
-    && typeof CSSStyleSheet !== 'undefined'
-    && typeof CSSStyleSheet.prototype.replaceSync === 'function'
-  );
+  const zeroed = DURATION_TOKENS.map((name) => `    ${PREFIX}-${name}: 0ms;`).join('\n');
+  return [
+    vars,
+    `${selector} {\n  color-scheme: ${entry.colorScheme};\n}`,
+    `@media (prefers-reduced-motion: reduce) {\n  ${selector} {\n${zeroed}\n  }\n}`,
+  ].join('\n');
 }
 
 export function attachSheet(root: SheetRoot, key: string, selector: string, css: string): SheetHandle {
-  if (supportsAdoptedSheets(root)) {
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync(css);
-    root.adoptedStyleSheets = [...root.adoptedStyleSheets, sheet];
-    return {
-      root,
-      selector,
-      update: (next) => sheet.replaceSync(next),
-      remove: () => {
-        root.adoptedStyleSheets = root.adoptedStyleSheets.filter((s) => s !== sheet);
-      },
-    };
-  }
-
-  const doc = root instanceof Document ? root : root.ownerDocument;
-  const style = doc.createElement('style');
-  style.setAttribute(TOKEN_SHEET_ATTR, key);
-  style.textContent = css;
-  (root instanceof Document ? root.head : root).appendChild(style);
-  return {
-    root,
-    selector,
-    update: (next) => {
-      if (style.textContent !== next) style.textContent = next;
-    },
-    remove: () => style.remove(),
-  };
-}
-
-/**
- * The root a node's sheet must live in, or null while the node is detached.
- * A detached element's root node is the element itself, which cannot hold a
- * stylesheet, so callers wait for attachment instead of writing into it.
- */
-export function sheetRootOf(node: Node): SheetRoot | null {
-  const root = node.getRootNode();
-  if (root instanceof Document) return root;
-  if (typeof ShadowRoot !== 'undefined' && root instanceof ShadowRoot) return root;
-  return null;
+  return attachAny(root, TOKEN_SHEET_ATTR, key, selector, css);
 }

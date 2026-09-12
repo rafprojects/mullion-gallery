@@ -19,9 +19,10 @@
  * - `overlay-root`: overlays render in a second shadow root of ours, attached
  *   to a host appended to `document.body`. It escapes the host page's
  *   stacking context like `document` does and is isolated from host CSS like
- *   `shadow` is; the price is a copy of the shadow stylesheet (plus the
- *   builder's document-only sheets) and the theme
- *   variables, which this module keeps in sync.
+ *   `shadow` is. Since P79-B the component sheet and the `--mullion-*` tokens
+ *   reach it through `MullionProvider`, which adopts the framework's shared
+ *   sheet into whichever tree the portal target lives in; this module keeps
+ *   only Mantine's own variables in sync, until Phase 81 removes them.
  *
  * Light mounts (`?shadow=0`, the wp-admin pages) always use `document`.
  */
@@ -33,7 +34,6 @@ import {
   type MantineTheme,
   type MantineThemeOverride,
 } from '@mantine/core';
-import { overlayStyles } from './shadowStyles';
 
 export type PortalMode = 'document' | 'shadow' | 'overlay-root';
 
@@ -58,9 +58,9 @@ export interface PortalTarget {
   /** The element Mantine portals into. Null means Mantine's default. */
   target: HTMLElement | null;
   /**
-   * Present in `overlay-root` mode only. The `--mullion-*` token sheet is no
-   * longer mirrored here: `MullionProvider` (P79-A) writes it into whichever
-   * tree `target` is in, keyed on the target's `data-mullion-scope`.
+   * Present in `overlay-root` mode only. Neither the `--mullion-*` token
+   * sheet (P79-A) nor the component sheet (P79-B) is written here:
+   * `MullionProvider` delivers both into whichever tree `target` is in.
    */
   overlay?: {
     host: HTMLElement;
@@ -82,13 +82,10 @@ function createPortalTarget(mode: PortalMode, rootId: string, shadowRootEl?: Sha
     const host = document.createElement('div');
     host.setAttribute('data-mullion-overlay-root', rootId);
     const shadow = host.attachShadow({ mode: 'open' });
-    const base = document.createElement('style');
-    base.setAttribute('data-mullion', 'true');
-    base.textContent = overlayStyles;
     const mantineVars = document.createElement('style');
     mantineVars.setAttribute('data-mantine-styles', 'variables');
     const target = createTarget(rootId);
-    shadow.append(base, mantineVars, target);
+    shadow.append(mantineVars, target);
     return { mode, target, overlay: { host, mantineVars } };
   }
   return { mode: 'document', target: null };
