@@ -168,3 +168,15 @@ export {
   UI_STYLES_ATTR,
   type UiStyleSheetOptions,
 } from './styles/uiStyles';
+
+// ── Framework: the layer scale (P79-C) ─────────────────────────────────────
+// Chrome reads a step by name rather than writing a z-index, which is the one
+// form the host offset can reach. See src/ui/styles/layers.ts.
+export { uiLayer, type UiLayer } from './styles/layers';
+
+// The presentational components (P79-C) live in `./components` and are
+// deliberately not re-exported here yet: this list is the migration ledger,
+// and moving `Text` onto the framework here would move all 92 files that
+// import it in one commit. Phase 81 flips them, name by name, with the
+// consumers. Until then Storybook, the unit suite and the e2e showcase import
+// `@/ui/components` directly.

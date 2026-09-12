@@ -86,8 +86,26 @@ function offendersOf(files: string[], pattern: RegExp): string[] {
 describe('framework component sheets', () => {
   const files = walk(UI_DIR);
 
-  it('scans at least the base sheet', () => {
-    expect(files.map((f) => path.relative(UI_DIR, f))).toContain(path.join('styles', 'base.css'));
+  // A guard that scans nothing passes every rule below it, so the scan's own
+  // reach is pinned: P79-C added seven component sheets and the focus rule
+  // under `components/` and `styles/`, and all of them must be in the walk.
+  it('scans every framework sheet, not just the ones it was written against', () => {
+    const scanned = files.map((f) => path.relative(UI_DIR, f));
+    expect(scanned).toContain(path.join('styles', 'base.css'));
+    expect(scanned).toContain(path.join('styles', 'focus.css'));
+    for (const family of [
+      'layout',
+      'surface',
+      'typography',
+      'control',
+      'feedback',
+      'display',
+      'utility',
+    ]) {
+      expect(scanned, `${family}.css is not being scanned`).toContain(
+        path.join('components', `${family}.css`),
+      );
+    }
   });
 
   it('contain no colour literal', () => {

@@ -1,0 +1,42 @@
+/*
+ * The focus ring (P79-C, study 3.4). One rule, four selectors, all keyed on
+ * the `data-mullion-focus` attribute that every framework control stamps
+ * through `ControlBase`.
+ *
+ * This replaces the shape of `src/styles/chrome-portable.scss`'s ring block,
+ * which is a list of Mantine class selectors and was twice found incomplete:
+ * the Switch track and the SegmentedControl label each drew a ring the list
+ * did not reach. A list of vendor classes can miss a component; an attribute
+ * the component sets itself cannot.
+ *
+ * Geometry is the P78-C framework tier, so no theme can make the ring thin
+ * enough to disappear. Both colours are tokens: a 2px core in the
+ * contrast-selected `primary-stroke` (P75-E) inside a 6px halo of the theme's
+ * own neutral, which is what makes the pair legible on a filled control and on
+ * a bare surface alike (P77-F).
+ */
+@layer mullion.components {
+  /*
+   * `sibling` is for a control whose visible box is the next element: the
+   * chip's clipped checkbox. `[data-focus-visible]` is the attribute form
+   * Base UI sets on its own parts, so Phase 80's components land under this
+   * rule without changing it.
+   */
+  [data-mullion-focus='']:focus-visible,
+  [data-mullion-focus=''][data-focus-visible],
+  [data-mullion-focus='sibling']:focus-visible + *,
+  [data-mullion-focus='sibling'][data-focus-visible] + * {
+    outline: var(--mullion-focus-ring-width) solid var(--mullion-color-primary-stroke);
+    outline-offset: var(--mullion-focus-ring-offset);
+    box-shadow: 0 0 0 var(--mullion-focus-halo-width) var(--mullion-color-focus-halo);
+  }
+
+  /*
+   * The clipped input must not paint a ring of its own. It has no box worth
+   * ringing and its sibling carries one, so a second outline would show as a
+   * 2px smudge at the label's leading edge.
+   */
+  [data-mullion-focus='sibling']:focus-visible {
+    outline: none;
+  }
+}

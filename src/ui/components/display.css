@@ -1,0 +1,111 @@
+/*
+ * Display (P79-C). The table's spacing is a data attribute because ten call
+ * sites already spell `verticalSpacing="sm"`, and its striping and hover read
+ * the `--mullion-table-hover-bg` component token P78-C lifted from the
+ * adapter, so a migrated table looks like the one beside it.
+ */
+@layer mullion.components {
+  .mullion-image {
+    display: block;
+    inline-size: var(--mullion-image-width, 100%);
+    block-size: var(--mullion-image-height, auto);
+    border-radius: var(--mullion-radius, 0);
+    object-fit: var(--mullion-image-fit, cover);
+  }
+
+  .mullion-color-swatch {
+    display: inline-flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--mullion-swatch-size, 24px);
+    block-size: var(--mullion-swatch-size, 24px);
+    border: 1px solid var(--mullion-color-border);
+    border-radius: var(--mullion-radius, 50%);
+    /* The only colour in the framework that comes from a prop: the swatch's
+       job is to show one the user picked, so it arrives inline on the element
+       rather than being a decision this sheet could make. */
+    background-color: var(--mullion-swatch-color, transparent);
+  }
+
+  .mullion-table-scroll {
+    overflow-x: auto;
+    inline-size: 100%;
+  }
+
+  .mullion-table-scroll-inner {
+    min-inline-size: var(--mullion-table-min-width, auto);
+  }
+
+  .mullion-table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    color: var(--mullion-color-text);
+    font-family: var(--mullion-font-family);
+    font-size: var(--mullion-font-size-sm);
+  }
+
+  .mullion-table[data-with-border] {
+    border: 1px solid var(--mullion-color-border);
+  }
+
+  .mullion-table-th,
+  .mullion-table-td {
+    padding-block: var(--mullion-table-spacing, var(--mullion-spacing-sm));
+    padding-inline: var(--mullion-spacing-sm);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  .mullion-table[data-spacing='xs'] {
+    --mullion-table-spacing: var(--mullion-spacing-xs);
+  }
+
+  .mullion-table[data-spacing='sm'] {
+    --mullion-table-spacing: var(--mullion-spacing-sm);
+  }
+
+  .mullion-table[data-spacing='md'] {
+    --mullion-table-spacing: var(--mullion-spacing-md);
+  }
+
+  .mullion-table[data-spacing='lg'] {
+    --mullion-table-spacing: var(--mullion-spacing-lg);
+  }
+
+  .mullion-table[data-spacing='xl'] {
+    --mullion-table-spacing: var(--mullion-spacing-xl);
+  }
+
+  .mullion-table-th {
+    color: var(--mullion-color-text-muted);
+    font-weight: 600;
+  }
+
+  .mullion-table-thead .mullion-table-tr {
+    border-block-end: 1px solid var(--mullion-color-border);
+  }
+
+  .mullion-table-tbody .mullion-table-tr + .mullion-table-tr {
+    border-block-start: 1px solid var(--mullion-color-border);
+  }
+
+  .mullion-table[data-column-borders] .mullion-table-th + .mullion-table-th,
+  .mullion-table[data-column-borders] .mullion-table-td + .mullion-table-td {
+    border-inline-start: 1px solid var(--mullion-color-border);
+  }
+
+  .mullion-table[data-striped] .mullion-table-tbody .mullion-table-tr:nth-of-type(odd) {
+    background-color: var(--mullion-color-surface2);
+  }
+
+  .mullion-table[data-hover] .mullion-table-tbody .mullion-table-tr:hover {
+    background-color: var(--mullion-table-hover-bg);
+  }
+
+  .mullion-table-caption {
+    padding-block: var(--mullion-spacing-xs);
+    color: var(--mullion-color-text-muted);
+    font-size: var(--mullion-font-size-xs);
+  }
+}

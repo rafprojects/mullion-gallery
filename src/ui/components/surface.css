@@ -1,0 +1,99 @@
+/*
+ * Surfaces (P79-C). The ladder is the theme's: `surface` for a panel and
+ * `surface-raised` for a panel over one. A component never names a grey, so a
+ * light theme and a dark theme render the same markup without a second rule.
+ */
+@layer mullion.components {
+  .mullion-paper,
+  .mullion-card {
+    padding-block: var(--mullion-pad-block, var(--mullion-pad, 0));
+    padding-inline: var(--mullion-pad-inline, var(--mullion-pad, 0));
+    border-radius: var(--mullion-radius, var(--mullion-radius-md));
+    background-color: var(--mullion-surface, var(--mullion-color-surface));
+    box-shadow: var(--mullion-shadow, none);
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-paper[data-raised],
+  .mullion-card[data-raised] {
+    --mullion-surface: var(--mullion-color-surface-raised);
+  }
+
+  .mullion-paper[data-with-border],
+  .mullion-card[data-with-border] {
+    border: 1px solid var(--mullion-color-border);
+  }
+
+  .mullion-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /*
+   * A section bleeds to the card's edges. The inset is the card's own padding
+   * custom property rather than a repeated length, so a card with unusual
+   * padding keeps its sections aligned.
+   */
+  .mullion-card-section {
+    margin-inline: calc(-1 * var(--mullion-pad-inline, var(--mullion-pad, 0)));
+    padding-block: var(--mullion-pad-block, var(--mullion-pad, 0));
+    padding-inline: var(--mullion-pad-inline, var(--mullion-pad, 0));
+  }
+
+  .mullion-card-section:first-child {
+    margin-block-start: calc(-1 * var(--mullion-pad-block, var(--mullion-pad, 0)));
+  }
+
+  .mullion-card-section:last-child {
+    margin-block-end: calc(-1 * var(--mullion-pad-block, var(--mullion-pad, 0)));
+  }
+
+  .mullion-card-section[data-with-border] {
+    border-block-end: 1px solid var(--mullion-color-border);
+  }
+
+  .mullion-divider {
+    border: 0;
+  }
+
+  .mullion-divider[data-orientation='horizontal'] {
+    display: flex;
+    align-items: center;
+    gap: var(--mullion-spacing-sm);
+    inline-size: 100%;
+    color: var(--mullion-color-text-muted);
+    font-size: var(--mullion-font-size-xs);
+  }
+
+  /*
+   * The rule itself is drawn by two pseudo-elements so a label can sit between
+   * them. With no label the second one carries the whole width, which is why
+   * an unlabelled divider needs no separate rule.
+   */
+  .mullion-divider[data-orientation='horizontal']::before,
+  .mullion-divider[data-orientation='horizontal']::after {
+    content: '';
+    flex: 1 1 auto;
+    border-block-start: 1px solid var(--mullion-color-border);
+  }
+
+  .mullion-divider[data-label-position='left']::before {
+    flex: 0 0 var(--mullion-spacing-md);
+  }
+
+  .mullion-divider[data-label-position='right']::after {
+    flex: 0 0 var(--mullion-spacing-md);
+  }
+
+  .mullion-divider[data-orientation='vertical'] {
+    align-self: stretch;
+    inline-size: 0;
+    min-block-size: 100%;
+    border-inline-start: 1px solid var(--mullion-color-border);
+  }
+
+  .mullion-divider-label {
+    flex: 0 0 auto;
+  }
+}

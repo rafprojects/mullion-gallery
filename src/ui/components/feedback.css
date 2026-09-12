@@ -1,0 +1,164 @@
+/*
+ * Feedback (P79-C). Three surface variants, shared by `Alert` and `Badge`:
+ * `filled` paints the tone, `light` paints a wash of it, `outline` draws it as
+ * a border. The wash is `color-mix` against the theme's own surface rather
+ * than a second token per tone, so a theme supplies seven colours and gets
+ * twenty-one treatments.
+ */
+@layer mullion.components {
+  .mullion-alert {
+    display: flex;
+    gap: var(--mullion-spacing-sm);
+    padding-block: var(--mullion-pad-block, var(--mullion-pad, var(--mullion-spacing-sm)));
+    padding-inline: var(--mullion-pad-inline, var(--mullion-pad, var(--mullion-spacing-md)));
+    border-radius: var(--mullion-radius-md);
+    font-size: var(--mullion-font-size-sm);
+  }
+
+  .mullion-alert[data-variant='light'] {
+    background-color: var(--mullion-tone-wash);
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-alert[data-variant='outline'] {
+    border: 1px solid var(--mullion-tone);
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-alert[data-variant='filled'] {
+    background-color: var(--mullion-tone-fill);
+    color: var(--mullion-tone-on);
+  }
+
+  .mullion-alert-icon {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    color: var(--mullion-tone);
+  }
+
+  .mullion-alert[data-variant='filled'] .mullion-alert-icon {
+    color: inherit;
+  }
+
+  .mullion-alert-body {
+    min-width: 0;
+  }
+
+  .mullion-alert-title {
+    font-weight: 600;
+  }
+
+  .mullion-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    border-radius: var(--mullion-radius, var(--mullion-radius-xl));
+    font-family: var(--mullion-font-family);
+    font-weight: 600;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .mullion-badge[data-size='xs'] {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.625rem;
+  }
+
+  .mullion-badge[data-size='sm'] {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.6875rem;
+  }
+
+  .mullion-badge[data-size='md'] {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+  }
+
+  .mullion-badge[data-size='lg'] {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8125rem;
+  }
+
+  .mullion-badge[data-size='xl'] {
+    padding: 0.55rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  /* Tint the ground or colour the ink, never both: see control.css. */
+  .mullion-badge[data-variant='light'] {
+    background-color: var(--mullion-tone-wash);
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-badge[data-variant='outline'] {
+    border: 1px solid var(--mullion-tone);
+    color: var(--mullion-tone);
+  }
+
+  .mullion-badge[data-variant='filled'] {
+    background-color: var(--mullion-tone-fill);
+    color: var(--mullion-tone-on);
+  }
+
+  .mullion-loader {
+    display: inline-block;
+    box-sizing: border-box;
+    inline-size: var(--mullion-loader-size, 1.5rem);
+    block-size: var(--mullion-loader-size, 1.5rem);
+    border: 2px solid color-mix(in srgb, var(--mullion-tone, var(--mullion-color-primary-stroke)) 25%, transparent);
+    border-block-start-color: var(--mullion-tone, var(--mullion-color-primary-stroke));
+    border-radius: 50%;
+    /* The duration token is zeroed by the token sheet under
+       `prefers-reduced-motion: reduce`, and a zero-duration animation does not
+       run, so the spinner stops without a second rule here (P79-B). */
+    animation: mullion-spin calc(var(--mullion-duration-slow) * 3) linear infinite;
+  }
+
+  .mullion-loader[data-size='xs'] {
+    --mullion-loader-size: 1rem;
+  }
+
+  .mullion-loader[data-size='sm'] {
+    --mullion-loader-size: 1.25rem;
+  }
+
+  .mullion-loader[data-size='md'] {
+    --mullion-loader-size: 1.5rem;
+  }
+
+  .mullion-loader[data-size='lg'] {
+    --mullion-loader-size: 2rem;
+  }
+
+  .mullion-loader[data-size='xl'] {
+    --mullion-loader-size: 2.5rem;
+  }
+
+  .mullion-skeleton {
+    inline-size: var(--mullion-skeleton-width, 100%);
+    block-size: var(--mullion-skeleton-height, 1rem);
+    border-radius: var(--mullion-radius, var(--mullion-radius-sm));
+    background-color: var(--mullion-color-surface2);
+    animation: mullion-pulse calc(var(--mullion-duration-slow) * 4) ease-in-out infinite;
+  }
+
+  .mullion-skeleton[data-circle] {
+    --mullion-skeleton-height: var(--mullion-skeleton-width, 1rem);
+    border-radius: 50%;
+  }
+
+  @keyframes mullion-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes mullion-pulse {
+    50% {
+      opacity: 0.45;
+    }
+  }
+}

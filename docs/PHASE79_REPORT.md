@@ -1,8 +1,8 @@
 # Phase 79 - Framework core and theme manager
 
-**Status:** In progress (P79-A and P79-B landed)
+**Status:** In progress (P79-A, P79-B and P79-C landed)
 **Created:** 2026-09-10
-**Last updated:** 2026-09-12 (P79-B landed)
+**Last updated:** 2026-09-12 (P79-C landed)
 
 ### Tracks
 
@@ -10,7 +10,7 @@
 |-------|-------------|--------|--------|
 | P79-A | `MullionProvider`: scope, portal container, lock and follow mode, persistence, runtime theme registration | **Done** (2026-09-12), see notes | Medium-Large |
 | P79-B | Style delivery and the token sheet: one registration list written into every tree the plugin owns | **Done** (2026-09-12), see notes | Medium |
-| P79-C | Layout and typography primitives, and the single focus rule | Planned | Medium |
+| P79-C | Layout and typography primitives, and the single focus rule | **Done** (2026-09-12), see notes | Medium |
 | P79-D | Theme manager merge: registry, catalogue, selector, scoping, lock and follow | Planned | Medium |
 
 ---
@@ -165,7 +165,7 @@ Move them into the framework as provider surface, keeping the behaviour the plug
 | Components with interaction behaviour | Phase 80. This phase deliberately ships nothing that handles a keypress. |
 | Deleting `AdminChromeProvider`, `chromeTheme.ts`, `ThemeContext` | Phase 81. They keep serving Mantine components until those are gone. |
 | A user-facing theme editor UI | Key Decision E. The API lands here; the product feature is unscheduled. |
-| Host-safe layer wired from PHP so the admin bar stops covering the drawer | The token ships in P78-C and the framework reads it here. Wiring the PHP side is a small follow-on, and it closes a FUTURE_TASKS accessibility entry. |
+| ~~Host-safe layer wired from PHP so the admin bar stops covering the drawer~~ | **Done in P79-C**, not deferred. This row and the P79-C acceptance criterion disagreed about whether the PHP side belonged here; the criterion won, because the FUTURE_TASKS entry cannot close until the drawer actually clears the bar. The drawer reads `uiLayer('modal')` and the embed raises `--mullion-layer-host-offset` when the admin bar is showing. |
 
 ## Implementation Notes
 
@@ -310,6 +310,98 @@ Move them into the framework as provider surface, keeping the behaviour the plug
 | Validation: `e2e/style-delivery.spec.ts` extended, both mount modes | Two new shadow-mount tests and the light-mount test extended; every reader of a tree's sheets now includes `adoptedStyleSheets` |
 | Validation: a colour literal in a component sheet fails the static test by file and line | mutation M1 |
 
+### P79-C (2026-09-12)
+
+**Status: landed.** The presentational set is [`src/ui/components/`](../src/ui/components/): thirty components in seven family modules, a sheet each, plus `element.tsx` (the `render` escape hatch and the focus attribute) and `scale.ts` (prop values to token references). The focus ring is one rule in [`src/ui/styles/focus.css`](../src/ui/styles/focus.css). The layer scale gained a reader, [`uiLayer()`](../src/ui/styles/layers.ts), and with it the WordPress admin bar stops covering the Settings drawer header. The theme engine emits the type scale it had been carrying and never publishing. One unit suite, six Storybook stories, one e2e spec and three PHP tests cover the track; the FUTURE_TASKS entry is deleted.
+
+**What a framework component does, in one rule.** It reads tokens and nothing else. Colour arrives as a `data-mullion-tone` attribute the sheet resolves to a token, so no component's TSX contains a colour. Per-instance geometry arrives as an inline custom property, so the value travels with the element into whatever tree it is portaled to. Sizes and variants are data attributes, so a rule never enumerates a combination. And the focus ring is one rule keyed on one attribute that every focusable stamps through a shared base, so it cannot miss a component built on it.
+
+**What the measurement changed about the plan.**
+
+| Plan said | Built |
+|-----------|-------|
+| "Build the presentational set listed in the study's section 4" | All thirty, in seven family modules with one sheet each rather than one file each. A `.mullion-stack` and a `.mullion-group` differ by two declarations and share the padding idiom; thirty files would have put one rule in each of seven of them. |
+| Layout primitives take `gap`, `align`, `justify`, `wrap`, `padding` | Those five plus `paddingBlock` and `paddingInline`. Measured at the call sites: the axis form outnumbers the all-sides one (`py` 26 times on `Center`, 11 on `Text`, 7 on `Container`, against 6 `p` on `Stack`), so a single `padding` prop would have sent every one of them to `className`. |
+| "renders as inline custom properties ... which travel with it into any tree" | As planned. A scale step resolves to the theme's token, a number to pixels, any other string passes through: the same reading Mantine gives `gap`, `p` and `radius` today, so Phase 81's codemod does not have to re-measure a call site to know what it meant. |
+| "Mantine's full style-prop surface is deliberately not reproduced" | Held: `m`, `w`, `h`, `pos`, `c`, `fw`, `fz` and the responsive object form are all absent. `Text` is the exception the study allows for, and its props are the ones its 418 call sites actually spell. `c="dimmed"`, 233 of the 253 colour props on `Text`, becomes `tone="muted"`. |
+| "One focus rule on `[data-focus-visible]`" | One rule, four selectors, every one keyed on `data-mullion-focus`, which `ControlBase` stamps. `[data-focus-visible]` is in the list so Phase 80's Base UI parts land under it unchanged. The attribute is the whole point: `chrome-portable.scss` spells the same ring as a list of Mantine class selectors and that list was found incomplete twice, at the Switch track and the SegmentedControl label. |
+| "geometry values from the framework constants P78-C added" | As planned. The e2e reads `--mullion-color-primary-stroke` and `--mullion-color-focus-halo` off the ringed element and compares the paint to them, so the walk holds for any theme without a table of expected colours, which the P77-F walk needs. |
+| Study 3.3 lists `font-size-*` under "Role tokens (exist)" | **They did not exist.** Every theme JSON has carried `typography.fontSizes` and `typography.headings` since the engine was written, and only the Mantine adapter could read them, so `Text size="sm"` had nothing to read. The engine now emits `--mullion-font-size-*`, `--mullion-heading-size-h1` to `h6`, the matching line heights and `--mullion-heading-font-family`. A theme that ships its own scale now moves every framework `Text` and `Title`. |
+| "Storybook covers the set, with the decorator on `MullionProvider` rather than Mantine's" | A story opts in with `parameters: { mullion: true }` and renders under `MullionProvider` alone. Swapping the global decorator would have dropped Mantine's provider from the sixteen existing stories, which still render Mantine components, and put the framework's token sheet into the document the Storybook screenshot suite baselines. |
+| Acceptance: the FUTURE_TASKS admin-bar entry "is deleted in the same change"; Follow-On Candidates: "Wiring the PHP side is a small follow-on" | The two halves of the plan disagreed. Resolved for the acceptance criterion, which is also what P78-C's own note asks for: the entry goes "once the drawer actually clears the bar, which is P79-C". Both sides landed here, the drawer reading `uiLayer('modal')` and the embed raising the offset, and the entry is deleted. |
+| "The presentational set renders correctly in all four scopes" | Three of the four, measured in the browser: the gallery shadow root, a light-mount document and the overlay root. The wp-admin light DOM still has no provider, which P79-A recorded as a deliberate omission and P81-B closes. |
+| The set replaces the names on the `@/ui` barrel | **Not yet, deliberately.** The components are exported from `@/ui/components` and the barrel's export list is unchanged. Moving `Text` there would move all 92 files that import it in one commit, which is Phase 81's job and its pixel-refresh budget; Phase 80's Decision B says the same thing for its own components. Storybook, the unit suite and the e2e fixture import the new path directly, so nothing in the shipped bundle carries a component nothing renders. |
+
+**Design decisions taken while building.**
+
+- *Colour is an attribute, never a prop value.* `tone="muted"` becomes `data-mullion-tone` and the sheet resolves it. The seven tones are the theme's semantic roles, so a theme redirects all of them at once, and `Badge color="blue"` (52 sites) stops naming a palette entry a theme cannot see. `ColorSwatch` is the single exception, because the colour it shows is the user's data rather than a theme decision; it rides inline and never reaches a sheet.
+- *One unscoped selector, and it carries the namespace.* The tone ladder is the only rule not scoped by a `.mullion-*` class, because scoping it would mean a rule per tone per component. Under a light mount this sheet is adopted into the document, so a bare `[data-tone]` would paint host page content that happened to use the name; `data-mullion-tone` cannot.
+- *The focus sheet registers last.* `Paper` and `Card` both set `box-shadow` for elevation, and inside one cascade layer a tie goes to the later rule, so a focusable card would otherwise lose its halo to its own shadow. The registration order is pinned by a test that says why.
+- *`render`, not `as`.* Base UI, chosen in P78-B, spells polymorphism as a `render` prop taking an element or a function. Two spellings in one framework is worse than one, and the helper is twenty lines: class names and inline custom properties merge, every other prop on the supplied element wins, and React 19 carries the ref with the rest.
+- *Breakpoints are constants in the sheet.* A media query cannot read a custom property, so a theme's `breakpoints` block could never have reached one. No bundled theme overrides it and the sheet carries those values. Each step falls back to the one below it, so `cols={{ base: 1, md: 2 }}` holds one column through `sm` without the call site spelling it.
+- *`Collapse` animates `grid-template-rows` from `0fr` to `1fr`.* Nothing measures the content, so there is no ResizeObserver and nothing to get wrong when the content changes while open. It reads the duration token, so P79-B's reduced-motion switch already stops it.
+- *The chip's input is clipped, not hidden.* `display: none` takes a control out of the tab order, which is the WCAG 2.4.7 failure P76-I-1 shipped. The input keeps its box and its native semantics, the label carries the visible state, and the ring is drawn on the label by the `sibling` value of the focus attribute, with the input's own outline suppressed.
+- *`FileButton` holds its input in state and `CopyButton` owns its timer in an effect.* Both were written with refs and both tripped `react-hooks/refs`, correctly: each hands a closure over a ref to a render prop called during render. State makes `FileButton`'s dependency honest at the cost of one render on mount, and moving `CopyButton`'s countdown into an effect resets the window on a second copy and clears the timer on unmount, neither of which the ref version did.
+
+**The finding that made the admin bar fix possible.**
+
+`frameworkConstants` returned `layer-host-offset: '0'`, and `generateCssVariables` emitted every entry it returns, so the offset was declared on the gallery's own scope. Every step of the scale reads it as `calc(var(--mullion-layer-host-offset, 0) + N)`, so the design was that a host raises the offset and the layers move with it; but a declaration on the scope shadows any value set above it, for everything inside the scope. The token could not have done its job as shipped, in any host. The engine no longer declares it and the `var(..., 0)` fallback in each step carries the default. The e2e measures both halves inside the shadow root: with nothing set, the offset reads empty and `--mullion-layer-modal` resolves to `calc(0 + 500)`; with a `:root` declaration added at runtime, the same element resolves `calc(100000 + 500)`.
+
+One consequence is worth writing down for whoever reads the scale next. Raising the offset raises every step, `layer-base` included, so a host that escapes its own furniture also lifts the gallery's lowest layer. That is safe today because the scale has exactly one reader after this change, the Settings drawer and the editor nested inside it, and it stops being safe the moment something inside the gallery reads `--mullion-layer-base` and is not inside a stacking context of its own.
+
+**Two defects introduced and caught.**
+
+1. *The showcase host carried `class="mullion-gallery"`.* `main.tsx` is still on the fixture page, finds every element with that class and mounts the real gallery into it, so the first full e2e run had two apps, two overlay roots and one contested shadow root, and all fourteen checks timed out waiting for the panel that never rendered. The class was never needed: a framework component reads tokens, not `global.scss`.
+2. *Every component that takes padding dropped the props it does not own.* They read `padding` and its two axes out of `...rest` and then never forwarded what was left, so a `data-testid` or an `aria-label` on a layout primitive vanished; the three that did forward `rest` put `padding="md"` on the element as an attribute instead. Found while building the showcase, whose `data-testid` on a `Stack` did not appear in the DOM. The more useful half of the finding is that the unit suite passed before the fix and after it: it was asserting classes and custom properties and nothing at all about the props it was handed. `splitPadding` is now one function rather than a destructure repeated in nine components, and three tests pin it.
+
+**Rendered output.** No shipped screen renders a framework component yet, because `@/ui` does not export them. Three things did change in the shipped tree. The engine emits eighteen more `--mullion-*` tokens on every scope and one fewer, all of them typography or the host offset, and nothing outside the framework reads any of them. The Settings drawer and its nested gallery-config editor take their z-index from `--mullion-layer-modal` and `--mullion-layer-popover` rather than from 450 and 500, which resolve to 500 and 600 unless a host raises the offset. And the embed emits one `<style>` element, once per page, only when `is_admin_bar_showing()`. `theme-qa`'s snapshot matrix and the axe checks are the check, see validation.
+
+**The colour model, which the 2x visual pass turned into most of this track.**
+
+The plan's validation line asks for "a visual pass at 2x on tight layouts, as P77-F did". It found two things at a glance, a `filled` button showing the browser's `buttonface` grey because no variant rule reset the background, and a page with no ground because the fixture never painted one. Then it raised a question a screenshot cannot answer: whether a `light` button's coloured label on a tint of its own colour is legible. Measuring that, across all 23 bundled themes, seven tones and six variants, is where this track spent most of its time, and it found three real things.
+
+1. *`filled` paired the wrong two tokens.* It painted `--mullion-color-primary-stroke` as the ground with `--mullion-color-primary-on` as the ink. Those are not a pair: the engine contrast-selects `primaryStroke` against the surfaces at the 1.4.11 non-text floor (P75-E) and picks `primaryOnFill` against `primaryFill`, a different rung. Measured at 2.55:1 on tokyo-night, a 1.4.3 failure. The tone ladder now carries a fill and its ink separately from the colour a component draws with, and `filled` reads the pair.
+2. *No role colour had a text rung.* A theme declares `success`, `warning`, `error` and `info` as raw colours and nothing had ever painted text in them, so nothing had ever selected a legible rung. Across the 23 themes, 268 role-and-ground pairs fall below 4.5:1 when the declared colour is used as text. The engine now derives `primary-text`, `success-text`, `warning-text`, `error-text`, `info-text` and `accent-text`: the nearest rung of the role's own ramp that clears 4.5:1 against `background`, `surface`, `surface2` and `surfaceRaised`, using the same `selectUiContrastIndex` walk P75-E wrote for `primaryStroke` with the floor raised. The hue moves by under five degrees on every theme, so a theme's red stays its red and becomes readable. `--mullion-color-primary-stroke` is untouched and remains the focus ring's colour at 3:1, which is what P77-F pinned.
+3. *No hover mix of a filled control's ground is safe.* Three candidates were measured on all 23 themes and all seven tones: towards the ink at 90%, and towards the page ground at 85% and 92%. Every one dropped some pair under 4.5:1 (worst 3.48, 3.83 and 4.00, all on default-light), while the rest state cleared everywhere at worst 4.63. A ground the theme has been audited on is worth more than a ground that moves on hover, so `filled` keeps its ground and signals hover with the theme's elevation and a hairline of its own ink, neither of which touches the measured pair.
+
+Out of that came the one rule the framework's colour API now states: **tint the ground or colour the ink, never both.** A `light` control tints and keeps the theme's text colour; `subtle`, `outline` and `Text` colour the ink and sit on neutral grounds the rung was selected against. An icon is the exception and keeps its tone on a tint, because an icon answers to 1.4.11's 3:1. The whole matrix is now a permanent check in `e2e/ui-showcase.spec.ts`: seven tones by six variants by 23 themes, rest and hover, buttons and text at 4.5:1 and icons at 3:1.
+
+**A trap in measuring computed colour, which cost an hour and nearly cost a wrong design.** Chromium reports a `color-mix()` result as `color(srgb 0.94 0.87 0.87)` and everything else as `rgb(240, 222, 222)`. The first probe parsed both with one number-matching regex and read the floats as 0-255 channels, so every mixed ground measured as very nearly black. That produced a list of forty-odd failures that did not exist and pointed at a redesign of the wash that was not needed; the real failure list was four hover pairs in the 4.10 to 4.36 range, fixed by softening one percentage. The lesson is not about `color-mix`: it is that a probe reading `getComputedStyle` in this codebase now meets at least two colour serialisations, and the check in `ui-showcase.spec.ts` carries the normalisation with a comment saying why. What survived the correction is recorded above; what the bad measurement had suggested about the `light` variant did not, and was rechecked from scratch.
+
+**Mutations.** Each applied alone against the guarding suite and restored byte-identically afterwards.
+
+| Guard | Mutation applied | Result |
+|-------|------------------|--------|
+| no colour literal (static) | `color: #ff0000` added to `components/control.css` | fails naming the file and line |
+| no `!important` (static) | `!important` added to a `components/layout.css` declaration | fails naming the file and line |
+| no ancestor scheme selector (static, both guards) | `[data-mullion-color-scheme="dark"] .mullion-kbd` in `components/typography.css` | the sheet guard and the P79-A source guard both fail, each naming the line |
+| the ring registers last | `ui/focus` moved ahead of the component sheets | the registration-order test fails, quoting the rule it protects |
+| every control stamps the focus attribute | `focusable` dropped from `ControlBase` | two unit tests fail, including the one for the `render` escape hatch |
+| colour is an attribute, never a value | `Text` paints `tone="muted"` as an inline `color` instead | the typography test fails on the missing attribute |
+| a component forwards what it does not own | `Stack` stops spreading its pass-through props | the forwarding test fails on the caller's `data-testid` |
+| the host offset is read, never declared | `frameworkConstants` returns `layer-host-offset: '0'` again | the engine test fails on the property and on the emitted declaration |
+| the type scale is the theme's | the `font-size-*` emission removed from `generateCssVariables` | three engine tests fail, the missing-typography fallback among them |
+| responsive columns per breakpoint | `--mullion-cols-md` dropped from `SimpleGrid` | the layout test fails |
+| the chip rings its label, not its clipped input | the two `sibling` selectors removed from `focus.css` | the chip e2e check fails: the clipped input paints a 2px ring of its own |
+| the embed raises the host offset | `host_layer_style()` returns the empty string | two of the three PHP tests fail; the third, which asserts the offset is absent without an admin bar, still passes, which is what makes it worth having |
+| a tone paints a legible text rung | the danger tone points at `--mullion-color-error` again | the contrast matrix fails, naming the theme, the variant and the ratio |
+| `filled` pairs the fill rung with its own ink | `filled` painted with the draw rung and the primary ink, as the first draft did | the contrast matrix fails across themes and tones, buttons at 4.5:1 and icons at 3:1 |
+
+**Acceptance criteria, checked.**
+
+| Criterion | Where it is proved |
+|-----------|--------------------|
+| The presentational set renders correctly in all four scopes | `e2e/ui-showcase.spec.ts`: the component sheet carries its layer statement and its rules into the gallery tree and the overlay root under both mounts, and a component's painted colour, type size and gap equal the theme's tokens in the inline scope and the overlay scope alike. The fourth scope, the wp-admin light DOM, has no provider; P79-A recorded that omission and P81-B closes it |
+| The P77-F ring walk passes against framework components, all four mount and chrome combinations, asserting core colour, 2px width, the halo token present and the exact 6px halo | the "focus ring on framework components" block, four walks plus a fifth on a second theme. It compares the paint to the tokens read off the ringed element rather than to a table of expected colours, so it holds for any theme, and it pins the 2px offset as well as the 2px core; mutations M5 and M11 |
+| Every component sheet passes the three static tests from P79-B | `src/ui/__tests__/componentSheets.test.ts`, with the scan's own reach now pinned so a guard that scans nothing cannot pass; mutations M1 to M3 |
+| Storybook covers the set, with the decorator on `MullionProvider` rather than Mantine's | `src/ui/components/framework.stories.tsx`, six stories under `Framework/Presentational set` with a theme picker in the toolbar; `.storybook/preview.tsx` chooses the provider per story so the sixteen existing Mantine stories are untouched |
+| The drawer header clears the WordPress admin bar via the host-safe layer token, and the FUTURE_TASKS entry is deleted in the same change | the drawer and its nested editor read `uiLayer('modal')` and `uiLayer('popover')`; `Mullion_Embed::host_layer_style()` raises the offset when the admin bar shows, three PHP tests; the e2e proves a host declaration above the gallery reaches the scale inside the shadow root; the entry is removed from `docs/FUTURE_TASKS.md` and the removal is logged there; mutations M8 and M12 |
+| Validation: `npx vitest run`, the ring walk in `e2e/theme-qa.spec.ts`, and a visual pass at 2x on tight layouts | below. The ring walk for framework components is a new block in `ui-showcase.spec.ts` rather than an extension of `theme-qa.spec.ts`, because `theme-qa` tabs the real Settings drawer and no framework component renders there until Phase 81; `theme-qa`'s own walk is unchanged and still guards the Mantine tree |
+
+**Validation.** Run at CI parity on the final tree: `npm run lint` clean, `npx tsc --noEmit` clean, `npm run ui:allowlist:check` green at 178 files (nothing this track added names a Mantine package), `npm run test:coverage` 4,118 of 4,118 across 268 files with every threshold met (statements 86.52, branches 75.34, functions 83.10, lines 88.50), `npx playwright test` 67 of 67 with no snapshot differences, `npm run build-storybook` clean, and `npm run build` clean apart from the pre-existing chunk-size warnings. The suite grew by 53 unit tests (46 in the new component suite, four in the engine's component-token suite and three in its CSS-variable suite) and by 16 e2e tests, all in the new `ui-showcase` spec. One run of the coverage suite failed a single unrelated `AuthContext` `waitFor` under load and passed on its own and on every rerun; nothing in this track touches `src/contexts`.
+
+The visual pass was three 2x captures at 390px and 1280px, on `default-dark`, `github-light` and `tokyo-night`, with a control focused so the ring is in frame. It is what found the `buttonface` grey and started the contrast work above; the captures after the fixes show the ground, the transparent outline variant and the two-tone ring resolving per theme.
+
 ## Outcome
 
-_P79-A and P79-B landed 2026-09-12; C and D pending._
+_P79-A, P79-B and P79-C landed 2026-09-12; D pending._

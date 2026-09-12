@@ -59,6 +59,12 @@ signal once its test infrastructure is in place.
 | `src/components/Auth/AuthBarFloating.tsx` | Floating auth bar with position tracking | — |
 | `src/components/Galleries/Adapters/GalleryAdapter.ts` | Pure type/interface file; no executable code | N/A — will never have coverage |
 
+## Dev-only fixtures
+
+| File | Reason excluded | Notes |
+|---|---|---|
+| `src/ui/showcase/**` (P79-C) | The e2e fixture that renders the framework's presentational set in a shadow mount, a light mount and the overlay root. Dev-only on the same basis as a Storybook story: never imported by the app, absent from the build | N/A — proved by `e2e/ui-showcase.spec.ts`, which is the only thing that can measure a computed custom property |
+
 ## Priority
 
 Files marked with a suggested approach above are the highest-value targets for

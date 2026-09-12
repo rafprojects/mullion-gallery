@@ -316,18 +316,6 @@ The backend is the part with no seam at all: 32 PHP classes, about 11,000 lines,
 
 ---
 
-### WordPress Admin Bar Covers the Settings Drawer Header for Logged-In Users
-
-**Origin:** [PHASE77_REPORT.md](PHASE77_REPORT.md) P77-B (2026-09-09), measured on wordpress.lan.
-
-**Context:** `#wpadminbar` is `position: fixed` at `z-index: 99999`; Mantine's Drawer sits at 450, so the drawer's Cancel, Save and Close buttons render under the bar on the front end whenever the admin bar is shown. Same in every portal mode.
-
-**What to implement:** Either offset the drawer by the admin bar's height when `body.admin-bar` is present (WordPress already exposes `--wp-admin--admin-bar--height`), or raise the chrome's z-index above the bar. The offset is the more conventional choice in the WordPress ecosystem.
-
-**Effort:** Small | **Impact:** Medium — every logged-in admin on the front end hits it.
-
----
-
 ### Structural a11y (axe) gate — grow coverage beyond `LayoutTemplateList`
 
 **Origin:** [PHASE62_REPORT.md](archive/phases/PHASE62_REPORT.md) P62-H (component structural axe harness, 2026-07-11) — the automatable half of the structural work, deferred here after the harness landed. *The concrete `LayoutTemplateList` fixes this entry used to include (icon-only SegmentedControl accessible names; nested-interactive Card/Menu button) were promoted to [PHASE72_REPORT.md](archive/phases/PHASE72_REPORT.md) track **P72-G** (2026-07-23) — this entry now covers only the open-ended remainder below.*
@@ -820,3 +808,5 @@ When promoting future tasks to an active phase:
 *Updated: September 10, 2026 (P77-I, Phase 77 closed): No new entries. The portal default is now `overlay-root`, so the two accessibility entries that describe the old placement are re-scoped rather than removed: "Focus Return After Closing Portaled Chrome Lands on `body`" is unchanged and still real, because it is Mantine's `useFocusReturn` reading `document.activeElement` rather than a placement problem, and it is closed by the framework in Phase 80 where all three headless candidates resolve the active element through the shadow tree. "WordPress Admin Bar Covers the Settings Drawer Header" is likewise unchanged and is owned by the host-safe layer token in P78-C. One test-integrity fix landed with P77-I and is recorded there rather than here: `playwright.config.ts` defaulted to Vite's port 5173, another project on the machine was serving it, and `reuseExistingServer` ran the whole suite against that application, producing 45 phantom failures.*
 
 *Updated: September 12, 2026 (P79-B delivered): **Removed:** "Share One Constructable Stylesheet Between the Gallery Root and the Overlay Root" (Code Quality). It was owned by P79-B since the Phase 78 to 81 re-plan and is now built: one registration list (`src/ui/styles/uiStyles.ts`, with the app's entries in `src/appStyles.ts`) becomes one `CSSStyleSheet` per page that `MullionProvider` adopts into every root it paints, with a `<style>` fallback where constructable sheets are missing. The overlay root and the gallery root no longer carry hand-written copies, and the two-instance e2e measures four roots sharing one parsed sheet. Details in [PHASE79_REPORT.md](PHASE79_REPORT.md) P79-B.*
+
+*Updated: September 12, 2026 (P79-C delivered): **Removed:** "WordPress Admin Bar Covers the Settings Drawer Header for Logged-In Users" (Accessibility). It has been owned by the host-safe layer token since P78-C shipped the token and P79-C gave it a reader: the Settings drawer takes its z-index from `--mullion-layer-modal` through `uiLayer('modal')`, and the embed raises `--mullion-layer-host-offset` on `:root` when `is_admin_bar_showing()`, so every layer clears the bar's 99999. Building it found the reason the token could not have worked as shipped: the engine declared `layer-host-offset: 0` on the gallery's own scope, which shadowed any value a host set above it. The engine no longer declares it and the `var(..., 0)` fallback in each step carries the default. Three PHP tests and one e2e check cover it; details in [PHASE79_REPORT.md](PHASE79_REPORT.md) P79-C.*

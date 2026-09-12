@@ -21,7 +21,8 @@
  * focus ring invisible by making it thin.
  */
 
-import { withAlpha } from './colorGen';
+import { generateColorScale, selectUiContrastIndex, withAlpha } from './colorGen';
+import chroma from 'chroma-js';
 import type { ResolvedColors } from './types';
 
 // ---------------------------------------------------------------------------
@@ -82,7 +83,65 @@ export const COMPONENT_TOKEN_DERIVATIONS = {
   // `surface2`, which is three points from `surface` on default-dark and
   // imperceptible even at full opacity (P76-I-2).
   'table-hover-bg': (rc) => rc.surfaceRaised,
+
+  // [P79-C] The rung of each role that is legible as TEXT on the theme's
+  // grounds. `primaryStroke` is contrast-selected at the 1.4.11 non-text
+  // floor of 3:1 (P75-E), which is right for the focus ring and a border and
+  // is not enough for a label; the semantic colours were never selected at
+  // all, because until the framework had a tone model nothing painted text in
+  // them. Measured on the first draft: `Button variant="light" tone="danger"`
+  // came to 3.90:1 on github-light. Each of these is the nearest rung of the
+  // role's own ramp that clears 4.5:1 against every ground, so a theme's red
+  // stays red and becomes readable rather than being replaced.
+  'primary-text': (rc) => textRung(rc.primaryStroke, rc),
+  'success-text': (rc) => textRung(rc.success, rc),
+  'warning-text': (rc) => textRung(rc.warning, rc),
+  'error-text': (rc) => textRung(rc.error, rc),
+  'info-text': (rc) => textRung(rc.info, rc),
+  'accent-text': (rc) => textRung(rc.accent, rc),
+
+  // [P79-C] The ink that reads on each semantic colour used as a fill. The
+  // engine already picks one for `primaryFill` (`primaryOnFill` in
+  // `colorGen`); these are the same pick for the four semantic roles, which
+  // had none because nothing had ever filled with them. Measured need: the
+  // framework's `filled` button and badge paint the tone and put text on it,
+  // and on tokyo-night the pair the first draft used came to 2.55:1.
+  'success-on': (rc) => onColor(rc.success),
+  'warning-on': (rc) => onColor(rc.warning),
+  'error-on': (rc) => onColor(rc.error),
+  'info-on': (rc) => onColor(rc.info),
+  'accent-on': (rc) => onColor(rc.accent),
 } as const satisfies Record<string, (rc: ResolvedColors) => string>;
+
+/** Black or white, whichever reads better on `fill`. The same rule `primaryOnFill` uses. */
+function onColor(fill: string): string {
+  return chroma.contrast('#ffffff', fill) >= chroma.contrast('#000000', fill) ? '#ffffff' : '#000000';
+}
+
+/** The 1.4.3 text floor. The role's hue is kept; only its rung moves. */
+const TEXT_CONTRAST_MIN = 4.5;
+
+/**
+ * The nearest rung of `base`'s own ramp that reads as text on every ground
+ * the theme puts text on. `selectUiContrastIndex` does the walk; all this
+ * adds is the ramp (a single role colour is not one) and the starting rung,
+ * which is whichever is closest to the colour the theme actually declared.
+ */
+function textRung(base: string, rc: ResolvedColors): string {
+  const scheme = chroma(rc.background).luminance() < 0.5 ? 'dark' : 'light';
+  const ramp = generateColorScale(base, scheme);
+  let preferred = 0;
+  let closest = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < ramp.length; i++) {
+    const distance = chroma.distance(ramp[i]!, base);
+    if (distance < closest) {
+      closest = distance;
+      preferred = i;
+    }
+  }
+  const grounds = [rc.background, rc.surface, rc.surface2, rc.surfaceRaised];
+  return ramp[selectUiContrastIndex(ramp, grounds, preferred, TEXT_CONTRAST_MIN)]!;
+}
 
 export type ComponentTokenName = keyof typeof COMPONENT_TOKEN_DERIVATIONS;
 
@@ -139,8 +198,8 @@ export function deriveComponentTokens(
  * which a host may raise to escape its own furniture: `#wpadminbar` is
  * `position: fixed` at `z-index: 99999` and covers the Settings drawer header
  * for every logged-in admin on the front end. The embed sets the offset from
- * PHP; P79-C is where the drawer actually reads it, and the FUTURE_TASKS entry
- * for the admin bar stays open until then.
+ * PHP (P79-C) and the Settings drawer reads `--mullion-layer-modal`, so the
+ * header clears the bar.
  */
 const LAYER_STEPS = {
   'layer-base': 1,
@@ -181,7 +240,12 @@ export function frameworkConstants(prefix: string): Record<string, string> {
     'duration-base': '200ms',
     'duration-slow': '300ms',
 
-    'layer-host-offset': '0',
+    // `layer-host-offset` is deliberately NOT declared here. Every step reads
+    // it through `var(..., 0)`, so a host that sets it above the gallery (the
+    // WordPress embed does, when the admin bar is showing) inherits into every
+    // tree. Declaring `0` on the scope would shadow the host's value for
+    // everything inside it, which is the P79-C finding that made the admin
+    // bar fix work at all.
     ...Object.fromEntries(
       Object.entries(LAYER_STEPS).map(([name, step]) => [
         name,

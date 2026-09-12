@@ -144,7 +144,7 @@ export default defineConfig({
     // P79-B: vitest hands back an empty string for CSS it does not process.
     // The framework's own sheets are imported `?inline` and asserted on, so
     // they are processed; everything else stays off for speed.
-    css: { include: [/src\/ui\/styles\/.*\.s?css/] },
+    css: { include: [/src\/ui\/.*\.s?css/] },
     include: ['src/**/*.test.{ts,tsx}', 'packages/**/*.test.{ts,tsx}'],
     exclude: ['e2e/**', 'node_modules/**'],
     testTimeout: 60000,
@@ -175,11 +175,14 @@ export default defineConfig({
         // runtime and not unit-tested — exclude them from coverage accounting.
         '**/*.stories.{ts,tsx}',
         'src/stories/**',
+        // P79-C: the e2e fixture that renders the framework's presentational
+        // set in every scope. Dev-only on the same basis as a story, and
+        // proved by `e2e/ui-showcase.spec.ts` rather than by a unit test.
+        'src/ui/showcase/**',
         'src/**/*.d.ts',
         'src/services/auth/AuthProvider.ts',
         'src/services/monitoring/**',
         'src/main.tsx',
-        'src/shadowStyles.ts',
         'src/data/**',
         'src/types/**',
         'src/themes/types.ts',

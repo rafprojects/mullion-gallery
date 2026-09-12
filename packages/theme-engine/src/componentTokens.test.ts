@@ -121,6 +121,78 @@ describe('framework constants', () => {
     }
   });
 
+  it('selects a text rung that clears 4.5:1 on every ground, for every bundled theme', () => {
+    // [P79-C] The framework paints text in a role colour (`Text tone="danger"`,
+    // a `light` button's label, an `outline` badge). `primaryStroke` is
+    // selected at the 3:1 non-text floor and the semantic colours at nothing
+    // at all, so the first draft measured 3.90:1 for a danger label on
+    // github-light.
+    for (const ext of bundledThemeDefinitions) {
+      const def = fullDefinition(ext);
+      const rc = resolveColors(def.colors as ThemeColors, def.colorScheme);
+      const tokens = deriveComponentTokens(rc);
+      const grounds = [rc.background, rc.surface, rc.surface2, rc.surfaceRaised];
+      for (const role of ['primary', 'success', 'warning', 'error', 'info', 'accent'] as const) {
+        const rung = tokens[`${role}-text`];
+        for (const ground of grounds) {
+          expect(
+            chroma.contrast(rung, ground),
+            `${def.id}: ${role}-text (${rung}) on ${ground}`,
+          ).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    }
+  });
+
+  it('keeps the role\u2019s hue when it moves the rung', () => {
+    // Readable, not repainted: a theme's red must still be red. The ramp is
+    // generated from the role's own chroma and hue, so only lightness moves.
+    for (const ext of bundledThemeDefinitions) {
+      const def = fullDefinition(ext);
+      const rc = resolveColors(def.colors as ThemeColors, def.colorScheme);
+      const tokens = deriveComponentTokens(rc);
+      for (const [role, base] of [
+        ['success', rc.success],
+        ['warning', rc.warning],
+        ['error', rc.error],
+        ['info', rc.info],
+      ] as const) {
+        const [, baseChroma, baseHue] = chroma(base).oklch();
+        // A near-grey base has no meaningful hue, so only compare where it does.
+        if (!Number.isFinite(baseHue) || baseChroma < 0.02) continue;
+        const [, , rungHue] = chroma(tokens[`${role}-text`]).oklch();
+        const delta = Math.abs(((rungHue - baseHue + 540) % 360) - 180);
+        expect(delta, `${def.id}: ${role}-text drifted off hue`).toBeLessThan(5);
+      }
+    }
+  });
+
+  it('picks an ink that reads on every semantic fill, for every bundled theme', () => {
+    // [P79-C] The framework's `filled` variant paints the tone and puts text
+    // on it. Nothing had ever filled with a semantic colour before, so none
+    // of them had a paired ink; the first draft reused `primary-on` and came
+    // to 2.55:1 on tokyo-night.
+    for (const ext of bundledThemeDefinitions) {
+      const def = fullDefinition(ext);
+      const rc = resolveColors(def.colors as ThemeColors, def.colorScheme);
+      const tokens = deriveComponentTokens(rc);
+      const pairs: Array<[string, string, string]> = [
+        ['success', rc.success, tokens['success-on']],
+        ['warning', rc.warning, tokens['warning-on']],
+        ['error', rc.error, tokens['error-on']],
+        ['info', rc.info, tokens['info-on']],
+        ['accent', rc.accent, tokens['accent-on']],
+      ];
+      for (const [name, fill, ink] of pairs) {
+        expect(['#ffffff', '#000000'], `${def.id} ${name}-on`).toContain(ink);
+        expect(
+          chroma.contrast(ink, fill),
+          `${def.id}: ${name}-on (${ink}) on ${fill} is below the 4.5:1 text floor`,
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+
   it('carries the P77-F ring geometry', () => {
     const c = frameworkConstants(DEFAULT_CSS_VAR_PREFIX);
     expect(c['focus-ring-width']).toBe('2px');
@@ -143,6 +215,23 @@ describe('framework constants', () => {
         steps[i - 1]![1],
       );
     }
+  });
+
+  // [P79-C] The host offset is read, never declared. `frameworkConstants`
+  // used to return `layer-host-offset: '0'`, which `generateCssVariables`
+  // emitted on the scope; an embed that set the offset on the page above the
+  // gallery was shadowed by that declaration for everything inside the scope,
+  // so no layer could ever escape the host's furniture. The `var(..., 0)`
+  // fallback in each step is where the default lives instead.
+  it('never declares the host offset, so a host value above the scope inherits in', () => {
+    expect(frameworkConstants(DEFAULT_CSS_VAR_PREFIX)).not.toHaveProperty('layer-host-offset');
+    const def = fullDefinition(bundledThemeDefinitions[0]);
+    const rc = resolveColors(def.colors as ThemeColors, def.colorScheme);
+    const css = generateCssVariables(rc, def);
+    expect(css).not.toContain(`${DEFAULT_CSS_VAR_PREFIX}-layer-host-offset:`);
+    expect(css).toContain(
+      `${DEFAULT_CSS_VAR_PREFIX}-layer-modal: calc(var(${DEFAULT_CSS_VAR_PREFIX}-layer-host-offset, 0) + 500);`,
+    );
   });
 
   it('resolves the host offset through the caller’s prefix, not a hardcoded one', () => {

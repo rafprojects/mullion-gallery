@@ -89,7 +89,8 @@ position. Framework sheets under `src/ui/` are never layered under
 | CSS module registered in `src/appStyles.ts` (every module: `CampaignCard`, `CardGallery`, `CampaignViewer`, `MediaCard`, `MediaTab`, `TemplatePickerModal`) | M2, and M1 by Vite's own injection | every tree | **canonical** for component-local structure. The registry test fails on a module left off the list; the document-only exemption is gone, because since P77-I "portaled" means the overlay root and `TemplatePickerModal`'s module was dead there until P79-B |
 | `src/styles/builder.css` | M2 | every tree; read only in the overlay root where the Layout Builder paints | **canonical** for the Dockview bridge until P81 retires the `--mullion-builder-*` block |
 | `src/styles/wpAdminFormReset.css` | M1 only | document only | **constrained** by design: the wp-admin reset targets light-DOM admin pages and is intentionally absent from every shadow tree |
-| a framework sheet under `src/ui/` (`styles/base.css` so far; P79-C adds the component sheets) | M2 | every tree | **canonical** for framework components; three static tests hold each one to no colour literal, no `!important`, no ancestor scheme selector |
+| a framework sheet under `src/ui/` (`styles/base.css`, `styles/focus.css` and the seven family sheets under `components/`) | M2 | every tree the provider paints, once the app imports `@/ui/components` | **canonical** for framework components; three static tests hold each one to no colour literal, no `!important`, no ancestor scheme selector, and every rule sits in `@layer mullion.components` |
+| a layout or typography prop on a framework component (`gap`, `padding`, `cols`, `size`) | M4 as an inline custom property (`--mullion-gap`) | the element, into whatever tree it is portaled to | **canonical** for per-instance geometry. Colour is never a prop: it travels as a `data-mullion-tone` attribute the sheet resolves to a token. `ColorSwatch` is the single exception, because the colour it shows is the user's data |
 | Mantine `vars` (theme adapter or component prop) | M4 as custom properties | the element and Mantine's own rules that read the variable, including pseudo-state rules | **canonical** for colour and state on a Mantine part whenever Mantine exposes a variable for it (`--input-bd`, `--table-hover-color`, `--checkbox-color`, and so on) |
 | Mantine `classNames` plus a stylesheet | whichever stylesheet | see the stylesheet | **canonical** for state and pseudo-state Mantine does not expose a variable for; the stylesheet must be `chrome-portable.scss` if the part can render in chrome |
 | Mantine `styles` (theme adapter or component prop) | M4 as inline style | the element; pseudo-class and attribute keys are silently dropped (P76-I-1) | **constrained**: flat declarations only, and only when no `vars` route exists. Two tests enforce flatness, one for the adapter and one for the 14 component call sites |
@@ -97,13 +98,20 @@ position. Framework sheets under `src/ui/` are never layered under
 | `--mullion-builder-*` inline block (`LayoutBuilderModal`) | M4 | the builder shell | **legacy, load-bearing**: Dockview is themed through `--dv-*` variables that must resolve inside a portal. Same fate as the row above |
 | `MullionProvider` token sheet | M3 | every scope the provider paints, including the portal container in the overlay root | **canonical** for per-theme tokens everywhere; it replaced `ThemeContext`'s injection in P79-A |
 
-Counting authoring surfaces after P79-B gives eleven again, with a different
-composition: the document-only CSS module row is gone and the framework sheet
-row is new. Counting mechanisms still gives four, but M2 now has one reach
-("every tree the provider paints") instead of a per-file answer, which is the
-collapse the framework study asked for. The remaining legacy surfaces exist
-because Mantine's variables and overrides still have to reach portaled chrome,
-which is Phase 81's removal, not this document's.
+Counting authoring surfaces after P79-C gives twelve, with a different
+composition again: the document-only CSS module row went in P79-B, the
+framework sheet row and the framework prop row are new. Counting mechanisms
+still gives four, but M2 now has one reach ("every tree the provider paints")
+instead of a per-file answer, which is the collapse the framework study asked
+for. The remaining legacy surfaces exist because Mantine's variables and
+overrides still have to reach portaled chrome, which is Phase 81's removal,
+not this document's.
+
+Five of the twelve rows are Mantine's and go with it. What the framework
+leaves in their place is two: a sheet per component family and a small set of
+props that become custom properties. There is no framework equivalent of
+`vars`, `classNames`, `styles` or `adminChromeStyles()`, because a framework
+component reads its own tokens from the tree it is in.
 
 ## 4. Which channel for which job
 
@@ -119,6 +127,11 @@ which is Phase 81's removal, not this document's.
 | Per-theme tokens for gallery components | `--mullion-*` from the provider's token sheet | hardcoded hex; see the theme authoring guide |
 | Per-theme tokens for portaled chrome | `--mullion-*` from the portal container's token sheet; the gallery's tokens under the root provider, the brand's under a nested `mode="lock"` provider whose container the chrome portals into | `adminChromeStyles()`, which survives only for the `--mantine-*` half until Phase 81 |
 | A third-party library themed by CSS variables inside a portal | the inline variable bridge, as Dockview does | expecting M2 or M3 to reach it |
+| Colour on a framework component | `tone="muted"` and friends, resolved to a token by the component's sheet | a colour value in a prop; the tone list is the theme's seven semantic roles and a theme can redirect all of them at once |
+| A coloured label on a coloured ground | one or the other: tint the ground and keep the label the theme's text colour, or colour the label and leave the ground neutral | both. A role's text rung is contrast-selected against the theme's plain surfaces, so a coloured label on a tint of its own role is a pair nothing has measured. Icons are exempt at 1.4.11's 3:1 |
+| Geometry on a framework layout primitive | `gap`, `padding`, `paddingBlock`, `paddingInline`, `align`, `justify`, `wrap`, `cols` | a Mantine style prop; `m`, `w`, `h`, `pos` and the responsive object form are deliberately not reproduced and migrate to `className` |
+| A z-index for chrome | `uiLayer('modal')` and the rest of the scale | a literal. Only a token reference picks up `--mullion-layer-host-offset`, which the WordPress embed raises so the admin bar stops covering the drawer |
+| A focus ring on anything the framework renders | nothing: `ControlBase` stamps `data-mullion-focus` and the one rule in `src/ui/styles/focus.css` paints it | a per-component ring rule, which is the shape that was twice found incomplete in `chrome-portable.scss` |
 
 When in doubt, the question to ask is "which tree is the element in when it
 paints?", and the answer decides the mechanism. The surface follows.
@@ -145,6 +158,9 @@ pins through `styles` will never show a state colour from any stylesheet.
 | `e2e/multi-instance-theme.spec.ts` (P79-A, extended in P79-B) | two hosts on one page resolve their own tokens with no bleed, and their four roots share one parsed component sheet | build the sheet per provider |
 | `e2e/portal-mode.spec.ts` (P77-B) | under a transformed, overflow-hidden host wrapper with the page scrolled, `?portal=overlay-root` keeps the drawer at the viewport origin, keeps a host `button` rule off it, dismisses on Escape and click outside, ignores the flag on a light mount, and styles the Layout Builder | point the geometry test at `?portal=shadow`; drop Dockview from `src/appStyles.ts` |
 | `e2e/theme-qa.spec.ts`: focus ring pair (P76-I-2, P77-F) | on every tabbable control in the drawer, in both mount modes and both chrome modes, the painted ring is a 2px `primaryStroke` core plus a 6px `--mullion-color-focus-halo` box-shadow, and the halo token reaches the element | drop a selector from the ring rule; remove the halo from `chromeVars()` |
+| `src/ui/__tests__/components.test.tsx` (P79-C) | which class each component carries, which data attribute a variant becomes, which inline custom property a prop value lands in, and that the focus rule is one attribute rather than a list | rename a class; make `tone` a colour value |
+| `e2e/ui-showcase.spec.ts` (P79-C) | the component sheet reaches the gallery tree and the overlay root in both mounts; a component's painted colour, type size and gap equal the theme's tokens rather than a fallback; the ring walk over framework controls in all four mount and chrome combinations, and on a second theme; lock and follow; and that the layer scale reads a host offset set above the gallery | drop a token from the engine; declare `layer-host-offset` on the scope again |
+| same file: the tone and variant contrast matrix (P79-C) | every one of the seven tones against every one of the six variants, on all 23 bundled themes, at rest and on hover: buttons and text at 4.5:1, icons at 3:1 | point a tone at its raw role colour instead of its text rung; pair `filled` with the draw rung instead of the fill rung |
 
 The e2e spec needs the gallery dev server on the configured port. Note that
 `playwright.config.ts` reuses any server already listening there, whatever it
