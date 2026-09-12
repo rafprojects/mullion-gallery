@@ -7,7 +7,11 @@
  *  - Available theme list for UI pickers
  *  - LocalStorage persistence (respects admin disable flag)
  *  - WP config injection reading
- *  - Shadow DOM CSS variable injection
+ *
+ * [P79-A] The `--mullion-*` variable injection this context used to own
+ * (shadow root and scoped document sheets) moved to `MullionProvider` in
+ * `src/ui/provider`, which is the framework's one emitter for every tree.
+ * The theme id, persistence and switching stay here until P79-D moves them.
  *
  * Context definition lives in themeContextDef.ts for Fast Refresh
  * compatibility. The useTheme() hook lives in hooks/useTheme.ts.
@@ -30,10 +34,6 @@ import {
   DEFAULT_THEME_ID,
   type ThemeEntry,
 } from '../themes/index';
-import {
-  buildThemeStyleElementId,
-  normalizeThemeScopeToken,
-} from '@/utils/themeScope';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -140,25 +140,6 @@ export interface ThemeProviderProps {
   instanceId?: string | undefined;
 
   /**
-   * Shadow DOM root reference. When provided, the CSS variables will
-   * be injected into this element via a <style> tag for Shadow DOM
-   * isolation.
-   */
-  shadowRoot?: ShadowRoot | null;
-
-  /**
-   * Host element for non-shadow mounts. Used to scope custom MULLION CSS
-   * variables per gallery instance when rendering in the normal DOM.
-   */
-  hostElement?: HTMLElement | null;
-
-  /**
-   * Scoped selector for non-shadow custom CSS variable injection.
-   * Example: `[data-mullion-theme-scope="abc123"]`.
-   */
-  themeScopeSelector?: string | undefined;
-
-  /**
    * Host-injected initial-theme candidates, in priority order. The first
    * candidate that resolves to a registered theme is used as the initial
    * theme (after localStorage and `defaultThemeId`). Kept injectable so the
@@ -174,9 +155,6 @@ export function ThemeProvider({
   forcedThemeId,
   defaultThemeId,
   instanceId,
-  shadowRoot,
-  hostElement,
-  themeScopeSelector,
   resolveWpThemeIds,
 }: ThemeProviderProps) {
   const storageKey = instanceId ? `${STORAGE_KEY}-${instanceId}` : STORAGE_KEY;
@@ -187,10 +165,6 @@ export function ThemeProvider({
 
   // The effective theme ID: preview overrides saved, forced overrides all
   const effectiveThemeId = forcedThemeId ?? previewThemeId ?? themeId;
-  const scopeId = hostElement?.dataset.mullionThemeScope
-    ? normalizeThemeScopeToken(hostElement.dataset.mullionThemeScope)
-    : null;
-  const scopedStyleId = scopeId ? buildThemeStyleElementId(scopeId) : null;
 
   // Lookup from the pre-computed registry — O(1), no re-computation
   const entry: ThemeEntry = useMemo(() => getTheme(effectiveThemeId), [effectiveThemeId]);
@@ -230,65 +204,6 @@ export function ThemeProvider({
       setThemeIdState(forcedThemeId);
     }
   }, [forcedThemeId]);
-
-  // Inject custom MULLION CSS variables into the shadow root.
-  // Split into two effects so the style element is only created/removed when
-  // the shadowRoot changes (mount/unmount), while cssVars changes only update
-  // textContent — avoiding remove+recreate DOM churn and brief CSS var gaps on
-  // theme switches.
-  const STYLE_ID = 'mullion-theme-vars';
-  useEffect(() => {
-    if (!shadowRoot) return;
-    // Use ownerDocument rather than the ambient `document` so the element
-    // is created in the same document as the shadow host (important in
-    // cross-frame scenarios and avoids AdoptedStyleSheets quirks).
-    const styleEl = shadowRoot.ownerDocument.createElement('style');
-    styleEl.id = STYLE_ID;
-    shadowRoot.prepend(styleEl);
-    return () => {
-      // Remove on shadowRoot unmount so styles don't leak after gallery teardown.
-      styleEl.remove();
-    };
-  }, [shadowRoot]);
-
-  useEffect(() => {
-    if (!shadowRoot) return;
-    const styleEl = shadowRoot.querySelector(`#${STYLE_ID}`) as HTMLStyleElement | null;
-    if (styleEl) styleEl.textContent = entry.cssVars;
-  }, [shadowRoot, entry.cssVars]);
-
-  useEffect(() => {
-    if (shadowRoot || !scopedStyleId || !themeScopeSelector) {
-      return;
-    }
-
-    let styleEl = document.getElementById(scopedStyleId) as HTMLStyleElement | null;
-
-    if (!styleEl) {
-      styleEl = document.createElement('style');
-      styleEl.id = scopedStyleId;
-      document.head.appendChild(styleEl);
-    }
-
-    return () => {
-      if (styleEl?.parentNode === document.head) {
-        document.head.removeChild(styleEl);
-      }
-    };
-  }, [shadowRoot, scopedStyleId, themeScopeSelector]);
-
-  useEffect(() => {
-    if (shadowRoot || !scopedStyleId || !themeScopeSelector) {
-      return;
-    }
-
-    const styleEl = document.getElementById(scopedStyleId) as HTMLStyleElement | null;
-    if (!styleEl) {
-      return;
-    }
-
-    styleEl.textContent = entry.cssVars.replace(/:host/g, themeScopeSelector);
-  }, [shadowRoot, scopedStyleId, themeScopeSelector, entry.cssVars]);
 
   // Context value — memoized to prevent unnecessary re-renders
   const value = useMemo<ThemeContextValue>(

@@ -29,6 +29,36 @@
  */
 
 import { test, expect, type Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// P79-A: the `--mullion-*` tokens reach the gallery through `MullionProvider`,
+// by constructable stylesheet where the browser supports it, so there is no
+// `<style>` element to read. Reach is measured on the shadow host instead;
+// `colors.background` is emitted verbatim, so it fingerprints the theme.
+const DEFINITIONS = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..',
+  'packages',
+  'theme-engine',
+  'src',
+  'definitions',
+);
+
+function themeBackground(themeId: string): string {
+  const def = JSON.parse(readFileSync(path.join(DEFINITIONS, `${themeId}.json`), 'utf8')) as {
+    colors: { background: string };
+  };
+  return def.colors.background.toLowerCase();
+}
+
+function hostBackground(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const host = document.getElementById('root');
+    return host ? getComputedStyle(host).getPropertyValue('--mullion-color-background').trim().toLowerCase() : '';
+  });
+}
 
 // ── Shared fixtures ──────────────────────────────────────────────────────────
 
@@ -45,21 +75,31 @@ const BASE_SETTINGS = {
 
 async function installThemeSession(
   page: Page,
-  opts: { themeId?: string; wpInjectedThemeId?: string; applyThemeEverywhere?: boolean } = {},
+  opts: {
+    themeId?: string;
+    wpInjectedThemeId?: string;
+    applyThemeEverywhere?: boolean;
+    /** The admin setting that locks the theme: false disables the user's stored choice. */
+    allowUserThemeOverride?: boolean;
+  } = {},
 ) {
-  const { themeId, wpInjectedThemeId, applyThemeEverywhere } = opts;
+  const { themeId, wpInjectedThemeId, applyThemeEverywhere, allowUserThemeOverride } = opts;
 
   await page.addInitScript(
-    ([storedTheme, wpTheme]: [string | undefined, string | undefined]) => {
+    ([storedTheme, wpTheme, allowOverride]: [string | undefined, string | undefined, boolean | undefined]) => {
       const g = window as Window & {
         __MULLION_AUTH_PROVIDER__?: 'wp-jwt' | 'none';
         __MULLION_API_BASE__?: string;
-        __MULLION_CONFIG__?: { enableJwt?: boolean; restNonce?: string };
+        __MULLION_CONFIG__?: { enableJwt?: boolean; restNonce?: string; allowUserThemeOverride?: boolean };
         __mullionThemeId?: string;
       };
       g.__MULLION_AUTH_PROVIDER__ = 'wp-jwt';
       g.__MULLION_API_BASE__ = 'http://127.0.0.1:5173';
-      g.__MULLION_CONFIG__ = { enableJwt: true, restNonce: 'test-nonce' };
+      g.__MULLION_CONFIG__ = {
+        enableJwt: true,
+        restNonce: 'test-nonce',
+        ...(allowOverride === undefined ? {} : { allowUserThemeOverride: allowOverride }),
+      };
 
       localStorage.setItem('mullion_access_token', 'fake-token');
       localStorage.setItem(
@@ -73,7 +113,7 @@ async function installThemeSession(
         g.__mullionThemeId = wpTheme;
       }
     },
-    [themeId, wpInjectedThemeId] as [string | undefined, string | undefined],
+    [themeId, wpInjectedThemeId, allowUserThemeOverride] as [string | undefined, string | undefined, boolean | undefined],
   );
 
   let currentSettings: Record<string, unknown> = {
@@ -180,35 +220,41 @@ test.describe('theme behavioral tests', () => {
       .toBe('tokyo-night');
   });
 
-  test('WP injected __mullionThemeId overrides localStorage stored theme', async ({ page }) => {
-    // localStorage has tokyo-night but WP injection says cyberpunk
+  // P79-A: this was titled "WP injected __mullionThemeId overrides localStorage
+  // stored theme" and asserted only that a style element contained `:host`,
+  // which is always true. Measured against the resolved tokens, the page does
+  // the opposite, and that is the documented priority in ThemeContext: the
+  // user's stored choice wins while the admin allows overrides, and the
+  // injected id wins only once overrides are disabled. Both halves are now
+  // pinned; the fingerprint is `colors.background`, which differs between the
+  // two themes.
+  test('a stored user choice wins over the WP-injected theme while user overrides are allowed', async ({ page }) => {
+    expect(themeBackground('cyberpunk')).not.toBe(themeBackground('tokyo-night'));
     await installThemeSession(page, { themeId: 'tokyo-night', wpInjectedThemeId: 'cyberpunk' });
     await page.goto('/');
     await waitForShadowMount(page);
 
-    // Check that CSS variables reflect the WP-injected theme (cyberpunk)
-    const themeApplied = await page.evaluate(() => {
-      const shadowRoot = document.getElementById('root')?.shadowRoot;
-      if (!shadowRoot) return null;
-      const styleEl = shadowRoot.querySelector('#mullion-theme-vars') as HTMLStyleElement | null;
-      return styleEl?.textContent ?? null;
-    });
-
-    // The CSS variables should be non-empty and belong to cyberpunk
-    expect(themeApplied).toBeTruthy();
-    expect(themeApplied).toContain(':host');
+    await expect.poll(() => hostBackground(page)).toBe(themeBackground('tokyo-night'));
   });
 
-  test('CSS variable style element exists inside shadow root after mount', async ({ page }) => {
+  test('the WP-injected theme wins over a stored choice once the admin disables user overrides', async ({ page }) => {
+    await installThemeSession(page, {
+      themeId: 'tokyo-night',
+      wpInjectedThemeId: 'cyberpunk',
+      allowUserThemeOverride: false,
+    });
+    await page.goto('/');
+    await waitForShadowMount(page);
+
+    await expect.poll(() => hostBackground(page)).toBe(themeBackground('cyberpunk'));
+  });
+
+  test('theme tokens reach the shadow host after mount', async ({ page }) => {
     await installThemeSession(page, { themeId: 'material-dark' });
     await page.goto('/');
     await waitForShadowMount(page);
 
-    const hasThemeVars = await page.evaluate(() => {
-      const shadowRoot = document.getElementById('root')?.shadowRoot;
-      return !!shadowRoot?.querySelector('#mullion-theme-vars');
-    });
-    expect(hasThemeVars).toBe(true);
+    await expect.poll(() => hostBackground(page)).toBe(themeBackground('material-dark'));
   });
 });
 

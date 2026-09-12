@@ -57,10 +57,13 @@ export interface PortalTarget {
   mode: PortalMode;
   /** The element Mantine portals into. Null means Mantine's default. */
   target: HTMLElement | null;
-  /** Present in `overlay-root` mode only. */
+  /**
+   * Present in `overlay-root` mode only. The `--mullion-*` token sheet is no
+   * longer mirrored here: `MullionProvider` (P79-A) writes it into whichever
+   * tree `target` is in, keyed on the target's `data-mullion-scope`.
+   */
   overlay?: {
     host: HTMLElement;
-    themeVars: HTMLStyleElement;
     mantineVars: HTMLStyleElement;
   };
 }
@@ -82,13 +85,11 @@ function createPortalTarget(mode: PortalMode, rootId: string, shadowRootEl?: Sha
     const base = document.createElement('style');
     base.setAttribute('data-mullion', 'true');
     base.textContent = overlayStyles;
-    const themeVars = document.createElement('style');
-    themeVars.id = 'mullion-theme-vars';
     const mantineVars = document.createElement('style');
     mantineVars.setAttribute('data-mantine-styles', 'variables');
     const target = createTarget(rootId);
-    shadow.append(base, themeVars, mantineVars, target);
-    return { mode, target, overlay: { host, themeVars, mantineVars } };
+    shadow.append(base, mantineVars, target);
+    return { mode, target, overlay: { host, mantineVars } };
   }
   return { mode: 'document', target: null };
 }
@@ -124,11 +125,6 @@ export function withPortalTarget(theme: MantineThemeOverride, portal: PortalTarg
       Portal: { defaultProps: { target: portal.target } },
     },
   };
-}
-
-/** Writes the gallery's theme variables into the overlay root's copy. */
-export function syncOverlayThemeVars(portal: PortalTarget, cssVars: string): void {
-  if (portal.overlay) portal.overlay.themeVars.textContent = cssVars;
 }
 
 /**

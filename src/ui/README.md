@@ -23,8 +23,33 @@ construction.
    When a framework component replaces a name, its export line moves from
    `@mantine/core` to a sibling module in this directory. The export list is
    the migration ledger.
-3. **This phase re-exports only.** No behaviour is re-implemented here.
-   Interaction code arrives with the framework components, not in the barrel.
+3. **The barrel re-exports; the framework lives in sibling directories.**
+   Phase 78 shipped the barrel as re-exports only. Phase 79 adds the first
+   code of our own: `provider/` holds `MullionProvider`, the theme registry
+   and the token sheet (P79-A). Interaction code arrives with the framework
+   components in Phase 80, never in the barrel itself.
+
+## The provider
+
+`MullionProvider` owns everything that used to be spread across
+`ThemeContext`'s variable injection, `OverlayRootSync`, `AdminChromeProvider`
+and `adminChromeStyles()`: which tree the `--mullion-*` token sheet is written
+into, the `color-scheme` on the scope, the container overlays portal into,
+lock and follow for chrome, persistence and runtime themes. The rule it
+enforces is that every element it paints, inline or portaled, sits under an
+element carrying its tokens by stylesheet, so nothing is carried inline.
+
+```tsx
+<MullionProvider theme="tokyo-night" scope={shadowRoot} portal={overlayTarget}>
+  ...
+  <MullionProvider mode="lock">   {/* brand palette, identical tree in both modes */}
+```
+
+Hooks: `useMullionTheme()` (switching API, always the root's),
+`useMullionScope()` (what the nearest provider paints), `useMullionPortal()`
+(where overlays go). `defineTheme()` registers a theme at runtime and refuses
+one that fails the contrast audits. A static test forbids any
+`[data-*-color-scheme]` ancestor selector under `src/ui`.
 
 ## The allow-list
 

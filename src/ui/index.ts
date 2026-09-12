@@ -130,3 +130,28 @@ export {
 export { modals, ModalsProvider } from '@mantine/modals';
 export { notifications, Notifications, showNotification } from '@mantine/notifications';
 export { useForm } from '@mantine/form';
+
+// ── Framework: provider and theme registry (P79-A) ─────────────────────────
+// The first names on this surface that are ours rather than re-exports. The
+// provider owns scope, tokens, colour scheme, portal container, lock and
+// follow, persistence and runtime themes; see src/ui/provider/MullionProvider.tsx.
+export {
+  MullionProvider,
+  type MullionProviderProps,
+  type MullionScope,
+  type MullionMode,
+  type MullionPersistence,
+} from './provider/MullionProvider';
+export { useMullionTheme, useMullionScope, useMullionPortal } from './provider/hooks';
+export type { MullionThemeManager, MullionScopeValue, MullionScopeMode } from './provider/mullionContexts';
+export {
+  BRAND_THEME_ID,
+  defineTheme,
+  hasTheme,
+  getThemeEntry,
+  listThemes,
+  resolveThemeId,
+  type DefineThemeResult,
+  type MullionThemeEntry,
+} from './provider/registry';
+export { buildTokenSheet } from './provider/tokenSheet';

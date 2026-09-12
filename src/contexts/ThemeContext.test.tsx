@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { ThemeProvider } from './ThemeContext';
 import { useTheme } from '../hooks/useTheme';
 import { resolveWpThemeIds } from '../services/wpThemeId';
-import { DEFAULT_THEME_ID, getAllThemeMeta, getTheme } from '../themes/index';
+import { DEFAULT_THEME_ID, getAllThemeMeta } from '../themes/index';
 
 function wrapper({ children }: { children: ReactNode }) {
   // Inject the app's WP theme-id resolver — the WordPress global reads now live
@@ -24,7 +24,6 @@ describe('ThemeProvider', () => {
     // Reset any window globals
     delete (window as unknown as Record<string, unknown>).__mullionThemeId;
     delete (window as unknown as Record<string, unknown>).__MULLION_CONFIG__;
-    document.head.querySelectorAll('style[id^="mullion-theme-vars-"]').forEach((node) => node.remove());
   });
 
   it('provides default theme when no preference is set', () => {
@@ -157,117 +156,5 @@ describe('ThemeProvider', () => {
     expect(result.current.themeId).toBe(otherTheme!.id);
     // Should NOT have persisted
     expect(localStorage.getItem('mullion-theme-id')).toBeNull();
-  });
-
-  it('updates scoped document CSS variables when previewing a theme in non-shadow mode', () => {
-    const host = document.createElement('div');
-    host.dataset.mullionThemeScope = 'test-scope';
-    document.body.appendChild(host);
-
-    const scopedWrapper = ({ children }: { children: ReactNode }) => (
-      <ThemeProvider
-        hostElement={host}
-        themeScopeSelector='[data-mullion-theme-scope="test-scope"]'
-      >
-        {children}
-      </ThemeProvider>
-    );
-
-    const { result } = renderHook(() => useTheme(), { wrapper: scopedWrapper });
-    const otherTheme = result.current.availableThemes.find((theme) => theme.id !== DEFAULT_THEME_ID);
-    expect(otherTheme).toBeDefined();
-
-    const initialStyle = document.head.querySelector('#mullion-theme-vars-test-scope') as HTMLStyleElement | null;
-    expect(initialStyle).toBeTruthy();
-    expect(initialStyle?.textContent).toContain('[data-mullion-theme-scope="test-scope"]');
-
-    act(() => {
-      result.current.setPreviewTheme(otherTheme!.id);
-    });
-
-    const updatedStyle = document.head.querySelector('#mullion-theme-vars-test-scope') as HTMLStyleElement | null;
-    expect(updatedStyle).toBeTruthy();
-    expect(result.current.themeId).toBe(otherTheme!.id);
-    expect(updatedStyle?.textContent).toBe(
-      getTheme(otherTheme!.id).cssVars.replace(/:host/g, '[data-mullion-theme-scope="test-scope"]'),
-    );
-
-    host.remove();
-    updatedStyle?.remove();
-  });
-
-  it('injects and updates CSS variables inside a shadow root when previewing a theme', () => {
-    const host = document.createElement('div');
-    const shadowRoot = host.attachShadow({ mode: 'open' });
-    document.body.appendChild(host);
-
-    const shadowWrapper = ({ children }: { children: ReactNode }) => (
-      <ThemeProvider shadowRoot={shadowRoot}>{children}</ThemeProvider>
-    );
-
-    const { result } = renderHook(() => useTheme(), { wrapper: shadowWrapper });
-    const otherTheme = result.current.availableThemes.find((theme) => theme.id !== DEFAULT_THEME_ID);
-    expect(otherTheme).toBeDefined();
-
-    const initialStyle = shadowRoot.querySelector('#mullion-theme-vars') as HTMLStyleElement | null;
-    expect(initialStyle).toBeTruthy();
-    expect(initialStyle?.textContent).toBe(getTheme(DEFAULT_THEME_ID).cssVars);
-
-    act(() => {
-      result.current.setPreviewTheme(otherTheme!.id);
-    });
-
-    const updatedStyle = shadowRoot.querySelector('#mullion-theme-vars') as HTMLStyleElement | null;
-    expect(updatedStyle).toBeTruthy();
-    expect(result.current.themeId).toBe(otherTheme!.id);
-    expect(updatedStyle?.textContent).toBe(getTheme(otherTheme!.id).cssVars);
-
-    host.remove();
-  });
-
-  it('removes shadow DOM theme style element on unmount', () => {
-    const host = document.createElement('div');
-    const shadowRoot = host.attachShadow({ mode: 'open' });
-    document.body.appendChild(host);
-
-    const shadowWrapper = ({ children }: { children: ReactNode }) => (
-      <ThemeProvider shadowRoot={shadowRoot}>{children}</ThemeProvider>
-    );
-
-    const { unmount } = renderHook(() => useTheme(), { wrapper: shadowWrapper });
-
-    // Verify the style element was injected
-    expect(shadowRoot.querySelector('#mullion-theme-vars')).not.toBeNull();
-
-    unmount();
-
-    // Verify the style element was removed on unmount
-    expect(shadowRoot.querySelector('#mullion-theme-vars')).toBeNull();
-
-    host.remove();
-  });
-
-  it('removes scoped document CSS variables on unmount', () => {
-    const host = document.createElement('div');
-    host.dataset.mullionThemeScope = 'cleanup-scope';
-    document.body.appendChild(host);
-
-    const scopedWrapper = ({ children }: { children: ReactNode }) => (
-      <ThemeProvider
-        hostElement={host}
-        themeScopeSelector='[data-mullion-theme-scope="cleanup-scope"]'
-      >
-        {children}
-      </ThemeProvider>
-    );
-
-    const { unmount } = renderHook(() => useTheme(), { wrapper: scopedWrapper });
-
-    expect(document.head.querySelector('#mullion-theme-vars-cleanup-scope')).toBeTruthy();
-
-    unmount();
-
-    expect(document.head.querySelector('#mullion-theme-vars-cleanup-scope')).toBeNull();
-    host.remove();
   });
 });

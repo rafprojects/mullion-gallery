@@ -1,26 +1,22 @@
 import { useEffect } from 'react';
 import { useMantineTheme } from '@mantine/core';
-import { syncOverlayMantineVars, syncOverlayThemeVars, type PortalTarget } from './portalTarget';
+import { syncOverlayMantineVars, type PortalTarget } from './portalTarget';
 
 /**
- * P77-B prototype: keeps the overlay root's copies of the theme variables
- * current. Renders nothing; must sit inside the `MantineProvider` whose theme
- * it mirrors. No-op unless the portal mode is `overlay-root`.
+ * P77-B: keeps the overlay root's copy of Mantine's variables current. Renders
+ * nothing; must sit inside the `MantineProvider` whose theme it mirrors. No-op
+ * unless the portal mode is `overlay-root`. The `--mullion-*` token sheet it
+ * also mirrored until P79-A is now written by `MullionProvider`; this survives
+ * only until Phase 81 removes Mantine's own variables.
  */
 export function OverlayRootSync({
   portal,
-  cssVars,
   colorScheme,
 }: {
   portal: PortalTarget;
-  cssVars: string;
   colorScheme: 'light' | 'dark';
 }) {
   const theme = useMantineTheme();
-
-  useEffect(() => {
-    syncOverlayThemeVars(portal, cssVars);
-  }, [portal, cssVars]);
 
   useEffect(() => {
     syncOverlayMantineVars(portal, theme, colorScheme);

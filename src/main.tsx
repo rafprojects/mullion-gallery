@@ -23,7 +23,7 @@ import { createAppQueryClient } from './services/queryClient'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { resolveWpThemeIds } from './services/wpThemeId'
 import { useTheme } from './hooks/useTheme'
-import { buildThemeScopeSelector, ensureHostThemeScopeToken } from './utils/themeScope'
+import { MullionProvider } from './ui'
 import { RootIdProvider } from '@mullion/shared-ui'
 import { parseProps, parseNodeConfig, type MountProps, type NodeConfig } from './mountConfig'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -64,10 +64,6 @@ if ('serviceWorker' in navigator && !import.meta.env.DEV) {
   });
 }
 
-const ensureThemeScopeSelector = (host: HTMLElement): string => {
-  return buildThemeScopeSelector(ensureHostThemeScopeToken(host))
-}
-
 /**
  * P36-A: Stable root identity for a host element. Used to scope localStorage
  * keys (`mullion_view_<rootId>_<feature>`) across multiple shortcode mounts.
@@ -85,20 +81,28 @@ const getRootId = (host: HTMLElement, index = 0): string => {
  * Inner shell that consumes the ThemeContext and feeds the resolved
  * MantineThemeOverride into MantineProvider. This component re-renders
  * only when the theme changes (O(1) map lookup, pre-computed objects).
+ *
+ * P79-A: `MullionProvider` sits beside `MantineProvider` (Phase 79 Key
+ * Decision A). It owns the `--mullion-*` token sheet for the gallery tree
+ * (shadow root or scoped host element) and for the overlay root, following
+ * the theme id `ThemeContext` still selects; Mantine keeps its own variables
+ * until Phase 81.
  */
 // eslint-disable-next-line react-refresh/only-export-components
 function ThemedApp({
   props,
   isShadowDom,
   shadowRootEl,
+  hostElement,
   rootId,
 }: {
   props: MountProps
   isShadowDom: boolean
   shadowRootEl?: ShadowRoot | undefined
+  hostElement: HTMLElement
   rootId: string
 }) {
-  const { mantineTheme, colorScheme, cssVars } = useTheme()
+  const { themeId, mantineTheme, colorScheme } = useTheme()
   // P77-B: where overlays portal under a shadow mount. See portalTarget.ts.
   const portal = usePortalTarget(portalMode, rootId, shadowRootEl)
 
@@ -119,32 +123,39 @@ function ThemedApp({
   )
 
   return (
-    <MantineProvider
-      theme={themeWithA11y}
-      forceColorScheme={colorScheme}
-      deduplicateInlineStyles
-      // Scope Mantine CSS variables into shadow root or document :root
-      cssVariablesSelector={isShadowDom ? ':host' : ':root'}
-      // getRootElement controls where data-mantine-color-scheme is set.
-      // Must match cssVariablesSelector: :host → shadow host, :root → <html>.
-      getRootElement={() =>
-        isShadowDom && shadowRootEl
-          ? (shadowRootEl.host as HTMLElement) ?? document.documentElement
-          : document.documentElement
-      }
+    <MullionProvider
+      theme={themeId}
+      scope={shadowRootEl ?? hostElement}
+      portal={portal.target ?? undefined}
+      instanceId={rootId}
     >
-      <OverlayRootSync portal={portal} cssVars={cssVars} colorScheme={colorScheme} />
-      <Notifications withinPortal={false} />
-      <ModalsProvider>
-        {/* P69-D: public-facing boundary. No isAdmin prop → a public visitor
-            sees generic copy, never a raw exception message (Sentry still gets
-            the full error). Admin sub-trees have their own inner ErrorBoundary
-            passing isAdmin so operators keep raw messages for troubleshooting. */}
-        <ErrorBoundary>
-          <App {...props} />
-        </ErrorBoundary>
-      </ModalsProvider>
-    </MantineProvider>
+      <MantineProvider
+        theme={themeWithA11y}
+        forceColorScheme={colorScheme}
+        deduplicateInlineStyles
+        // Scope Mantine CSS variables into shadow root or document :root
+        cssVariablesSelector={isShadowDom ? ':host' : ':root'}
+        // getRootElement controls where data-mantine-color-scheme is set.
+        // Must match cssVariablesSelector: :host → shadow host, :root → <html>.
+        getRootElement={() =>
+          isShadowDom && shadowRootEl
+            ? (shadowRootEl.host as HTMLElement) ?? document.documentElement
+            : document.documentElement
+        }
+      >
+        <OverlayRootSync portal={portal} colorScheme={colorScheme} />
+        <Notifications withinPortal={false} />
+        <ModalsProvider>
+          {/* P69-D: public-facing boundary. No isAdmin prop → a public visitor
+              sees generic copy, never a raw exception message (Sentry still gets
+              the full error). Admin sub-trees have their own inner ErrorBoundary
+              passing isAdmin so operators keep raw messages for troubleshooting. */}
+          <ErrorBoundary>
+            <App {...props} />
+          </ErrorBoundary>
+        </ModalsProvider>
+      </MantineProvider>
+    </MullionProvider>
   )
 }
 
@@ -161,7 +172,6 @@ const renderApp = (
   nodeConfig: NodeConfig = {},
 ) => {
   const isShadow = !!shadowRootEl
-  const themeScopeSelector = shadowRootEl ? undefined : ensureThemeScopeSelector(hostElement)
   const queryClient = createAppQueryClient()
   const instanceId = nodeConfig.spaceId != null ? String(nodeConfig.spaceId) : undefined
 
@@ -170,9 +180,6 @@ const renderApp = (
       <QueryClientProvider client={queryClient}>
         <RootIdProvider value={rootId}>
           <ThemeProvider
-            shadowRoot={shadowRootEl ?? null}
-            hostElement={hostElement}
-            themeScopeSelector={themeScopeSelector}
             allowPersistence={allowThemePersistence}
             defaultThemeId={nodeConfig.theme}
             instanceId={instanceId}
@@ -182,6 +189,7 @@ const renderApp = (
               props={props}
               isShadowDom={isShadow}
               shadowRootEl={shadowRootEl}
+              hostElement={hostElement}
               rootId={rootId}
             />
           </ThemeProvider>
@@ -240,7 +248,6 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
     shadowRoot?: ShadowRoot
     props: MountProps
     portalKey: string
-    themeScopeSelector?: string
     nodeConfig: NodeConfig
   }
 
@@ -270,14 +277,7 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
       instances.push({ mountPoint, hostElement: host, shadowRoot, props, portalKey, nodeConfig })
     } else {
       const portalKey = getRootId(host, index)
-      instances.push({
-        mountPoint: host,
-        hostElement: host,
-        props,
-        portalKey,
-        themeScopeSelector: ensureThemeScopeSelector(host),
-        nodeConfig,
-      })
+      instances.push({ mountPoint: host, hostElement: host, props, portalKey, nodeConfig })
     }
   })
 
@@ -318,9 +318,6 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
           return createPortal(
             <RootIdProvider value={inst.portalKey}>
               <ThemeProvider
-                shadowRoot={inst.shadowRoot ?? null}
-                hostElement={inst.hostElement}
-                themeScopeSelector={inst.themeScopeSelector}
                 allowPersistence={i === 0 && allowThemePersistence}
                 defaultThemeId={inst.nodeConfig.theme}
                 instanceId={instanceId}
@@ -330,6 +327,7 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
                   props={inst.props}
                   isShadowDom={!!inst.shadowRoot}
                   shadowRootEl={inst.shadowRoot}
+                  hostElement={inst.hostElement}
                   rootId={inst.portalKey}
                 />
               </ThemeProvider>
