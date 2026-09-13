@@ -274,9 +274,16 @@ one dark theme using the toolbar theme picker.
 | 9 | With a screen reader: the dialog is announced with its title, and the menu as a menu with its item count | 4.1.2 |
 | 10 | The **Hostile host** story: every overlay still covers the sticky header after scrolling | — |
 
-**Known, already filed in [PHASE80_REPORT.md](../PHASE80_REPORT.md):** a `tone="danger"` menu item
-fails AA contrast while highlighted on 22 of 23 themes. Do not re-report it; note only if what you
-see differs from that description.
+**Known, and changed on 2026-09-13 — read before check 7.** A menu row that carries a tone (the
+red `Delete` in the **Menus** story) **deliberately does not tint when highlighted**, while an
+un-toned row does. That is the framework's rule applied: tint the ground or colour the ink, never
+both. So on the `Delete` row, a pointer hover shows **no visible change at all** and only a
+keyboard move shows the focus ring. That is current intended behaviour, not a bug, and the missing
+hover affordance on toned rows is an open design question with the designer.
+
+What is still worth reporting from check 7: whether the ring appears on un-toned rows on a keyboard
+move only, and whether you can actually *find* the highlighted row while arrowing quickly through a
+long menu.
 
 | Story | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 |-------|---|---|---|---|---|---|---|---|---|----|
