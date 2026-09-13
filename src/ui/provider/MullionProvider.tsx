@@ -23,6 +23,7 @@
 import {
   useCallback,
   useContext,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -79,6 +80,8 @@ export interface MullionProviderProps {
    * A registered theme id, or a definition registered on first render through
    * `defineTheme`. A root provider treats it as the instance default, below a
    * persisted user choice; a locked nested provider paints exactly this theme.
+   * Pass a definition by stable reference: it is re-registered, audits and
+   * all, whenever its identity changes.
    */
   theme?: string | ThemeExtension | ThemeDefinition | undefined;
   /**
@@ -249,10 +252,18 @@ export function MullionProvider({
   // portal container live, so nothing the provider paints is left unstyled.
   const handlesRef = useRef<SheetHandle[]>([]);
   const adoptedRef = useRef<Map<SheetRoot, () => void>>(new Map());
-  useLayoutEffect(() => {
+  // [P79-0] Written as a function the two effects below share. The layout
+  // effect paints before the first frame; a passive effect repeats the pass
+  // when a target had no tree yet, because a nested provider's container is
+  // attached to its parent's before the parent's own layout effect has put
+  // that one in the document. Every layout effect in the commit runs before
+  // any passive one, so the second pass sees the finished tree.
+  const paint = useCallback((): boolean => {
     const targets: Array<{ root: SheetRoot; selector: string }> = [];
+    let complete = true;
     const add = (root: SheetRoot | null, sel: string) => {
-      if (root && !targets.some((t) => t.root === root && t.selector === sel)) targets.push({ root, selector: sel });
+      if (!root) complete = false;
+      else if (!targets.some((t) => t.root === root && t.selector === sel)) targets.push({ root, selector: sel });
     };
     if (isShadowRoot(scope)) add(scope, ':host');
     else if (scope === 'document') add(document, ':root');
@@ -295,7 +306,22 @@ export function MullionProvider({
       if (!next.includes(h)) h.remove();
     }
     handlesRef.current = next;
+    return complete;
   }, [scope, selector, container, entry, scopeId]);
+
+  const deferredRef = useRef(false);
+  useLayoutEffect(() => {
+    deferredRef.current = !paint();
+  }, [paint]);
+  useEffect(() => {
+    if (!deferredRef.current) return;
+    deferredRef.current = false;
+    if (!paint() && import.meta.env.DEV) {
+      // A caller-supplied container attached after this point is never painted:
+      // the passes above run only on a prop or theme change.
+      console.warn('[Mullion UI] A `portal` container is not attached to a document or shadow root; overlays in it will not receive this provider\'s tokens. Attach it before the provider mounts.');
+    }
+  }, [paint]);
 
   useLayoutEffect(
     () => () => {

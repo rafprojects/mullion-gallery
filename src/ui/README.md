@@ -91,8 +91,9 @@ over them without specificity games.
 
 `components/` holds the thirty components the study lists as "ours,
 presentational": no keyboard handling, no ARIA state machine, nothing to buy
-from a headless primitive. Seven sheets, one per family, plus the focus rule,
-registered into the style list when the module is imported.
+from a headless primitive. Seven sheets, one per family, plus the tone ladder
+(`styles/tones.css`) and the focus rule, registered into the style list when
+the module is imported.
 
 Four rules govern every one of them:
 
@@ -117,6 +118,13 @@ Four rules govern every one of them:
    icon is the exception, because it answers to 1.4.11's 3:1 rather than
    1.4.3's 4.5:1. `e2e/ui-showcase.spec.ts` measures every tone against every
    variant on all 23 bundled themes, at rest and on hover, at both floors.
+
+   A tone applies to the element that declares it. Custom properties inherit,
+   so a component reads `--mullion-tone` only under its own
+   `[data-mullion-tone]`, never bare (P79-0). An un-toned `Text` or `Title`
+   inherits its colour, as Mantine's do, and a `Loader` inside a control is
+   drawn in the control's ink. The parts of one component, an alert's icon or
+   a chip's label, read the inherited value on purpose.
 2. **Per-instance geometry is an inline custom property.** `gap="md"` becomes
    `--mullion-gap: var(--mullion-spacing-md)` on the element, so the value
    travels with it into any tree. A scale step resolves to a token, a number
@@ -128,7 +136,10 @@ Four rules govern every one of them:
    `ControlBase`, which stamps `data-mullion-focus`; `styles/focus.css` is
    keyed on that attribute alone. `chrome-portable.scss` had to spell the
    ring as a list of Mantine class selectors and that list was twice found
-   incomplete, which is the shape this replaces.
+   incomplete, which is the shape this replaces. A Phase 80 wrapper spreads
+   `focusable` on the Base UI part that takes focus; the rule matches
+   `[data-focus-visible]` only together with our attribute, so a part without
+   it has no ring.
 
 Polymorphism is a `render` prop, taking an element to clone or a function
 handed the props: `<Text render={<label htmlFor="x" />} />`. Base UI, chosen

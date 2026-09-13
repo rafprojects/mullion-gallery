@@ -18,6 +18,7 @@
  */
 
 import { registerUiStyles } from '../styles/uiStyles';
+import tonesCss from '../styles/tones.css?inline';
 import layoutCss from './layout.css?inline';
 import surfaceCss from './surface.css?inline';
 import typographyCss from './typography.css?inline';
@@ -31,6 +32,8 @@ import focusCss from '../styles/focus.css?inline';
 // `.mullion-group` differ by two declarations and share their padding idiom,
 // so a file each would put one rule in each of seven files. The three static
 // guards in `../__tests__/componentSheets.test.ts` cover them either way.
+// The tone ladder first: it is the vocabulary every other sheet reads.
+registerUiStyles('ui/tones', tonesCss);
 registerUiStyles('ui/layout', layoutCss);
 registerUiStyles('ui/surface', surfaceCss);
 registerUiStyles('ui/typography', typographyCss);

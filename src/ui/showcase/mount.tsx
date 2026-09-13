@@ -123,6 +123,16 @@ function Gallery({ prefix }: { prefix: string }) {
       <Alert tone="info" title="An alert">
         Reads the info tone.
       </Alert>
+      {/* P79-0: where a tone meets an element that did not declare one. */}
+      <Alert tone="danger" data-testid={`${prefix}-tone-alert`}>
+        <Text data-testid={`${prefix}-tone-plain`}>plain text inside a toned alert</Text>
+      </Alert>
+      <Text tone="muted" data-testid={`${prefix}-tone-muted`}>
+        muted text with <Anchor href="#top" data-testid={`${prefix}-tone-anchor`}>a link</Anchor>
+      </Text>
+      <Button loading data-testid={`${prefix}-tone-loading`}>
+        loading
+      </Button>
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
         <Paper withBorder padding="sm">
           <Text size="sm">bordered paper</Text>

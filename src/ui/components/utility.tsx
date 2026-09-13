@@ -38,13 +38,16 @@ export interface CollapseProps extends UiElementProps {
   children?: ReactNode;
 }
 
-export function Collapse({ className, style, render, children, in: open, duration }: CollapseProps) {
+export function Collapse({ className, style, render, children, in: open, duration, ...rest }: CollapseProps) {
   return renderElement(
     'div',
     {
+      ...rest,
       className: cx('mullion-collapse', className),
       'data-open': open ? '' : undefined,
-      ...(open ? {} : { 'aria-hidden': 'true' }),
+      // Closed content is clipped, not removed, so without `inert` its
+      // controls would stay in the tab order behind a zero-height box.
+      ...(open ? {} : { 'aria-hidden': 'true', inert: true }),
       style: {
         ...customProperties({
           '--mullion-collapse-duration': duration === undefined ? undefined : `${duration}ms`,

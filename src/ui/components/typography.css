@@ -1,8 +1,9 @@
 /*
  * Typography (P79-C). Colour arrives as a `data-mullion-tone` attribute resolved to a
- * token here, never as a prop value: a component that took `c="#888"` would be
- * making a theme decision the theme cannot see. The tone list is the same on
- * `Text`, `Title`, `Anchor`, `Badge` and `Alert`, so a reader learns it once.
+ * token, never as a prop value: a component that took `c="#888"` would be
+ * making a theme decision the theme cannot see. The ladder that resolves the
+ * attribute is `../styles/tones.css`, shared with `Badge`, `Alert` and the
+ * controls, so a reader learns it once.
  *
  * The type scale and the heading scale are the theme's own, emitted by the
  * engine since P79-C. A theme that ships a larger `fontSizes.md` moves every
@@ -15,9 +16,17 @@
     font-size: var(--mullion-font-size, var(--mullion-font-size-md));
     font-weight: var(--mullion-font-weight, 400);
     line-height: 1.55;
-    color: var(--mullion-tone, var(--mullion-color-text));
+    /* No colour of its own: an un-toned Text inherits, as Mantine's does, so a
+       label inside a filled control or an alert body takes that surface's ink.
+       Colour arrives only with the attribute; see styles/tones.css. */
     text-align: var(--mullion-text-align, inherit);
     text-transform: var(--mullion-text-transform, none);
+  }
+
+  .mullion-text[data-mullion-tone],
+  .mullion-title[data-mullion-tone],
+  .mullion-anchor[data-mullion-tone] {
+    color: var(--mullion-tone);
   }
 
   .mullion-text[data-font='mono'] {
@@ -46,7 +55,6 @@
     margin: 0;
     font-family: var(--mullion-heading-font-family, var(--mullion-font-family));
     font-weight: 600;
-    color: var(--mullion-tone, var(--mullion-color-text));
     text-align: var(--mullion-text-align, inherit);
   }
 
@@ -83,7 +91,10 @@
   .mullion-anchor {
     font-family: var(--mullion-font-family);
     font-size: var(--mullion-font-size, inherit);
-    color: var(--mullion-tone, var(--mullion-color-primary-stroke));
+    /* Link text answers to 1.4.3's 4.5:1, so the default is the primary text
+       rung and not `primary-stroke`, which is selected at the 3:1 non-text
+       floor for the ring and borders. */
+    color: var(--mullion-primary-text);
     cursor: pointer;
     text-decoration: none;
   }
@@ -108,98 +119,5 @@
     font-family: var(--mullion-font-family-mono);
     font-size: 0.85em;
     line-height: 1.4;
-  }
-
-  /*
-   * The tone ladder, shared by every component that takes `tone`. Each entry
-   * sets one custom property and the component rules above read it, so a new
-   * component joins the ladder by reading `--mullion-tone` rather than by
-   * growing this list.
-   *
-   * This is the one selector in the framework not scoped by a `.mullion-*`
-   * class, because scoping it would mean a rule per tone per component. The
-   * attribute carries the namespace instead: under a light mount this sheet is
-   * adopted into the document, where a bare `[data-tone]` would paint host
-   * page content that happens to use the name.
-   */
-  /*
-   * Three properties per tone, not one.
-   *
-   * `--mullion-tone` is the colour to draw WITH on a neutral ground: a label,
-   * a border, an icon. It is the role's contrast-selected text rung, which
-   * P79-C added to the engine, because a role colour as the theme declares it
-   * is not guaranteed to be readable: a danger label measured 3.90:1 on
-   * github-light. `primary` reads its own rung rather than
-   * `--mullion-color-primary-stroke`, which is selected at the 3:1 non-text
-   * floor and stays the focus ring's colour.
-   *
-   * `-fill` is the ground of a solid control and `-on` is the ink that reads
-   * on it. The fill differs from the draw colour for `primary`, where the
-   * engine selects a separate fill rung with its own paired ink; a `filled`
-   * button using the stroke rung as its ground measured 2.55:1 on
-   * tokyo-night, which is how the split was found.
-   *
-   * `-wash` and `-wash-strong` are the grounds of the `light` variant, at
-   * rest and on hover. They mix the role's own declared colour rather than
-   * its text rung, which is dark on a light theme and made the wash darker
-   * than the label sitting on it: `light` fell to 1.25:1 on default-light
-   * before this pair existed. `default` and `muted` have no role colour to
-   * wash, so they take the theme's neutral surfaces, which its text is
-   * already audited against.
-   */
-  [data-mullion-tone='default'] {
-    --mullion-tone: var(--mullion-color-text);
-    --mullion-tone-fill: var(--mullion-color-text);
-    --mullion-tone-on: var(--mullion-color-background);
-    --mullion-tone-wash: var(--mullion-color-surface2);
-    --mullion-tone-wash-strong: var(--mullion-color-surface3);
-  }
-
-  [data-mullion-tone='muted'] {
-    --mullion-tone: var(--mullion-color-text-muted);
-    --mullion-tone-fill: var(--mullion-color-text-muted);
-    --mullion-tone-on: var(--mullion-color-background);
-    --mullion-tone-wash: var(--mullion-color-surface2);
-    --mullion-tone-wash-strong: var(--mullion-color-surface3);
-  }
-
-  [data-mullion-tone='primary'] {
-    --mullion-tone: var(--mullion-primary-text);
-    --mullion-tone-fill: var(--mullion-color-primary);
-    --mullion-tone-on: var(--mullion-color-primary-on);
-    --mullion-tone-wash: color-mix(in srgb, var(--mullion-color-primary) 14%, var(--mullion-color-surface));
-    --mullion-tone-wash-strong: color-mix(in srgb, var(--mullion-color-primary) 20%, var(--mullion-color-surface));
-  }
-
-  [data-mullion-tone='success'] {
-    --mullion-tone: var(--mullion-success-text);
-    --mullion-tone-fill: var(--mullion-color-success);
-    --mullion-tone-on: var(--mullion-success-on);
-    --mullion-tone-wash: color-mix(in srgb, var(--mullion-color-success) 14%, var(--mullion-color-surface));
-    --mullion-tone-wash-strong: color-mix(in srgb, var(--mullion-color-success) 20%, var(--mullion-color-surface));
-  }
-
-  [data-mullion-tone='warning'] {
-    --mullion-tone: var(--mullion-warning-text);
-    --mullion-tone-fill: var(--mullion-color-warning);
-    --mullion-tone-on: var(--mullion-warning-on);
-    --mullion-tone-wash: color-mix(in srgb, var(--mullion-color-warning) 14%, var(--mullion-color-surface));
-    --mullion-tone-wash-strong: color-mix(in srgb, var(--mullion-color-warning) 20%, var(--mullion-color-surface));
-  }
-
-  [data-mullion-tone='danger'] {
-    --mullion-tone: var(--mullion-error-text);
-    --mullion-tone-fill: var(--mullion-color-error);
-    --mullion-tone-on: var(--mullion-error-on);
-    --mullion-tone-wash: color-mix(in srgb, var(--mullion-color-error) 14%, var(--mullion-color-surface));
-    --mullion-tone-wash-strong: color-mix(in srgb, var(--mullion-color-error) 20%, var(--mullion-color-surface));
-  }
-
-  [data-mullion-tone='info'] {
-    --mullion-tone: var(--mullion-info-text);
-    --mullion-tone-fill: var(--mullion-color-info);
-    --mullion-tone-on: var(--mullion-info-on);
-    --mullion-tone-wash: color-mix(in srgb, var(--mullion-color-info) 14%, var(--mullion-color-surface));
-    --mullion-tone-wash-strong: color-mix(in srgb, var(--mullion-color-info) 20%, var(--mullion-color-surface));
   }
 }

@@ -8,7 +8,7 @@
  * admin panel sit in.
  */
 
-import { useState, type ReactNode } from 'react';
+import { useState, type ReactEventHandler, type ReactNode } from 'react';
 import { renderElement, cx, type UiElementProps } from './element';
 import { customProperties, radiusValue, type UiRadius, type UiScaleStep } from './scale';
 
@@ -18,6 +18,7 @@ export interface ImageProps extends UiElementProps {
   /** Shown when `src` fails to load. Without one a failed image renders an empty box. */
   fallbackSrc?: string | undefined;
   loading?: 'eager' | 'lazy' | undefined;
+  onError?: ReactEventHandler<HTMLImageElement> | undefined;
   fit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down' | undefined;
   radius?: UiRadius | undefined;
   width?: number | string | undefined;
@@ -37,6 +38,7 @@ export function Image({
   radius,
   width,
   height,
+  onError,
   ...rest
 }: ImageProps) {
   const [failed, setFailed] = useState(false);
@@ -47,7 +49,10 @@ export function Image({
       ...rest,
       ...(resolved !== undefined ? { src: resolved } : {}),
       className: cx('mullion-image', className),
-      onError: () => setFailed(true),
+      onError: (event: Parameters<ReactEventHandler<HTMLImageElement>>[0]) => {
+        setFailed(true);
+        onError?.(event);
+      },
       style: {
         ...customProperties({
           '--mullion-image-fit': fit,
@@ -134,10 +139,12 @@ function TableScrollContainer({
   render,
   minWidth,
   children,
+  ...rest
 }: TableScrollContainerProps) {
   return renderElement(
     'div',
     {
+      ...rest,
       className: cx('mullion-table-scroll', className),
       style: {
         ...customProperties({ '--mullion-table-min-width': length(minWidth) }),

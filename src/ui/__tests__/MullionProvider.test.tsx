@@ -246,6 +246,24 @@ describe('MullionProvider portal', () => {
     overlay.host.remove();
   });
 
+  // [P79-0] The sheets are reconciled in a layout effect keyed on props and
+  // theme, so a container attached after mount is never painted. The
+  // contract is that a supplied container is attached first; the provider
+  // says so rather than failing silently. `portalTarget.ts` meets it by
+  // attaching the shadow-mode target at creation (see portalTarget.test.tsx).
+  it('warns when a supplied container has no tree to write into', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const detached = document.createElement('div');
+    render(
+      <MullionProvider theme="tokyo-night" scope="document" portal={detached}>
+        <Probe />
+      </MullionProvider>,
+    );
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('container is not attached'));
+    expect(sheetsIn(document).filter((s) => s.includes(detached.getAttribute(SCOPE_ATTR)!))).toHaveLength(0);
+    warn.mockRestore();
+  });
+
   it('nests a child container inside the parent container', () => {
     render(
       <MullionProvider theme="tokyo-night" scope="document">

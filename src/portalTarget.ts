@@ -74,9 +74,28 @@ function createTarget(rootId: string): HTMLElement {
   return target;
 }
 
+/**
+ * P79-0: the target is attached to the gallery's shadow root here, at
+ * creation, rather than in the effect below. `MullionProvider` reconciles its
+ * sheets in a layout effect that runs before this hook's effects (a child's
+ * effects run first), and a detached target has no tree to write into, so
+ * under `shadow` mode a nested provider's container went without its token
+ * sheet. Reusing an existing target keeps StrictMode's double initialiser
+ * from leaving an orphan in the tree.
+ */
+function createShadowTarget(rootId: string, shadowRootEl: ShadowRoot): HTMLElement {
+  const existing = Array.from(shadowRootEl.children).find(
+    (el): el is HTMLElement => el.getAttribute('data-mullion-portal') === rootId,
+  );
+  if (existing) return existing;
+  const target = createTarget(rootId);
+  shadowRootEl.appendChild(target);
+  return target;
+}
+
 function createPortalTarget(mode: PortalMode, rootId: string, shadowRootEl?: ShadowRoot): PortalTarget {
   if (mode === 'shadow' && shadowRootEl) {
-    return { mode, target: createTarget(rootId) };
+    return { mode, target: createShadowTarget(rootId, shadowRootEl) };
   }
   if (mode === 'overlay-root' && shadowRootEl) {
     const host = document.createElement('div');
@@ -105,7 +124,8 @@ export function usePortalTarget(mode: PortalMode, rootId: string, shadowRootEl?:
       document.body.appendChild(portal.overlay.host);
       return () => portal.overlay?.host.remove();
     }
-    shadowRootEl?.appendChild(portal.target);
+    // Already attached at creation; re-attach after StrictMode's simulated unmount.
+    if (!portal.target.isConnected) shadowRootEl?.appendChild(portal.target);
     return () => portal.target?.remove();
   }, [portal, shadowRootEl]);
 

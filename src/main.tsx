@@ -215,7 +215,8 @@ const renderApp = (
 ) => {
   const isShadow = !!shadowRootEl
   const queryClient = createAppQueryClient()
-  const instanceId = nodeConfig.spaceId != null ? String(nodeConfig.spaceId) : undefined
+  // The storage key is scoped by the space, never by the React root: see MullionProvider's `persistence.scope`.
+  const persistenceScope = nodeConfig.spaceId != null ? String(nodeConfig.spaceId) : undefined
 
   createRoot(mountNode).render(
     <StrictMode>
@@ -228,7 +229,7 @@ const renderApp = (
             hostElement={hostElement}
             rootId={rootId}
             defaultThemeId={nodeConfig.theme}
-            persistenceScope={instanceId}
+            persistenceScope={persistenceScope}
           />
         </RootIdProvider>
       </QueryClientProvider>
@@ -332,7 +333,7 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         {instances.map((inst, i) => {
-          const instanceId = inst.nodeConfig.spaceId != null ? String(inst.nodeConfig.spaceId) : undefined
+          const persistenceScope = inst.nodeConfig.spaceId != null ? String(inst.nodeConfig.spaceId) : undefined
           return createPortal(
             <RootIdProvider value={inst.portalKey}>
               <ThemedApp
@@ -342,7 +343,7 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
                 hostElement={inst.hostElement}
                 rootId={inst.portalKey}
                 defaultThemeId={inst.nodeConfig.theme}
-                persistenceScope={instanceId}
+                persistenceScope={persistenceScope}
                 persistTheme={i === 0}
               />
             </RootIdProvider>,

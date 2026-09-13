@@ -106,6 +106,12 @@
     align-items: center;
   }
 
+  /* A loading control's spinner is part of the control and takes its ink. */
+  .mullion-button .mullion-loader,
+  .mullion-action-icon .mullion-loader {
+    color: inherit;
+  }
+
   .mullion-button-label {
     overflow: hidden;
     text-overflow: ellipsis;

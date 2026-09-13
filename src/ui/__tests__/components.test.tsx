@@ -405,6 +405,13 @@ describe('feedback and display', () => {
     rerender(<Image src="/also-broken.png" alt="a campaign" />);
     fireEvent.error(container.querySelector('img')!);
     expect(container.querySelector('img')!.getAttribute('src')).toBe('/also-broken.png');
+
+    // [P79-0] The component's own error handler was replacing the caller's.
+    const onError = vi.fn();
+    rerender(<Image src="/x.png" fallbackSrc="/y.png" alt="a campaign" onError={onError} />);
+    fireEvent.error(container.querySelector('img')!);
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(container.querySelector('img')!.getAttribute('src')).toBe('/y.png');
   });
 
   it('carries a swatch colour inline, the one colour the framework takes as a prop', () => {
@@ -417,7 +424,7 @@ describe('feedback and display', () => {
 
   it('keeps the compound table spelling the codebase already uses', () => {
     const { container } = render(
-      <Table.ScrollContainer minWidth={640}>
+      <Table.ScrollContainer minWidth={640} data-testid="scroller">
         <Table striped highlightOnHover withTableBorder verticalSpacing="xs">
           <Table.Thead>
             <Table.Tr>
@@ -441,6 +448,7 @@ describe('feedback and display', () => {
     expect(vars(container.querySelector('.mullion-table-scroll')!)['--mullion-table-min-width']).toBe(
       '640px',
     );
+    expect(container.querySelector('.mullion-table-scroll')!.getAttribute('data-testid')).toBe('scroller');
   });
 });
 
@@ -451,14 +459,23 @@ describe('structural utilities', () => {
   });
 
   it('flags a collapse open or closed and hides the closed one from assistive tech', () => {
-    const { container, rerender } = render(<Collapse in={false}>hidden</Collapse>);
+    const { container, rerender } = render(
+      <Collapse in={false} data-testid="filters">
+        <button type="button">inside</button>
+      </Collapse>,
+    );
     const collapse = container.querySelector('.mullion-collapse')!;
     expect(collapse.hasAttribute('data-open')).toBe(false);
     expect(collapse.getAttribute('aria-hidden')).toBe('true');
+    // [P79-0] Closed content is clipped rather than removed, so it has to be
+    // inert or its button stays a tab stop behind a zero-height box.
+    expect(collapse.hasAttribute('inert')).toBe(true);
+    expect(collapse.getAttribute('data-testid')).toBe('filters');
     rerender(<Collapse in duration={120}>shown</Collapse>);
     const open = container.querySelector('.mullion-collapse')!;
     expect(open.hasAttribute('data-open')).toBe(true);
     expect(open.hasAttribute('aria-hidden')).toBe(false);
+    expect(open.hasAttribute('inert')).toBe(false);
     expect(vars(open)['--mullion-collapse-duration']).toBe('120ms');
   });
 });
@@ -598,6 +615,10 @@ describe('the component sheets on the framework list', () => {
       expect(ids, `${family} is not registered`).toContain(family);
       expect(ids.indexOf(family)).toBeGreaterThan(ids.indexOf('ui/base'));
       expect(
+        ids.indexOf('ui/tones'),
+        'the tone ladder is the vocabulary every component sheet reads, so it registers first',
+      ).toBeLessThan(ids.indexOf(family));
+      expect(
         ids.indexOf('ui/focus'),
         'the ring must come after every component sheet, or a focusable Card loses its halo to its own elevation',
       ).toBeGreaterThan(ids.indexOf(family));
@@ -612,6 +633,31 @@ describe('the component sheets on the framework list', () => {
     expect(text).toContain('@layer mullion.components {');
     expect(text).toContain("[data-mullion-tone='muted']");
     expect(text).not.toMatch(/(?<!mullion-)\[data-tone=/);
+  });
+
+  // [P79-0] Custom properties inherit, so the ladder's outputs reach every
+  // descendant of the element that declared the tone. A component must read
+  // `--mullion-tone` only under its own attribute: the first draft read it
+  // bare, so an un-toned Text inside a danger Alert painted red, an Anchor
+  // inside a muted Text went muted, and a Loader inside a filled Button drew
+  // the text rung on the fill.
+  it('reads a tone only on the element that declared it', () => {
+    const text = uiStylesText();
+    const block = (selector: string) => {
+      const match = text.match(new RegExp(`\\n  ${selector.replace(/[.[\]]/g, '\\$&')} \\{([^}]*)\\}`));
+      expect(match, `${selector} has no rule`).not.toBeNull();
+      return match![1]!;
+    };
+    for (const component of ['.mullion-text', '.mullion-title', '.mullion-anchor', '.mullion-loader']) {
+      expect(block(component), `${component} reads the tone without declaring one`).not.toContain('--mullion-tone');
+    }
+    expect(text).toContain('.mullion-text[data-mullion-tone],');
+    expect(text).toContain('.mullion-anchor[data-mullion-tone] {\n    color: var(--mullion-tone);');
+    expect(block('.mullion-loader[data-mullion-tone]')).toContain('var(--mullion-tone)');
+    // Link text is text: the default is the 4.5:1 rung, not the 3:1 stroke.
+    expect(block('.mullion-anchor')).toContain('color: var(--mullion-primary-text);');
+    // A spinner inside a control is part of it and takes its ink.
+    expect(text).toContain('.mullion-button .mullion-loader,\n  .mullion-action-icon .mullion-loader {\n    color: inherit;');
   });
 
   it('keeps the ring on one attribute rather than a list of component selectors', () => {

@@ -191,7 +191,8 @@ export function CloseButton({ className, ...rest }: CloseButtonProps) {
   );
 }
 
-export interface ChipProps extends UiElementProps {
+/** No `render`: the chip is a fixed label-and-input pair, so there is no single element to swap. */
+export interface ChipProps extends Omit<UiElementProps, 'render'> {
   checked?: boolean | undefined;
   defaultChecked?: boolean | undefined;
   onChange?: ((checked: boolean) => void) | undefined;

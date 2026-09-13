@@ -108,13 +108,21 @@
     box-sizing: border-box;
     inline-size: var(--mullion-loader-size, 1.5rem);
     block-size: var(--mullion-loader-size, 1.5rem);
-    border: 2px solid color-mix(in srgb, var(--mullion-tone, var(--mullion-color-primary-stroke)) 25%, transparent);
-    border-block-start-color: var(--mullion-tone, var(--mullion-color-primary-stroke));
+    /* Drawn in `currentColor` so a loader inside a filled Button spins in the
+       button's ink rather than the tone's text rung on the tone's fill. On its
+       own it is the primary stroke, a non-text mark at 1.4.11's 3:1. */
+    color: var(--mullion-color-primary-stroke);
+    border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-block-start-color: currentColor;
     border-radius: 50%;
     /* The duration token is zeroed by the token sheet under
        `prefers-reduced-motion: reduce`, and a zero-duration animation does not
        run, so the spinner stops without a second rule here (P79-B). */
     animation: mullion-spin calc(var(--mullion-duration-slow) * 3) linear infinite;
+  }
+
+  .mullion-loader[data-mullion-tone] {
+    color: var(--mullion-tone);
   }
 
   .mullion-loader[data-size='xs'] {

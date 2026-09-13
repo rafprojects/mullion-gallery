@@ -552,6 +552,39 @@ test('lock paints the brand palette in the overlay and follow paints the gallery
   );
 });
 
+// [P79-0] Custom properties inherit, so a tone declared on one element reaches
+// every descendant. A component reads `--mullion-tone` only under its own
+// attribute; the first draft read it bare, and all three of these painted the
+// wrong colour.
+test('a tone stops at the element that declared it', async ({ page }) => {
+  await open(page, 'shadow', 'lock', 'github-light');
+  const reading = await page.evaluate(() => {
+    const set = document.getElementById('showcase')!.shadowRoot!.querySelector('[data-testid="inline-set"]')!;
+    const by = (id: string) => set.querySelector(`[data-testid="inline-${id}"]`) as HTMLElement;
+    const colour = (el: HTMLElement) => getComputedStyle(el).color;
+    const token = (el: HTMLElement, name: string) => getComputedStyle(el).getPropertyValue(name).trim();
+    const hexToRgb = (hex: string) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ')})`;
+    const alert = by('tone-alert');
+    const button = by('tone-loading');
+    const loader = button.querySelector('.mullion-loader') as HTMLElement;
+    return {
+      plainInAlert: colour(by('tone-plain')),
+      alertInk: colour(alert),
+      dangerText: hexToRgb(token(alert, '--mullion-error-text')),
+      anchorInMuted: colour(by('tone-anchor')),
+      primaryText: hexToRgb(token(alert, '--mullion-primary-text')),
+      mutedText: hexToRgb(token(alert, '--mullion-color-text-muted')),
+      loaderTop: getComputedStyle(loader).borderTopColor,
+      buttonInk: colour(button),
+    };
+  });
+  expect(reading.plainInAlert, 'un-toned text takes the alert body\'s ink').toBe(reading.alertInk);
+  expect(reading.plainInAlert).not.toBe(reading.dangerText);
+  expect(reading.anchorInMuted, 'a link inside muted text keeps its own colour').toBe(reading.primaryText);
+  expect(reading.anchorInMuted).not.toBe(reading.mutedText);
+  expect(reading.loaderTop, 'a loading button\'s spinner is drawn in the button\'s ink').toBe(reading.buttonInk);
+});
+
 test('the layer scale reads the host offset instead of declaring it', async ({ page }) => {
   await open(page, 'shadow', 'lock');
   const reading = await page.evaluate(() => {
