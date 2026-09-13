@@ -259,6 +259,22 @@ describe('the menu', () => {
     }
   });
 
+  it('tints a highlighted row only when it carries no tone', () => {
+    // control.css's rule, applied here: tint the ground or colour the ink,
+    // never both. A toned row has coloured its ink, and its ink clears 4.5:1
+    // against the menu's own ground with as little as 0.03 to spare, so a
+    // lightened ground under it fails AA on 22 of 23 themes.
+    const sheet = uiStylesText();
+    const rule = sheet
+      .split('}')
+      .find((block) => block.includes('.mullion-menu-item[data-highlighted]'));
+    expect(rule, 'the highlight rule is gone').toBeDefined();
+    expect(
+      rule,
+      'the highlight tint must exclude toned rows, or a toned label drops below AA',
+    ).toContain(':not([data-mullion-tone])');
+  });
+
   it('sets data-highlighted on keyboard navigation, which is the attribute the sheet targets', () => {
     openMenu();
     const items = screen.getAllByRole('menuitem');
