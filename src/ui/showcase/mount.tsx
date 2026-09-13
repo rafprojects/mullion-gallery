@@ -50,12 +50,26 @@ import {
   Title,
   UnstyledButton,
   VisuallyHidden,
+  Drawer,
+  Menu,
+  Modal,
+  Popover,
+  Tooltip,
 } from '../components';
 
 const params = new URLSearchParams(window.location.search);
 const useShadow = params.get('mount') !== 'light';
 const themeId = params.get('theme') ?? 'default-dark';
 const chromeMode = params.get('chrome') === 'follow' ? 'follow' : 'lock';
+/**
+ * P80-A's overlays are opt-in. Adding them to the default page would move the
+ * ui-showcase and theme-qa snapshot baselines for a section most of those
+ * checks do not look at, so `?overlays=1` appends them and every existing URL
+ * renders exactly what it rendered before.
+ */
+const withOverlays = params.get('overlays') === '1';
+/** `?host=hostile` reproduces the P77-B probe around the whole fixture. */
+const hostileHost = params.get('host') === 'hostile';
 
 /** Every focusable component in the set, so the ring walk has something to walk. */
 function Focusables({ prefix }: { prefix: string }) {
@@ -177,6 +191,83 @@ function Gallery({ prefix }: { prefix: string }) {
         <Image alt="a placeholder" src="/missing.png" width={80} height={40} radius="sm" />
       </Center>
       <VisuallyHidden>hidden to the eye, present to a reader</VisuallyHidden>
+      {withOverlays && <Overlays prefix={prefix} />}
+    </Stack>
+  );
+}
+
+/**
+ * P80-A: the overlays, each with a trigger the ring walk and the focus-return
+ * check can address. The triggers live in the scope under test, so a modal
+ * opened from inside the gallery shadow root has to return focus across that
+ * boundary, which is the defect Mantine has today.
+ */
+function Overlays({ prefix }: { prefix: string }) {
+  const [modal, setModal] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  return (
+    <Stack gap="sm" padding="md" data-testid={`${prefix}-overlays`}>
+      <Divider label="overlays" labelPosition="left" />
+      <Group gap="sm">
+        <Button data-testid={`${prefix}-modal-trigger`} onClick={() => setModal(true)}>
+          {prefix} modal
+        </Button>
+        <Button variant="light" data-testid={`${prefix}-drawer-trigger`} onClick={() => setDrawer(true)}>
+          {prefix} drawer
+        </Button>
+        <Menu>
+          <Menu.Trigger render={<Button variant="outline" data-testid={`${prefix}-menu-trigger`} />}>
+            {prefix} menu
+          </Menu.Trigger>
+          <Menu.Content data-testid={`${prefix}-menu-content`}>
+            <Menu.Item data-testid={`${prefix}-menu-item`}>first item</Menu.Item>
+            <Menu.Item>second item</Menu.Item>
+            <Menu.Divider />
+            <Menu.Item tone="danger" data-testid={`${prefix}-menu-danger`}>
+              delete
+            </Menu.Item>
+          </Menu.Content>
+        </Menu>
+        <Popover>
+          <Popover.Trigger render={<Button variant="subtle" data-testid={`${prefix}-popover-trigger`} />}>
+            {prefix} popover
+          </Popover.Trigger>
+          <Popover.Content width={240} padding="md" data-testid={`${prefix}-popover-content`}>
+            <Text size="sm">popover body</Text>
+            <Button variant="light">inside the popover</Button>
+          </Popover.Content>
+        </Popover>
+        <Tooltip label={`${prefix} tooltip label`} openDelay={0}>
+          <Button variant="default" data-testid={`${prefix}-tooltip-trigger`}>
+            {prefix} tooltip
+          </Button>
+        </Tooltip>
+      </Group>
+
+      <Modal
+        opened={modal}
+        onClose={() => setModal(false)}
+        title={`${prefix} modal`}
+        data-testid={`${prefix}-modal`}
+      >
+        <Stack gap="sm">
+          <Text size="sm">modal body</Text>
+          <Button data-testid={`${prefix}-modal-inside`}>inside the modal</Button>
+        </Stack>
+      </Modal>
+
+      <Drawer
+        opened={drawer}
+        onClose={() => setDrawer(false)}
+        title={`${prefix} drawer`}
+        position="right"
+        data-testid={`${prefix}-drawer`}
+      >
+        <Stack gap="sm">
+          <Text size="sm">drawer body</Text>
+          <Button data-testid={`${prefix}-drawer-inside`}>inside the drawer</Button>
+        </Stack>
+      </Drawer>
     </Stack>
   );
 }
@@ -209,13 +300,38 @@ const GROUND = {
 } as const;
 
 function Showcase() {
-  return (
+  const body = (
     <Container size="lg" padding="md" style={GROUND}>
       <Gallery prefix="inline" />
       <MullionProvider mode={chromeMode}>
         <Chrome />
       </MullionProvider>
     </Container>
+  );
+  if (!hostileHost) return body;
+  /*
+   * The P77-B probe: a transformed ancestor (which makes `position: fixed`
+   * resolve against it rather than the viewport) and a sticky header above
+   * every layer the scale defines. An overlay that is not portaled out of
+   * here is clipped by the transform and covered by the header.
+   */
+  return (
+    <div style={{ transform: 'translateZ(0)', position: 'relative' }} data-testid="hostile-host">
+      <div
+        data-testid="hostile-header"
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 9999,
+          padding: '8px 16px',
+          backgroundColor: 'var(--mullion-color-surface-raised)',
+          color: 'var(--mullion-color-text)',
+        }}
+      >
+        sticky header at z-index 9999
+      </div>
+      {body}
+    </div>
   );
 }
 

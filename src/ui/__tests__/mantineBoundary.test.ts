@@ -16,6 +16,9 @@ import {
   RESTRICTED_PACKAGES,
   findDirectImporters,
   hasRestrictedImport,
+  hasImportFrom,
+  MANTINE_PACKAGES,
+  PRIMITIVE_PACKAGES,
   listSourceFiles,
   projectRoot,
   readAllowlist,
@@ -66,16 +69,36 @@ describe('the @/ui surface', () => {
   });
 
   it('names Mantine in the barrel and nowhere else under src/ui', () => {
+    // Mantine only: `@base-ui/react` is restricted from the app but belongs in
+    // any framework module, which is where P80-A's components are built. A
+    // framework component that reached for Mantine would be building the new
+    // layer on the one being removed, and that is what this pins.
     const barrel = join(projectRoot, 'src/ui/index.ts');
-    expect(hasRestrictedImport(readFileSync(barrel, 'utf8'))).toBe(true);
+    expect(hasImportFrom(readFileSync(barrel, 'utf8'), MANTINE_PACKAGES)).toBe(true);
 
     const inside = listSourceFiles(BOUNDARY_DIR);
     expect(inside).toContain('src/ui/index.ts');
 
     const others = inside
       .filter((file) => file !== 'src/ui/index.ts')
-      .filter((file) => hasRestrictedImport(readFileSync(join(projectRoot, file), 'utf8')));
+      .filter((file) => hasImportFrom(readFileSync(join(projectRoot, file), 'utf8'), MANTINE_PACKAGES));
     expect(others).toEqual([]);
+  });
+
+  it('keeps the primitive inside the boundary, and out of the app', () => {
+    // P80-A: the same rule the ESLint config enforces, as a test that names
+    // the files. Base UI arrived with zero importers outside `src/ui/`, and
+    // this is what keeps that true through Phase 81's migration.
+    const inside = listSourceFiles(BOUNDARY_DIR).filter((file) =>
+      hasImportFrom(readFileSync(join(projectRoot, file), 'utf8'), PRIMITIVE_PACKAGES),
+    );
+    expect(inside.length, 'the framework builds on the primitive somewhere').toBeGreaterThan(0);
+
+    const outside = listSourceFiles('src')
+      .concat(listSourceFiles('packages'))
+      .filter((file) => !file.startsWith(`${BOUNDARY_DIR}/`))
+      .filter((file) => hasImportFrom(readFileSync(join(projectRoot, file), 'utf8'), PRIMITIVE_PACKAGES));
+    expect(outside, 'the app must reach the primitive through @/ui').toEqual([]);
   });
 
   it('excludes Mantine theme plumbing, which belongs to the adapter', () => {

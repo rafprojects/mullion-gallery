@@ -6,7 +6,8 @@
     "@mantine/form",
     "@mantine/hooks",
     "@mantine/modals",
-    "@mantine/notifications"
+    "@mantine/notifications",
+    "@base-ui/react"
   ],
   "maxFiles": 178,
   "files": [

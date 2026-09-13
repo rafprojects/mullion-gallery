@@ -1,10 +1,14 @@
 /**
- * The framework's presentational components (P79-C).
+ * The framework's components (P79-C, P80-A).
  *
- * The thirty components the study's section 4 lists as "ours, presentational":
+ * P79-C built the thirty the study's section 4 lists as "ours, presentational":
  * no keyboard handling, no ARIA state machine, nothing to buy from a headless
  * primitive. They are also the most-used names in the codebase, which is why
- * they can be built and proved before Phase 80 installs the primitive.
+ * they could be built and proved before the primitive arrived.
+ *
+ * P80-A adds the first components with interaction behaviour, in `./overlay`.
+ * None of that behaviour is written here: Base UI owns it and the wrappers
+ * supply the portal container, the classes and the tokens (study principle 6).
  *
  * They are deliberately NOT re-exported from `@/ui` yet. That barrel is the
  * migration ledger: moving `Text` onto this implementation there would move
@@ -25,6 +29,7 @@ import typographyCss from './typography.css?inline';
 import controlCss from './control.css?inline';
 import feedbackCss from './feedback.css?inline';
 import displayCss from './display.css?inline';
+import overlayCss from './overlay.css?inline';
 import utilityCss from './utility.css?inline';
 import focusCss from '../styles/focus.css?inline';
 
@@ -40,6 +45,7 @@ registerUiStyles('ui/typography', typographyCss);
 registerUiStyles('ui/control', controlCss);
 registerUiStyles('ui/feedback', feedbackCss);
 registerUiStyles('ui/display', displayCss);
+registerUiStyles('ui/overlay', overlayCss);
 registerUiStyles('ui/utility', utilityCss);
 // Last, so the ring wins a tie inside `@layer mullion.components` against any
 // component rule that also sets `box-shadow`: `Paper` and `Card` both do, and
@@ -153,3 +159,23 @@ export {
   type CollapseProps,
   type VisuallyHiddenProps,
 } from './utility';
+export {
+  Drawer,
+  Menu,
+  Modal,
+  Popover,
+  Tooltip,
+  type DrawerProps,
+  type MenuContentProps,
+  type MenuGroupProps,
+  type MenuItemProps,
+  type MenuProps,
+  type ModalProps,
+  type PopoverContentProps,
+  type PopoverProps,
+  type TooltipGroupProps,
+  type TooltipProps,
+  type UiAlign,
+  type UiDrawerSide,
+  type UiSide,
+} from './overlay';

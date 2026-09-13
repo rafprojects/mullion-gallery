@@ -1,0 +1,337 @@
+/*
+ * The overlays (P80-A). Every colour here is a token and every z-index is a
+ * layer step, so a popup painted into the overlay root looks the same as one
+ * painted inline: the container it lands in carries the nearest provider's
+ * tokens (P79-A), and this sheet is adopted into that container's tree by the
+ * same delivery list as everything else (P79-B).
+ *
+ * Base UI stamps the state attributes this sheet reads: `data-open`,
+ * `data-closed`, `data-starting-style`, `data-ending-style`, `data-side`,
+ * `data-highlighted` and `data-disabled`. None of them is ours to set, which
+ * is why none of them is written in the TSX.
+ */
+@layer mullion.components {
+  /* ── Shared ──────────────────────────────────────────────────────────── */
+
+  /*
+   * The positioner is Base UI's absolutely positioned wrapper. It takes the
+   * layer because it is the element that actually stacks; the popup inside it
+   * is in flow.
+   */
+  .mullion-overlay-positioner {
+    z-index: var(--mullion-overlay-layer, var(--mullion-layer-popover));
+  }
+
+  .mullion-overlay-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--mullion-overlay-layer, var(--mullion-layer-overlay));
+    background-color: var(--mullion-overlay-bg);
+    backdrop-filter: blur(var(--mullion-overlay-blur, 0px));
+    opacity: 1;
+    transition: opacity var(--mullion-duration-base) ease;
+  }
+
+  .mullion-overlay-backdrop[data-starting-style],
+  .mullion-overlay-backdrop[data-ending-style] {
+    opacity: 0;
+  }
+
+  .mullion-overlay-popup {
+    position: fixed;
+    z-index: var(--mullion-overlay-layer, var(--mullion-layer-modal));
+    display: flex;
+    flex-direction: column;
+    max-block-size: 100%;
+    background-color: var(--mullion-color-surface);
+    color: var(--mullion-color-text);
+    box-shadow: var(--mullion-shadow-lg);
+    /*
+     * The popup is the scroll container for its own body, so a long dialog
+     * scrolls inside itself rather than growing past the viewport.
+     */
+    overflow: hidden;
+  }
+
+  .mullion-overlay-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--mullion-spacing-sm);
+    padding-block: var(--mullion-pad-block, var(--mullion-pad, var(--mullion-spacing-md)));
+    padding-inline: var(--mullion-pad-inline, var(--mullion-pad, var(--mullion-spacing-md)));
+    padding-block-end: var(--mullion-spacing-sm);
+    flex: none;
+  }
+
+  .mullion-overlay-title {
+    margin: 0;
+    font-size: var(--mullion-font-size-lg);
+    font-weight: 600;
+    line-height: var(--mullion-heading-line-height-h4);
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-overlay-body {
+    padding-block: var(--mullion-pad-block, var(--mullion-pad, var(--mullion-spacing-md)));
+    padding-inline: var(--mullion-pad-inline, var(--mullion-pad, var(--mullion-spacing-md)));
+    overflow: auto;
+    flex: 1 1 auto;
+    min-block-size: 0;
+  }
+
+  /*
+   * A header already paid the top padding, so the body must not pay it again.
+   * `:first-child` is the no-header case and keeps its own.
+   */
+  .mullion-overlay-header + .mullion-overlay-body {
+    padding-block-start: 0;
+  }
+
+  /* ── Modal ───────────────────────────────────────────────────────────── */
+
+  .mullion-modal {
+    inset-block-start: var(--mullion-spacing-xl);
+    inset-inline: 0;
+    margin-inline: auto;
+    inline-size: min(var(--mullion-modal-size, 26rem), calc(100vw - 2 * var(--mullion-spacing-md)));
+    max-block-size: calc(100vh - 2 * var(--mullion-spacing-xl));
+    border-radius: var(--mullion-radius, var(--mullion-radius-md));
+    transition:
+      opacity var(--mullion-duration-base) ease,
+      transform var(--mullion-duration-base) ease;
+  }
+
+  .mullion-modal[data-centered] {
+    inset-block: 0;
+    margin-block: auto;
+  }
+
+  .mullion-modal[data-full-screen] {
+    inset: 0;
+    inline-size: 100%;
+    max-block-size: 100vh;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .mullion-modal[data-starting-style],
+  .mullion-modal[data-ending-style] {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  /* ── Drawer ──────────────────────────────────────────────────────────── */
+
+  .mullion-drawer {
+    transition: transform var(--mullion-duration-base) ease;
+  }
+
+  .mullion-drawer[data-position='left'],
+  .mullion-drawer[data-position='right'] {
+    inset-block: 0;
+    inline-size: min(var(--mullion-drawer-size, 22rem), 100vw);
+    max-block-size: 100vh;
+  }
+
+  .mullion-drawer[data-position='left'] {
+    inset-inline-start: 0;
+  }
+
+  .mullion-drawer[data-position='right'] {
+    inset-inline-end: 0;
+  }
+
+  .mullion-drawer[data-position='top'],
+  .mullion-drawer[data-position='bottom'] {
+    inset-inline: 0;
+    block-size: min(var(--mullion-drawer-size, 18rem), 100vh);
+  }
+
+  .mullion-drawer[data-position='top'] {
+    inset-block-start: 0;
+  }
+
+  .mullion-drawer[data-position='bottom'] {
+    inset-block-end: 0;
+  }
+
+  /*
+   * The resting transform is per edge, so the panel slides out of the edge it
+   * is anchored to. Logical properties do not reach `translate`, so the two
+   * inline edges are written in physical terms and mirrored under `dir=rtl`.
+   */
+  .mullion-drawer[data-position='left'][data-starting-style],
+  .mullion-drawer[data-position='left'][data-ending-style] {
+    transform: translateX(-100%);
+  }
+
+  .mullion-drawer[data-position='right'][data-starting-style],
+  .mullion-drawer[data-position='right'][data-ending-style] {
+    transform: translateX(100%);
+  }
+
+  [dir='rtl'] .mullion-drawer[data-position='left'][data-starting-style],
+  [dir='rtl'] .mullion-drawer[data-position='left'][data-ending-style] {
+    transform: translateX(100%);
+  }
+
+  [dir='rtl'] .mullion-drawer[data-position='right'][data-starting-style],
+  [dir='rtl'] .mullion-drawer[data-position='right'][data-ending-style] {
+    transform: translateX(-100%);
+  }
+
+  .mullion-drawer[data-position='top'][data-starting-style],
+  .mullion-drawer[data-position='top'][data-ending-style] {
+    transform: translateY(-100%);
+  }
+
+  .mullion-drawer[data-position='bottom'][data-starting-style],
+  .mullion-drawer[data-position='bottom'][data-ending-style] {
+    transform: translateY(100%);
+  }
+
+  /* ── Tooltip ─────────────────────────────────────────────────────────── */
+
+  /*
+   * The trigger renders a `span` so it can wrap any child without becoming a
+   * box of its own. `display: contents` would drop it from the layout, but
+   * Base UI needs a measurable anchor, so it is inline-flex instead.
+   */
+  .mullion-tooltip-trigger {
+    display: inline-flex;
+  }
+
+  .mullion-tooltip {
+    max-inline-size: 18rem;
+    padding-block: calc(var(--mullion-spacing-xs) / 2);
+    padding-inline: var(--mullion-spacing-xs);
+    border-radius: var(--mullion-radius-sm);
+    border: 1px solid var(--mullion-tooltip-bd);
+    background-color: var(--mullion-tooltip-bg);
+    color: var(--mullion-tooltip-color);
+    font-size: var(--mullion-font-size-xs);
+    line-height: 1.4;
+    transition: opacity var(--mullion-duration-fast) ease;
+  }
+
+  .mullion-tooltip[data-starting-style],
+  .mullion-tooltip[data-ending-style] {
+    opacity: 0;
+  }
+
+  /* ── Popover ─────────────────────────────────────────────────────────── */
+
+  .mullion-popover-trigger,
+  .mullion-menu-trigger {
+    display: inline-flex;
+  }
+
+  .mullion-popover {
+    inline-size: var(--mullion-popover-width, auto);
+    max-inline-size: calc(100vw - 2 * var(--mullion-spacing-md));
+    padding-block: var(--mullion-pad-block, var(--mullion-pad, var(--mullion-spacing-sm)));
+    padding-inline: var(--mullion-pad-inline, var(--mullion-pad, var(--mullion-spacing-sm)));
+    border: 1px solid var(--mullion-menu-bd);
+    border-radius: var(--mullion-radius, var(--mullion-radius-md));
+    background-color: var(--mullion-menu-bg);
+    color: var(--mullion-color-text);
+    box-shadow: var(--mullion-shadow-md);
+    transition:
+      opacity var(--mullion-duration-fast) ease,
+      transform var(--mullion-duration-fast) ease;
+  }
+
+  .mullion-popover[data-starting-style],
+  .mullion-popover[data-ending-style] {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  /* ── Menu ────────────────────────────────────────────────────────────── */
+
+  .mullion-menu {
+    inline-size: var(--mullion-menu-width, auto);
+    min-inline-size: 10rem;
+    max-inline-size: calc(100vw - 2 * var(--mullion-spacing-md));
+    padding-block: var(--mullion-spacing-xs);
+    border: 1px solid var(--mullion-menu-bd);
+    border-radius: var(--mullion-radius, var(--mullion-radius-md));
+    background-color: var(--mullion-menu-bg);
+    color: var(--mullion-color-text);
+    box-shadow: var(--mullion-shadow-md);
+    overflow: auto;
+    transition:
+      opacity var(--mullion-duration-fast) ease,
+      transform var(--mullion-duration-fast) ease;
+  }
+
+  .mullion-menu[data-starting-style],
+  .mullion-menu[data-ending-style] {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  .mullion-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--mullion-spacing-xs);
+    padding-block: calc(var(--mullion-spacing-xs) / 1.5);
+    padding-inline: var(--mullion-spacing-sm);
+    font-size: var(--mullion-font-size-sm);
+    /*
+     * An un-toned item inherits the menu's ink. A toned one reads the ladder
+     * only under its own attribute, which is the P79-0 rule: reading
+     * `--mullion-tone` bare would paint every item in a menu that happens to
+     * contain one destructive command.
+     */
+    color: inherit;
+    cursor: default;
+    user-select: none;
+  }
+
+  .mullion-menu-item[data-mullion-tone] {
+    color: var(--mullion-tone);
+  }
+
+  /*
+   * `data-highlighted` is Base UI's roving-focus marker and is what the
+   * pointer and the arrow keys both set. The ring in `../styles/focus.css`
+   * paints on top of it for a keyboard focus, which is the pair the product
+   * already ships: a hover tint plus a ring only when the keyboard moved.
+   */
+  .mullion-menu-item[data-highlighted] {
+    background-color: var(--mullion-menu-hover-bg);
+  }
+
+  .mullion-menu-item[data-disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .mullion-menu-item-label {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+  }
+
+  .mullion-menu-item-section {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+  }
+
+  .mullion-menu-label {
+    padding-block: calc(var(--mullion-spacing-xs) / 1.5);
+    padding-inline: var(--mullion-spacing-sm);
+    font-size: var(--mullion-font-size-xs);
+    font-weight: 600;
+    color: var(--mullion-color-text-muted);
+  }
+
+  .mullion-menu-divider {
+    block-size: 1px;
+    margin-block: var(--mullion-spacing-xs);
+    border: 0;
+    background-color: var(--mullion-menu-bd);
+  }
+}

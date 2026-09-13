@@ -63,6 +63,24 @@ export const COMPONENT_TOKEN_DERIVATIONS = {
   'menu-bg': (rc) => rc.surfaceRaised,
   'menu-bd': (rc) => rc.border,
 
+  // [P80-A] Tooltip. Lifted from `Tooltip.styles.tooltip` in the adapter,
+  // which paints the raised surface with the ordinary text colour and a
+  // border rather than the inverted chip most libraries default to. The
+  // framework's Tooltip reads these three so it keeps looking like the
+  // product's tooltip rather than Base UI's.
+  'tooltip-bg': (rc) => rc.surfaceRaised,
+  'tooltip-color': (rc) => rc.text,
+  'tooltip-bd': (rc) => rc.border,
+
+  // [P80-A] The modal and drawer scrim. NOT role-derived, and the second
+  // documented exception after `control-height-*`. Mantine's `Overlay`
+  // defaults to black at `backgroundOpacity`, the two call sites that set one
+  // both pass 0.6, and that is what ships today on all 23 themes. Deriving it
+  // from a role would make the scrim white on a light theme, which is a
+  // redesign rather than a lift and a worse scrim. A theme that wants its own
+  // can still override the token.
+  'overlay-bg': () => withAlpha('#000000', 0.6),
+
   // Menu item hover. NOT a lift: the adapter has no menu hover derivation and
   // Mantine's default supplies it today. The surface ladder cannot express it
   // either, because a menu dropdown already sits at `surfaceRaised`, the top

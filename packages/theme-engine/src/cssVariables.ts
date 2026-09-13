@@ -12,7 +12,7 @@
 
 import type { ResolvedColors } from './types';
 import type { ThemeDefinition } from './types';
-import { sanitizeCssValue } from '@mullion/shared-utils';
+import { sanitizeCssColor, sanitizeCssValue } from '@mullion/shared-utils';
 import { deriveComponentTokens, frameworkConstants } from './componentTokens';
 
 // ---------------------------------------------------------------------------
@@ -136,9 +136,21 @@ export function generateCssVariables(
   // Derived from the role tokens above, overridable per theme. The adapter
   // still makes these decisions for Mantine; this tier is what the in-house
   // framework reads instead, and what the 1.4.11 audit can name.
+  //
+  // [P80-A] Colour first, then the generic value sanitiser.
+  //
+  // `sanitizeCssValue` is a blacklist that rejects `/`, and chroma-js 3 emits
+  // the modern space-and-slash form (`rgb(0 0 0 / 0.08)`) from `.css()`. Every
+  // alpha-derived component token was therefore written as `inherit`:
+  // `menu-hover-bg` has had no value since P78-C shipped it, which nothing
+  // caught because no framework component read it until P80-A's `Menu`.
+  // `sanitizeCssColor` is a whitelist that allows `/` inside a colour function
+  // and is strictly stricter for anything it accepts, so trying it first
+  // widens nothing but valid colours. The non-colour tokens in this tier
+  // (`control-height-*`) fall through to the generic path unchanged.
   const componentTokens = deriveComponentTokens(rc, def.componentTokens ?? {});
   for (const [name, value] of Object.entries(componentTokens)) {
-    vars.push(`${PREFIX}-${name}: ${sanitizeCssValue(value) ?? 'inherit'};`);
+    vars.push(`${PREFIX}-${name}: ${sanitizeCssColor(value) ?? sanitizeCssValue(value) ?? 'inherit'};`);
   }
 
   // --- Framework constants (P78-C) ---

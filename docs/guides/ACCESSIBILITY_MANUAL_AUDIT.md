@@ -233,6 +233,43 @@ from the free build) — audit them in a Pro/dev build.
 
 ---
 
+## 6B. Framework overlays (P80-A) — **not yet run**
+
+The framework's own `Modal`, `Drawer`, `Popover`, `Tooltip` and `Menu` landed on 2026-09-13 and
+nothing in the product renders them yet (Phase 80 Key Decision B), so this script tests them in
+Storybook rather than on a screen. Key Decision C counts a component done only once this pass is
+recorded, so until the table below has ticks the overlays have three of their four gates.
+
+Run `npm run storybook` and open **Framework/Overlays**. Do each story on at least one light and
+one dark theme using the toolbar theme picker.
+
+| # | Check | Criterion |
+|---|-------|-----------|
+| 1 | Every trigger is reachable by Tab and shows the two-tone ring | 2.1.1, 2.4.7 |
+| 2 | Enter and Space open the overlay from a focused trigger | 2.1.1 |
+| 3 | Focus lands inside the overlay when it opens | 2.4.3 |
+| 4 | Tab and Shift+Tab cycle **within** the overlay and never reach the page behind it | 2.1.2 |
+| 5 | Escape closes it, and focus returns to the trigger that opened it | 2.1.2, 2.4.3 |
+| 6 | In **Menus**: Up/Down move the highlight, Home/End jump to the ends, typing a letter jumps to a matching item, and a disabled item is skipped | 2.1.1 |
+| 7 | In **Menus**: the ring appears only on a keyboard move, and a pointer hover paints the tint alone | 2.4.7 |
+| 8 | **Tooltip** appears on keyboard focus and not only on hover, and Escape dismisses it | 1.4.13 |
+| 9 | With a screen reader: the dialog is announced with its title, and the menu as a menu with its item count | 4.1.2 |
+| 10 | The **Hostile host** story: every overlay still covers the sticky header after scrolling | — |
+
+**Known, already filed in [PHASE80_REPORT.md](../PHASE80_REPORT.md):** a `tone="danger"` menu item
+fails AA contrast while highlighted on 22 of 23 themes. Do not re-report it; note only if what you
+see differs from that description.
+
+| Story | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|-------|---|---|---|---|---|---|---|---|---|----|
+| Modals | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | n/a | n/a | n/a | ⬜ | n/a |
+| Drawers | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | n/a | n/a | n/a | ⬜ | n/a |
+| Menus | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | n/a | ⬜ | n/a |
+| Popovers and tooltips | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | n/a | n/a | ⬜ | ⬜ | n/a |
+| Hostile host | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | n/a | ⬜ |
+
+---
+
 ## 7. Issue log
 
 One row per distinct problem. Severity: **Blocker** (fails a core task) / **Serious** / **Moderate** /
@@ -258,6 +295,7 @@ One row per distinct problem. Severity: **Blocker** (fails a core task) / **Seri
 | 5B Settings | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | — | — |
 | 5C Modals | ⬜ | ⬜ | ⬜ | ⬜ | n/a | ⬜ | — | — |
 | 6 LayoutBuilder | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | — | — |
+| 6B Framework overlays (P80-A) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | — | — |
 
 Legend: ⬜ not started · 🟡 partial · ✅ done. Update after each run.
 
@@ -265,6 +303,9 @@ Legend: ⬜ not started · 🟡 partial · ✅ done. Update after each run.
 
 ## 9. Changelog (living doc)
 
+- **2026-09-13** — Added §6B, the keyboard and screen-reader script for the framework overlays
+  built in P80-A. Not yet run: it is the fourth of the four gates in Phase 80 Key Decision C, and
+  those components are complete on the other three until someone works through it.
 - **2026-07-11** — Doc created (P62-H). Sections: setup, global checks, public/admin/builder surfaces,
   Shadow-DOM, issue log, coverage tracker. Seeded from the code-level static review in
   [ACCESSIBILITY.md](ACCESSIBILITY.md) §2. _Next candidates to add: per-adapter gallery checks

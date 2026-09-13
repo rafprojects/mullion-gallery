@@ -1,14 +1,14 @@
 # Phase 80 - Behavioural components
 
-**Status:** Planned, no code yet
+**Status:** In progress (P80-A's overlay batch landed; its input-family batch and P80-B/C are Planned)
 **Created:** 2026-09-10
-**Last updated:** 2026-09-11 (P78-B picked Base UI 1.8.0; Decision D's gap list is now concrete)
+**Last updated:** 2026-09-13 (P80-A overlays: Modal, Drawer, Popover, Tooltip and Menu on Base UI 1.8.0)
 
 ### Tracks
 
 | Track | Description | Status | Effort |
 |-------|-------------|--------|--------|
-| P80-A | Overlays and the input family: the components the theme adapter fights hardest | Planned | Large |
+| P80-A | Overlays and the input family: the components the theme adapter fights hardest | **Overlays done** (2026-09-13), input family Planned | Large |
 | P80-B | Selection, navigation and choice controls: the select family, tabs, accordion, checkbox, switch, chip, segmented control, slider | Planned | Large |
 | P80-C | Imperative managers: notifications and confirmations | Planned | Small-Medium |
 
@@ -122,14 +122,101 @@ A `notify` store over the primitive's toast, and a `confirm()` over the framewor
 | Candidate | Why it is deferred |
 |-----------|--------------------|
 | Migrating consumers onto these components | Phase 81, by Key Decision B. |
+| **`FileButton`'s hidden file input has no accessible name** | P79-C, found by P80-A's axe scan of the showcase. `<input type="file" class="mullion-visually-hidden" tabindex="-1">` fails the `label` rule at critical impact. It is a real defect in a shipped framework component and it is one attribute to fix, but it is P79-C's component and not an overlay; it belongs with the input family in the rest of P80-A, where the field and label composition is being written anyway. |
+| **Semantic tone rungs are not selected against the menu hover ground** | P80-A, measured on all 23 themes: 22 have at least one `*-text` rung below 4.5:1 on `menu-bg` lightened by 8% of `text`, so a toned menu item fails AA while highlighted. Every fix is someone else's decision (the engine's ground list, which moves signed-off colours on 23 themes; the tint; or dropping the tone on highlight), which is why it is here rather than patched. Nothing consumes the component yet. It blocks nothing in P80-B but must be settled before P81-B migrates a menu with a destructive command, and it wants the designer. |
+| **`aria-owns` across a shadow boundary** | Base UI points `aria-owns` at an id in another shadow root for iOS VoiceControl, which axe reports as `aria-valid-attr-value` at critical impact and which cannot resolve in the accessibility tree. Worth confirming in P80-B against a real screen reader before deciding whether it needs a workaround. |
+| **`link-in-text-block` on an `Anchor` inside muted `Text`** | P79-0's tone probe measures 1.11:1 between the link and its surrounding text with no underline, which is a serious axe violation. It may be fixture-only: the probe is a deliberate tone composition rather than a product screen. Confirm against a real surface during P81-B, and if it reproduces, the fix is a rule on `Anchor` rather than a theme change. |
 | `Table` as a behavioural component | It is presentational in this product; row selection keyboard support is a separate FUTURE_TASKS entry and a real a11y gap, and it should be fixed as a feature rather than smuggled into a migration. |
 | Date pickers | `@mantine/dates` is a dependency but no date component appears in the measured import inventory. Confirm before Phase 81 and drop the dependency if genuinely unused. |
 | Dropping `@mantine/hooks` | Seven hooks, about 150 lines. Cheap, and it can wait for Phase 81's removal track. |
 
 ## Implementation Notes
 
-_None yet, phase is Planned._
+### P80-A, overlays batch (2026-09-13)
+
+**Status: landed.** `Modal`, `Drawer`, `Popover`, `Tooltip` and `Menu` in [`src/ui/components/overlay.tsx`](../src/ui/components/overlay.tsx) with [`overlay.css`](../src/ui/components/overlay.css), on `@base-ui/react` 1.8.0. The track's input family is not in this batch and is still Planned. 36 unit tests, 13 browser tests, four Storybook stories and an opt-in showcase section cover it; five mutations were applied and caught.
+
+**What the wrapper does, in one rule.** Base UI owns every keypress: the focus trap, the scroll lock, the dismissal reasons, the roving focus and typeahead in a menu, and the anchor positioning. This module supplies four things and nothing else: the portal container from `useMullionPortal()`, the class names, the focus attribute, and a sheet that reads tokens. That is study principle 6 held literally, and the one thing it buys is the phase's stated success criterion: a popup is inside an element carrying the nearest provider's tokens whatever tree its trigger lives in, so nothing is mirrored inline the way `adminChromeStyles()` does today.
+
+**What the measurement changed about the plan.**
+
+| Plan said | Built |
+|-----------|-------|
+| "Wrap the primitive's dialog, popover, tooltip and menu" | As planned, and `Drawer` is the **dialog** with a different resting position rather than Base UI 1.8.0's own `Drawer`. That primitive is a swipe-dismissible mobile sheet with indent backgrounds and virtual-keyboard handling; the product's two drawers are settings panels. P78-B measured the dialog shape, so this is the shape that was proved. |
+| Key Decision A, "compound parts plus a flat convenience component" | Applied per component from the call sites rather than uniformly. `Modal` (26 sites), `Drawer` (2) and `Tooltip` (115) are flat because every existing site is; `Popover` (5) and `Menu` (12) are compound because every existing site is. Building both surfaces for all five would have doubled the test surface to serve no call site. |
+| The parts would carry Mantine's names | They carry ours: `Trigger` and `Content`, not `Target` and `Dropdown`. P78-A's barrel already established that a vendor's vocabulary does not become the framework's, and Phase 81 rewrites these 17 call sites anyway under its refresh budget. |
+| `openDelay` maps onto the tooltip root | Base UI 1.8.0 puts `delay` on `Tooltip.Provider` and not on `Tooltip.Root`, so a per-tooltip delay is a provider per tooltip. That is a context value and nothing more, and it keeps `openDelay` meaning what it means at the 16 sites that set one. `Tooltip.Group` is the shared-delay form. |
+| A `modal` boolean | `boolean \| 'trap-focus'`, passed through unchanged. The first draft mapped `false` onto `'trap-focus'` and documented it as "leaves the page interactive", which is wrong in the way that matters: measured in Chromium, `'trap-focus'` still sets `aria-hidden` on the rest of the page. Remapping a primitive's three-valued option onto two was lossy, and passing it through is both thinner and honest. |
+| The menu would have a `Separator` part | Base UI's menu has none, so `Menu.Divider` is the standalone `Separator` primitive, which carries the `role="separator"` the grouping needs. |
+
+**Five defects found while building, four of them mine.**
+
+1. *`Menu.Label` threw.* Base UI's `GroupLabel` requires a `Menu.Group` ancestor and throws without one; the product's four `Menu.Label` call sites are bare headings with no group. A component that throws at its existing call sites is not a migration path. `Menu.Label` is now a plain styled element, and `Menu.Group label=...` is the accessible form that actually names the items it heads.
+2. *The default triggers were invalid markup.* `render={<span />}` on `Menu.Trigger` and `Popover.Trigger` without `nativeButton={false}` left Base UI still assuming a native button: it stamped `type="button"` on a `<span>` with no `role`, so the control was unannounced. Letting Base UI render its own `<button>` is simpler and correct. The tooltip trigger stays a `<span>`, because its 115 call sites wrap a control that is already focusable and a button inside a button is invalid; Base UI adds no `type` or `tabindex` there, measured.
+3. *Six parts dropped every prop they did not own.* `Menu.Content`, `Menu.Item`, `Menu.Label`, `Menu.Divider`, `Menu.Group`, `Popover.Content` and `Tooltip` swallowed `data-testid` and any `aria-*`. This is the rule P79-C established and P79-0 found broken again in `Collapse` and `Table.ScrollContainer`; it is now a test that names the offending part.
+4. *Invented tokens.* The first draft of the sheet read `--mullion-color-overlay`, `--mullion-color-tooltip-surface`, `--mullion-color-surface-hover` and `--mullion-line-height-heading`, none of which the engine emits. The colour-literal guard in `componentSheets.test.ts` caught the fallback literal; the rest were caught by enumerating what `buildTokenSheet` actually writes. Every one is now a real token, and the two the tier lacked were added to it (below).
+5. *`Tooltip.Group` did nothing.* Every `Tooltip` wrapped itself in a `Tooltip.Provider`, including the ones setting no delay, and a provider with no `delay` resets to Base UI's default rather than inheriting an ancestor's. The group component existed and had no effect. A tooltip now wraps only when it sets a delay of its own. The first guard written for this passed against both the fix and the mutation, because `findByText` waits long enough for the default delay to satisfy it either way; that is the P76-I failure mode (a green test asserting a path that never ran), so it was rewritten to query without waiting, which is the only form that can tell a zero delay from a default one.
+6. *A shipped engine defect, not mine.* See the next block.
+
+**`menu-hover-bg` has never had a value.** Adding `overlay-bg` to the component-token tier produced a backdrop that painted `rgba(0, 0, 0, 0)` in Chromium while the token read back as the empty string. The cause is in the emitter: `cssVariables.ts` ran every component token through `sanitizeCssValue`, a blacklist that rejects `/`, and chroma-js 3's `.css()` emits the modern space-and-slash form (`rgb(0 0 0 / 0.08)`). Every alpha-derived component token was therefore written as `inherit`, silently. That is `menu-hover-bg`, shipped by P78-C on 2026-09-11 and never painted since, which nothing caught because no framework component read it until this track's `Menu`. The fix tries `sanitizeCssColor` first, a whitelist that allows `/` inside a colour function and is strictly stricter for anything it accepts, and falls through to the generic sanitiser for the non-colour tokens in the tier. The guard is a new per-theme test asserting what reaches the **emitted CSS** rather than what the derivation returns, which is the gap the defect lived in; mutating the emitter back fails it on all 23 themes.
+
+**Mutations.** Each applied alone against the guarding suite and restored byte-identically afterwards.
+
+| Guard | Mutation applied | Result |
+|-------|------------------|--------|
+| the vendor boundary reaches the primitive | a `@base-ui/react` import added to a new file in `src/` | two tests fail, both naming the file |
+| Mantine stays in the barrel | a `@mantine/core` import added to `overlay.tsx` | the barrel test fails naming the file; the primitive test stays green, which is the split working |
+| every part forwards what it does not own | `{...rest}` dropped from `Menu.Content` | the forwarding test fails naming `menu-content` |
+| a colour token survives into the emitted CSS | the emitter put back to `sanitizeCssValue` alone | the new emission test fails on all 23 themes, naming `overlay-bg` and its derived value |
+| `Tooltip.Group` is inherited | the per-tooltip provider made unconditional again | the group test fails |
+| the ESLint boundary | a `@base-ui/react` import in a probe file | lint errors with the boundary message |
+
+**Three tokens added to the tier (P78-C's shape, not a redesign).**
+
+| Token | Derivation | Why |
+|-------|-----------|-----|
+| `tooltip-bg`, `tooltip-color`, `tooltip-bd` | `surfaceRaised`, `text`, `border` | Lifted verbatim from the adapter's `Tooltip.styles.tooltip`, which paints the raised surface with ordinary text rather than the inverted chip most libraries default to. The framework's tooltip keeps looking like the product's. |
+| `overlay-bg` | black at 0.6 | The second documented exception after `control-height-*`, and deliberately not role-derived. Mantine's `Overlay` defaults to black, the two call sites that set an opacity both pass 0.6, and that is what ships today on all 23 themes. Deriving it from a role would make the scrim white on a light theme, which is a redesign and a worse scrim. A theme can still override it. |
+
+**Two contrast pairs added, and one deliberately not added.** `text on surfaceRaised` and `textMuted on surfaceRaised` joined the 1.4.3 text audit: every portaled panel in the product (menu, popover, tooltip) derives its ground from that role, menus have painted text on it since long before the framework, and nothing had ever named the pair. Measured across all 23 themes before adding, the worst is 5.54 and 5.10, so it pins behaviour rather than changing it. A `tooltip-bd on tooltip-bg` pair was considered for the 1.4.11 audit and rejected on measurement: it ranges 1.00 to 2.46 on 20 of 23 themes, because a panel's own border against its own fill is decoration and not a "user interface component or state" boundary. Adding it would have failed 20 themes against a requirement WCAG does not make.
+
+**The boundary now fences the primitive.** `@base-ui/react` joined `RESTRICTED_PACKAGES` on its first day, which is the only moment at which no file outside `src/ui/` imports it. The allow-list did not grow (178 files, unchanged) because none does. This split one rule into two, and the split is the point: Base UI may be imported by any framework module, because that is where components are built, while Mantine may still only be named by the barrel, because a framework component building on the library being removed is the thing worth preventing. Both halves are proved by mutation.
+
+**Two e2e failures that were the test's fault, recorded because the next batch will hit them.**
+
+1. *The focus trap looked broken and is not.* Twelve back-to-back `Tab` presses recorded three stops on real buttons behind an open drawer. Base UI contains focus by letting the browser move it to a guard and then redirecting, which settles over a frame or two, and synthetic input with no gap outruns it. At a 120ms cadence all twelve stops stay inside the drawer, on both the shadow and the light mount. The test now tabs at a human cadence and says why in a comment.
+2. *"The modal is not in the overlay root" when it was.* The hostile-host probe queried `document.querySelector` for a fixture element that renders inside the gallery shadow root on a shadow mount. The helper now walks shadow roots, and the stacking assertion uses `elementsFromPoint`, which returns shadow hosts, rather than `elementFromPoint` and `contains`.
+
+**Turning `menu-hover-bg` on exposed a colour-model gap, and it is the one open question in this batch.** With the token painting for the first time, axe reported a contrast failure on a `tone="danger"` menu item. Measured on default-dark: `error-text` (`#ff7063`) is 4.75:1 on the menu ground (`#1a3542`) and passes, and 3.74:1 on the *highlighted* ground (the same colour lightened by 8% of `text`), which fails AA. It is not one theme. Taking the worst semantic rung per theme on the hover ground:
+
+| Result | Themes |
+|--------|--------|
+| Worst rung below 4.5:1 | **22 of 23** (range 3.63 on solarized-dark to 4.46 on sunset-boulevard) |
+| Worst rung at or above 4.5:1 | 1 (default-light, 5.17) |
+| Plain `text` on the hover ground | passes everywhere, worst 4.73 on darcula |
+
+The cause is in the engine, not in the menu. `textRung` selects each semantic rung against four grounds (`background`, `surface`, `surface2`, `surfaceRaised`) and the hover ground is a fifth that no rung was ever selected against, because until now nothing painted it. Plain text survives because it has far more headroom.
+
+**This is deliberately not fixed here.** Every repair is a decision someone else owns: adding the hover ground to `textRung` shifts the semantic colours on 23 themes that carry a designer sign-off from P76 and P77; changing the tint's strength or its source colour is a design change to the menu; and dropping the tone on a highlighted row makes a destructive command stop looking destructive. Nothing consumes these components yet (Key Decision B), so nothing ships with the failure, and it is filed below rather than patched on the way past.
+
+**The axe gate is scoped, and scoping costs the contrast rule.** `include` is chained through the overlay root's shadow host, because axe does not cross a shadow boundary with a plain selector and reports "No elements found" instead. Scoping to the popup also means axe cannot resolve the background stack above it, so `color-contrast` does not run inside the gate: the finding above came from a full-page scan, not from the gate. The gate therefore proves structure (roles, names, ARIA validity) for the overlays and does **not** prove their contrast. That is a real limit of this gate and the ring walk and the engine audits are what cover colour.
+
+**Two Base UI artefacts a full-page scan reports, excluded by that scoping.** `aria-hidden-focus` on six `<span aria-hidden="true" tabindex="0" data-base-ui-focus-guard>` elements, which is the focus-trap pattern every library in this class uses, and `aria-valid-attr-value` on a `<span aria-owns="_r_m_">` whose target sits in a different shadow root, so axe cannot resolve the id. Both are the primitive's own machinery rather than markup this module writes. The second is worth a second look in P80-B, because `aria-owns` genuinely cannot cross a shadow boundary in the accessibility tree and Base UI uses it for iOS VoiceControl.
+
+**Two P79-C findings with a home, not fixed here.** A full-page axe scan of the showcase reports two critical/serious violations that belong to the presentational set rather than to the overlays: `FileButton`'s hidden `<input type="file">` ([control.tsx:279](../src/ui/components/control.tsx#L279)) has no accessible name, and the fixture's tone probe puts an `Anchor` inside muted `Text` at 1.11:1 with no underline (`link-in-text-block`). The first is a real component defect; the second may be fixture-only, since it is the P79-0 tone probe rather than a product composition. P80-A's axe gate is scoped to the popup under test so that it measures this track, and both are filed in Follow-On Candidates below.
+
+**Three of the four gates, and the fourth is written down rather than claimed.** Key Decision C counts a component done on the axe gate, the ring walk, the static sheet tests and a recorded manual keyboard pass. The first three are green: the axe gate is four scoped browser scans (with the contrast limit recorded above), the ring is measured on a keyboard-highlighted menu item in Chromium, and the static guards in `componentSheets.test.ts` cover the new sheet with no change to them. The manual pass is **not run**. Its script is now [ACCESSIBILITY_MANUAL_AUDIT.md §6B](guides/ACCESSIBILITY_MANUAL_AUDIT.md), ten checks per story against the four Storybook stories, and until someone works through it these components have three gates of four.
+
+**Validation.** Run at CI parity on the final tree: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run ui:allowlist:check` green at 178 files (the primitive joined the restricted set and the list did not grow), `npm run themes:catalog:check` green, `npx vitest run` 4,202 of 4,202 across 271 files, `npx playwright test` 83 of 83 with no snapshot differences, and `npm run build` clean apart from the pre-existing chunk-size warnings. The unit suite grew by 60 tests and one file against the tree this batch started from (4,142 across 270), and `e2e/ui-overlays.spec.ts` adds 15 browser tests. The `theme-qa` and `ui-showcase` baselines are untouched, which is what the `?overlays=1` gate is for.
+
+**Rendered output.** Nothing in the product changed: no consumer imports these components, and `@/ui` still re-exports Mantine's overlays (Key Decision B). The showcase's overlay section is behind `?overlays=1` so the existing `ui-showcase` and `theme-qa` baselines render exactly what they rendered before.
 
 ## Outcome
 
-_Pending._
+_Phase in progress. P80-A's overlay batch landed 2026-09-13; the track's input family, P80-B and P80-C are still Planned._
+
+**What the overlay batch proved about the framework's design.** The phase's Rationale 2 put the overlays first so that a design problem would surface while the phase was still small enough to change direction. It did not surface one. The provider's portal container, the `render` convention, the focus attribute and the tone ladder all took Base UI's components without modification, and the one architectural claim the phase rests on holds in a browser: a popup opened from inside the gallery shadow root paints from the nearest provider's tokens, survives a transformed ancestor and a sticky header at `z-index` 9999, and returns focus across the shadow boundary to the trigger that opened it, which is the defect the product has today.
+
+**What it changed about the plan.** Three things, each recorded above: the drawer is the dialog primitive rather than Base UI's own swipe sheet; the compound-or-flat decision is made per component from the call sites rather than uniformly; and `modal` is the primitive's three-valued option passed through rather than a two-valued remapping that measurement showed was lossy.
+
+**The most useful thing it found is not in the overlays.** `menu-hover-bg` has been emitted as `inherit` on every theme since P78-C shipped it, because the emitter's injection blacklist rejects the `/` in chroma's modern `rgb(r g b / a)` form. Nothing caught it for two days because no framework component read the token. Turning it on then exposed a second, larger gap: the semantic text rungs were never selected against the ground a highlighted menu row paints, and 22 of 23 themes fail AA there. The first is fixed with a guard on the emitted CSS rather than on the derivation, which is the gap it lived in. The second is filed, because every repair is a decision the designer or the user owns.
