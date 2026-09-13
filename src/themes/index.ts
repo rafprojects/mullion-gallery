@@ -30,17 +30,20 @@ import {
   generateCssVariables,
   resolveColors,
   baseThemeDefaults,
+  bundledThemeCatalog,
   bundledThemeDefinitions,
 } from '@mullion/theme-engine';
 import { adaptTheme } from './adapter';
-import catalogData from '../../wp-plugin/mullion-gallery/theme-catalog.json';
 
 // ---------------------------------------------------------------------------
 // Catalog lookup — keyed by theme ID
 // ---------------------------------------------------------------------------
 
+// [P79-D] The catalogue travels with the theme definitions in the engine, so
+// this registry and the framework registry describe a theme identically. The
+// WordPress settings field reads a generated copy of the same file.
 const catalog = new Map<string, ThemeCatalogEntry>(
-  (catalogData as ThemeCatalogEntry[]).map((entry) => [entry.id, entry]),
+  bundledThemeCatalog.map((entry) => [entry.id, entry]),
 );
 
 // ---------------------------------------------------------------------------
@@ -247,24 +250,6 @@ export function getAllThemeMeta(): ThemeMeta[] {
     const bo = catalog.get(b.id)?.displayOrder ?? 999;
     return ao !== bo ? ao - bo : a.name.localeCompare(b.name);
   });
-}
-
-/**
- * Get metadata for all registered themes, grouped for selector UI.
- * Returns an array of groups in catalog order, each containing ordered themes.
- */
-export function getAllThemeMetaGrouped(): Array<{ group: string; themes: ThemeMeta[] }> {
-  const grouped = new Map<string, ThemeMeta[]>();
-  for (const meta of getAllThemeMeta()) {
-    const group = meta.group;
-    const existing = grouped.get(group);
-    if (existing) {
-      existing.push(meta);
-    } else {
-      grouped.set(group, [meta]);
-    }
-  }
-  return Array.from(grouped.entries()).map(([group, themes]) => ({ group, themes }));
 }
 
 /**

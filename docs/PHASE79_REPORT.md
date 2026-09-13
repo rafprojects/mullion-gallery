@@ -1,8 +1,8 @@
 # Phase 79 - Framework core and theme manager
 
-**Status:** In progress (P79-A, P79-B and P79-C landed)
+**Status:** Complete (P79-A, P79-B, P79-C and P79-D landed)
 **Created:** 2026-09-10
-**Last updated:** 2026-09-12 (P79-C landed)
+**Last updated:** 2026-09-12 (P79-D landed)
 
 ### Tracks
 
@@ -11,7 +11,7 @@
 | P79-A | `MullionProvider`: scope, portal container, lock and follow mode, persistence, runtime theme registration | **Done** (2026-09-12), see notes | Medium-Large |
 | P79-B | Style delivery and the token sheet: one registration list written into every tree the plugin owns | **Done** (2026-09-12), see notes | Medium |
 | P79-C | Layout and typography primitives, and the single focus rule | **Done** (2026-09-12), see notes | Medium |
-| P79-D | Theme manager merge: registry, catalogue, selector, scoping, lock and follow | Planned | Medium |
+| P79-D | Theme manager merge: registry, catalogue, selector, scoping, lock and follow | **Done** (2026-09-12), see notes | Medium |
 
 ---
 
@@ -402,6 +402,64 @@ Out of that came the one rule the framework's colour API now states: **tint the 
 
 The visual pass was three 2x captures at 390px and 1280px, on `default-dark`, `github-light` and `tokyo-night`, with a control focused so the ring is in frame. It is what found the `buttonface` grey and started the contrast work above; the captures after the fixes show the ground, the transparent outline variant and the two-tone ring resolving per theme.
 
+### P79-D (2026-09-12)
+
+**Status: landed.** Theme management is framework state. `MullionProvider` owns the registry, the catalogue, the initial-theme priority, switching, preview and persistence; [`src/contexts/ThemeContext.tsx`](../src/contexts/ThemeContext.tsx) is what remains of the app-side owner. It went from 224 lines to 64, of which 23 are the component, and all it does now is turn the framework's current theme into the two Mantine-shaped values the app still reads. `useTheme()` kept its exact shape, so none of its thirteen consumers changed when the owner did. The theme catalogue moved into the engine beside the definitions it describes, and the WordPress copy is generated from it.
+
+**What moved, and what deliberately did not.** The merge the phase is named for is a move of *ownership*, not a move of files. Selection, persistence, scoping and the catalogue now have exactly one implementation and it is the framework's. `ThemeContext`, `chromeTheme.ts` and `AdminChromeProvider` all survive this track because what is left in them is Mantine variable plumbing (`defaultCssVariablesResolver`, `mergeMantineTheme`, a nested `MantineProvider`, `data-mantine-color-scheme`), which has nothing to do with theme management and dies with Mantine in Phase 81. The Follow-On row promising their deletion in Phase 81 and this track's "move them into the framework" are both satisfied by that reading, and only by it.
+
+**What the measurement changed about the plan.**
+
+| Plan said | Built |
+|-----------|-------|
+| "Move them into the framework as provider surface" | Ownership moved; four files stayed. `ThemeContext` is now an adapter over `useMullionTheme()`, holding only `mantineTheme` and `cssVars`. Deleting it here would have contradicted the phase's own Follow-On row, which keeps it until Mantine goes. |
+| "`ThemeSelector` becomes a framework component reading the registry" | The registry reading moved; the file did not. `ThemeSelector` renders a Mantine `Select`, and Phase 80 owns the real one. Moving the file into `src/ui/` would have put a `@mantine/core` import inside the framework, which is the one thing the P78-A boundary exists to prevent, and would have *added* a path to an allow-list that is only allowed to shrink. What the criterion actually asks for is done: the selector reads `useMullionTheme()`, `groupThemes()` and `themeSwatches()`, and no longer imports a registry at all. |
+| "`resolveWpThemeIds` is the WordPress glue P79-D is meant to move" | Moved as a seam, not as code. `MullionProvider` gained a `themeCandidates` prop and the app passes `resolveWpThemeIds` into it. Moving the reads themselves would have put `window.__MULLION_CONFIG__` inside a framework whose whole purpose is to be host-free; the framework's runtime code imports nothing but React, the engine and one debug helper, and this track kept it that way. |
+| "the four-step initial-theme priority" | Found missing. `MullionProvider` resolved storage, then `theme`, then the brand theme: it had no host-candidate step at all, so a WordPress-injected theme would have been ignored the moment the framework became the owner. The step is now there and each of the four is pinned by its own test. |
+| "the catalogue grouping the WordPress settings field shares" | The catalogue moved into `packages/theme-engine/src/definitions/_catalog.json`, beside the definitions it describes. The framework registry reads it through the engine; `wp-plugin/mullion-gallery/theme-catalog.json` is now generated from it by `npm run themes:catalog`, and `themes:catalog:check` fails the build if the two drift. PHP reads its own file at the same path as before and needed no change. |
+| "covered by the existing tests moved with it"; "proved by the existing `ThemeContext` suite" | **Both claims were false.** The suite had eleven tests and not one of them covered the priority *order* or the per-instance storage key, which are the two things the criteria name. It asserted that a stored theme is restored and that a WordPress global is read, never that one outranks the other. Nineteen tests now pin the behaviour where it lives. |
+| `forcedThemeId` is part of the behaviour the plugin depends on | It is not. No production file has ever passed it, in this track or any before it: every use of it is a test pinning a theme. It is not ported. Pinning a theme for a test is now a `themeId` option on the shared `render`, which sets it at the root where the manager is. |
+
+**Findings.**
+
+1. *The storage key and the scope id are different ids, and conflating them silently discards every saved theme choice.* `ThemeProvider` scoped its key by `spaceId` (`mullion-theme-id-42`); `MullionProvider` scopes its generated CSS selector by `rootId`, the per-React-root key. P79-A's `storageKeyFor(key, instanceId)` had one id to work with because nothing had yet asked it to have two. I saw the collision, added a separate `persistence.scope`, and then defaulted it to `instanceId` when it was not given, which reintroduced the same bug for the case that matters most: a page with no space passes no scope, so the key became `mullion-theme-id-<rootId>` and the unscoped value written by every previous release read back empty. The unit suite did not catch it, because I had written a test asserting that fallback was correct. `theme-qa` caught it in the browser: three behavioural failures and three visual snapshots 93% different, because the gallery painted the brand theme instead of the stored one. The scope is now explicit and never defaulted, and the two tests that encoded the wrong assumption (mine, and P79-A's own `scopes the storage key per instance`) now pin the right one. This is a deliberate change to an API P79-A shipped three commits ago: `instanceId` scopes the generated scope id and nothing else.
+
+2. *An uninstalled instance default used to fall through to the host hint, and in the first draft it stopped doing so.* `ThemeContext` guarded step 2 with `hasTheme(defaultThemeId)`, so a space configured with a theme that is no longer registered fell through to the WordPress-injected candidate. Writing the priority as a chain of `??` lost that: an unregistered id is still a string, so it short-circuited the chain and landed on the brand theme, skipping the host's answer entirely. Each step is now checked before it counts, and a test names the case.
+3. *The two registries described themes from different copies of the same file.* The app registry read `wp-plugin/mullion-gallery/theme-catalog.json` directly. With the framework registry also needing groups and descriptions, that would have been a second reader of a file inside the WordPress plugin, from a directory that is meant to be extractable. Both now read the engine's copy, and the adapter suite asserts the two produce identical metadata in identical order, which is the cheapest possible proof that the catalogue merge did not change what a user sees.
+4. *`getAllThemeMetaGrouped()` became dead the moment the framework could group.* Removed rather than left, so the catalogue grouping has one implementation and not two that can disagree.
+
+**Measurements.** Framework registry initialisation for the 23 bundled themes: **24ms** on the production path and **85ms** with the development-only contrast audits included, both against the criterion's 100ms budget. A lookup is a `Map.get` at **0.029 microseconds**, unchanged. A timing assertion would be flaky, so what the suite pins instead is the property that would actually break if a getter started recomputing: `getThemeEntry(id)` returns the same object every time, and the same object `listThemes()` holds.
+
+**Acceptance check.**
+
+| Criterion | Evidence |
+|-----------|----------|
+| The initial-theme priority order is unchanged | Seven tests in `src/ui/__tests__/themeSelection.test.tsx`: each of the four steps in isolation, each adjacent pair in the order the plan names, and the two fall-through cases (an unregistered stored choice, an uninstalled instance default); mutations M1 and M2 |
+| Persistence, the admin disable flag and the per-instance key behave identically | Seven tests: persist, restore, the admin lock switching without storing, storage ignored when not asked for, and three on the scoped key including two independent instances; the multi-instance "only the first gallery persists" rule is carried on `ThemedApp`; mutations M3 and M7 |
+| `getTheme` stays an O(1) map lookup; registry init stays under 100ms for 23 themes | 0.029 microseconds per lookup and 24ms of initialisation, measured above; identity pinned by test rather than by timing |
+| No app file imports a theme registry directly | ✔ for theme identity, the catalogue and switching: zero. Four files still import `src/themes/index.ts` for the `MantineThemeOverride` (`ThemeContext`, `useTheme`'s outside-provider fallback, `AdminChromeProvider`, `src/theme.ts`). That is the Mantine adapter reading its own adapter output, and Phase 81 deletes the file and all four readers together |
+| The existing theme suites, re-pointed and unchanged in their assertions | The chrome, selector, builder-colour and adapter suites all kept their assertions; only their wrappers changed. The selection assertions moved to the framework suite and were extended, because the criteria claimed a coverage that did not exist |
+| `theme-qa` end to end, both mount modes | `e2e/theme-qa.spec.ts` 25 of 25 against the inverted provider tree, including the six per-theme snapshot pairs and the four focus-ring walks, with no snapshot movement. This suite is what caught finding 1 |
+
+**Mutation testing.** Each applied alone, then reverted byte-identically.
+
+| Guard | Mutation applied | Result |
+|-------|------------------|--------|
+| M1 the host-candidate step exists | `candidateId` dropped from the priority chain | three selection tests fail, naming the candidate they expected |
+| M2 each step must name a registered theme | the `hasTheme` check removed from the instance default | the fall-through test fails: the brand theme, not the host hint |
+| M3 the storage key is scoped by the space | `storageKeyFor` pointed back at `instanceId` | all three key tests fail, including the one written after the e2e caught this exact mutation in live code |
+| M4 the catalogue orders the list | `listThemes()` returned to registration order | the catalogue-order test and the adapter's equality test both fail |
+| M5 the catalogue describes a theme | the catalogue lookup dropped from `buildEntry` | the description test fails, and so does the adapter's `getAllThemeMeta` equality |
+| M6 the WordPress copy tracks the engine | one group renamed in the generated copy | `themes:catalog:check` fails naming both files |
+| M7 the admin lock blocks writes, not switches | `setTheme` persists regardless of `persisted` | the admin-lock test fails on the stored value |
+| M8 the adapter publishes a stable context value | `useMemo` dropped from the Mantine override lookup | **survived the first guard**, which asserted the override's identity: that object comes from the registry map and is stable however the adapter is written. Re-pinned on the context value itself, which is what a Mantine consumer actually re-renders on, and the mutation then fails |
+
 ## Outcome
 
-_P79-A, P79-B and P79-C landed 2026-09-12; D pending._
+All four tracks landed 2026-09-12. The framework has a provider that owns scope, tokens, portal container, lock and follow, and now theme management as well; one style-delivery mechanism that reaches every tree the plugin paints; thirty presentational components that read tokens and nothing else, under a single focus rule; and a colour model with a text rung and a fill ink for every semantic role.
+
+What the phase set out to prove, from Rationale 5: a component can read one token and be correct in the gallery tree, in the overlay root, under a locked brand palette and under a followed gallery theme, with nothing carried inline. Three of the four scopes are proved in a browser. The fourth, the wp-admin light DOM, still has no provider; P79-A recorded that as a deliberate omission and P81-B closes it.
+
+Of the five workarounds named in Rationale 2, `ThemeContext`'s variable injection is gone (P79-A) and its registry, persistence and scoping are gone (P79-D), leaving 64 lines of Mantine adapter where there were 224. `OverlayRootSync`, `AdminChromeProvider`, `adminChromeStyles()` and the `--mullion-builder-*` bridge are all still standing, and all four are now Mantine plumbing with a named replacement rather than theme management. They go when Mantine goes, in Phase 81.
+
+Phase 80 builds the components that handle a keypress. Phase 81 moves the 92 files that import `Text` and the rest onto the framework, and deletes what this phase left behind.

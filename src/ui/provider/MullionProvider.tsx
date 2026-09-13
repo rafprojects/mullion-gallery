@@ -64,6 +64,14 @@ export interface MullionPersistence {
   key?: string | undefined;
   /** Defaults to true when `persistence` is given at all. */
   allowed?: boolean | undefined;
+  /**
+   * What the key is scoped by. Deliberately separate from `instanceId` and
+   * never defaulted from it: `instanceId` identifies a React root, which is a
+   * new value on every mount, while a saved theme choice has to outlive the
+   * root and belongs to whatever the host considers one gallery. Omitted, the
+   * key is unscoped and every instance on the page shares one choice.
+   */
+  scope?: string | undefined;
 }
 
 export interface MullionProviderProps {
@@ -90,7 +98,15 @@ export interface MullionProviderProps {
   portal?: HTMLElement | null | undefined;
   /** Root providers only. Omitted, nothing is read from or written to storage. */
   persistence?: MullionPersistence | undefined;
-  /** Scopes the storage key and the generated scope id per gallery instance. */
+  /**
+   * Host-injected initial-theme candidates in priority order, read once at
+   * mount. The first that names a registered theme is used, below a persisted
+   * user choice and `theme` and above the brand fallback. Injected rather than
+   * read here so the framework carries no host coupling: the WordPress reads
+   * live in `@/services/wpThemeId`.
+   */
+  themeCandidates?: (() => Array<string | null | undefined>) | undefined;
+  /** Scopes the generated scope id. For the storage key, see `persistence.scope`. */
   instanceId?: string | undefined;
   children?: ReactNode;
 }
@@ -114,6 +130,7 @@ export function MullionProvider({
   portal,
   persistence,
   instanceId,
+  themeCandidates,
   children,
 }: MullionProviderProps) {
   const parentManager = useContext(MullionThemeContext);
@@ -125,7 +142,7 @@ export function MullionProvider({
   const propThemeId = useRegisteredThemeId(theme);
 
   // ── Switching state: only the root's is published, but hooks are unconditional ──
-  const storageKey = storageKeyFor(persistence?.key, instanceId);
+  const storageKey = storageKeyFor(persistence?.key, persistence?.scope);
   const persisted = persistence?.allowed ?? persistence !== undefined;
   const [selectedId, setSelectedId] = useState<string | null>(() => {
     if (!persisted) return null;
@@ -133,6 +150,16 @@ export function MullionProvider({
     return stored && hasTheme(stored) ? stored : null;
   });
   const [previewId, setPreviewId] = useState<string | null>(null);
+
+  // Read once at mount: these are host reads (a global, a DOM attribute) whose
+  // answer is fixed for the page, and re-reading them on a later render would
+  // let a stale hint outrank a choice the user has since made.
+  const [candidateId] = useState<string | null>(() => {
+    for (const candidate of themeCandidates?.() ?? []) {
+      if (candidate && hasTheme(candidate)) return candidate;
+    }
+    return null;
+  });
 
   const setTheme = useCallback(
     (id: string) => {
@@ -147,7 +174,14 @@ export function MullionProvider({
     if (id === null || hasTheme(id)) setPreviewId(id);
   }, []);
 
-  const rootThemeId = resolveThemeId(previewId ?? selectedId ?? propThemeId);
+  // The initial-theme priority, unchanged from `ThemeContext`: a preview beats
+  // everything, then the user's own choice (this session's or the stored one),
+  // then the instance default, then a host hint, then the brand theme. Each
+  // step has to be a registered theme to count, so an instance configured with
+  // a theme that is no longer installed falls through to the host hint rather
+  // than skipping it for the brand.
+  const instanceDefaultId = propThemeId && hasTheme(propThemeId) ? propThemeId : null;
+  const rootThemeId = resolveThemeId(previewId ?? selectedId ?? instanceDefaultId ?? candidateId);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- registryVersion is the store's change signal
   const themes = useMemo<MullionThemeEntry[]>(() => listThemes(), [registryVersion]);
   const ownManager = useMemo<MullionThemeManager>(

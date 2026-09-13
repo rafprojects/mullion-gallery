@@ -7,9 +7,14 @@
 
 export const DEFAULT_STORAGE_KEY = 'mullion-theme-id';
 
-export function storageKeyFor(key: string | undefined, instanceId: string | undefined): string {
+/**
+ * [P79-D] `scope` is the id the key is scoped by, which is not always the
+ * provider's `instanceId`: the gallery scopes its tokens per React root but
+ * saves a theme choice per space, so a visitor's choice survives a remount.
+ */
+export function storageKeyFor(key: string | undefined, scope: string | undefined): string {
   const base = key ?? DEFAULT_STORAGE_KEY;
-  return instanceId ? `${base}-${instanceId}` : base;
+  return scope ? `${base}-${scope}` : base;
 }
 
 export function readStoredThemeId(key: string): string | null {

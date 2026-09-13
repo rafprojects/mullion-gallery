@@ -4,6 +4,7 @@ import { render, type RenderOptions } from '@testing-library/react';
 import { MantineProvider, mergeThemeOverrides } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { createTestQueryClient } from '@/services/queryClient';
+import { MullionProvider } from '@/ui';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { theme } from '../theme';
 
@@ -16,22 +17,44 @@ const testTheme = mergeThemeOverrides(theme, {
   },
 });
 
-function Providers({ children }: PropsWithChildren) {
+function Providers({ themeId, children }: PropsWithChildren<{ themeId?: string | undefined }>) {
   const [queryClient] = useState(createTestQueryClient);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <MantineProvider theme={testTheme} env="test">
-          <ModalsProvider>{children}</ModalsProvider>
-        </MantineProvider>
-      </ThemeProvider>
+      {/* P79-D: the framework provider owns the theme, so `ThemeProvider` (now
+          a Mantine adapter) has something to adapt. No `persistence`, so a test
+          neither reads nor writes localStorage unless it asks to. */}
+      <MullionProvider theme={themeId}>
+        <ThemeProvider>
+          <MantineProvider theme={testTheme} env="test">
+            <ModalsProvider>{children}</ModalsProvider>
+          </MantineProvider>
+        </ThemeProvider>
+      </MullionProvider>
     </QueryClientProvider>
   );
 }
 
-const renderWithProviders = (ui: ReactElement, options?: RenderOptions) =>
-  render(ui, { wrapper: Providers, ...options });
+export interface RenderWithProvidersOptions extends RenderOptions {
+  /**
+   * Pin the root theme. The framework provider owns theme selection, and a
+   * nested provider publishes the root's switching API rather than its own, so
+   * a test that needs a particular theme sets it here and not inside `ui`.
+   */
+  themeId?: string | undefined;
+}
+
+const renderWithProviders = (
+  ui: ReactElement,
+  { themeId, ...options }: RenderWithProvidersOptions = {},
+) =>
+  render(ui, {
+    wrapper: ({ children }: PropsWithChildren) => (
+      <Providers themeId={themeId}>{children}</Providers>
+    ),
+    ...options,
+  });
 
 export * from '@testing-library/react';
 export { renderWithProviders as render };

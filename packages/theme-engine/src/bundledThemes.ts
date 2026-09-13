@@ -5,9 +5,10 @@
  * 23 built-in themes + base defaults travel with the package. The app-side
  * registry imports these, deep-merges + validates + adapts them to Mantine.
  */
-import type { ThemeExtension } from './types';
+import type { ThemeCatalogEntry, ThemeExtension } from './types';
 
 import baseDefaults from './definitions/_base.json';
+import catalogEntries from './definitions/_catalog.json';
 import defaultDarkDef from './definitions/default-dark.json';
 import defaultLightDef from './definitions/default-light.json';
 import materialDarkDef from './definitions/material-dark.json';
@@ -61,3 +62,12 @@ export const bundledThemeDefinitions: ThemeExtension[] = [
   reverseHalloweenDef,
   midnightRoseDef,
 ].map((def) => def as unknown as ThemeExtension);
+
+/**
+ * Display metadata for the bundled themes: group, description, order and the
+ * seasonal flag. [P79-D] This is the source of truth; the WordPress settings
+ * field reads a generated copy at `wp-plugin/mullion-gallery/theme-catalog.json`
+ * which `npm run themes:catalog:check` holds to it.
+ */
+export const bundledThemeCatalog: ThemeCatalogEntry[] =
+  catalogEntries as unknown as ThemeCatalogEntry[];

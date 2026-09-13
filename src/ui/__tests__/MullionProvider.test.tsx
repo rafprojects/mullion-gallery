@@ -448,14 +448,24 @@ describe('MullionProvider per-instance scoping', () => {
     b.host.remove();
   });
 
-  it('scopes the storage key per instance', () => {
+  // [P79-D] The storage key is scoped by `persistence.scope`, not by
+  // `instanceId`. P79-A used `instanceId` for both because it had one id to
+  // work with; the app has two, and the React root id this one carries is a
+  // new value on every mount. See the P79-D notes, finding 1.
+  it('scopes the storage key by the persistence scope, not the provider id', () => {
     render(
-      <MullionProvider theme="tokyo-night" scope="document" persistence={{}} instanceId="one">
+      <MullionProvider
+        theme="tokyo-night"
+        scope="document"
+        persistence={{ scope: 'one' }}
+        instanceId="react-root-1"
+      >
         <Switcher to="nord" />
       </MullionProvider>,
     );
     act(() => screen.getByRole('button').click());
     expect(localStorage.getItem('mullion-theme-id-one')).toBe('nord');
+    expect(localStorage.getItem('mullion-theme-id-react-root-1')).toBeNull();
     expect(localStorage.getItem('mullion-theme-id')).toBeNull();
   });
 });

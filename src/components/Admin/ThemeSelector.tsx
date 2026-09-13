@@ -1,13 +1,14 @@
 /**
  * ThemeSelector — Admin theme picker with live preview swatches
  *
- * Reads available themes from useTheme().availableThemes and renders a
- * grouped Select dropdown with color-swatch previews and metadata-backed
- * descriptions. Selecting a theme calls setTheme() for instant switching
- * (no save button needed — theme is persisted to localStorage by ThemeProvider).
+ * Renders a grouped Select of every registered theme, with colour-swatch
+ * previews and catalogue-backed descriptions. Choosing one previews it
+ * instantly; the Settings panel saves it.
  *
- * Groups and descriptions come from the shared theme-catalog.json so the
- * React selector and the WordPress settings field stay in sync.
+ * [P79-D] The themes, their grouping, their order and their swatches all come
+ * from the framework registry through `useMullionTheme()`, which reads the same
+ * catalogue the WordPress settings field does. This file no longer knows where
+ * a theme is stored or how one is described.
  *
  * Usage:
  * ```tsx
@@ -28,50 +29,8 @@ import {
   type SelectProps,
 } from '@mantine/core';
 import { useTheme } from '@/hooks/useTheme';
-import type { ThemeMeta } from '@mullion/theme-engine';
-import { getTheme, getAllThemeMetaGrouped } from '@/themes/index';
+import { groupThemes, themeSwatches, useMullionTheme } from '@/ui';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Extract the base color string from a ColorShorthand value */
-function colorStr(c: string | { base: string; shades: number } | undefined): string {
-  if (!c) return '#888888';
-  if (typeof c === 'string') return c;
-  return c.base;
-}
-
-/** Build representative display swatches from a theme's definition */
-function getSwatches(themeId: string): string[] {
-  const entry = getTheme(themeId);
-  if (!entry) return [];
-  const c = entry.definition.colors;
-  return [c.background, colorStr(c.primary), colorStr(c.accent), c.success, c.error];
-}
-
-// ---------------------------------------------------------------------------
-// Grouped Select data builder
-// ---------------------------------------------------------------------------
-
-/**
- * Build Mantine Select data in grouped format:
- * [{ group: 'Default', items: [{ value, label }] }, ...]
- */
-function buildSelectData(availableThemes: ThemeMeta[]): SelectProps['data'] {
-  const availableIds = new Set(availableThemes.map((m) => m.id));
-  const grouped = getAllThemeMetaGrouped();
-
-  return grouped
-    .map(({ group, themes }) => ({
-      group,
-      items: themes
-        .filter((t) => availableIds.has(t.id))
-        .map((t) => ({ value: t.id, label: t.name })),
-    }))
-    .filter((g) => g.items.length > 0);
-}
 
 // ---------------------------------------------------------------------------
 // Component
@@ -100,7 +59,8 @@ export function ThemeSelector({
   const { t } = useTranslation('mullion');
   const effectiveLabel = label ?? t('admin_theme_label', 'Theme');
   const effectiveDescription = description ?? t('admin_theme_desc', 'Choose a color theme. Preview applies instantly; saved when you click Save.');
-  const { themeId, availableThemes, setPreviewTheme } = useTheme();
+  const { themeId, setPreviewTheme } = useTheme();
+  const { themes } = useMullionTheme();
   const resolvedValue = value ?? themeId;
   const { comboboxProps, ...restSelectProps } = selectProps ?? {};
 
@@ -112,12 +72,17 @@ export function ThemeSelector({
   // Keep in sync when context themeId changes externally (e.g. on reset)
   useEffect(() => { setLocalValue(resolvedValue); }, [resolvedValue]);
 
-  const data = buildSelectData(availableThemes);
+  const data = groupThemes(themes)
+    .map(({ group, themes: inGroup }) => ({
+      group,
+      items: inGroup.map((t) => ({ value: t.id, label: t.name })),
+    }))
+    .filter((g) => g.items.length > 0);
 
   const renderOption: SelectProps['renderOption'] = ({ option }) => {
-    const swatches = getSwatches(option.value);
-    const meta = availableThemes.find((m) => m.id === option.value);
-    // Use catalog-backed description; fall back to scheme hint
+    const swatches = themeSwatches(option.value);
+    const meta = themes.find((m) => m.id === option.value);
+    // Catalogue-backed description; a runtime theme falls back to a scheme hint
     const desc = meta?.description ?? (meta?.colorScheme === 'dark' ? t('admin_theme_dark', 'Dark theme') : t('admin_theme_light', 'Light theme'));
 
     return (
@@ -151,7 +116,7 @@ export function ThemeSelector({
           onThemeChange?.(value);
         }
       }}
-      data={data ?? []}
+      data={data}
       renderOption={renderOption}
       allowDeselect={false}
       // Keep the dropdown in the same tree as the shadow-root modal so

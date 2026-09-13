@@ -25,8 +25,9 @@ construction.
    the migration ledger.
 3. **The barrel re-exports; the framework lives in sibling directories.**
    Phase 78 shipped the barrel as re-exports only. Phase 79 adds the first
-   code of our own: `provider/` holds `MullionProvider`, the theme registry
-   and the token sheet (P79-A); `styles/` holds the style registration list,
+   code of our own: `provider/` holds `MullionProvider`, the theme registry,
+   the catalogue, persistence and the token sheet (P79-A, P79-D); `styles/`
+   holds the style registration list,
    its delivery and the framework's own sheets (P79-B, P79-C);
    `components/` holds the presentational set (P79-C). Interaction code
    arrives with the framework components in Phase 80, never in the barrel
@@ -43,9 +44,18 @@ construction.
 `ThemeContext`'s variable injection, `OverlayRootSync`, `AdminChromeProvider`
 and `adminChromeStyles()`: which tree the `--mullion-*` token sheet is written
 into, the `color-scheme` on the scope, the container overlays portal into,
-lock and follow for chrome, persistence and runtime themes. The rule it
-enforces is that every element it paints, inline or portaled, sits under an
-element carrying its tokens by stylesheet, so nothing is carried inline.
+lock and follow for chrome, persistence and runtime themes. Since P79-D it
+also owns theme management itself: the registry and catalogue, the
+initial-theme priority, switching and preview. The rule it enforces is that
+every element it paints, inline or portaled, sits under an element carrying
+its tokens by stylesheet, so nothing is carried inline.
+
+The initial theme is resolved once, in this order, each step counting only if
+it names a registered theme: a stored user choice (when `persistence` is
+given), then `theme` as the instance default, then the first host candidate
+`themeCandidates` returns, then the brand theme. `persistence.scope` is what
+the storage key is scoped by and is never defaulted from `instanceId`, which
+identifies a React root and changes on every mount.
 
 ```tsx
 <MullionProvider theme="tokyo-night" scope={shadowRoot} portal={overlayTarget}>

@@ -147,12 +147,16 @@ export type { MullionThemeManager, MullionScopeValue, MullionScopeMode } from '.
 export {
   BRAND_THEME_ID,
   defineTheme,
+  groupThemes,
   hasTheme,
   getThemeEntry,
   listThemes,
+  listThemeGroups,
   resolveThemeId,
+  themeSwatches,
   type DefineThemeResult,
   type MullionThemeEntry,
+  type MullionThemeGroup,
 } from './provider/registry';
 export { buildTokenSheet } from './provider/tokenSheet';
 

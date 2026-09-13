@@ -1,160 +1,87 @@
+/**
+ * The Mantine theme adapter (P79-D).
+ *
+ * Selection, persistence and the initial-theme priority moved to the framework
+ * and are pinned in `src/ui/__tests__/themeSelection.test.tsx`. What is left
+ * here is the adapter's own job: follow the framework's current theme and
+ * publish the Mantine-shaped values the app still reads through `useTheme()`.
+ */
+
 import { renderHook, act } from '@testing-library/react';
 import { describe, expect, it, beforeEach } from 'vitest';
 import type { ReactNode } from 'react';
+import { MullionProvider, useMullionTheme, listThemes } from '@/ui';
 import { ThemeProvider } from './ThemeContext';
 import { useTheme } from '../hooks/useTheme';
-import { resolveWpThemeIds } from '../services/wpThemeId';
-import { DEFAULT_THEME_ID, getAllThemeMeta } from '../themes/index';
+import { getTheme, DEFAULT_THEME_ID, getAllThemeMeta } from '../themes/index';
 
 function wrapper({ children }: { children: ReactNode }) {
-  // Inject the app's WP theme-id resolver — the WordPress global reads now live
-  // app-side (see @/services/wpThemeId) rather than inside ThemeContext. [P51-D]
-  return <ThemeProvider resolveWpThemeIds={resolveWpThemeIds}>{children}</ThemeProvider>;
-}
-
-function forcedWrapper(themeId: string) {
-  return ({ children }: { children: ReactNode }) => (
-    <ThemeProvider forcedThemeId={themeId}>{children}</ThemeProvider>
+  return (
+    <MullionProvider persistence={{}}>
+      <ThemeProvider>{children}</ThemeProvider>
+    </MullionProvider>
   );
 }
 
-describe('ThemeProvider', () => {
+describe('ThemeProvider (Mantine adapter)', () => {
   beforeEach(() => {
     localStorage.clear();
-    // Reset any window globals
-    delete (window as unknown as Record<string, unknown>).__mullionThemeId;
-    delete (window as unknown as Record<string, unknown>).__MULLION_CONFIG__;
   });
 
-  it('provides default theme when no preference is set', () => {
+  it('publishes the default theme with its Mantine override and variables', () => {
     const { result } = renderHook(() => useTheme(), { wrapper });
 
     expect(result.current.themeId).toBe(DEFAULT_THEME_ID);
-    expect(result.current.mantineTheme).toBeDefined();
-    expect(result.current.availableThemes.length).toBeGreaterThan(0);
+    expect(result.current.mantineTheme).toBe(getTheme(DEFAULT_THEME_ID).mantine);
     expect(result.current.cssVars).toBeTruthy();
-  });
-
-  it('provides all available themes from the registry', () => {
-    const { result } = renderHook(() => useTheme(), { wrapper });
-
-    const allMeta = getAllThemeMeta();
-    expect(result.current.availableThemes).toEqual(allMeta);
-  });
-
-  it('switches theme via setTheme', () => {
-    const { result } = renderHook(() => useTheme(), { wrapper });
-
-    // Pick a non-default theme
-    const otherTheme = result.current.availableThemes.find(
-      (t) => t.id !== DEFAULT_THEME_ID,
-    );
-    expect(otherTheme).toBeDefined();
-
-    act(() => {
-      result.current.setTheme(otherTheme!.id);
-    });
-
-    expect(result.current.themeId).toBe(otherTheme!.id);
-  });
-
-  it('falls back to default for invalid theme ID', () => {
-    const { result } = renderHook(() => useTheme(), { wrapper });
-
-    act(() => {
-      result.current.setTheme('totally-invalid-theme-id');
-    });
-
-    expect(result.current.themeId).toBe(DEFAULT_THEME_ID);
-  });
-
-  it('persists theme choice to localStorage', () => {
-    const { result } = renderHook(() => useTheme(), { wrapper });
-
-    const otherTheme = result.current.availableThemes.find(
-      (t) => t.id !== DEFAULT_THEME_ID,
-    );
-    expect(otherTheme).toBeDefined();
-
-    act(() => {
-      result.current.setTheme(otherTheme!.id);
-    });
-
-    expect(localStorage.getItem('mullion-theme-id')).toBe(otherTheme!.id);
-  });
-
-  it('restores theme from localStorage on mount', () => {
-    const allMeta = getAllThemeMeta();
-    const otherTheme = allMeta.find((t) => t.id !== DEFAULT_THEME_ID);
-    expect(otherTheme).toBeDefined();
-
-    localStorage.setItem('mullion-theme-id', otherTheme!.id);
-
-    const { result } = renderHook(() => useTheme(), { wrapper });
-
-    expect(result.current.themeId).toBe(otherTheme!.id);
-  });
-
-  it('respects forcedThemeId prop', () => {
-    const allMeta = getAllThemeMeta();
-    const otherTheme = allMeta.find((t) => t.id !== DEFAULT_THEME_ID);
-    expect(otherTheme).toBeDefined();
-
-    const { result } = renderHook(() => useTheme(), {
-      wrapper: forcedWrapper(otherTheme!.id),
-    });
-
-    expect(result.current.themeId).toBe(otherTheme!.id);
-  });
-
-  it('reads WP global __mullionThemeId', () => {
-    const allMeta = getAllThemeMeta();
-    const otherTheme = allMeta.find((t) => t.id !== DEFAULT_THEME_ID);
-    expect(otherTheme).toBeDefined();
-
-    (window as unknown as Record<string, unknown>).__mullionThemeId = otherTheme!.id;
-
-    const { result } = renderHook(() => useTheme(), { wrapper });
-
-    expect(result.current.themeId).toBe(otherTheme!.id);
-  });
-
-  it('reads WP __MULLION_CONFIG__.theme', () => {
-    const allMeta = getAllThemeMeta();
-    const otherTheme = allMeta.find((t) => t.id !== DEFAULT_THEME_ID);
-    expect(otherTheme).toBeDefined();
-
-    (window as unknown as Record<string, unknown>).__MULLION_CONFIG__ = { theme: otherTheme!.id };
-
-    const { result } = renderHook(() => useTheme(), { wrapper });
-
-    expect(result.current.themeId).toBe(otherTheme!.id);
-  });
-
-  it('provides a valid colorScheme', () => {
-    const { result } = renderHook(() => useTheme(), { wrapper });
-
     expect(['light', 'dark']).toContain(result.current.colorScheme);
   });
 
-  it('does not persist when allowPersistence is false', () => {
-    const noPersistWrapper = ({ children }: { children: ReactNode }) => (
-      <ThemeProvider allowPersistence={false}>{children}</ThemeProvider>
+  it('exposes the framework registry in the picker shape the app expects', () => {
+    const { result } = renderHook(() => useTheme(), { wrapper });
+
+    expect(result.current.availableThemes).toEqual(getAllThemeMeta());
+    expect(result.current.availableThemes.map((m) => m.id)).toEqual(
+      listThemes().map((t) => t.id),
+    );
+  });
+
+  it('follows the framework when the theme changes', () => {
+    const { result } = renderHook(
+      () => ({ adapter: useTheme(), framework: useMullionTheme() }),
+      { wrapper },
     );
 
-    const { result } = renderHook(() => useTheme(), { wrapper: noPersistWrapper });
+    const other = result.current.adapter.availableThemes.find((t) => t.id !== DEFAULT_THEME_ID);
+    expect(other).toBeDefined();
 
-    const otherTheme = result.current.availableThemes.find(
-      (t) => t.id !== DEFAULT_THEME_ID,
-    );
-    expect(otherTheme).toBeDefined();
+    act(() => result.current.framework.setTheme(other!.id));
 
-    act(() => {
-      result.current.setTheme(otherTheme!.id);
-    });
+    expect(result.current.adapter.themeId).toBe(other!.id);
+    expect(result.current.adapter.mantineTheme).toBe(getTheme(other!.id).mantine);
+    expect(result.current.adapter.cssVars).toBe(getTheme(other!.id).cssVars);
+    expect(result.current.adapter.colorScheme).toBe(result.current.framework.colorScheme);
+  });
 
-    expect(result.current.themeId).toBe(otherTheme!.id);
-    // Should NOT have persisted
-    expect(localStorage.getItem('mullion-theme-id')).toBeNull();
+  it('switches through the adapter, which is the framework switcher', () => {
+    const { result } = renderHook(() => useTheme(), { wrapper });
+
+    const other = result.current.availableThemes.find((t) => t.id !== DEFAULT_THEME_ID);
+    act(() => result.current.setTheme(other!.id));
+
+    expect(result.current.themeId).toBe(other!.id);
+    expect(localStorage.getItem('mullion-theme-id')).toBe(other!.id);
+  });
+
+  // The adapter sits above every Mantine consumer in the tree, so an unstable
+  // context value re-renders all of them on any parent render. Asserting the
+  // override's identity is not enough: that object comes from the registry map
+  // and is stable however the adapter is written.
+  it('publishes a stable context value while the theme does not change', () => {
+    const { result, rerender } = renderHook(() => useTheme(), { wrapper });
+
+    const first = result.current;
+    rerender();
+    expect(result.current).toBe(first);
   });
 });

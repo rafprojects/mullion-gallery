@@ -96,7 +96,7 @@ position. Framework sheets under `src/ui/` are never layered under
 | Mantine `styles` (theme adapter or component prop) | M4 as inline style | the element; pseudo-class and attribute keys are silently dropped (P76-I-1) | **constrained**: flat declarations only, and only when no `vars` route exists. Two tests enforce flatness, one for the adapter and one for the 14 component call sites |
 | `adminChromeStyles()` (`chromeTheme.ts`) | M4 | Drawer and Modal `inner` and `content` | **legacy, load-bearing**: the only way theme tokens reach portaled chrome across the boundary (P76-H). Carries the full `--mantine-*` set and one `--mullion-*` token. Retired or generalised by P77-B |
 | `--mullion-builder-*` inline block (`LayoutBuilderModal`) | M4 | the builder shell | **legacy, load-bearing**: Dockview is themed through `--dv-*` variables that must resolve inside a portal. Same fate as the row above |
-| `MullionProvider` token sheet | M3 | every scope the provider paints, including the portal container in the overlay root | **canonical** for per-theme tokens everywhere; it replaced `ThemeContext`'s injection in P79-A |
+| `MullionProvider` token sheet | M3 | every scope the provider paints, including the portal container in the overlay root | **canonical** for per-theme tokens everywhere; it replaced `ThemeContext`'s injection in P79-A, and since P79-D the provider picks the theme as well as painting it |
 
 Counting authoring surfaces after P79-C gives twelve, with a different
 composition again: the document-only CSS module row went in P79-B, the

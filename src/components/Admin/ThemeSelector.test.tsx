@@ -3,6 +3,7 @@ import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { MantineProvider } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { DEFAULT_THEME_ID, getAllThemeMeta } from '@/themes/index';
+import { MullionProvider } from '@/ui';
 
 const { setPreviewThemeSpy } = vi.hoisted(() => ({
   setPreviewThemeSpy: vi.fn(),
@@ -81,9 +82,14 @@ import { ThemeSelector } from './ThemeSelector';
 const allThemes = getAllThemeMeta();
 const alternateTheme = allThemes.find((theme) => theme.id !== DEFAULT_THEME_ID)!;
 
+// [P79-D] The selector reads the registry through `useMullionTheme()`, so it
+// needs the framework provider. `useTheme` stays mocked: this suite is about
+// the widget, not about who owns the theme.
 function wrapper({ children }: { children: ReactNode }) {
   return (
-    <MantineProvider>{children}</MantineProvider>
+    <MullionProvider>
+      <MantineProvider>{children}</MantineProvider>
+    </MullionProvider>
   );
 }
 

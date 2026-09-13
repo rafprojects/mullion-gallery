@@ -13,6 +13,7 @@ import {
   auditThemeContrast,
   auditUiContrast,
   baseThemeDefaults,
+  bundledThemeCatalog,
   bundledThemeDefinitions,
   resolveColors,
   validateTheme,
@@ -30,8 +31,20 @@ export interface MullionThemeEntry {
   colorScheme: 'light' | 'dark';
   definition: ThemeDefinition;
   resolved: ResolvedColors;
+  /** Selector grouping, from the catalogue. `Custom` for a runtime theme. */
+  group: string;
+  /** One-line description shown under the name in a picker. */
+  description: string;
+  /** Whether the catalogue marks this a seasonal theme. */
+  seasonal: boolean;
   /** True for a theme registered at runtime through `defineTheme`. */
   custom: boolean;
+}
+
+/** A catalogue group and its themes, in catalogue order. */
+export interface MullionThemeGroup {
+  group: string;
+  themes: MullionThemeEntry[];
 }
 
 export type DefineThemeResult =
@@ -94,6 +107,11 @@ function validationIssues(merged: unknown): string[] {
 // Store and subscription
 // ---------------------------------------------------------------------------
 
+const catalogue = new Map(bundledThemeCatalog.map((entry) => [entry.id, entry]));
+
+/** Sorts after every catalogued theme, so a runtime theme lands at the end. */
+const UNCATALOGUED_ORDER = 999;
+
 const entries = new Map<string, MullionThemeEntry>();
 const listeners = new Set<() => void>();
 let version = 0;
@@ -111,14 +129,23 @@ function notify(): void {
 }
 
 function buildEntry(def: ThemeDefinition, custom: boolean): MullionThemeEntry {
+  const listed = catalogue.get(def.id);
   return {
     id: def.id,
     name: def.name,
     colorScheme: def.colorScheme,
     definition: def,
     resolved: resolveColors(def.colors, def.colorScheme),
+    group: listed?.group ?? (custom ? 'Custom' : 'Other'),
+    description:
+      listed?.description ?? (def.colorScheme === 'dark' ? 'Dark theme' : 'Light theme'),
+    seasonal: listed?.seasonal ?? false,
     custom,
   };
+}
+
+function orderOf(id: string): number {
+  return catalogue.get(id)?.displayOrder ?? UNCATALOGUED_ORDER;
 }
 
 /**
@@ -160,9 +187,49 @@ export function getThemeEntry(id: string | null | undefined): MullionThemeEntry 
   return entry;
 }
 
-/** Every registered theme, bundled first in registration order, then custom in definition order. */
+/**
+ * Every registered theme in catalogue order, then by name. A theme the
+ * catalogue does not list sorts last, which is where a runtime one belongs.
+ */
 export function listThemes(): MullionThemeEntry[] {
-  return Array.from(entries.values());
+  return Array.from(entries.values()).sort((a, b) => {
+    const ao = orderOf(a.id);
+    const bo = orderOf(b.id);
+    return ao !== bo ? ao - bo : a.name.localeCompare(b.name);
+  });
+}
+
+/**
+ * Group themes for a picker, preserving the order they arrive in. Groups appear
+ * in the order their first theme does, so one ordering decides both levels.
+ * Takes the list rather than reading the registry so a component can group the
+ * themes its provider already handed it and stay reactive to registry changes.
+ */
+export function groupThemes(themes: readonly MullionThemeEntry[]): MullionThemeGroup[] {
+  const groups = new Map<string, MullionThemeEntry[]>();
+  for (const entry of themes) {
+    const existing = groups.get(entry.group);
+    if (existing) existing.push(entry);
+    else groups.set(entry.group, [entry]);
+  }
+  return Array.from(groups, ([group, themes]) => ({ group, themes }));
+}
+
+/** Every registered theme, grouped. */
+export function listThemeGroups(): MullionThemeGroup[] {
+  return groupThemes(listThemes());
+}
+
+/**
+ * The colours a picker shows as a preview of a theme: ground, primary, accent
+ * and the two loudest semantics. Read off the definition rather than the
+ * resolved set so a swatch shows what the theme author wrote.
+ */
+export function themeSwatches(id: string): string[] {
+  const { colors } = getThemeEntry(id).definition;
+  const base = (c: string | { base: string; shades: number } | undefined): string =>
+    !c ? '#888888' : typeof c === 'string' ? c : c.base;
+  return [colors.background, base(colors.primary), base(colors.accent), colors.success, colors.error];
 }
 
 /** Subscribe to registry changes; the returned function unsubscribes. */

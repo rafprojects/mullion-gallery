@@ -80,15 +80,13 @@ const getRootId = (host: HTMLElement, index = 0): string => {
 }
 
 /**
- * Inner shell that consumes the ThemeContext and feeds the resolved
- * MantineThemeOverride into MantineProvider. This component re-renders
- * only when the theme changes (O(1) map lookup, pre-computed objects).
+ * The gallery's root provider stack.
  *
- * P79-A: `MullionProvider` sits beside `MantineProvider` (Phase 79 Key
- * Decision A). It owns the `--mullion-*` token sheet for the gallery tree
- * (shadow root or scoped host element) and for the overlay root, following
- * the theme id `ThemeContext` still selects; Mantine keeps its own variables
- * until Phase 81.
+ * P79-D: `MullionProvider` is the owner. It picks the theme (a stored choice,
+ * then this instance's default, then a host hint, then the brand theme) and
+ * writes the `--mullion-*` token sheet into the gallery tree and the overlay
+ * root. `ThemeProvider` below it is a Mantine adapter that follows whatever the
+ * framework picked; Mantine keeps its own variables until Phase 81.
  */
 // eslint-disable-next-line react-refresh/only-export-components
 function ThemedApp({
@@ -97,16 +95,65 @@ function ThemedApp({
   shadowRootEl,
   hostElement,
   rootId,
+  defaultThemeId,
+  persistenceScope,
+  persistTheme = true,
 }: {
   props: MountProps
   isShadowDom: boolean
   shadowRootEl?: ShadowRoot | undefined
   hostElement: HTMLElement
   rootId: string
+  defaultThemeId?: string | undefined
+  persistenceScope?: string | undefined
+  /**
+   * False for every gallery but the first on a multi-instance page, so two
+   * galleries sharing a storage key cannot overwrite each other's choice.
+   */
+  persistTheme?: boolean
 }) {
-  const { themeId, mantineTheme, colorScheme } = useTheme()
   // P77-B: where overlays portal under a shadow mount. See portalTarget.ts.
   const portal = usePortalTarget(portalMode, rootId, shadowRootEl)
+
+  return (
+    <MullionProvider
+      theme={defaultThemeId}
+      scope={shadowRootEl ?? hostElement}
+      portal={portal.target ?? undefined}
+      instanceId={rootId}
+      persistence={{ allowed: persistTheme && allowThemePersistence, scope: persistenceScope }}
+      themeCandidates={resolveWpThemeIds}
+    >
+      <ThemeProvider>
+        <MantineBridge
+          props={props}
+          isShadowDom={isShadowDom}
+          shadowRootEl={shadowRootEl}
+          portal={portal}
+        />
+      </ThemeProvider>
+    </MullionProvider>
+  )
+}
+
+/**
+ * P79-D: everything below the framework provider that still needs Mantine.
+ * `ThemedApp` cannot read `useTheme()` itself any more, because the context it
+ * reads is now published by `ThemeProvider` inside its own tree.
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+function MantineBridge({
+  props,
+  isShadowDom,
+  shadowRootEl,
+  portal,
+}: {
+  props: MountProps
+  isShadowDom: boolean
+  shadowRootEl?: ShadowRoot | undefined
+  portal: ReturnType<typeof usePortalTarget>
+}) {
+  const { mantineTheme, colorScheme } = useTheme()
 
   // P60-D: give every Mantine close button (modals, drawers) an accessible name.
   // Mantine leaves CloseButton unlabeled by default, which trips axe `button-name`
@@ -125,12 +172,6 @@ function ThemedApp({
   )
 
   return (
-    <MullionProvider
-      theme={themeId}
-      scope={shadowRootEl ?? hostElement}
-      portal={portal.target ?? undefined}
-      instanceId={rootId}
-    >
       <MantineProvider
         theme={themeWithA11y}
         forceColorScheme={colorScheme}
@@ -157,13 +198,12 @@ function ThemedApp({
           </ErrorBoundary>
         </ModalsProvider>
       </MantineProvider>
-    </MullionProvider>
   )
 }
 
 /**
- * Top-level render — wraps everything in ThemeProvider, then ThemedApp
- * bridges ThemeContext → MantineProvider.
+ * Top-level render. `ThemedApp` mounts the provider stack: the framework
+ * provider, the Mantine adapter, then Mantine itself.
  */
 const renderApp = (
   mountNode: Element,
@@ -181,20 +221,15 @@ const renderApp = (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <RootIdProvider value={rootId}>
-          <ThemeProvider
-            allowPersistence={allowThemePersistence}
+          <ThemedApp
+            props={props}
+            isShadowDom={isShadow}
+            shadowRootEl={shadowRootEl}
+            hostElement={hostElement}
+            rootId={rootId}
             defaultThemeId={nodeConfig.theme}
-            instanceId={instanceId}
-            resolveWpThemeIds={resolveWpThemeIds}
-          >
-            <ThemedApp
-              props={props}
-              isShadowDom={isShadow}
-              shadowRootEl={shadowRootEl}
-              hostElement={hostElement}
-              rootId={rootId}
-            />
-          </ThemeProvider>
+            persistenceScope={instanceId}
+          />
         </RootIdProvider>
       </QueryClientProvider>
     </StrictMode>,
@@ -300,20 +335,16 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
           const instanceId = inst.nodeConfig.spaceId != null ? String(inst.nodeConfig.spaceId) : undefined
           return createPortal(
             <RootIdProvider value={inst.portalKey}>
-              <ThemeProvider
-                allowPersistence={i === 0 && allowThemePersistence}
+              <ThemedApp
+                props={inst.props}
+                isShadowDom={!!inst.shadowRoot}
+                shadowRootEl={inst.shadowRoot}
+                hostElement={inst.hostElement}
+                rootId={inst.portalKey}
                 defaultThemeId={inst.nodeConfig.theme}
-                instanceId={instanceId}
-                resolveWpThemeIds={resolveWpThemeIds}
-              >
-                <ThemedApp
-                  props={inst.props}
-                  isShadowDom={!!inst.shadowRoot}
-                  shadowRootEl={inst.shadowRoot}
-                  hostElement={inst.hostElement}
-                  rootId={inst.portalKey}
-                />
-              </ThemeProvider>
+                persistenceScope={instanceId}
+                persistTheme={i === 0}
+              />
             </RootIdProvider>,
             inst.mountPoint,
             inst.portalKey,

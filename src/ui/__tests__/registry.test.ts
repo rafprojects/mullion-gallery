@@ -6,7 +6,11 @@
  */
 
 import { describe, expect, it, vi } from 'vitest';
-import { bundledThemeDefinitions, type ThemeExtension } from '@mullion/theme-engine';
+import {
+  bundledThemeCatalog,
+  bundledThemeDefinitions,
+  type ThemeExtension,
+} from '@mullion/theme-engine';
 import {
   BRAND_THEME_ID,
   defineTheme,
@@ -14,8 +18,10 @@ import {
   getThemesVersion,
   hasTheme,
   listThemes,
+  listThemeGroups,
   resolveThemeId,
   subscribeThemes,
+  themeSwatches,
 } from '../provider/registry';
 
 const tokyoNight = bundledThemeDefinitions.find((t) => t.id === 'tokyo-night')!;
@@ -28,9 +34,68 @@ describe('framework theme registry', () => {
   it('registers every bundled theme, with the brand theme among them', () => {
     const ids = listThemes().map((t) => t.id);
     expect(ids).toHaveLength(bundledThemeDefinitions.length);
-    expect(ids).toEqual(bundledThemeDefinitions.map((t) => t.id));
+    expect(new Set(ids)).toEqual(new Set(bundledThemeDefinitions.map((t) => t.id)));
     expect(hasTheme(BRAND_THEME_ID)).toBe(true);
     expect(listThemes().every((t) => !t.custom)).toBe(true);
+  });
+
+  // [P79-D] `listThemes()` moved from registration order to catalogue order,
+  // which is what a picker shows and what the WordPress settings field shows.
+  it('lists themes in catalogue order', () => {
+    const ids = listThemes().map((t) => t.id);
+    const catalogued = [...bundledThemeCatalog]
+      .sort((a, b) => (a.displayOrder !== b.displayOrder
+        ? a.displayOrder - b.displayOrder
+        : a.name.localeCompare(b.name)))
+      .map((entry) => entry.id);
+    expect(ids).toEqual(catalogued);
+  });
+
+  it('carries the catalogue description and group onto every bundled theme', () => {
+    for (const entry of listThemes()) {
+      const listed = bundledThemeCatalog.find((c) => c.id === entry.id)!;
+      expect(entry.group).toBe(listed.group);
+      expect(entry.description).toBe(listed.description);
+      expect(entry.seasonal).toBe(listed.seasonal);
+    }
+  });
+
+  it('groups themes in catalogue order, groups ordered by their first theme', () => {
+    const groups = listThemeGroups();
+    expect(groups.flatMap((g) => g.themes.map((t) => t.id))).toEqual(
+      listThemes().map((t) => t.id),
+    );
+    expect(groups[0]?.group).toBe('Default');
+    expect(new Set(groups.map((g) => g.group)).size).toBe(groups.length);
+  });
+
+  it('describes a runtime theme as Custom and sorts it last', () => {
+    const id = 'catalogue-absent-theme';
+    expect(defineTheme(customFrom(tokyoNight, id)).ok).toBe(true);
+
+    const entry = getThemeEntry(id);
+    expect(entry.group).toBe('Custom');
+    expect(entry.custom).toBe(true);
+    expect(entry.description).toBe('Dark theme');
+    expect(listThemes().at(-1)?.id).toBe(id);
+    expect(listThemeGroups().at(-1)?.group).toBe('Custom');
+  });
+
+  // [P79-D] The acceptance criterion is that a lookup stays O(1). A timing
+  // assertion would be flaky; identity is the property that would actually
+  // break if someone made the getter recompute, so that is what is pinned.
+  it('returns the same entry object on every lookup', () => {
+    const first = getThemeEntry('nord');
+    expect(getThemeEntry('nord')).toBe(first);
+    expect(listThemes().find((t) => t.id === 'nord')).toBe(first);
+    expect(first.resolved).toBe(getThemeEntry('nord').resolved);
+  });
+
+  it('reads swatches off the definition, not the resolved ramp', () => {
+    const swatches = themeSwatches('tokyo-night');
+    expect(swatches).toHaveLength(5);
+    expect(swatches[0]).toBe(tokyoNight.colors!.background);
+    expect(swatches.every((c) => typeof c === 'string' && c.length > 0)).toBe(true);
   });
 
   it('holds resolved colours and the merged definition, not a Mantine override', () => {
