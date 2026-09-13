@@ -1,13 +1,14 @@
 # Phase 79 - Framework core and theme manager
 
-**Status:** Complete (P79-A, P79-B, P79-C and P79-D landed)
+**Status:** Complete (P79-A, P79-B, P79-C and P79-D landed; P79-0 reviewed them)
 **Created:** 2026-09-10
-**Last updated:** 2026-09-12 (P79-D landed)
+**Last updated:** 2026-09-13 (P79-0 review landed)
 
 ### Tracks
 
 | Track | Description | Status | Effort |
 |-------|-------------|--------|--------|
+| P79-0 | Review of the four tracks against the study and against Phases 80 and 81: five fixes, each with a guard, and a home for everything else | **Done** (2026-09-13), see notes | Small |
 | P79-A | `MullionProvider`: scope, portal container, lock and follow mode, persistence, runtime theme registration | **Done** (2026-09-12), see notes | Medium-Large |
 | P79-B | Style delivery and the token sheet: one registration list written into every tree the plugin owns | **Done** (2026-09-12), see notes | Medium |
 | P79-C | Layout and typography primitives, and the single focus rule | **Done** (2026-09-12), see notes | Medium |
@@ -155,6 +156,28 @@ Move them into the framework as provider surface, keeping the behaviour the plug
 
 - The existing theme suites, re-pointed and unchanged in their assertions wherever the behaviour is meant to be identical.
 - `theme-qa` end to end: switch theme, reload, confirm persistence, in both mount modes.
+
+---
+
+## Track P79-0 - Review
+
+### Problem
+
+This phase is the preparatory stage for the two that follow. Every behavioural component Phase 80 builds sits on the provider, the delivery list, the tone ladder and the focus rule shipped here, and every consumer Phase 81 migrates inherits the presentational set's defaults. A defect in this layer is paid for once per component built on it, so the four tracks were reviewed as a whole against the study, their own acceptance criteria and what Phases 80 and 81 will ask of them.
+
+### Fix
+
+Small corrections only, each with a guard that fails on the defect it fixes. Nothing about the direction is disputed: one provider owning scope, tokens, portal container and theme management, one delivery list adopted into every tree, components that read tokens and nothing else, and a focus rule keyed on an attribute the components stamp all hold up against the next two phases. Every finding not fixed here is placed in the phase document it belongs to.
+
+### Acceptance criteria
+
+- Every finding is fixed in this track or has a named home in Phase 80, Phase 81 or FUTURE_TASKS.
+- Every fix carries a guard, and a mutation of the fix fails that guard.
+- The full suites stay green, and the showcase's 23-theme contrast matrix still passes with the tone model changed.
+
+### Validation
+
+- `npx vitest run`, `npx tsc --noEmit`, `npm run lint`, and `e2e/ui-showcase.spec.ts` in Chromium, before and after the fixes.
 
 ---
 
@@ -454,9 +477,55 @@ The visual pass was three 2x captures at 390px and 1280px, on `default-dark`, `g
 | M7 the admin lock blocks writes, not switches | `setTheme` persists regardless of `persisted` | the admin-lock test fails on the stored value |
 | M8 the adapter publishes a stable context value | `useMemo` dropped from the Mantine override lookup | **survived the first guard**, which asserted the override's identity: that object comes from the registry map and is stable however the adapter is written. Re-pinned on the context value itself, which is what a Mantine consumer actually re-renders on, and the mutation then fails |
 
+### P79-0 (2026-09-13)
+
+**Status: landed.** The four tracks were read against the study's principles, their own acceptance criteria and the Phase 80 and 81 plans, and the code was read in full: the provider and its five sibling modules, the delivery layer, the seven component modules and their sheets, the app wiring in `main.tsx`, `appStyles.ts` and `portalTarget.ts`, the trimmed adapter, and the engine changes. Five things were fixed, each with a guard; the rest is recorded below with where it went.
+
+**The direction, checked against what comes next.** Phase 80 needs a portal container that carries the nearest provider's tokens, a `render` prop it can hand to Base UI, a focus rule its parts land under, and a tone vocabulary its sheets can read. All four exist and are shaped the way Base UI expects: `useMullionPortal()` returns an element, `renderElement` takes the element-or-function form Base UI spells, the ring rule already lists `[data-focus-visible]`, and the ladder is one attribute. Phase 81 needs the presentational defaults to mean what Mantine's mean so its codemod is mechanical: `gap`, `p` and `radius` read the same way, `Group` wraps by default, `Stack` and `Group` default to the `md` gap, `Text` renders a `<p>`. Two places where they did not are below (finding 1, and the container scale under "kept").
+
+**Findings fixed.**
+
+1. *A tone leaked into every descendant of the element that declared it.* The ladder turns `data-mullion-tone` into `--mullion-tone` and its four siblings, and custom properties inherit; `Text`, `Title`, `Anchor` and `Loader` read `--mullion-tone` bare, with the theme's default as the fallback. So an un-toned `Text` inside a danger `Alert` painted the danger text rung, an `Anchor` inside `Text tone="muted"` went muted, and the `Loader` a loading `filled` `Button` shows was drawn in the primary text rung on the primary fill, a pair nothing had measured. Every component now reads the tone only under its own `[data-mullion-tone]`. An un-toned `Text` or `Title` has no colour of its own and inherits, which is what Mantine's `Text` and `Title` do (their root rules set no `color`) and therefore what the 418 `Text` call sites already assume; a `Loader` is drawn in `currentColor`, so inside a control it takes the control's ink, and on its own it is the primary stroke; `Anchor`'s default became the primary text rung, because link text answers to 1.4.3's 4.5:1 and `primary-stroke` is selected at the 3:1 non-text floor. The ladder moved out of `typography.css` into [`src/ui/styles/tones.css`](../src/ui/styles/tones.css) and registers first, since it is the vocabulary every other sheet reads rather than a typography concern. The parts of one component still read the inherited value on purpose: an alert's icon, a chip's label. Guards: a unit test on the sheet text that no bare component rule mentions `--mullion-tone`, and an e2e case in the showcase measuring the three examples above in Chromium.
+
+2. *The provider painted its trees once, in a layout effect, and a nested provider's container was reconciled before it had a tree.* A child's effects run before its parent's. A nested provider appends its own container to the parent's container in a layout effect, then reconciles its sheets; the parent's layout effect, which puts that outer container into the document or the overlay root, has not run yet, so `sheetRootOf` returned null and the container's sheet was skipped. Every lock-and-follow test passed regardless, because under a document scope the nested wrapper's sheet lives in the same tree and carries the same selector, which also matches the container once it lands. Where the two trees differ it would not have: `shadow` portal mode (`?portal=shadow`, kept for support cases) attached its target in a passive effect, so the root provider's own container had no sheet and a nested lock's overlays would have painted the gallery theme. Two fixes. The provider's pass is now a function two effects share: the layout effect paints before the first frame, and a passive effect repeats the pass when a target had no tree, which is safe because every layout effect in a commit runs before any passive one; if a caller-supplied container still has no tree after that, the provider warns in dev instead of failing silently. And `portalTarget.ts` attaches the shadow-mode target at creation, reusing an existing one so StrictMode's double initialiser leaves no orphan. The overlay-root mode was never affected: its target is inside a shadow root of its own from creation. Guards: the provider's "warns when a supplied container has no tree" test, and `src/portalTarget.test.tsx`.
+
+3. *Closed `Collapse` content stayed in the tab order.* The content is clipped to a zero-height grid row rather than removed, which is what lets it animate without measuring, but a button inside it remained a tab stop behind an invisible box. A closed collapse is now `inert` as well as `aria-hidden`. It also dropped every prop it did not own, as did `Table.ScrollContainer`, which contradicts the forwarding rule P79-C established after finding the same defect in nine other components; both forward now.
+
+4. *`Image` replaced the caller's `onError`.* The fallback handler was set after the spread, so a caller's own handler never ran. Both run now.
+
+5. *`Chip` accepted a `render` prop it forwarded to the `<label>` as an attribute.* The chip is a fixed label-and-input pair with no single element to swap, so the prop is omitted from its type.
+
+One naming correction in `main.tsx`: the local `instanceId` held the space id, which the provider takes as `persistence.scope`, while the provider's own `instanceId` prop takes the React root id. P79-D's finding 1 was exactly the cost of conflating those two, so the local is now `persistenceScope`.
+
+**Reviewed and kept, with the reasoning and the home for each.**
+
+| What | Reasoning | Home |
+|------|-----------|------|
+| A Phase 80 part is under the ring only if the wrapper stamps `data-mullion-focus` | The rule matches Base UI's `data-focus-visible` together with our attribute, never alone. That is the design (an attribute the component sets cannot miss a component), but it is a contract the wrapper has to meet, not one it inherits | P80-A acceptance criterion, added |
+| The `Container` scale (`40rem` to `90rem`) is not Mantine's (540px to 1320px) | The names carry across but the values do not, and the single `size="sm"` call site moves 48px. The scale is the designer's to set; the codemod must not assume the names map | P81-A data point, added |
+| `theme` given as a definition object re-registers, audits and all, whenever its identity changes | `useMemo` on the prop is the right cost model for a stable reference and the wrong one for an inline literal | Documented on the prop |
+| A `defineTheme`'d theme paints framework tokens while the Mantine adapter falls back to the brand theme for Mantine components | No product path defines a theme at runtime (Key Decision E), and the adapter is deleted with Mantine | Resolved by construction in P81-D |
+| Nested providers accept `persistence` and `themeCandidates` and ignore them | Root-only, said so on both props; no consumer passes them to a nested provider. A dev warning was considered and not added, because it would fire in test wrappers that nest a provider under the shared one | Not filed, by this reasoning |
+| Two theme registries run at startup, 24ms for the framework's beside the app's | Planned in P79-A and measured in P79-D | P81-D deletes the app registry |
+| `prefers-reduced-motion` zeroes the duration tokens, so the `Loader` stops spinning | A still ring is still a loader, and one token switch honoured everywhere is the study's rule | Kept |
+| jsdom prints "Could not parse CSS stylesheet" twice per suite that attaches the fallback `<style>` | Its parser does not know `@layer`; the tests that trip it do not touch this track's sheets and passed before it | Kept, noise only |
+
+**Mutations.** Each applied alone against the guarding suite and restored byte-identically afterwards.
+
+| Guard | Mutation applied | Result |
+|-------|------------------|--------|
+| a tone is read only under the declaring attribute (static) | `.mullion-text` reads `var(--mullion-tone, inherit)` bare again | the sheet test fails naming `.mullion-text` |
+| the same, painted | the same mutation, against the showcase in Chromium | the "a tone stops at the element that declared it" test fails on the plain text inside the alert |
+| the shadow-mode target is attached at creation | attached in the effect again, as before | `portalTarget.test.tsx` fails: the target's root at first render is not the shadow root |
+| the passive second pass | the pass removed | the provider's warn test fails: nothing reports the detached container |
+| closed content is inert | `inert` dropped from the closed state | the collapse test fails |
+| the caller's `onError` runs | the call removed | the image test fails on the spy |
+
+**Validation.** Run at CI parity on the final tree: `npx tsc --noEmit` clean, `npm run lint` clean (the first draft of the shared paint function assigned a ref during render, which `react-hooks/refs` refused; it is a `useCallback` keyed on the same dependencies instead), `npm run ui:allowlist:check` green at 178 files, `npm run themes:catalog:check` green, `npm run test:coverage` 4,142 of 4,142 across 270 files with every threshold met (statements 86.72, branches 75.48, functions 83.34, lines 88.68), and `e2e/ui-showcase.spec.ts` 17 of 17 in Chromium, the 23-theme contrast matrix included, since that is the check the tone change could have broken. The suite grew by 24 unit tests net (one new file and four extended cases) and by one e2e test.
+
 ## Outcome
 
-All four tracks landed 2026-09-12. The framework has a provider that owns scope, tokens, portal container, lock and follow, and now theme management as well; one style-delivery mechanism that reaches every tree the plugin paints; thirty presentational components that read tokens and nothing else, under a single focus rule; and a colour model with a text rung and a fill ink for every semantic role.
+All four tracks landed 2026-09-12, and P79-0 reviewed them on 2026-09-13: five small fixes with guards, no change of direction, and a home for every finding that was not fixed here. The framework has a provider that owns scope, tokens, portal container, lock and follow, and now theme management as well; one style-delivery mechanism that reaches every tree the plugin paints; thirty presentational components that read tokens and nothing else, under a single focus rule; and a colour model with a text rung and a fill ink for every semantic role.
 
 What the phase set out to prove, from Rationale 5: a component can read one token and be correct in the gallery tree, in the overlay root, under a locked brand palette and under a followed gallery theme, with nothing carried inline. Three of the four scopes are proved in a browser. The fourth, the wp-admin light DOM, still has no provider; P79-A recorded that as a deliberate omission and P81-B closes it.
 
