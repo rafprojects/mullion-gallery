@@ -31,7 +31,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useGetSettings } from '@/services/settingsQuery';
 import { AdminChromeProvider } from '@/components/Admin/AdminChromeProvider';
 import { adminChromeAttributes, adminChromeClassNames, adminChromeStyles, resolveChromeThemeId } from '@/themes/chromeTheme';
-import { getTheme } from '@/themes/index';
+import { getThemeEntry } from '@/ui';
 import { useLatestRef } from '@mullion/shared-utils';
 import { DockviewReact, DockviewDefaultTab } from 'dockview';
 import { debugGroup, debugLog, debugGroupEnd } from '@/utils/debug';
@@ -117,7 +117,7 @@ export function LayoutBuilderModal({
   const { data: chromeSettings } = useGetSettings(apiClient, settingsSpaceId);
   const applyThemeEverywhere = chromeSettings?.applyThemeEverywhere === true;
   const shellColors = useBuilderShellColors(applyThemeEverywhere);
-  const chromeScheme = getTheme(resolveChromeThemeId(applyThemeEverywhere, themeId)).meta.colorScheme;
+  const chromeScheme = getThemeEntry(resolveChromeThemeId(applyThemeEverywhere, themeId)).colorScheme;
   const [isSaving, setIsSaving] = useState(false);
 
   const builderShellVars = useMemo(

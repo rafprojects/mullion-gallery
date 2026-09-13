@@ -1,0 +1,345 @@
+/*
+ * Controls (P79-C). Heights come from the `--mullion-control-height-*`
+ * component tokens P78-C measured off Mantine's own stylesheet, so a control
+ * built here lines up with one still rendered by Mantine during the Phase 81
+ * migration, when both will be on screen at once.
+ *
+ * Six variants, one tone. `filled` paints the tone, `light` a wash of it,
+ * `outline` a border, `subtle` nothing until hover, `default` the theme's
+ * input surface, `transparent` nothing at all.
+ */
+@layer mullion.components {
+  .mullion-unstyled-button {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    cursor: pointer;
+  }
+
+  .mullion-unstyled-button:disabled {
+    cursor: not-allowed;
+  }
+
+  .mullion-button,
+  .mullion-action-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    /* The UA paints `buttonface` on a `<button>`, so a variant that sets no
+       background of its own showed the browser's grey. `outline` was the one
+       that did, found in the 2x visual pass. */
+    background-color: transparent;
+    border-radius: var(--mullion-radius, var(--mullion-radius-sm));
+    font-family: var(--mullion-font-family);
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background-color var(--mullion-duration-fast) ease,
+      border-color var(--mullion-duration-fast) ease,
+      color var(--mullion-duration-fast) ease;
+  }
+
+  .mullion-button:disabled,
+  .mullion-action-icon:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  .mullion-button {
+    gap: var(--mullion-spacing-xs);
+    block-size: var(--mullion-control-height, var(--mullion-control-height-sm));
+    padding-inline: var(--mullion-control-pad, var(--mullion-spacing-md));
+  }
+
+  .mullion-button[data-size='xs'] {
+    --mullion-control-height: var(--mullion-control-height-xs);
+    --mullion-control-pad: var(--mullion-spacing-sm);
+    font-size: var(--mullion-font-size-xs);
+  }
+
+  .mullion-button[data-size='sm'] {
+    --mullion-control-height: var(--mullion-control-height-sm);
+    font-size: var(--mullion-font-size-sm);
+  }
+
+  .mullion-button[data-size='md'] {
+    --mullion-control-height: var(--mullion-control-height-md);
+    font-size: var(--mullion-font-size-md);
+  }
+
+  .mullion-button[data-size='lg'] {
+    --mullion-control-height: var(--mullion-control-height-lg);
+    --mullion-control-pad: var(--mullion-spacing-lg);
+    font-size: var(--mullion-font-size-lg);
+  }
+
+  .mullion-button[data-size='xl'] {
+    --mullion-control-height: var(--mullion-control-height-xl);
+    --mullion-control-pad: var(--mullion-spacing-xl);
+    font-size: var(--mullion-font-size-xl);
+  }
+
+  /* Mantine's `compact-*` sizes, which eight call sites use: the label keeps
+     its size and the control loses its height. */
+  .mullion-button[data-compact] {
+    --mullion-control-height: auto;
+    --mullion-control-pad: var(--mullion-spacing-xs);
+    padding-block: 0.25rem;
+  }
+
+  .mullion-button[data-full-width] {
+    inline-size: 100%;
+  }
+
+  .mullion-button-section {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+  }
+
+  /* A loading control's spinner is part of the control and takes its ink. */
+  .mullion-button .mullion-loader,
+  .mullion-action-icon .mullion-loader {
+    color: inherit;
+  }
+
+  .mullion-button-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mullion-action-icon {
+    flex: 0 0 auto;
+    inline-size: var(--mullion-control-size, var(--mullion-control-height-sm));
+    block-size: var(--mullion-control-size, var(--mullion-control-height-sm));
+    padding: 0;
+  }
+
+  .mullion-action-icon[data-size='xs'] {
+    --mullion-control-size: var(--mullion-control-height-xs);
+  }
+
+  .mullion-action-icon[data-size='sm'] {
+    --mullion-control-size: var(--mullion-control-height-sm);
+  }
+
+  .mullion-action-icon[data-size='md'] {
+    --mullion-control-size: var(--mullion-control-height-md);
+  }
+
+  .mullion-action-icon[data-size='lg'] {
+    --mullion-control-size: var(--mullion-control-height-lg);
+  }
+
+  .mullion-action-icon[data-size='xl'] {
+    --mullion-control-size: var(--mullion-control-height-xl);
+  }
+
+  /* The variant ladder, shared by both controls. */
+  /*
+   * The fill rung and its paired ink, never the draw rung: see the tone ladder
+   * in typography.css.
+   *
+   * Hover does not move the ground. Three candidate mixes were measured across
+   * all 23 bundled themes and all seven tones, towards the ink and towards the
+   * page ground at two strengths, and every one of them dropped some pair
+   * under 4.5:1 while the rest state cleared it everywhere. A ground a theme
+   * has been audited on is worth more than a ground that shifts on hover, so
+   * the affordance is the theme's own elevation and a hairline of the ink,
+   * neither of which touches the pair that was measured.
+   */
+  .mullion-button[data-variant='filled'],
+  .mullion-action-icon[data-variant='filled'] {
+    background-color: var(--mullion-tone-fill);
+    color: var(--mullion-tone-on);
+  }
+
+  .mullion-button[data-variant='filled']:hover:not(:disabled),
+  .mullion-action-icon[data-variant='filled']:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--mullion-tone-on) 45%, transparent);
+    box-shadow: var(--mullion-shadow-sm);
+  }
+
+  /*
+   * One rule governs colour in this framework: tint the ground or colour the
+   * ink, never both. A `light` control tints its ground, so its label is the
+   * theme's text colour and the tone is carried by the tint. Colouring both
+   * is what fell to 2.92:1 on the light themes, because a role's text rung is
+   * selected against the theme's plain surfaces and a tint of that role is
+   * not one of them.
+   *
+   * An icon is the exception and keeps the tone, because an icon is non-text
+   * and answers to 1.4.11's 3:1 rather than 1.4.3's 4.5:1. Both floors are
+   * measured per theme in e2e/ui-showcase.spec.ts.
+   */
+  .mullion-button[data-variant='light'],
+  .mullion-action-icon[data-variant='light'] {
+    background-color: var(--mullion-tone-wash);
+  }
+
+  .mullion-button[data-variant='light'] {
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-action-icon[data-variant='light'] {
+    color: var(--mullion-tone);
+  }
+
+  .mullion-button[data-variant='light']:hover:not(:disabled),
+  .mullion-action-icon[data-variant='light']:hover:not(:disabled) {
+    background-color: var(--mullion-tone-wash-strong);
+  }
+
+  .mullion-button[data-variant='outline'],
+  .mullion-action-icon[data-variant='outline'] {
+    border-color: var(--mullion-tone);
+    color: var(--mullion-tone);
+  }
+
+  .mullion-button[data-variant='outline']:hover:not(:disabled),
+  .mullion-action-icon[data-variant='outline']:hover:not(:disabled) {
+    background-color: var(--mullion-color-surface2);
+  }
+
+  .mullion-button[data-variant='subtle'],
+  .mullion-action-icon[data-variant='subtle'] {
+    background-color: transparent;
+    color: var(--mullion-tone);
+  }
+
+  .mullion-button[data-variant='subtle']:hover:not(:disabled),
+  .mullion-action-icon[data-variant='subtle']:hover:not(:disabled) {
+    /* A neutral surface, not a tint of the tone: these two keep their coloured
+       ink, so the ground they move to has to be one the rung was selected
+       against. */
+    background-color: var(--mullion-color-surface2);
+  }
+
+  .mullion-button[data-variant='default'],
+  .mullion-action-icon[data-variant='default'] {
+    border-color: var(--mullion-color-border-strong);
+    background-color: var(--mullion-color-input);
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-button[data-variant='default']:hover:not(:disabled),
+  .mullion-action-icon[data-variant='default']:hover:not(:disabled) {
+    background-color: var(--mullion-color-surface2);
+  }
+
+  .mullion-button[data-variant='transparent'],
+  .mullion-action-icon[data-variant='transparent'] {
+    background-color: transparent;
+    color: var(--mullion-tone);
+  }
+
+  /*
+   * The cross, drawn rather than imported. Two bars crossed at the centre, at
+   * 40% of the control so it keeps its proportion at every size.
+   */
+  .mullion-close-button {
+    position: relative;
+  }
+
+  .mullion-close-button::before,
+  .mullion-close-button::after {
+    content: '';
+    position: absolute;
+    inline-size: 40%;
+    block-size: 1.5px;
+    border-radius: 1px;
+    background-color: currentColor;
+  }
+
+  .mullion-close-button::before {
+    transform: rotate(45deg);
+  }
+
+  .mullion-close-button::after {
+    transform: rotate(-45deg);
+  }
+
+  .mullion-chip {
+    display: inline-flex;
+    position: relative;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .mullion-chip[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  /*
+   * The input stays in the layout and in the tab order: `display: none` would
+   * take it out of both, which is the WCAG 2.4.7 failure P76-I-1 shipped. It
+   * is clipped instead and the label carries the visible state.
+   */
+  .mullion-chip-input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .mullion-chip-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    border: 1px solid var(--mullion-color-border-strong);
+    border-radius: var(--mullion-radius-xl);
+    background-color: var(--mullion-color-surface2);
+    color: var(--mullion-color-text);
+    font-family: var(--mullion-font-family);
+    line-height: 1;
+    transition:
+      background-color var(--mullion-duration-fast) ease,
+      border-color var(--mullion-duration-fast) ease;
+  }
+
+  .mullion-chip[data-size='xs'] .mullion-chip-label {
+    padding: 0.3rem 0.6rem;
+    font-size: var(--mullion-font-size-xs);
+  }
+
+  .mullion-chip[data-size='sm'] .mullion-chip-label {
+    padding: 0.4rem 0.75rem;
+    font-size: var(--mullion-font-size-sm);
+  }
+
+  .mullion-chip[data-size='md'] .mullion-chip-label {
+    padding: 0.5rem 0.9rem;
+    font-size: var(--mullion-font-size-md);
+  }
+
+  .mullion-chip[data-size='lg'] .mullion-chip-label {
+    padding: 0.6rem 1.05rem;
+    font-size: var(--mullion-font-size-lg);
+  }
+
+  .mullion-chip[data-size='xl'] .mullion-chip-label {
+    padding: 0.7rem 1.2rem;
+    font-size: var(--mullion-font-size-xl);
+  }
+
+  .mullion-chip-input:checked + .mullion-chip-label {
+    border-color: var(--mullion-tone);
+    background-color: var(--mullion-tone-wash);
+    color: var(--mullion-color-text);
+  }
+}

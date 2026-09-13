@@ -143,14 +143,15 @@ test.describe('portal mode: overlay-root carries the builder sheets', () => {
     await page.getByRole('button', { name: 'New Layout' }).click();
 
     // Dockview and builder.css are document stylesheets in main.tsx; the
-    // overlay root must carry its own copy or the builder renders unstyled
-    // (measured: zero `.dv-` rules, tabs with no padding).
+    // overlay root must carry them too or the builder renders unstyled
+    // (measured: zero `.dv-` rules, tabs with no padding). Since P79-B they
+    // arrive as an adopted sheet, which `styleSheets` does not list.
     const builder = await page.waitForFunction(() => {
       const overlay = document.querySelector('[data-mullion-overlay-root]')?.shadowRoot;
       const tab = overlay?.querySelector('.dv-tab');
       if (!tab) return null;
       let dvRules = 0;
-      for (const s of overlay!.styleSheets) for (const r of s.cssRules) if ((r as CSSStyleRule).selectorText?.includes('.dv-')) dvRules++;
+      for (const s of [...overlay!.styleSheets, ...overlay!.adoptedStyleSheets]) for (const r of s.cssRules) if ((r as CSSStyleRule).selectorText?.includes('.dv-')) dvRules++;
       const cs = getComputedStyle(tab);
       return { dvRules, padding: cs.padding, background: cs.backgroundColor };
     }, null, { timeout: 120_000 });

@@ -242,18 +242,6 @@ The codebase works around this per-consumer rather than structurally, and has al
 
 ---
 
-### Share One Constructable Stylesheet Between the Gallery Root and the Overlay Root
-
-**Origin:** [PHASE77_REPORT.md](PHASE77_REPORT.md) P77-B (2026-09-09).
-
-**Context:** The overlay root (`src/portalTarget.ts`) carries its own `<style>` copy of `overlayStyles`, about 315 KB of CSS text per mount, on top of the gallery root's copy of `shadowStyles`. `adoptedStyleSheets` with one `CSSStyleSheet` built once per page would share the parsed sheet between every root the plugin creates, including multi-shortcode pages.
-
-**What to implement:** Build the sheets once with `replaceSync`, adopt them in `mountWithShadow` and in the overlay root, and keep the `<style>` path as the fallback for browsers without constructable stylesheets. Do it only after the overlay root is the shipped default.
-
-**Effort:** Small | **Impact:** Low-Medium — memory and parse time on multi-mount pages.
-
----
-
 ### Host Decoupling: Run Mullion on Any Web App ("Mullion-next")
 
 **Origin:** User request, 2026-09-10, raised alongside the [UI dependency evaluation](UI_DEPENDENCY_EVALUATION.md). Supersedes the abandoned dual WP/non-WP experiment as the *approach*, not as the goal.
@@ -325,18 +313,6 @@ The backend is the part with no seam at all: 32 PHP classes, about 11,000 lines,
 **Update, 2026-09-11 (P78-B):** measured rather than described. The bake-off built the same drawer three times and probed focus after Escape: Mantine lands on `BODY`, and **both Ark UI and Base UI return focus to the trigger inside the gallery shadow root with no help from us**. So this is not work we have to do. It goes away when `Drawer` becomes a framework component on Base UI in P80-A, and the hand-rolled capture above is only worth writing if that slips or if a surface needs the fix before then. Numbers in [PHASE78_REPORT.md](PHASE78_REPORT.md) under track P78-B.
 
 **Effort:** Small | **Impact:** Medium — WCAG 2.4.3 focus order on every admin surface.
-
----
-
-### WordPress Admin Bar Covers the Settings Drawer Header for Logged-In Users
-
-**Origin:** [PHASE77_REPORT.md](PHASE77_REPORT.md) P77-B (2026-09-09), measured on wordpress.lan.
-
-**Context:** `#wpadminbar` is `position: fixed` at `z-index: 99999`; Mantine's Drawer sits at 450, so the drawer's Cancel, Save and Close buttons render under the bar on the front end whenever the admin bar is shown. Same in every portal mode.
-
-**What to implement:** Either offset the drawer by the admin bar's height when `body.admin-bar` is present (WordPress already exposes `--wp-admin--admin-bar--height`), or raise the chrome's z-index above the bar. The offset is the more conventional choice in the WordPress ecosystem.
-
-**Effort:** Small | **Impact:** Medium — every logged-in admin on the front end hits it.
 
 ---
 
@@ -830,3 +806,7 @@ When promoting future tasks to an active phase:
 *Updated: September 10, 2026 (P77-E accepted, phases re-planned): No new entries. The user accepted the P77-E recommendation and chose to build the in-house component framework before release. The work is now [PHASE78_REPORT.md](PHASE78_REPORT.md) (boundary, primitive bake-off, token model), [PHASE79_REPORT.md](PHASE79_REPORT.md) (framework core and theme manager), [PHASE80_REPORT.md](PHASE80_REPORT.md) (behavioural components) and [PHASE81_REPORT.md](PHASE81_REPORT.md) (migration and Mantine removal). Release pipeline hygiene moved from Phase 79 to [PHASE82_REPORT.md](PHASE82_REPORT.md) and go-live from Phase 80 to [PHASE83_REPORT.md](PHASE83_REPORT.md); links above are corrected. Two backlog items are now owned by the new phases and stay here only until those phases land: "Share One Constructable Stylesheet Between the Gallery Root and the Overlay Root" becomes part of P79-B, and the WordPress admin bar covering the drawer header is closed by the host-safe layer token in P78-C.*
 
 *Updated: September 10, 2026 (P77-I, Phase 77 closed): No new entries. The portal default is now `overlay-root`, so the two accessibility entries that describe the old placement are re-scoped rather than removed: "Focus Return After Closing Portaled Chrome Lands on `body`" is unchanged and still real, because it is Mantine's `useFocusReturn` reading `document.activeElement` rather than a placement problem, and it is closed by the framework in Phase 80 where all three headless candidates resolve the active element through the shadow tree. "WordPress Admin Bar Covers the Settings Drawer Header" is likewise unchanged and is owned by the host-safe layer token in P78-C. One test-integrity fix landed with P77-I and is recorded there rather than here: `playwright.config.ts` defaulted to Vite's port 5173, another project on the machine was serving it, and `reuseExistingServer` ran the whole suite against that application, producing 45 phantom failures.*
+
+*Updated: September 12, 2026 (P79-B delivered): **Removed:** "Share One Constructable Stylesheet Between the Gallery Root and the Overlay Root" (Code Quality). It was owned by P79-B since the Phase 78 to 81 re-plan and is now built: one registration list (`src/ui/styles/uiStyles.ts`, with the app's entries in `src/appStyles.ts`) becomes one `CSSStyleSheet` per page that `MullionProvider` adopts into every root it paints, with a `<style>` fallback where constructable sheets are missing. The overlay root and the gallery root no longer carry hand-written copies, and the two-instance e2e measures four roots sharing one parsed sheet. Details in [PHASE79_REPORT.md](PHASE79_REPORT.md) P79-B.*
+
+*Updated: September 12, 2026 (P79-C delivered): **Removed:** "WordPress Admin Bar Covers the Settings Drawer Header for Logged-In Users" (Accessibility). It has been owned by the host-safe layer token since P78-C shipped the token and P79-C gave it a reader: the Settings drawer takes its z-index from `--mullion-layer-modal` through `uiLayer('modal')`, and the embed raises `--mullion-layer-host-offset` on `:root` when `is_admin_bar_showing()`, so every layer clears the bar's 99999. Building it found the reason the token could not have worked as shipped: the engine declared `layer-host-offset: 0` on the gallery's own scope, which shadowed any value a host set above it. The engine no longer declares it and the `var(..., 0)` fallback in each step carries the default. Three PHP tests and one e2e check cover it; details in [PHASE79_REPORT.md](PHASE79_REPORT.md) P79-C.*

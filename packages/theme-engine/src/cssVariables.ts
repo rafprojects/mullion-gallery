@@ -26,6 +26,12 @@ import { deriveComponentTokens, frameworkConstants } from './componentTokens';
  */
 export const DEFAULT_CSS_VAR_PREFIX = '--mullion';
 
+/** The five rungs every `SizeScale` in a theme definition carries. */
+const SIZE_STEPS = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
+
+/** The six heading levels `HeadingsConfig.sizes` carries. */
+const HEADING_LEVELS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as const;
+
 // ---------------------------------------------------------------------------
 // Generator
 // ---------------------------------------------------------------------------
@@ -101,6 +107,27 @@ export function generateCssVariables(
   // --- Typography ---
   vars.push(`${PREFIX}-font-family: ${sanitizeCssValue(def.typography.fontFamily) ?? 'inherit'};`);
   vars.push(`${PREFIX}-font-family-mono: ${sanitizeCssValue(def.typography.fontFamilyMono) ?? 'monospace'};`);
+
+  // [P79-C] The type scale and the heading scale, which every theme has
+  // carried in its JSON since the engine was written and which only the
+  // Mantine adapter could read. The framework's `Text` and `Title` read these
+  // tokens, so a theme that sets its own sizes now reaches them too.
+  // Optional chaining throughout, like the fallbacks above: a definition
+  // reaches here from theme JSON and from `defineTheme`, and a missing section
+  // must degrade to an inherited value rather than throw.
+  for (const step of SIZE_STEPS) {
+    const size = def.typography?.fontSizes?.[step];
+    vars.push(`${PREFIX}-font-size-${step}: ${sanitizeCssValue(size) ?? 'inherit'};`);
+  }
+  const headings = def.typography?.headings;
+  vars.push(`${PREFIX}-heading-font-family: ${sanitizeCssValue(headings?.fontFamily) ?? 'inherit'};`);
+  for (const level of HEADING_LEVELS) {
+    const heading = headings?.sizes?.[level];
+    vars.push(`${PREFIX}-heading-size-${level}: ${sanitizeCssValue(heading?.fontSize) ?? 'inherit'};`);
+    vars.push(
+      `${PREFIX}-heading-line-height-${level}: ${sanitizeCssValue(heading?.lineHeight) ?? 'normal'};`,
+    );
+  }
 
   // --- Meta ---
   vars.push(`${PREFIX}-color-scheme: ${def.colorScheme};`);

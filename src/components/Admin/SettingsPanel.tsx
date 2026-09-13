@@ -40,6 +40,7 @@ import {
   type SettingsData,
   type SettingsDataInput,
 } from '@/contexts/SettingsStore';
+import { uiLayer } from '@/ui';
 import { SettingTooltip } from './SettingTooltip';
 import type { CustomFontEntry } from '../Common/TypographyEditor';
 import type { UpdateGallerySetting } from '../Settings/GalleryAdapterSettingsSection';
@@ -639,7 +640,11 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
       }
       position="right"
       size={isSmallScreen ? '100%' : toCss(settings.settingsPanelWidth ?? 600, settings.settingsPanelWidthUnit ?? 'px')}
-      zIndex={450}
+      // P79-C: a step by name rather than 450. The WordPress admin bar is
+      // fixed at z-index 99999 and covered this drawer's header for every
+      // logged-in admin; the embed raises `--mullion-layer-host-offset` when
+      // the bar is showing and every layer moves with it.
+      zIndex={uiLayer('modal')}
       withinPortal={withinPortal}
       closeOnClickOutside={!hasChanges}
       closeOnEscape={!hasChanges}
@@ -707,7 +712,7 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
 
                   handleGalleryConfigEditorSave(galleryConfig);
                 }}
-                zIndex={500}
+                zIndex={uiLayer('popover')}
                 blurEnabled={settings.settingsDrawerBlurEnabled}
                 withinPortal={withinPortal}
                 drawerProps={{

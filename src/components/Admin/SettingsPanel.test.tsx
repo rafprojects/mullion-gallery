@@ -4,6 +4,7 @@ import { SettingsPanel } from './SettingsPanel';
 import type { ApiClient } from '@/services/apiClient';
 import { DEFAULT_GALLERY_BEHAVIOR_SETTINGS, type GalleryConfig } from '@/types';
 import { getAdapterSelectOptions } from '@/components/Galleries/Adapters/adapterRegistry';
+import { uiLayer } from '@/ui';
 
 const { setThemeSpy, setPreviewThemeSpy } = vi.hoisted(() => ({
   setThemeSpy: vi.fn(),
@@ -18,7 +19,7 @@ const { setThemeSpy, setPreviewThemeSpy } = vi.hoisted(() => ({
 //   • renders minimal DOM to keep role-queries fast.
 let capturedModalValue: Partial<GalleryConfig> | undefined;
 let capturedOnSave: ((cfg: GalleryConfig) => void) | undefined;
-let capturedModalZIndex: number | undefined;
+let capturedModalZIndex: string | number | undefined;
 
 vi.mock('@/components/Common/GalleryConfigEditorModal', () => ({
   GalleryConfigEditorModal: (props: {
@@ -27,7 +28,7 @@ vi.mock('@/components/Common/GalleryConfigEditorModal', () => ({
     value?: Partial<GalleryConfig>;
     onSave: (cfg: GalleryConfig) => void;
     onClose: () => void;
-    zIndex?: number;
+    zIndex?: string | number;
   }) => {
     capturedModalValue = props.value;
     capturedOnSave = props.onSave;
@@ -1139,7 +1140,11 @@ describe('SettingsPanel', () => {
     await openResponsiveConfigEditor();
 
     expect(screen.getByTestId('gallery-config-editor-modal')).toBeInTheDocument();
-    expect(capturedModalZIndex).toBe(500);
+    // P79-C: the editor sits one step above the drawer on the framework's
+    // layer scale rather than at a literal 500. Both steps carry the host
+    // offset the WordPress embed raises when the admin bar is showing, which
+    // is what stops the bar covering the drawer header.
+    expect(capturedModalZIndex).toBe(uiLayer('popover'));
   });
 
   it('renders per-type breakpoint adapter grids without the selection mode toggle', async () => {

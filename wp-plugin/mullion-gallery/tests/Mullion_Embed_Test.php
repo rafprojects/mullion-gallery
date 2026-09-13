@@ -54,6 +54,55 @@ class Mullion_Embed_Test extends WP_UnitTestCase {
     }
 
     /**
+     * P79-C: the WordPress admin bar is `position: fixed` at `z-index: 99999`
+     * and covered the Settings drawer header for every logged-in admin on the
+     * front end. The framework's layer scale is
+     * `calc(var(--mullion-layer-host-offset, 0) + N)`, so the embed only has
+     * to raise the offset; the drawer reads `--mullion-layer-modal`.
+     */
+    public function test_render_shortcode_raises_the_host_layer_offset_when_the_admin_bar_shows() {
+        add_filter( 'show_admin_bar', '__return_true' );
+
+        $output = Mullion_Embed::render_shortcode();
+
+        remove_filter( 'show_admin_bar', '__return_true' );
+
+        $this->assertStringContainsString( '--mullion-layer-host-offset:100000', $output );
+        $this->assertStringContainsString( ':root{--mullion-layer-host-offset', $output );
+    }
+
+    /**
+     * P79-C: a visitor with no admin bar gets no offset, so the gallery's
+     * layers stay at their own scale rather than sitting six figures up the
+     * stacking order of a page that has nothing to escape.
+     */
+    public function test_render_shortcode_omits_the_host_layer_offset_without_an_admin_bar() {
+        add_filter( 'show_admin_bar', '__return_false' );
+
+        $output = Mullion_Embed::render_shortcode();
+
+        remove_filter( 'show_admin_bar', '__return_false' );
+
+        $this->assertStringNotContainsString( '--mullion-layer-host-offset', $output );
+    }
+
+    /**
+     * The offset rides on the once-per-page config block, so two shortcodes on
+     * one page declare it once rather than twice.
+     */
+    public function test_host_layer_offset_is_emitted_once_per_page() {
+        add_filter( 'show_admin_bar', '__return_true' );
+
+        $first  = Mullion_Embed::render_shortcode();
+        $second = Mullion_Embed::render_shortcode();
+
+        remove_filter( 'show_admin_bar', '__return_true' );
+
+        $this->assertStringContainsString( '--mullion-layer-host-offset', $first );
+        $this->assertStringNotContainsString( '--mullion-layer-host-offset', $second );
+    }
+
+    /**
      * P68-B: an anonymous visitor's page config must NOT carry a REST nonce —
      * a guest nonce authenticates nothing but its presence as X-WP-Nonce made
      * the service worker treat every public request as authenticated, disabling

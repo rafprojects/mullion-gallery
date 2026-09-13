@@ -67,6 +67,10 @@
 
 A codemod for the direct mappings onto the framework's layout primitive props, which render as inline custom properties. Colour and typography props become `Text` variants or classes. The `size` and `variant` scales are the designer's to set, and the mapping from Mantine's scale to ours is written down once and applied uniformly rather than decided per file.
 
+**Data point from P79-B (2026-09-12).** Responsive style props were partly inert until P79-B. React 19 inserts Mantine's hoisted `__mdi__` sheet as a root's first child, so a responsive prop setting the same property as the component's core rule (`Card` with `p={{ base: 'sm', md: 'md' }}`, four sites in `AccessTab`) lost to the core rule at the base breakpoint while Mantine's sheet was a `<style>` after it. P79-B registers Mantine's sheet in the `mullion.vendor` cascade layer, so the hoisted rule now wins and those cards take `sm` padding below `md`. The codemod should carry the responsive intent (the values as written), not what painted before P79-B.
+
+**Data point from P79-0 (2026-09-13).** The framework `Container` scale is `40rem` to `90rem` (`xs` to `xl`) where Mantine's is 540px to 1320px, so the names do not map one to one: the single `size="sm"` call site moves from 720px to 768px. The mapping document should list the container scale beside the spacing scale rather than carry the step names across unchanged. `Text` and `Title` carry no colour of their own and inherit, as Mantine's do, so `c="dimmed"` becomes `tone="muted"` and an unqualified `Text` needs nothing.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.

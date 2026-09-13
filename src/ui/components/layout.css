@@ -1,0 +1,125 @@
+/*
+ * Layout primitives (P79-C). Every value a call site can set arrives as an
+ * inline custom property on the element, so these rules never enumerate a
+ * combination and never grow a selector per variant. The fallback in each
+ * `var()` is the prop's default, which keeps the default in one place.
+ *
+ * Inside `@layer mullion.components`, so any unlayered consumer rule wins
+ * over all of it without a specificity contest (study 3.4).
+ */
+@layer mullion.components {
+  .mullion-stack,
+  .mullion-group,
+  .mullion-center,
+  .mullion-container,
+  .mullion-grid,
+  .mullion-simple-grid {
+    /* One idiom for all three padding props: the axis value wins where it is
+       set, and both fall back to the all-sides value. */
+    padding-block: var(--mullion-pad-block, var(--mullion-pad, 0));
+    padding-inline: var(--mullion-pad-inline, var(--mullion-pad, 0));
+  }
+
+  .mullion-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mullion-gap, var(--mullion-spacing-md));
+    align-items: var(--mullion-align, stretch);
+    justify-content: var(--mullion-justify, flex-start);
+  }
+
+  .mullion-group {
+    display: flex;
+    flex-direction: row;
+    gap: var(--mullion-gap, var(--mullion-spacing-md));
+    align-items: var(--mullion-align, center);
+    justify-content: var(--mullion-justify, flex-start);
+    flex-wrap: var(--mullion-wrap, wrap);
+  }
+
+  .mullion-group[data-grow] > * {
+    flex: 1 1 0;
+    max-width: 100%;
+  }
+
+  .mullion-center {
+    display: flex;
+    align-items: var(--mullion-align, center);
+    justify-content: var(--mullion-justify, center);
+    gap: var(--mullion-gap, 0);
+  }
+
+  .mullion-center[data-inline] {
+    display: inline-flex;
+  }
+
+  .mullion-container {
+    margin-inline: auto;
+    max-width: var(--mullion-container-size, 64rem);
+    width: 100%;
+  }
+
+  .mullion-container[data-fluid] {
+    max-width: none;
+  }
+
+  .mullion-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--mullion-gap, var(--mullion-spacing-md));
+  }
+
+  .mullion-grid-col {
+    grid-column: span var(--mullion-grid-span, 12);
+    min-width: 0;
+  }
+
+  .mullion-simple-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--mullion-cols, 1), minmax(0, 1fr));
+    gap: var(--mullion-gap, var(--mullion-spacing-md));
+  }
+
+  /*
+   * The responsive column counts. A media query cannot read a custom property,
+   * so the breakpoints are constants here rather than theme tokens; they are
+   * the values every bundled theme declares and none overrides. Each step
+   * falls back to the one below it, so `cols={{ base: 1, md: 2 }}` holds one
+   * column through `sm` without the call site spelling it.
+   */
+  @media (min-width: 48em) {
+    .mullion-simple-grid {
+      grid-template-columns: repeat(var(--mullion-cols-sm, var(--mullion-cols, 1)), minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 62em) {
+    .mullion-simple-grid {
+      grid-template-columns: repeat(
+        var(--mullion-cols-md, var(--mullion-cols-sm, var(--mullion-cols, 1))),
+        minmax(0, 1fr)
+      );
+    }
+  }
+
+  @media (min-width: 75em) {
+    .mullion-simple-grid {
+      grid-template-columns: repeat(
+        var(--mullion-cols-lg, var(--mullion-cols-md, var(--mullion-cols-sm, var(--mullion-cols, 1)))),
+        minmax(0, 1fr)
+      );
+    }
+  }
+
+  @media (min-width: 88em) {
+    .mullion-simple-grid {
+      grid-template-columns: repeat(
+        var(
+          --mullion-cols-xl,
+          var(--mullion-cols-lg, var(--mullion-cols-md, var(--mullion-cols-sm, var(--mullion-cols, 1))))
+        ),
+        minmax(0, 1fr)
+      );
+    }
+  }
+}

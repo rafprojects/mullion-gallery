@@ -134,9 +134,13 @@ export default tseslint.config({
     'packages/shared-ui/src/**/*.{ts,tsx}',
   ],
   // Test/story fixtures render literal JSX intentionally — keep them exempt.
+  // [P79-C] `src/ui/showcase/` is the e2e fixture for the framework's
+  // presentational set: it is never imported by the app and never built, and
+  // its labels are what the ring walk tabs through.
   ignores: [
     '**/*.test.{ts,tsx}',
     '**/*.stories.{ts,tsx}',
+    'src/ui/showcase/**',
   ],
   plugins: { i18next },
   rules: {

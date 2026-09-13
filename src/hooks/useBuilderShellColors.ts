@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getTheme } from '@/themes/index';
+import { getThemeEntry } from '@/ui';
 import { resolveChromeThemeId } from '@/themes/chromeTheme';
 import { resolveColors, withAlpha } from '@mullion/theme-engine';
 import { useTheme } from './useTheme';
@@ -24,8 +24,8 @@ export interface BuilderShellColors {
 export function useBuilderShellColors(applyThemeEverywhere = false): BuilderShellColors {
   const { themeId, colorScheme } = useTheme();
   const chromeThemeId = resolveChromeThemeId(applyThemeEverywhere, themeId);
-  const chromeEntry = getTheme(chromeThemeId);
-  const chromeScheme = applyThemeEverywhere ? colorScheme : chromeEntry.meta.colorScheme;
+  const chromeEntry = getThemeEntry(chromeThemeId);
+  const chromeScheme = applyThemeEverywhere ? colorScheme : chromeEntry.colorScheme;
 
   return useMemo(() => {
     const colors = resolveColors(chromeEntry.definition.colors, chromeScheme);

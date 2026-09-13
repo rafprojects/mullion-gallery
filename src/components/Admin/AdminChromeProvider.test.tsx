@@ -7,7 +7,6 @@ import { withPortalTarget } from '@/portalTarget';
 import { AdminChromeProvider } from './AdminChromeProvider';
 import { ADMIN_CHROME_CLASS, BRAND_THEME_ID } from '@/themes/chromeTheme';
 import { getTheme } from '@/themes/index';
-import { ThemeProvider } from '@/contexts/ThemeContext';
 
 function PrimarySwatch() {
   const theme = useMantineTheme();
@@ -28,12 +27,11 @@ describe('AdminChromeProvider', () => {
     expect(galleryPrimary).not.toBe(brandPrimary);
 
     render(
-      <ThemeProvider forcedThemeId="github-light">
-        <AdminChromeProvider applyThemeEverywhere>
-          <PrimarySwatch />
-          <span data-testid="child">ok</span>
-        </AdminChromeProvider>
-      </ThemeProvider>,
+      <AdminChromeProvider applyThemeEverywhere>
+        <PrimarySwatch />
+        <span data-testid="child">ok</span>
+      </AdminChromeProvider>,
+      { themeId: 'github-light' },
     );
 
     expect(screen.getByTestId('child')).toHaveTextContent('ok');
@@ -47,11 +45,10 @@ describe('AdminChromeProvider', () => {
     const brandPrimary = getTheme(BRAND_THEME_ID).mantine.colors?.primary?.[5] ?? '';
 
     render(
-      <ThemeProvider forcedThemeId="tokyo-night">
-        <AdminChromeProvider applyThemeEverywhere={false}>
-          <PrimarySwatch />
-        </AdminChromeProvider>
-      </ThemeProvider>,
+      <AdminChromeProvider applyThemeEverywhere={false}>
+        <PrimarySwatch />
+      </AdminChromeProvider>,
+      { themeId: 'tokyo-night' },
     );
 
     expect(document.querySelector(`.${ADMIN_CHROME_CLASS}`)).not.toBeNull();
@@ -70,12 +67,10 @@ describe('AdminChromeProvider', () => {
     shadow.appendChild(container);
 
     render(
-      <ThemeProvider forcedThemeId="tokyo-night">
-        <AdminChromeProvider applyThemeEverywhere={false}>
-          <span>ok</span>
-        </AdminChromeProvider>
-      </ThemeProvider>,
-      { container },
+      <AdminChromeProvider applyThemeEverywhere={false}>
+        <span>ok</span>
+      </AdminChromeProvider>,
+      { container, themeId: 'tokyo-night' },
     );
 
     expect(document.body.hasAttribute('data-mantine-color-scheme')).toBe(false);
@@ -106,13 +101,11 @@ describe('AdminChromeProvider', () => {
         mounts += 1;
       };
       const tree = (flag: boolean) => (
-        <ThemeProvider forcedThemeId="tokyo-night">
-          <AdminChromeProvider applyThemeEverywhere={flag}>
-            <MountCounter onMount={onMount} />
-          </AdminChromeProvider>
-        </ThemeProvider>
+        <AdminChromeProvider applyThemeEverywhere={flag}>
+          <MountCounter onMount={onMount} />
+        </AdminChromeProvider>
       );
-      const { rerender } = render(tree(from));
+      const { rerender } = render(tree(from), { themeId: 'tokyo-night' });
       expect(mounts).toBe(1);
       rerender(tree(to));
       return mounts;
@@ -134,16 +127,14 @@ describe('AdminChromeProvider', () => {
       ['off', true, false],
     ])('keeps focus on the toggled control when the flag goes %s', (_label, from, to) => {
       const tree = (flag: boolean) => (
-        <ThemeProvider forcedThemeId="tokyo-night">
-          <AdminChromeProvider applyThemeEverywhere={flag}>
-            <button type="button" data-testid="switch">
-              Apply theme everywhere
-            </button>
-          </AdminChromeProvider>
-        </ThemeProvider>
+        <AdminChromeProvider applyThemeEverywhere={flag}>
+          <button type="button" data-testid="switch">
+            Apply theme everywhere
+          </button>
+        </AdminChromeProvider>
       );
 
-      const { rerender } = render(tree(from));
+      const { rerender } = render(tree(from), { themeId: 'tokyo-night' });
       const control = screen.getByTestId('switch');
       control.focus();
       expect(document.activeElement).toBe(control);
@@ -173,13 +164,11 @@ describe('AdminChromeProvider portal target', () => {
       return null;
     }
     render(
-      <ThemeProvider forcedThemeId="tokyo-night">
-        <MantineProvider theme={outer}>
-          <AdminChromeProvider applyThemeEverywhere={false}>
-            <Probe />
-          </AdminChromeProvider>
-        </MantineProvider>
-      </ThemeProvider>,
+      <MantineProvider theme={outer}>
+        <AdminChromeProvider applyThemeEverywhere={false}>
+          <Probe />
+        </AdminChromeProvider>
+      </MantineProvider>,
     );
     expect(seen).toBe(target);
   });

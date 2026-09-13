@@ -1,0 +1,42 @@
+/*
+ * Structural utilities (P79-C).
+ *
+ * `Collapse` animates `grid-template-rows` from `0fr` to `1fr`, which is the
+ * one form that animates to the content's own height without measuring it.
+ * The duration is the theme's token, so the token sheet's reduced-motion
+ * switch already zeroes it (P79-B) and no rule here mentions the preference.
+ */
+@layer mullion.components {
+  /*
+   * The clip-path form rather than the older 1px-inset one: it keeps the
+   * element in the tab order and in the accessibility tree, which is the
+   * whole point, and it does not force a line break the way `width: 1px`
+   * does for a skip link that becomes visible on focus.
+   */
+  .mullion-visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .mullion-collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--mullion-collapse-duration, var(--mullion-duration-base)) ease;
+  }
+
+  .mullion-collapse[data-open] {
+    grid-template-rows: 1fr;
+  }
+
+  .mullion-collapse-inner {
+    min-block-size: 0;
+    overflow: hidden;
+  }
+}

@@ -62,7 +62,8 @@ interface GalleryConfigEditorModalProps {
   clearMode?: 'external' | 'draft' | undefined;
   unifiedAdapterEnabled?: boolean | undefined;
   unifiedAdapterDescription?: string | undefined;
-  zIndex?: number | undefined;
+  /** A number, or a `--mullion-layer-*` token reference from `uiLayer()` (P79-C). */
+  zIndex?: string | number | undefined;
   blurEnabled?: boolean | undefined;
   /**
    * P77-D: where the editor's Drawer renders. Inline (the default) keeps it in

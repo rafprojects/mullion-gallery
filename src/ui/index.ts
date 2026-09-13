@@ -130,3 +130,57 @@ export {
 export { modals, ModalsProvider } from '@mantine/modals';
 export { notifications, Notifications, showNotification } from '@mantine/notifications';
 export { useForm } from '@mantine/form';
+
+// ── Framework: provider and theme registry (P79-A) ─────────────────────────
+// The first names on this surface that are ours rather than re-exports. The
+// provider owns scope, tokens, colour scheme, portal container, lock and
+// follow, persistence and runtime themes; see src/ui/provider/MullionProvider.tsx.
+export {
+  MullionProvider,
+  type MullionProviderProps,
+  type MullionScope,
+  type MullionMode,
+  type MullionPersistence,
+} from './provider/MullionProvider';
+export { useMullionTheme, useMullionScope, useMullionPortal } from './provider/hooks';
+export type { MullionThemeManager, MullionScopeValue, MullionScopeMode } from './provider/mullionContexts';
+export {
+  BRAND_THEME_ID,
+  defineTheme,
+  groupThemes,
+  hasTheme,
+  getThemeEntry,
+  listThemes,
+  listThemeGroups,
+  resolveThemeId,
+  themeSwatches,
+  type DefineThemeResult,
+  type MullionThemeEntry,
+  type MullionThemeGroup,
+} from './provider/registry';
+export { buildTokenSheet } from './provider/tokenSheet';
+
+// ── Framework: style delivery (P79-B) ──────────────────────────────────────
+// One registration list, adopted by the provider into every tree it paints.
+// The app registers the sheets it still needs in src/appStyles.ts.
+export {
+  adoptUiStyles,
+  hasAdoptedUiStyles,
+  listUiStyles,
+  registerUiStyles,
+  uiStylesText,
+  UI_STYLES_ATTR,
+  type UiStyleSheetOptions,
+} from './styles/uiStyles';
+
+// ── Framework: the layer scale (P79-C) ─────────────────────────────────────
+// Chrome reads a step by name rather than writing a z-index, which is the one
+// form the host offset can reach. See src/ui/styles/layers.ts.
+export { uiLayer, type UiLayer } from './styles/layers';
+
+// The presentational components (P79-C) live in `./components` and are
+// deliberately not re-exported here yet: this list is the migration ledger,
+// and moving `Text` onto the framework here would move all 92 files that
+// import it in one commit. Phase 81 flips them, name by name, with the
+// consumers. Until then Storybook, the unit suite and the e2e showcase import
+// `@/ui/components` directly.

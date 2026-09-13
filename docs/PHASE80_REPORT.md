@@ -62,6 +62,7 @@ Every state that used to need an inline colour is a token read by a data-attribu
 - The P77-B hostile-host probe passes: transformed ancestor, page scrolled 600px, sticky header at `z-index` 9999.
 - Input borders resolve from tokens in both colour schemes and both theme modes, which is the P76-D/H regression.
 - A focused input shows the focus border, and a focused control shows the two-tone ring, on all 23 themes.
+- Every part that takes focus carries `data-mullion-focus`, by spreading `focusable` from `@/ui/components` onto it. The ring rule in `src/ui/styles/focus.css` matches Base UI's `data-focus-visible` only together with that attribute, so a wrapped part without it paints no ring (recorded by P79-0, 2026-09-13).
 - The four gates in Key Decision C, for every component.
 
 ### Validation

@@ -19,9 +19,10 @@
  * - `overlay-root`: overlays render in a second shadow root of ours, attached
  *   to a host appended to `document.body`. It escapes the host page's
  *   stacking context like `document` does and is isolated from host CSS like
- *   `shadow` is; the price is a copy of the shadow stylesheet (plus the
- *   builder's document-only sheets) and the theme
- *   variables, which this module keeps in sync.
+ *   `shadow` is. Since P79-B the component sheet and the `--mullion-*` tokens
+ *   reach it through `MullionProvider`, which adopts the framework's shared
+ *   sheet into whichever tree the portal target lives in; this module keeps
+ *   only Mantine's own variables in sync, until Phase 81 removes them.
  *
  * Light mounts (`?shadow=0`, the wp-admin pages) always use `document`.
  */
@@ -33,7 +34,6 @@ import {
   type MantineTheme,
   type MantineThemeOverride,
 } from '@mantine/core';
-import { overlayStyles } from './shadowStyles';
 
 export type PortalMode = 'document' | 'shadow' | 'overlay-root';
 
@@ -57,10 +57,13 @@ export interface PortalTarget {
   mode: PortalMode;
   /** The element Mantine portals into. Null means Mantine's default. */
   target: HTMLElement | null;
-  /** Present in `overlay-root` mode only. */
+  /**
+   * Present in `overlay-root` mode only. Neither the `--mullion-*` token
+   * sheet (P79-A) nor the component sheet (P79-B) is written here:
+   * `MullionProvider` delivers both into whichever tree `target` is in.
+   */
   overlay?: {
     host: HTMLElement;
-    themeVars: HTMLStyleElement;
     mantineVars: HTMLStyleElement;
   };
 }
@@ -71,24 +74,38 @@ function createTarget(rootId: string): HTMLElement {
   return target;
 }
 
+/**
+ * P79-0: the target is attached to the gallery's shadow root here, at
+ * creation, rather than in the effect below. `MullionProvider` reconciles its
+ * sheets in a layout effect that runs before this hook's effects (a child's
+ * effects run first), and a detached target has no tree to write into, so
+ * under `shadow` mode a nested provider's container went without its token
+ * sheet. Reusing an existing target keeps StrictMode's double initialiser
+ * from leaving an orphan in the tree.
+ */
+function createShadowTarget(rootId: string, shadowRootEl: ShadowRoot): HTMLElement {
+  const existing = Array.from(shadowRootEl.children).find(
+    (el): el is HTMLElement => el.getAttribute('data-mullion-portal') === rootId,
+  );
+  if (existing) return existing;
+  const target = createTarget(rootId);
+  shadowRootEl.appendChild(target);
+  return target;
+}
+
 function createPortalTarget(mode: PortalMode, rootId: string, shadowRootEl?: ShadowRoot): PortalTarget {
   if (mode === 'shadow' && shadowRootEl) {
-    return { mode, target: createTarget(rootId) };
+    return { mode, target: createShadowTarget(rootId, shadowRootEl) };
   }
   if (mode === 'overlay-root' && shadowRootEl) {
     const host = document.createElement('div');
     host.setAttribute('data-mullion-overlay-root', rootId);
     const shadow = host.attachShadow({ mode: 'open' });
-    const base = document.createElement('style');
-    base.setAttribute('data-mullion', 'true');
-    base.textContent = overlayStyles;
-    const themeVars = document.createElement('style');
-    themeVars.id = 'mullion-theme-vars';
     const mantineVars = document.createElement('style');
     mantineVars.setAttribute('data-mantine-styles', 'variables');
     const target = createTarget(rootId);
-    shadow.append(base, themeVars, mantineVars, target);
-    return { mode, target, overlay: { host, themeVars, mantineVars } };
+    shadow.append(mantineVars, target);
+    return { mode, target, overlay: { host, mantineVars } };
   }
   return { mode: 'document', target: null };
 }
@@ -107,7 +124,8 @@ export function usePortalTarget(mode: PortalMode, rootId: string, shadowRootEl?:
       document.body.appendChild(portal.overlay.host);
       return () => portal.overlay?.host.remove();
     }
-    shadowRootEl?.appendChild(portal.target);
+    // Already attached at creation; re-attach after StrictMode's simulated unmount.
+    if (!portal.target.isConnected) shadowRootEl?.appendChild(portal.target);
     return () => portal.target?.remove();
   }, [portal, shadowRootEl]);
 
@@ -124,11 +142,6 @@ export function withPortalTarget(theme: MantineThemeOverride, portal: PortalTarg
       Portal: { defaultProps: { target: portal.target } },
     },
   };
-}
-
-/** Writes the gallery's theme variables into the overlay root's copy. */
-export function syncOverlayThemeVars(portal: PortalTarget, cssVars: string): void {
-  if (portal.overlay) portal.overlay.themeVars.textContent = cssVars;
 }
 
 /**

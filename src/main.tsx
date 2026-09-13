@@ -4,14 +4,16 @@ import { createRoot, type Root } from 'react-dom/client'
 import { createPortal } from 'react-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
-import { shadowStyles } from './shadowStyles'
+// P79-B: registers every sheet the gallery needs with the framework's style
+// list; MullionProvider adopts it into each tree it paints.
+import './appStyles'
 import { MantineProvider, mergeThemeOverrides } from '@mantine/core'
 import i18n from './i18n'
 import { Notifications } from '@mantine/notifications'
 import { ModalsProvider } from '@mantine/modals'
 import '@mantine/core/styles.css'
-// P76-I-2: must be unconditional. Portaled admin chrome (Drawer/Modal/Menu)
-// renders outside the shadow root, where global.scss never reaches it.
+// Also on the P79-B list; this document copy serves the wp-admin apps, which
+// have no provider until P81-B, and leaves with Mantine in Phase 81.
 import './styles/chrome-portable.scss'
 import '@mantine/notifications/styles.css'
 import 'dockview/dist/styles/dockview.css'
@@ -23,7 +25,7 @@ import { createAppQueryClient } from './services/queryClient'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { resolveWpThemeIds } from './services/wpThemeId'
 import { useTheme } from './hooks/useTheme'
-import { buildThemeScopeSelector, ensureHostThemeScopeToken } from './utils/themeScope'
+import { MullionProvider } from './ui'
 import { RootIdProvider } from '@mullion/shared-ui'
 import { parseProps, parseNodeConfig, type MountProps, type NodeConfig } from './mountConfig'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -64,10 +66,6 @@ if ('serviceWorker' in navigator && !import.meta.env.DEV) {
   });
 }
 
-const ensureThemeScopeSelector = (host: HTMLElement): string => {
-  return buildThemeScopeSelector(ensureHostThemeScopeToken(host))
-}
-
 /**
  * P36-A: Stable root identity for a host element. Used to scope localStorage
  * keys (`mullion_view_<rootId>_<feature>`) across multiple shortcode mounts.
@@ -82,25 +80,80 @@ const getRootId = (host: HTMLElement, index = 0): string => {
 }
 
 /**
- * Inner shell that consumes the ThemeContext and feeds the resolved
- * MantineThemeOverride into MantineProvider. This component re-renders
- * only when the theme changes (O(1) map lookup, pre-computed objects).
+ * The gallery's root provider stack.
+ *
+ * P79-D: `MullionProvider` is the owner. It picks the theme (a stored choice,
+ * then this instance's default, then a host hint, then the brand theme) and
+ * writes the `--mullion-*` token sheet into the gallery tree and the overlay
+ * root. `ThemeProvider` below it is a Mantine adapter that follows whatever the
+ * framework picked; Mantine keeps its own variables until Phase 81.
  */
 // eslint-disable-next-line react-refresh/only-export-components
 function ThemedApp({
   props,
   isShadowDom,
   shadowRootEl,
+  hostElement,
   rootId,
+  defaultThemeId,
+  persistenceScope,
+  persistTheme = true,
 }: {
   props: MountProps
   isShadowDom: boolean
   shadowRootEl?: ShadowRoot | undefined
+  hostElement: HTMLElement
   rootId: string
+  defaultThemeId?: string | undefined
+  persistenceScope?: string | undefined
+  /**
+   * False for every gallery but the first on a multi-instance page, so two
+   * galleries sharing a storage key cannot overwrite each other's choice.
+   */
+  persistTheme?: boolean
 }) {
-  const { mantineTheme, colorScheme, cssVars } = useTheme()
   // P77-B: where overlays portal under a shadow mount. See portalTarget.ts.
   const portal = usePortalTarget(portalMode, rootId, shadowRootEl)
+
+  return (
+    <MullionProvider
+      theme={defaultThemeId}
+      scope={shadowRootEl ?? hostElement}
+      portal={portal.target ?? undefined}
+      instanceId={rootId}
+      persistence={{ allowed: persistTheme && allowThemePersistence, scope: persistenceScope }}
+      themeCandidates={resolveWpThemeIds}
+    >
+      <ThemeProvider>
+        <MantineBridge
+          props={props}
+          isShadowDom={isShadowDom}
+          shadowRootEl={shadowRootEl}
+          portal={portal}
+        />
+      </ThemeProvider>
+    </MullionProvider>
+  )
+}
+
+/**
+ * P79-D: everything below the framework provider that still needs Mantine.
+ * `ThemedApp` cannot read `useTheme()` itself any more, because the context it
+ * reads is now published by `ThemeProvider` inside its own tree.
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+function MantineBridge({
+  props,
+  isShadowDom,
+  shadowRootEl,
+  portal,
+}: {
+  props: MountProps
+  isShadowDom: boolean
+  shadowRootEl?: ShadowRoot | undefined
+  portal: ReturnType<typeof usePortalTarget>
+}) {
+  const { mantineTheme, colorScheme } = useTheme()
 
   // P60-D: give every Mantine close button (modals, drawers) an accessible name.
   // Mantine leaves CloseButton unlabeled by default, which trips axe `button-name`
@@ -119,38 +172,38 @@ function ThemedApp({
   )
 
   return (
-    <MantineProvider
-      theme={themeWithA11y}
-      forceColorScheme={colorScheme}
-      deduplicateInlineStyles
-      // Scope Mantine CSS variables into shadow root or document :root
-      cssVariablesSelector={isShadowDom ? ':host' : ':root'}
-      // getRootElement controls where data-mantine-color-scheme is set.
-      // Must match cssVariablesSelector: :host → shadow host, :root → <html>.
-      getRootElement={() =>
-        isShadowDom && shadowRootEl
-          ? (shadowRootEl.host as HTMLElement) ?? document.documentElement
-          : document.documentElement
-      }
-    >
-      <OverlayRootSync portal={portal} cssVars={cssVars} colorScheme={colorScheme} />
-      <Notifications withinPortal={false} />
-      <ModalsProvider>
-        {/* P69-D: public-facing boundary. No isAdmin prop → a public visitor
-            sees generic copy, never a raw exception message (Sentry still gets
-            the full error). Admin sub-trees have their own inner ErrorBoundary
-            passing isAdmin so operators keep raw messages for troubleshooting. */}
-        <ErrorBoundary>
-          <App {...props} />
-        </ErrorBoundary>
-      </ModalsProvider>
-    </MantineProvider>
+      <MantineProvider
+        theme={themeWithA11y}
+        forceColorScheme={colorScheme}
+        deduplicateInlineStyles
+        // Scope Mantine CSS variables into shadow root or document :root
+        cssVariablesSelector={isShadowDom ? ':host' : ':root'}
+        // getRootElement controls where data-mantine-color-scheme is set.
+        // Must match cssVariablesSelector: :host → shadow host, :root → <html>.
+        getRootElement={() =>
+          isShadowDom && shadowRootEl
+            ? (shadowRootEl.host as HTMLElement) ?? document.documentElement
+            : document.documentElement
+        }
+      >
+        <OverlayRootSync portal={portal} colorScheme={colorScheme} />
+        <Notifications withinPortal={false} />
+        <ModalsProvider>
+          {/* P69-D: public-facing boundary. No isAdmin prop → a public visitor
+              sees generic copy, never a raw exception message (Sentry still gets
+              the full error). Admin sub-trees have their own inner ErrorBoundary
+              passing isAdmin so operators keep raw messages for troubleshooting. */}
+          <ErrorBoundary>
+            <App {...props} />
+          </ErrorBoundary>
+        </ModalsProvider>
+      </MantineProvider>
   )
 }
 
 /**
- * Top-level render — wraps everything in ThemeProvider, then ThemedApp
- * bridges ThemeContext → MantineProvider.
+ * Top-level render. `ThemedApp` mounts the provider stack: the framework
+ * provider, the Mantine adapter, then Mantine itself.
  */
 const renderApp = (
   mountNode: Element,
@@ -161,30 +214,23 @@ const renderApp = (
   nodeConfig: NodeConfig = {},
 ) => {
   const isShadow = !!shadowRootEl
-  const themeScopeSelector = shadowRootEl ? undefined : ensureThemeScopeSelector(hostElement)
   const queryClient = createAppQueryClient()
-  const instanceId = nodeConfig.spaceId != null ? String(nodeConfig.spaceId) : undefined
+  // The storage key is scoped by the space, never by the React root: see MullionProvider's `persistence.scope`.
+  const persistenceScope = nodeConfig.spaceId != null ? String(nodeConfig.spaceId) : undefined
 
   createRoot(mountNode).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <RootIdProvider value={rootId}>
-          <ThemeProvider
-            shadowRoot={shadowRootEl ?? null}
+          <ThemedApp
+            props={props}
+            isShadowDom={isShadow}
+            shadowRootEl={shadowRootEl}
             hostElement={hostElement}
-            themeScopeSelector={themeScopeSelector}
-            allowPersistence={allowThemePersistence}
+            rootId={rootId}
             defaultThemeId={nodeConfig.theme}
-            instanceId={instanceId}
-            resolveWpThemeIds={resolveWpThemeIds}
-          >
-            <ThemedApp
-              props={props}
-              isShadowDom={isShadow}
-              shadowRootEl={shadowRootEl}
-              rootId={rootId}
-            />
-          </ThemeProvider>
+            persistenceScope={persistenceScope}
+          />
         </RootIdProvider>
       </QueryClientProvider>
     </StrictMode>,
@@ -199,13 +245,6 @@ const mountWithShadow = (host: HTMLElement, props: MountProps, rootId: string, n
   host.setAttribute('data-mullion-mounted', 'true')
 
   const shadowRoot = host.shadowRoot ?? host.attachShadow({ mode: 'open' })
-
-  if (!shadowRoot.querySelector('style[data-mullion]')) {
-    const styleTag = document.createElement('style')
-    styleTag.setAttribute('data-mullion', 'true')
-    styleTag.textContent = shadowStyles
-    shadowRoot.appendChild(styleTag)
-  }
 
   const mountPoint = document.createElement('div')
   mountPoint.setAttribute('data-mullion-mount', 'true')
@@ -240,7 +279,6 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
     shadowRoot?: ShadowRoot
     props: MountProps
     portalKey: string
-    themeScopeSelector?: string
     nodeConfig: NodeConfig
   }
 
@@ -256,13 +294,6 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
     if (useShadowDom) {
       const shadowRoot = host.shadowRoot ?? host.attachShadow({ mode: 'open' })
 
-      if (!shadowRoot.querySelector('style[data-mullion]')) {
-        const styleTag = document.createElement('style')
-        styleTag.setAttribute('data-mullion', 'true')
-        styleTag.textContent = shadowStyles
-        shadowRoot.appendChild(styleTag)
-      }
-
       const mountPoint = document.createElement('div')
       mountPoint.setAttribute('data-mullion-mount', 'true')
       shadowRoot.appendChild(mountPoint)
@@ -270,23 +301,11 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
       instances.push({ mountPoint, hostElement: host, shadowRoot, props, portalKey, nodeConfig })
     } else {
       const portalKey = getRootId(host, index)
-      instances.push({
-        mountPoint: host,
-        hostElement: host,
-        props,
-        portalKey,
-        themeScopeSelector: ensureThemeScopeSelector(host),
-        nodeConfig,
-      })
+      instances.push({ mountPoint: host, hostElement: host, props, portalKey, nodeConfig })
     }
   })
 
   if (instances.length === 0) return
-
-  // Load global styles once for non-shadow-DOM mode.
-  if (!useShadowDom) {
-    import('./styles/global.scss')
-  }
 
   // Hidden container that anchors the single React root — reuse if it already exists.
   let container = document.getElementById('mullion-shared-root')
@@ -314,25 +333,19 @@ const mountSharedRoot = (nodes: NodeListOf<HTMLElement>) => {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         {instances.map((inst, i) => {
-          const instanceId = inst.nodeConfig.spaceId != null ? String(inst.nodeConfig.spaceId) : undefined
+          const persistenceScope = inst.nodeConfig.spaceId != null ? String(inst.nodeConfig.spaceId) : undefined
           return createPortal(
             <RootIdProvider value={inst.portalKey}>
-              <ThemeProvider
-                shadowRoot={inst.shadowRoot ?? null}
+              <ThemedApp
+                props={inst.props}
+                isShadowDom={!!inst.shadowRoot}
+                shadowRootEl={inst.shadowRoot}
                 hostElement={inst.hostElement}
-                themeScopeSelector={inst.themeScopeSelector}
-                allowPersistence={i === 0 && allowThemePersistence}
+                rootId={inst.portalKey}
                 defaultThemeId={inst.nodeConfig.theme}
-                instanceId={instanceId}
-                resolveWpThemeIds={resolveWpThemeIds}
-              >
-                <ThemedApp
-                  props={inst.props}
-                  isShadowDom={!!inst.shadowRoot}
-                  shadowRootEl={inst.shadowRoot}
-                  rootId={inst.portalKey}
-                />
-              </ThemeProvider>
+                persistenceScope={persistenceScope}
+                persistTheme={i === 0}
+              />
             </RootIdProvider>,
             inst.mountPoint,
             inst.portalKey,

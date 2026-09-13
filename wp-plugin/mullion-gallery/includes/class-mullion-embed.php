@@ -309,7 +309,8 @@ class Mullion_Embed {
             $GLOBALS['mullion_config_emitted'] = true;
             // admin_bar_delegation_js() is emitted once here alongside page config.
             // It listens for WP admin bar clicks and routes them to per-instance openers.
-            $config_script = '<script>' . self::page_config_js() . self::admin_bar_delegation_js() . '</script>';
+            $config_script = '<script>' . self::page_config_js() . self::admin_bar_delegation_js() . '</script>'
+                . self::host_layer_style();
         } else {
             $config_script = '';
         }
@@ -521,6 +522,30 @@ class Mullion_Embed {
             . 'background:#fcf9e8;color:#3c2f00;border-radius:4px;font-size:14px;line-height:1.5;">'
             . esc_html($message)
             . '</div>';
+    }
+
+    /**
+     * [P79-C] Lift the framework's layer scale above the WordPress admin bar.
+     *
+     * `#wpadminbar` is `position: fixed` at `z-index: 99999`, so the Settings
+     * drawer's Cancel, Save and Close buttons rendered under it for every
+     * logged-in admin on the front end. Every step of the theme engine's layer
+     * scale is `calc(var(--mullion-layer-host-offset, 0) + N)`, so setting the
+     * offset here is all the host has to do; nothing in the plugin's CSS or
+     * JavaScript names a z-index for it.
+     *
+     * Emitted only when the bar is actually showing, and on `:root` so it
+     * inherits into every shadow root and into the body-level overlay root
+     * alike. The engine deliberately does not declare the offset itself, since
+     * a declaration on the gallery's own scope would shadow this one for
+     * everything inside it.
+     */
+    private static function host_layer_style(): string {
+        if (!is_admin_bar_showing()) {
+            return '';
+        }
+
+        return '<style>:root{--mullion-layer-host-offset:100000;}</style>';
     }
 
     /**

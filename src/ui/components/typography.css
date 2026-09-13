@@ -1,0 +1,123 @@
+/*
+ * Typography (P79-C). Colour arrives as a `data-mullion-tone` attribute resolved to a
+ * token, never as a prop value: a component that took `c="#888"` would be
+ * making a theme decision the theme cannot see. The ladder that resolves the
+ * attribute is `../styles/tones.css`, shared with `Badge`, `Alert` and the
+ * controls, so a reader learns it once.
+ *
+ * The type scale and the heading scale are the theme's own, emitted by the
+ * engine since P79-C. A theme that ships a larger `fontSizes.md` moves every
+ * `Text` in the plugin.
+ */
+@layer mullion.components {
+  .mullion-text {
+    margin: 0;
+    font-family: var(--mullion-font-family);
+    font-size: var(--mullion-font-size, var(--mullion-font-size-md));
+    font-weight: var(--mullion-font-weight, 400);
+    line-height: 1.55;
+    /* No colour of its own: an un-toned Text inherits, as Mantine's does, so a
+       label inside a filled control or an alert body takes that surface's ink.
+       Colour arrives only with the attribute; see styles/tones.css. */
+    text-align: var(--mullion-text-align, inherit);
+    text-transform: var(--mullion-text-transform, none);
+  }
+
+  .mullion-text[data-mullion-tone],
+  .mullion-title[data-mullion-tone],
+  .mullion-anchor[data-mullion-tone] {
+    color: var(--mullion-tone);
+  }
+
+  .mullion-text[data-font='mono'] {
+    font-family: var(--mullion-font-family-mono);
+  }
+
+  .mullion-text[data-italic] {
+    font-style: italic;
+  }
+
+  .mullion-text[data-truncate] {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mullion-text[data-clamp] {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--mullion-line-clamp, 1);
+    line-clamp: var(--mullion-line-clamp, 1);
+    overflow: hidden;
+  }
+
+  .mullion-title {
+    margin: 0;
+    font-family: var(--mullion-heading-font-family, var(--mullion-font-family));
+    font-weight: 600;
+    text-align: var(--mullion-text-align, inherit);
+  }
+
+  .mullion-title[data-level='1'] {
+    font-size: var(--mullion-heading-size-h1);
+    line-height: var(--mullion-heading-line-height-h1);
+  }
+
+  .mullion-title[data-level='2'] {
+    font-size: var(--mullion-heading-size-h2);
+    line-height: var(--mullion-heading-line-height-h2);
+  }
+
+  .mullion-title[data-level='3'] {
+    font-size: var(--mullion-heading-size-h3);
+    line-height: var(--mullion-heading-line-height-h3);
+  }
+
+  .mullion-title[data-level='4'] {
+    font-size: var(--mullion-heading-size-h4);
+    line-height: var(--mullion-heading-line-height-h4);
+  }
+
+  .mullion-title[data-level='5'] {
+    font-size: var(--mullion-heading-size-h5);
+    line-height: var(--mullion-heading-line-height-h5);
+  }
+
+  .mullion-title[data-level='6'] {
+    font-size: var(--mullion-heading-size-h6);
+    line-height: var(--mullion-heading-line-height-h6);
+  }
+
+  .mullion-anchor {
+    font-family: var(--mullion-font-family);
+    font-size: var(--mullion-font-size, inherit);
+    /* Link text answers to 1.4.3's 4.5:1, so the default is the primary text
+       rung and not `primary-stroke`, which is selected at the 3:1 non-text
+       floor for the ring and borders. */
+    color: var(--mullion-primary-text);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .mullion-anchor[data-underline='always'] {
+    text-decoration: underline;
+  }
+
+  .mullion-anchor[data-underline='hover']:hover,
+  .mullion-anchor[data-underline='hover']:focus-visible {
+    text-decoration: underline;
+  }
+
+  .mullion-kbd {
+    display: inline-block;
+    padding: 0.125em 0.4em;
+    border: 1px solid var(--mullion-color-border-strong);
+    border-bottom-width: 2px;
+    border-radius: var(--mullion-radius-sm);
+    background-color: var(--mullion-color-surface2);
+    color: var(--mullion-color-text);
+    font-family: var(--mullion-font-family-mono);
+    font-size: 0.85em;
+    line-height: 1.4;
+  }
+}
