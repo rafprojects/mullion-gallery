@@ -19,6 +19,9 @@ it is in fact applied. This has caught a reviewer once already: during the 2026-
 review the auditor searched the host document for the two-tone ring rule, found only stock
 Mantine outlines, and was one step from reporting the ring as undeployed.
 
+This applies to the plugin's own mount (the dev site, or WordPress). It does **not** apply to
+Storybook, which renders in the light DOM with no shadow root at all; see §6B.
+
 Inspect inside the tree, not beside it:
 
 ```js
@@ -234,6 +237,21 @@ from the free build) — audit them in a Pro/dev build.
 ---
 
 ## 6B. Framework overlays (P80-A) — **not yet run**
+
+> **Section 0 does not apply here, and its two console snippets will fail.** They address the
+> plugin's own mount, where the gallery lives in a shadow root under `#root` and the overlays
+> live in a second shadow root under `[data-mullion-overlay-root]`. **Storybook has neither.**
+> Its decorator renders `<MullionProvider scope="document">`, so everything below is in the
+> ordinary light DOM: `document.styleSheets` works normally, DevTools needs no special handling,
+> and `document.getElementById('root')` is `null` because Storybook's own root is
+> `#storybook-root`. If you ran §0's snippets here and got
+> `can't access property "shadowRoot", document.getElementById(...) is null`, that is expected
+> and nothing is wrong.
+>
+> The one selector worth knowing in Storybook: with no `portal` prop the provider makes its own
+> container and appends it to `document.body`, so every overlay renders inside
+> `document.querySelector('[data-mullion-portal]')`.
+
 
 The framework's own `Modal`, `Drawer`, `Popover`, `Tooltip` and `Menu` landed on 2026-09-13 and
 nothing in the product renders them yet (Phase 80 Key Decision B), so this script tests them in
