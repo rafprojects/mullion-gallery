@@ -45,6 +45,7 @@ async function open(page: Page, { mount = 'shadow', theme = 'default-dark' }: { 
   await page.goto(`/ui-showcase?choice=1&mount=${mount}&chrome=lock&theme=${theme}`);
   await page.locator('[data-testid="inline-choices"]').waitFor();
   await page.locator('[data-testid="inline-toggles"]').waitFor();
+  await page.locator('[data-testid="inline-gaps"]').waitFor();
 }
 
 const inline = (page: Page, id: string) => page.locator(`[data-testid="inline-${id}"]`);
@@ -57,6 +58,7 @@ const inline = (page: Page, id: string) => page.locator(`[data-testid="inline-${
  */
 const choices = (page: Page) => page.locator('[data-testid="inline-choices"]');
 const toggles = (page: Page) => page.locator('[data-testid="inline-toggles"]');
+const gaps = (page: Page) => page.locator('[data-testid="inline-gaps"]');
 
 test.beforeAll(async ({ browser }) => {
   test.setTimeout(180_000);
@@ -349,6 +351,100 @@ test.describe('the choice controls', () => {
 });
 
 // ---------------------------------------------------------------------------
+// The two gaps Base UI does not fill
+// ---------------------------------------------------------------------------
+
+test.describe('the colour picker', () => {
+  test('a pointer on the surface picks the colour under it', async ({ page }) => {
+    // The surface is the one piece of pointer-and-rect code in the framework
+    // that is not the primitive's, so the browser is where it means anything:
+    // jsdom reports every box as zero and the arithmetic would read as correct
+    // against a zero-sized rect.
+    await open(page);
+    await gaps(page).getByRole('button', { name: /open the colour picker/i }).click();
+    const surface = page.getByRole('slider', { name: /saturation/i });
+    await surface.waitFor();
+
+    const box = (await surface.boundingBox())!;
+    expect(box.width, 'the surface has no width to measure against').toBeGreaterThan(50);
+
+    // The top-right corner is full saturation at full brightness, which is the
+    // pure hue whatever the hue happens to be.
+    await page.mouse.move(box.x + box.width - 2, box.y + 2);
+    await page.mouse.down();
+    await page.mouse.up();
+    await expect
+      .poll(async () => surface.getAttribute('aria-valuetext'))
+      .toMatch(/saturation 9[0-9]%|saturation 100%/);
+
+    // The bottom-left corner is no saturation and no brightness: black.
+    await page.mouse.move(box.x + 2, box.y + box.height - 2);
+    await page.mouse.down();
+    await page.mouse.up();
+    await expect.poll(async () => surface.getAttribute('aria-valuetext')).toMatch(/brightness [0-9]%/);
+  });
+
+  test('the field round-trips what the picker reports', async ({ page }) => {
+    await open(page);
+    const field = gaps(page).getByRole('textbox');
+    await expect(field).toHaveValue('rgba(18, 52, 86, 0.5)');
+
+    await gaps(page).getByRole('button', { name: /open the colour picker/i }).click();
+    await page.getByRole('button', { name: 'Use #ffffff' }).click();
+    await expect(field).toHaveValue('rgba(255, 255, 255, 1)');
+  });
+
+  test('the hue rail paints the spectrum rather than a theme colour', async ({ page }) => {
+    await open(page);
+    await gaps(page).getByRole('button', { name: /open the colour picker/i }).click();
+    const track = page.locator('.mullion-color-hue .mullion-slider-track');
+    await track.waitFor();
+    const background = await track.evaluate((el) => getComputedStyle(el).backgroundImage);
+    // A hue rail that is not the spectrum lies about what it selects, which is
+    // why this is the one sheet allowed a colour literal.
+    expect(background).toContain('linear-gradient');
+    expect(background).toContain('rgb(255, 0, 0)');
+    expect(background).toContain('rgb(0, 0, 255)');
+  });
+});
+
+test.describe('pagination', () => {
+  test('keeps its width as the current page moves', async ({ page }) => {
+    // A range that grows and shrinks makes the control reflow under the
+    // pointer between clicks, so the next number is not where the user aimed.
+    await open(page);
+    const nav = gaps(page).getByRole('navigation');
+    const before = (await nav.boundingBox())!.width;
+    await nav.getByRole('button', { name: 'Next page' }).click();
+    await expect(nav.getByRole('button', { name: 'Page 5' })).toHaveAttribute('aria-current', 'page');
+    const after = (await nav.boundingBox())!.width;
+    expect(Math.abs(after - before)).toBeLessThanOrEqual(1);
+  });
+
+  test('the current page is filled and takes the outset ring', async ({ page }) => {
+    await open(page);
+    const nav = gaps(page).getByRole('navigation');
+    const current = nav.locator('[data-active]');
+    const resting = nav.getByRole('button', { name: 'Page 1' });
+
+    const paint = await current.evaluate((el) => ({
+      ground: getComputedStyle(el).backgroundColor,
+      ink: getComputedStyle(el).color,
+    }));
+    const plain = await resting.evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(paint.ground).not.toBe(plain);
+    expect(paint.ink).not.toBe(paint.ground);
+
+    await current.focus();
+    const ring = await current.evaluate((el) => getComputedStyle(el).boxShadow);
+    // Rule 8: a filled control keeps the outset ring, and these sit in a gap
+    // so it has the clearance it needs.
+    expect(ring).not.toContain('inset');
+    expect(ring).not.toBe('none');
+  });
+});
+
+// ---------------------------------------------------------------------------
 // The structural axe gate
 // ---------------------------------------------------------------------------
 
@@ -358,6 +454,7 @@ test.describe('the axe gate', () => {
     const results = await new AxeBuilder({ page })
       .include('[data-testid="inline-choices"]')
       .include('[data-testid="inline-toggles"]')
+      .include('[data-testid="inline-gaps"]')
       .analyze();
     const serious = results.violations.filter((v) => v.impact === 'critical' || v.impact === 'serious');
     expect(serious, serious.map((v) => `${v.id} (${v.impact}): ${v.help}`).join('\n')).toHaveLength(0);

@@ -43,8 +43,11 @@ import {
   UnstyledButton,
   VisuallyHidden,
   Checkbox,
+  ColorInput,
+  ColorPicker,
   MultiSelect,
   NumberInput,
+  Pagination,
   SegmentedControl,
   Slider,
   Switch,
@@ -769,6 +772,50 @@ export const Toggles: Story = {
               <Chip value="shared">Shared with me</Chip>
             </Group>
           </Chip.Group>
+        </Section>
+      </Stack>
+    );
+  },
+};
+
+export const Gaps: Story = {
+  name: 'Pagination and the colour picker',
+  render: function Gaps() {
+    const [page, setPage] = useState(4);
+    const [colour, setColour] = useState('rgba(18, 52, 86, 0.5)');
+    const [hex, setHex] = useState('#3aa3c9');
+    return (
+      <Stack gap="md" padding="md">
+        <Section title="Pagination">
+          <Text size="sm" tone="muted">
+            The run of numbers keeps a constant width as the current page moves, so the control does
+            not reflow under the pointer between clicks. Every control is named: &ldquo;button
+            3&rdquo; says nothing.
+          </Text>
+          <Pagination value={page} onChange={setPage} total={20} aria-label="Campaign pages" />
+          <Pagination value={2} onChange={() => {}} total={3} size="xs" aria-label="Short" />
+        </Section>
+
+        <Section title="Colour">
+          <Text size="sm" tone="muted">
+            Base UI ships no colour picker, so the surface, the arithmetic and the parsing are ours.
+            The hue and opacity rails are the framework&rsquo;s Slider, so they arrive with arrows,
+            Home, End and the page keys rather than a second implementation of them. The text field
+            is the keyboard path: a two-dimensional gradient has no ARIA pattern that expresses it.
+          </Text>
+          <Group gap="md" align="flex-start">
+            <ColorInput
+              label="Background colour"
+              description="Stored as rgba"
+              value={colour}
+              onChange={setColour}
+              format="rgba"
+              swatches={['#102530', '#0d1117', '#ffffff', 'transparent']}
+              withEyeDropper
+            />
+            <ColorInput label="Accent" value={hex} onChange={setHex} />
+          </Group>
+          <ColorPicker value={colour} onChange={setColour} format="rgba" swatches={['#ff0000', '#00ff00', '#0000ff']} />
         </Section>
       </Stack>
     );

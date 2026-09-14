@@ -3,7 +3,10 @@
  * framework stylesheet obeys, reported by file and line.
  *
  *  1. No colour literal. Colour travels as a `--mullion-*` token, so a
- *     literal in a sheet is a theme decision the theme cannot make.
+ *     literal in a sheet is a theme decision the theme cannot make. One sheet
+ *     is exempt, `components/color.css`, and only for the literals the test
+ *     names: a hue rail is the spectrum and a checkerboard means transparency,
+ *     so neither is a theme's to choose.
  *  2. No `!important`. Component sheets sit in a cascade layer so consumer
  *     CSS wins; an important declaration would invert that.
  *  3. No ancestor colour-scheme selector. Scheme is a token and a declaration
@@ -88,6 +91,13 @@ const COLOUR_LITERAL = new RegExp(
   ].join('|'),
   'i',
 );
+/**
+ * [P80-B] The only sheet allowed a colour literal, and only the ones listed in
+ * the test below: `color.css` draws the visible spectrum and a transparency
+ * checkerboard, neither of which a theme owns.
+ */
+const LITERAL_EXEMPT_FILE = path.join('components', 'color.css');
+
 const IMPORTANT = /!\s*important/i;
 const SCHEME_SELECTOR = /\[\s*data-[\w-]*scheme\b/i;
 
@@ -129,7 +139,51 @@ describe('framework component sheets', () => {
   });
 
   it('contain no colour literal', () => {
-    expect(offendersOf(files, COLOUR_LITERAL), 'colour is a token; read --mullion-* instead').toEqual([]);
+    const offenders = offendersOf(files, COLOUR_LITERAL).filter(
+      (entry) => !entry.startsWith(LITERAL_EXEMPT_FILE),
+    );
+    expect(offenders, 'colour is a token; read --mullion-* instead').toEqual([]);
+  });
+
+  /*
+   * [P80-B] The one exemption, and it is narrow on purpose.
+   *
+   * `color.css` paints a hue rail and a transparency checkerboard. Neither is
+   * a theme decision: a hue rail that is not the spectrum lies about what it
+   * selects, and a checkerboard that takes a theme's colours stops reading as
+   * "what is behind shows through" and starts reading as a colour. Everything
+   * else in that file is a token like every other sheet.
+   *
+   * The exemption is pinned to the literals it was granted for, so it cannot
+   * quietly widen into "colours are fine in this file".
+   */
+  it('grants the colour-literal exemption only to the spectrum and the checkerboard', () => {
+    const allowed = new Set([
+      'rgb(0 0 0)',
+      'rgb(0 0 0 / 0)',
+      'rgb(0 0 0 / 0.4)',
+      'rgb(255 255 255)',
+      'rgb(255 255 255 / 0)',
+      'rgb(204 204 204)',
+      '#ff0000',
+      '#ffff00',
+      '#00ff00',
+      '#00ffff',
+      '#0000ff',
+      '#ff00ff',
+    ]);
+    const source = stripComments(
+      readFileSync(path.join(UI_DIR, LITERAL_EXEMPT_FILE), 'utf8'),
+    );
+    const found = [
+      ...source.matchAll(/#[0-9a-f]{3,8}\b|\brgba?\([^)]*\)/gi),
+    ].map((m) => m[0].trim());
+    expect(found.length, 'the exempt file has no literals; remove the exemption').toBeGreaterThan(0);
+    const unexpected = [...new Set(found.filter((literal) => !allowed.has(literal)))];
+    expect(
+      unexpected,
+      'a new colour literal appeared in the exempt file; it needs a token or a reason',
+    ).toEqual([]);
   });
 
   it('contain no !important', () => {

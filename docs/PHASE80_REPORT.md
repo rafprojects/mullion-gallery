@@ -1,15 +1,15 @@
 # Phase 80 - Behavioural components
 
-**Status:** In progress (P80-A complete; P80-B underway, select family landed; P80-C Planned)
+**Status:** In progress (P80-A and P80-B complete; P80-C Planned)
 **Created:** 2026-09-10
-**Last updated:** 2026-09-14 (P80-B: the select family, the navigation controls, then the choice controls)
+**Last updated:** 2026-09-14 (P80-B complete, including both components Base UI does not ship)
 
 ### Tracks
 
 | Track | Description | Status | Effort |
 |-------|-------------|--------|--------|
 | P80-A | Overlays and the input family: the components the theme adapter fights hardest | **Done** (2026-09-14), less `ColorInput` (see notes) | Large |
-| P80-B | Selection, navigation and choice controls: the select family, tabs, accordion, checkbox, switch, chip, segmented control, slider | **In progress** (everything named is done 2026-09-14; pagination and the colour picker remain) | Large |
+| P80-B | Selection, navigation and choice controls: the select family, tabs, accordion, checkbox, switch, chip, segmented control, slider | **Done** (2026-09-14), including the pagination and colour-picker gaps | Large |
 | P80-C | Imperative managers: notifications and confirmations | Planned | Small-Medium |
 
 ---
@@ -31,7 +31,7 @@
 | A | Compound parts or flat props? | **Both.** Compound parts where the primitive has them, plus a flat convenience component for the common case, because 26 files use the flat Mantine `Select` form and rewriting them into parts is migration cost with no benefit. The flat form is a wrapper over the parts, never a fork of them. |
 | B | Does this phase migrate any consumers? | **No.** Components are built and proved in Storybook and tests. Consumers move in Phase 81. Mixing the two would make every component's completion contingent on a file migration, and would put pixel movement and behaviour change in the same diff. |
 | C | How is a component proved done? | **Four gates:** the axe structural gate, the P77-F ring walk, the P79-B static sheet tests, and a manual keyboard pass recorded in `ACCESSIBILITY_MANUAL_AUDIT.md`. A component with green unit tests and no keyboard pass is not done. |
-| D | What about components the primitive lacks? | **Named, owned and reviewed as behaviour.** Resolved 2026-09-11 by P78-B's pick of Base UI 1.8.0, so the gap list is no longer conditional: **pagination** (10 files), **tags input** (5 files) and **colour picker** (20 files). Pagination is a button list with roving focus and is cheap. Tags input is Base UI's `Combobox` plus chips. The colour picker is a saturation and hue surface and is a component in its own right, so P80-B should budget for writing or vendoring it rather than wrapping it. Each gap carries the same four gates. |
+| D | What about components the primitive lacks? | **Named, owned and reviewed as behaviour.** Resolved 2026-09-11 by P78-B's pick of Base UI 1.8.0, so the gap list is no longer conditional: **pagination** (10 files), **tags input** (5 files) and **colour picker** (20 files). Pagination is a button list with roving focus and is cheap. Tags input is Base UI's `Combobox` plus chips. The colour picker is a saturation and hue surface and is a component in its own right, so P80-B should budget for writing or vendoring it rather than wrapping it. Each gap carries the same four gates. **All three built 2026-09-14, and the pricing held with one correction:** pagination is a button list without roving focus, because the Authoring Practices treat pagination as a set of links and each control is its own tab stop. |
 | E | Do the notification and confirmation managers keep their call shape? | **Yes.** `notify.show()` and `confirm()` mirror the 48 and 11 existing call sites, so Phase 81's migration of those sites is mechanical rather than a rewrite. |
 
 ## Execution Priority
@@ -138,6 +138,7 @@ A `notify` store over the primitive's toast, and a `confirm()` over the framewor
 | ~~**ID-based ARIA cannot cross the overlay-root boundary**~~ (superseded by the row above) | **P80-B blocker.** Found in the P80-A manual pass, 2026-09-14. The default portal mode is `overlay-root`, so a Mantine `Select`'s dropdown renders in the overlay root's shadow root while its input stays in the gallery's: two different trees. `aria-activedescendant` and `aria-controls` are **ID references**, and an ID reference cannot resolve across a shadow boundary. Reported symptoms on the Typography panel's Font and Theme selects: NVDA announces "blank" on every arrow key, typing filters the list but no option can be chosen, and the arrow keys move the text caret instead of the highlight. The shadow-boundary cause is a strong hypothesis and is **not yet confirmed**; the decisive test is `?portal=shadow`, **not** `?portal=document`: `document` mode sets the portal target to null so Mantine falls back to `document.body`, which is still outside the gallery's shadow root, and only `shadow` mode keeps the dropdown in the trigger's own tree. `?portal=document` was tried on 2026-09-14 and changed nothing, which is consistent with the hypothesis rather than against it. Measured separately: a bare Mantine `Select`, searchable and not, passes the full keyboard contract under the app's own test providers in jsdom (options open, `aria-activedescendant` is set on ArrowDown, Enter selects), so the component is not generically broken and the cause is environmental. This is the same class as the `aria-owns` finding below, so **Base UI will hit it too**: P80-B's select family must either keep the listbox in the trigger's own tree or avoid ID-referenced ARIA. Confirm before building, not after. |
 | **Filled-and-flush controls have no working ring geometry** | P81-B / layout. Enumerated by the designer on the live Admin Panel: `Add Media` (solid fill, **0px clearance**, inset pair measures 2.91 and fails 3:1), `Rescan Types` (0px clearance) and the Media sort mode (3px). The outset ring is clipped by the container and the inset variant does not clear on a solid fill, so **neither geometry works**. The adopted rule: filled controls take the outset ring and must be given at least 6px of clearance, since the outset halo meets the surface rather than the fill; flush controls on neutral or washed grounds take the inset ring; **filled *and* flush is a layout defect rather than a ring variant**. These three are layout tickets. |
 | **`aria-owns` across a shadow boundary** | Base UI points `aria-owns` at an id in another shadow root for iOS VoiceControl, which axe reports as `aria-valid-attr-value` at critical impact and which cannot resolve in the accessibility tree. Worth confirming in P80-B against a real screen reader before deciding whether it needs a workaround. **Partly answered 2026-09-14 by the select family**, which does not reproduce it: its popup stays in the trigger's root, so the id resolves and the scoped axe gate on an open listbox reports no critical or serious violation. It is still open for the P80-A overlays, which do portal out, and the question there is whether they should follow the select family's container rule. |
+| **The colour picker's surface has no manual pass yet** | P80-B, 2026-09-14. It is the framework's only two-dimensional control and the only one whose keyboard path is a text field rather than the control itself. The unit and browser suites cover the arithmetic, the pointer, the arrow keys and the announced value, and none of them can say whether a screen-reader user can actually set a colour with it. That belongs in §6B of the manual audit beside the overlays, and it is the one component where the manual pass could change the design rather than confirm it. |
 | **Should the overlays keep portalling out?** | P80-B, opened 2026-09-14 by the select family's container rule. The overlays go to the provider's overlay-root container and the select family deliberately does not, so the framework now has two answers to one question. It is not a defect: a modal has no ID-referenced wiring between trigger and popup, and leaving the tree is what buys it the hostile-host guarantee. But the select family's hostile-host probe passes without leaving, which weakens the case for the split. Worth settling before P80-C adds a third popup, not during it. |
 | **Tab order jumps backwards in the gallery main area** | FUTURE_TASKS, product a11y. Found in the P80-A manual pass, 2026-09-14: tabbing forward goes Typography icon, then **left** to Access Mode, then **left** again to the campaign filters group, so forward Tab moves backwards on screen. That is a WCAG 2.4.3 focus-order failure. Not a framework defect: none of these controls is a framework component yet. It wants a DOM-order fix on the surface itself, and it should be re-checked after P81-B migrates that chrome rather than patched twice. |
 | **A deploy breaks any open tab** | FUTURE_TASKS, robustness. Found 2026-09-14 while testing: an open tab holds an entry bundle from the previous build, and a lazily imported route chunk it asks for has been deleted by the new one, so the error boundary shows "Something went wrong / error loading dynamically imported module". The deployed build was verified self-consistent and the service worker correctly declines to cache hashed assets, so this is purely a stale client and a reload fixes it. The product fix is the usual one: catch a dynamic-import rejection at the route boundary and reload the page once before surfacing an error. Cheap, and it removes a class of support report. |
@@ -268,6 +269,35 @@ On a keyboard move a row carries the rail and the inset ring together, which is 
 
 **Scoped as the designer specified: `light` controls.** A `filled` control carries the role at full chroma, where the same CVD collapse is weaker but real (2.7 at worst). Left as it is rather than widened unilaterally, and noted for them.
 
+### P80-B, pagination and the colour picker (2026-09-14)
+
+**Status: landed, and P80-B with it.** `Pagination` in [`pagination.tsx`](../src/ui/components/pagination.tsx), `ColorPicker` and `ColorInput` in [`color.tsx`](../src/ui/components/color.tsx). 34 unit tests, 5 more browser tests and a Storybook story. These are Key Decision D's two remaining gaps: Base UI ships neither, so both are ours in full and both are reviewed as behaviour.
+
+**Pagination was the cheap one, as P78-B priced it.** A list of buttons and the arithmetic that decides which numbers to show. The part worth writing down is what libraries usually miss: a named `nav` landmark, `aria-current` on the current page, and a name on every control, because a screen reader reading "button 3" with no context has told the user nothing. Each button is its own tab stop, which is the Authoring Practices' treatment of pagination as a set of links rather than a composite widget, and so roving focus would be wrong here in the way it is right for a tab bar.
+
+The one real decision is that **the range keeps a constant width as the current page moves.** A range that grows and shrinks makes the control reflow under the pointer between clicks, so the next number is not where the user aimed. `paginationRange` is exported for that reason and the property is asserted over all 20 positions of a 20-page range, and again in a browser against the rendered width.
+
+**The colour picker: what is ours and what is not.** Three things are ours and each is named as behavioural code: the saturation-and-value surface, the colour arithmetic, and the parsing of whatever a caller has stored. Everything with an established keyboard contract stays the primitive's, which is principle 6 paying off rather than being argued for: the hue and opacity rails are the framework's own `Slider`, so they arrive with arrows, Home, End and the page keys instead of a second implementation of them.
+
+**The keyboard path is the text field, not the surface.** A two-dimensional gradient has no ARIA pattern that expresses it, so the field accepts and reports the value in the caller's own format and is what a keyboard or a screen reader uses. The surface is an enhancement on top: it takes focus and arrow keys, and it reports its position through `aria-valuetext` **in words**, because there is no honest `aria-valuenow` for a point in a plane. Claiming one would be worse than saying nothing.
+
+**Three decisions the arithmetic forced.**
+
+1. *A value that is not a colour stays null.* The empty string and `transparent` are both real stored values in this product's gradient stops, and coercing either into black would silently rewrite saved data. `transparent` parses to alpha zero; everything unrecognised parses to null and is left alone.
+2. *A half-typed value is left alone.* Rewriting someone's `#ff` into `#ffffff` under the cursor is the defect every colour field starts with, so the field holds the text and only the picker writes a formatted value.
+3. *The hue is remembered separately.* Black and white carry no hue, so a parsed value cannot report one; without a memory the surface snaps back to red the moment a caller drags the brightness to zero, and the next drag starts from the wrong place. It is held in state rather than a ref, because reading a ref during render is the concurrent-rendering hazard the lint rule exists for, and the first draft did exactly that.
+
+**One exemption to a standing rule, granted narrowly and pinned.** `color.css` is the only framework sheet allowed a colour literal. A hue rail that is not the spectrum lies about what it selects, and a transparency checkerboard that takes a theme's colours stops reading as "what is behind shows through" and starts reading as a colour; neither is a theme's decision to make. The exemption is pinned to the twelve literals it was granted for, so it cannot quietly widen into "colours are fine in this file", and adding a thirteenth fails the test.
+
+**Mutations.** Each applied alone against the guarding suite and restored byte-identically.
+
+| Guard | Mutation applied | Result |
+|-------|------------------|--------|
+| an unrecognised value is not a colour | `parseColor` made to return black for empty input | three tests fail |
+| the hue survives a colour that cannot carry it | the hue memory removed | the greyscale test fails |
+| the page range keeps its width | one branch of `paginationRange` shortened | the constant-width test fails |
+| the colour-literal exemption stays narrow | a `#336699` added to the exempt sheet | the pinned-literals test fails |
+
 ### P80-B, the choice controls (2026-09-14)
 
 **Status: landed.** `Checkbox`, `Switch` and `Slider` in [`toggle.tsx`](../src/ui/components/toggle.tsx) with [`toggle.css`](../src/ui/components/toggle.css), and `Chip.Group` beside the existing `Chip` in [`control.tsx`](../src/ui/components/control.tsx). 25 unit tests, 3 more browser tests and a Storybook story. **Pagination and the colour picker are what is left of P80-B.**
@@ -390,7 +420,22 @@ On a keyboard move a row carries the rail and the inset ring together, which is 
 
 ## Outcome
 
-_Phase in progress. P80-A's overlay batch landed 2026-09-13; the track's input family, P80-B and P80-C are still Planned._
+_Phase in progress. P80-A and P80-B are complete as of 2026-09-14; P80-C is still Planned._
+
+**What P80-B built, and what it cost.** Twelve components across five batches: the select family, tabs, the segmented control, the accordion, the checkbox, switch, slider and chip group, and both gaps Base UI does not fill. Every one carries the four gates of Key Decision C except the fourth, which is the same outstanding item P80-A has: the manual keyboard pass in `ACCESSIBILITY_MANUAL_AUDIT.md` is written down and **not run**.
+
+**The track's own acceptance criteria, against what was measured.**
+
+| Criterion | Result |
+|-----------|--------|
+| A checked select option takes its colour from a token, and the rule survives a mutation of the attribute name | Met, and the guard is stronger than the criterion asks: the attribute name is read out of the sheet and the rendered element asserted to carry it, for the select, the tab, the segment, the checkbox and the switch. |
+| Tabs and segmented control colours come from tokens with no inline colour on the part | Met. The active tab's weight travels as a custom property for the same reason, which is the half of P77-C that a colour-only check would miss. |
+| Keyboard contracts verified per component against the Authoring Practices | Met in jsdom and in a browser, including the page keys on the slider and typeahead in the select. Two contracts deliberately differ from Mantine's and are recorded above. |
+| The four gates, for every component | Three of four. The manual pass is the fourth and it is not run. |
+
+**What the track found that was not in its plan.** Three defects of the same class, each caught by a different gate. The P77-C failure mode reappeared in the tab bar and was caught in a browser rather than by the unit test that should have caught it; that test is now the strong form. The invented-token failure mode from P80-A reappeared here and is now a standing rule in `componentSheets.test.ts` rather than a step someone remembers to do. And a transitioned property animating once when the component sheet is adopted affected three components before anyone noticed it, because each looked like a separate timing quirk.
+
+**The binding constraint held.** P80-A left this track one rule: keep a listbox in its trigger's root. Every component that has a popup does, and a browser suite asserts it on both mounts against the shipped portal default. The product's own dropdowns are still broken until P81-B migrates them, which is the user's recorded decision and not this track's to reverse.
 
 **What the overlay batch proved about the framework's design.** The phase's Rationale 2 put the overlays first so that a design problem would surface while the phase was still small enough to change direction. It did not surface one. The provider's portal container, the `render` convention, the focus attribute and the tone ladder all took Base UI's components without modification, and the one architectural claim the phase rests on holds in a browser: a popup opened from inside the gallery shadow root paints from the nearest provider's tokens, survives a transformed ancestor and a sticky header at `z-index` 9999, and returns focus across the shadow boundary to the trigger that opened it, which is the defect the product has today.
 

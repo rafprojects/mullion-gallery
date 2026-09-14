@@ -1,0 +1,75 @@
+/*
+ * Pagination (P80-B).
+ *
+ * The current page is filled, and standing rule 8 allows it because the
+ * controls sit in a gap: the outset ring has the 6px it reaches into, so this
+ * is a filled control with clearance rather than the filled-and-flush the rule
+ * calls a layout defect.
+ */
+@layer mullion.components {
+  .mullion-pagination {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--mullion-spacing-xs) / 2);
+  }
+
+  .mullion-pagination-control {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: var(--mullion-control-height-sm);
+    block-size: var(--mullion-control-height-sm);
+    padding-inline: calc(var(--mullion-spacing-xs) / 2);
+    border: 1px solid var(--mullion-color-border);
+    border-radius: var(--mullion-radius-sm);
+    background: none;
+    color: var(--mullion-color-text);
+    font: inherit;
+    font-size: var(--mullion-font-size-sm);
+    cursor: pointer;
+  }
+
+  .mullion-pagination[data-size='xs'] .mullion-pagination-control {
+    min-inline-size: var(--mullion-control-height-xs);
+    block-size: var(--mullion-control-height-xs);
+    font-size: var(--mullion-font-size-xs);
+  }
+
+  .mullion-pagination[data-size='md'] .mullion-pagination-control {
+    min-inline-size: var(--mullion-control-height-md);
+    block-size: var(--mullion-control-height-md);
+  }
+
+  .mullion-pagination-control:hover:not(:disabled):not([data-active]) {
+    background-color: var(--mullion-menu-hover-bg);
+  }
+
+  .mullion-pagination-control[data-active] {
+    border-color: var(--mullion-color-primary);
+    background-color: var(--mullion-color-primary);
+    color: var(--mullion-color-primary-on);
+  }
+
+  .mullion-pagination-control:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .mullion-pagination-control svg {
+    inline-size: 1em;
+    block-size: 1em;
+  }
+
+  /* The previous control is the same chevron, turned. */
+  .mullion-pagination-prev svg {
+    transform: scaleX(-1);
+  }
+
+  .mullion-pagination-dots {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 1.5rem;
+    color: var(--mullion-color-text-muted);
+  }
+}

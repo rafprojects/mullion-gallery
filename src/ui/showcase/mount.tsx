@@ -54,7 +54,9 @@ import {
   Menu,
   Accordion,
   Checkbox,
+  ColorInput,
   Modal,
+  Pagination,
   Popover,
   SegmentedControl,
   Select,
@@ -211,6 +213,7 @@ function Gallery({ prefix }: { prefix: string }) {
       {withSelects && <Selects prefix={prefix} />}
       {withChoice && <Choices prefix={prefix} />}
       {withChoice && <Toggles prefix={prefix} />}
+      {withChoice && <Gaps prefix={prefix} />}
     </Stack>
   );
 }
@@ -258,6 +261,36 @@ function Choices({ prefix }: { prefix: string }) {
           <Accordion.Panel>behaviour body</Accordion.Panel>
         </Accordion.Item>
       </Accordion>
+    </Stack>
+  );
+}
+
+/**
+ * P80-B: the two components Base UI does not ship. The picker's surface is
+ * pointer-and-rect code of ours, so a browser is the only place its geometry
+ * means anything.
+ */
+function Gaps({ prefix }: { prefix: string }) {
+  const [page, setPage] = useState(4);
+  const [colour, setColour] = useState('rgba(18, 52, 86, 0.5)');
+  return (
+    <Stack gap="sm" padding="md" data-testid={`${prefix}-gaps`}>
+      <Divider label="gaps" labelPosition="left" />
+      <Pagination
+        value={page}
+        onChange={setPage}
+        total={20}
+        aria-label={`${prefix} pages`}
+        data-testid={`${prefix}-pagination`}
+      />
+      <ColorInput
+        label={`${prefix} background colour`}
+        value={colour}
+        onChange={setColour}
+        format="rgba"
+        swatches={['#102530', '#0d1117', '#ffffff', 'transparent']}
+        data-testid={`${prefix}-color-input`}
+      />
     </Stack>
   );
 }
