@@ -33,107 +33,16 @@ import {
 } from 'react';
 import { Field } from '@base-ui/react/field';
 import { NumberField } from '@base-ui/react/number-field';
-import { cx, focusable, type UiElementProps } from './element';
+import { cx, focusable } from './element';
 import { ActionIcon } from './control';
-import { customProperties, radiusValue, type UiRadius, type UiScaleStep } from './scale';
-
-/**
- * `className` and `style` without the polymorphic `render`, for the same
- * reason the overlays omit it: our `UiRender` function form allows custom
- * properties in `style` and Base UI's does not, so the two are not
- * interchangeable. These components forward to the primitive's parts rather
- * than through `renderElement`.
- */
-type InputStyleProps = Omit<UiElementProps, 'render'>;
-
-/** What every field in the family carries around its control. */
-interface FieldShellProps {
-  label?: ReactNode | undefined;
-  description?: ReactNode | undefined;
-  /** A string renders the message; `true` marks the field invalid without one. */
-  error?: ReactNode | boolean | undefined;
-  required?: boolean | undefined;
-  disabled?: boolean | undefined;
-  size?: UiScaleStep | undefined;
-  radius?: UiRadius | undefined;
-  /** Content inside the field's border, before the control. */
-  leftSection?: ReactNode | undefined;
-  /** Content inside the field's border, after the control. */
-  rightSection?: ReactNode | undefined;
-}
-
-type FieldShellInternal = FieldShellProps &
-  InputStyleProps & {
-    children: ReactNode;
-    /** Added to the wrapper so a component can style its own shape. */
-    variantClass?: string | undefined;
-  };
-
-/**
- * Label, control, description and error in one place.
- *
- * The composition is ours rather than the primitive's default because the
- * order and the wrapper are what the sheet styles: the control sits in a
- * bordered row that also holds the two sections, so an affordance inside the
- * field shares the field's border rather than drawing its own. That is the
- * seam `UnitScrubField` currently fakes with four `styles` overrides.
- */
-function FieldShell({
-  label,
-  description,
-  error,
-  required,
-  disabled,
-  size = 'sm',
-  radius,
-  leftSection,
-  rightSection,
-  className,
-  style,
-  children,
-  variantClass,
-}: FieldShellInternal) {
-  const invalid = error !== undefined && error !== false;
-  return (
-    <Field.Root
-      className={cx('mullion-field', className)}
-      data-size={size}
-      {...(invalid ? { invalid: true } : {})}
-      {...(disabled ? { disabled: true } : {})}
-      style={{ ...customProperties({ '--mullion-radius': radiusValue(radius) }), ...style }}
-    >
-      {label !== undefined && (
-        <Field.Label className="mullion-field-label">
-          {label}
-          {required && (
-            <span className="mullion-field-required" aria-hidden>
-              *
-            </span>
-          )}
-        </Field.Label>
-      )}
-      <div className={cx('mullion-field-control', variantClass)}>
-        {leftSection !== undefined && <span className="mullion-field-section">{leftSection}</span>}
-        {children}
-        {rightSection !== undefined && <span className="mullion-field-section">{rightSection}</span>}
-      </div>
-      {description !== undefined && (
-        <Field.Description className="mullion-field-description">{description}</Field.Description>
-      )}
-      {typeof error !== 'boolean' && error !== undefined && (
-        <Field.Error className="mullion-field-error" match>
-          {error}
-        </Field.Error>
-      )}
-    </Field.Root>
-  );
-}
+import { FieldShell, type FieldShellProps, type FieldStyleProps } from './field';
+import { customProperties, radiusValue } from './scale';
 
 // ---------------------------------------------------------------------------
 // TextInput and PasswordInput
 // ---------------------------------------------------------------------------
 
-export interface TextInputProps extends FieldShellProps, InputStyleProps {
+export interface TextInputProps extends FieldShellProps, FieldStyleProps {
   value?: string | undefined;
   defaultValue?: string | undefined;
   /**
@@ -232,7 +141,7 @@ export const PasswordInput = forwardRef(function PasswordInput(
 // Textarea
 // ---------------------------------------------------------------------------
 
-export interface TextareaProps extends FieldShellProps, InputStyleProps {
+export interface TextareaProps extends FieldShellProps, FieldStyleProps {
   value?: string | undefined;
   defaultValue?: string | undefined;
   onChange?: ((event: ChangeEvent<HTMLTextAreaElement>) => void) | undefined;
@@ -330,7 +239,7 @@ export const Textarea = forwardRef(function Textarea(
 // NumberInput
 // ---------------------------------------------------------------------------
 
-export interface NumberInputProps extends FieldShellProps, InputStyleProps {
+export interface NumberInputProps extends FieldShellProps, FieldStyleProps {
   value?: number | null | undefined;
   defaultValue?: number | null | undefined;
   /** The value, not an event: this is how the 136 call sites read it. */

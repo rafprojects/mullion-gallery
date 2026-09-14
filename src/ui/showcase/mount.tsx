@@ -54,6 +54,8 @@ import {
   Menu,
   Modal,
   Popover,
+  Select,
+  TagsInput,
   Tooltip,
 } from '../components';
 
@@ -68,6 +70,12 @@ const chromeMode = params.get('chrome') === 'follow' ? 'follow' : 'lock';
  * renders exactly what it rendered before.
  */
 const withOverlays = params.get('overlays') === '1';
+/**
+ * P80-B's select family, opt-in for the same reason. A select's popup goes
+ * somewhere different from an overlay's, so the browser suite needs triggers
+ * that live in the scope under test.
+ */
+const withSelects = params.get('selects') === '1';
 /** `?host=hostile` reproduces the P77-B probe around the whole fixture. */
 const hostileHost = params.get('host') === 'hostile';
 
@@ -192,6 +200,68 @@ function Gallery({ prefix }: { prefix: string }) {
       </Center>
       <VisuallyHidden>hidden to the eye, present to a reader</VisuallyHidden>
       {withOverlays && <Overlays prefix={prefix} />}
+      {withSelects && <Selects prefix={prefix} />}
+    </Stack>
+  );
+}
+
+const SELECT_ROLES = [
+  { value: 'admin', label: 'Administrator' },
+  { value: 'editor', label: 'Editor' },
+  { value: 'viewer', label: 'Viewer' },
+];
+
+const SELECT_FONTS = [
+  { group: 'Recently used', items: [{ value: 'inter', label: 'Inter' }] },
+  {
+    group: 'System',
+    items: [
+      { value: 'system-ui', label: 'System UI' },
+      { value: 'georgia', label: 'Georgia' },
+    ],
+  },
+];
+
+/**
+ * P80-B: the select family. The triggers live in the scope under test, so the
+ * decisive question is observable in a browser: does the listbox land in the
+ * trigger's own root, and does arrowing to an option and pressing Enter pick
+ * it? That is the contract every Mantine dropdown in the product fails today.
+ */
+function Selects({ prefix }: { prefix: string }) {
+  const [role, setRole] = useState<string | null>(null);
+  const [font, setFont] = useState<string | null>(null);
+  const [tags, setTags] = useState<string[]>([]);
+  return (
+    <Stack gap="sm" padding="md" data-testid={`${prefix}-selects`}>
+      <Divider label="selects" labelPosition="left" />
+      <Group gap="sm" align="flex-end">
+        <Select
+          label={`${prefix} role`}
+          data={SELECT_ROLES}
+          value={role}
+          onChange={setRole}
+          placeholder="pick a role"
+          data-testid={`${prefix}-select-trigger`}
+        />
+        <Select
+          label={`${prefix} font`}
+          data={SELECT_FONTS}
+          value={font}
+          onChange={setFont}
+          searchable
+          searchPlaceholder="type to filter"
+          nothingFoundMessage="no font matches that"
+          data-testid={`${prefix}-select-search`}
+        />
+        <TagsInput
+          label={`${prefix} tags`}
+          value={tags}
+          onChange={setTags}
+          placeholder="type and press Enter"
+          data-testid={`${prefix}-tags-input`}
+        />
+      </Group>
     </Stack>
   );
 }

@@ -41,8 +41,11 @@ import {
   Title,
   UnstyledButton,
   VisuallyHidden,
+  MultiSelect,
   NumberInput,
   PasswordInput,
+  Select,
+  TagsInput,
   Textarea,
   TextInput,
   type UiControlVariant,
@@ -517,6 +520,93 @@ export const DataAndUtilities: Story = {
             There is a visually hidden note here.
             <VisuallyHidden> Read only by a screen reader.</VisuallyHidden>
           </Text>
+        </Section>
+      </Stack>
+    );
+  },
+};
+
+const FONTS = [
+  {
+    group: 'Recently used',
+    items: [
+      { value: 'inter', label: 'Inter' },
+      { value: 'source-serif', label: 'Source Serif' },
+    ],
+  },
+  {
+    group: 'System',
+    items: [
+      { value: 'system-ui', label: 'System UI' },
+      { value: 'georgia', label: 'Georgia' },
+      { value: 'menlo', label: 'Menlo' },
+    ],
+  },
+];
+
+const ROLES = [
+  { value: 'admin', label: 'Administrator' },
+  { value: 'editor', label: 'Editor' },
+  { value: 'viewer', label: 'Viewer' },
+  { value: 'auditor', label: 'Auditor', disabled: true },
+];
+
+export const Selects: Story = {
+  name: 'Select family',
+  render: function Selects() {
+    const [one, setOne] = useState<string | null>('editor');
+    const [font, setFont] = useState<string | null>(null);
+    const [many, setMany] = useState<string[]>(['editor', 'viewer']);
+    const [tags, setTags] = useState<string[]>(['landscape']);
+    return (
+      <Stack gap="md" padding="md">
+        <Section title="One value">
+          <Text size="sm" tone="muted">
+            The popup opens in the trigger&rsquo;s own root rather than the provider&rsquo;s overlay
+            container, because a combobox names its list by id and an id reference cannot cross a
+            shadow boundary. Arrow through it: the highlighted row takes a rail and the inset ring,
+            and no ground in the popup moves.
+          </Text>
+          <Group gap="md" align="flex-end">
+            <Select label="Role" data={ROLES} value={one} onChange={setOne} placeholder="Pick a role" />
+            <Select label="Clearable" data={ROLES} value={one} onChange={setOne} clearable />
+            <Select label="Disabled" data={ROLES} value="admin" disabled />
+            <Select label="With an error" data={ROLES} error="Pick a role" />
+          </Group>
+        </Section>
+
+        <Section title="Groups and search">
+          <Group gap="md" align="flex-end">
+            <Select label="Font" data={FONTS} value={font} onChange={setFont} placeholder="System UI" />
+            <Select
+              label="Font (searchable)"
+              data={FONTS}
+              searchable
+              nothingFoundMessage="No font matches that"
+              searchPlaceholder="Type to filter"
+            />
+          </Group>
+        </Section>
+
+        <Section title="Several values, and free-form tags">
+          <Group gap="md" align="flex-start">
+            <MultiSelect label="Roles" data={ROLES} value={many} onChange={setMany} placeholder="Add a role" />
+            <TagsInput
+              label="Tags"
+              value={tags}
+              onChange={setTags}
+              placeholder="Type and press Enter"
+              description="Anything typed becomes a tag"
+            />
+          </Group>
+        </Section>
+
+        <Section title="Sizes">
+          <Group gap="md" align="flex-end">
+            {STEPS.map((step) => (
+              <Select key={step} size={step} label={step} data={ROLES} defaultValue="editor" />
+            ))}
+          </Group>
         </Section>
       </Stack>
     );

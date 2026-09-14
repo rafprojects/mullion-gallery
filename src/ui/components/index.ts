@@ -31,6 +31,7 @@ import feedbackCss from './feedback.css?inline';
 import displayCss from './display.css?inline';
 import overlayCss from './overlay.css?inline';
 import inputCss from './input.css?inline';
+import selectCss from './select.css?inline';
 import utilityCss from './utility.css?inline';
 import focusCss from '../styles/focus.css?inline';
 
@@ -48,6 +49,9 @@ registerUiStyles('ui/feedback', feedbackCss);
 registerUiStyles('ui/display', displayCss);
 registerUiStyles('ui/overlay', overlayCss);
 registerUiStyles('ui/input', inputCss);
+// After the field sheet: the select family wears the same shell and overrides
+// two of its rules (a chip row's height, a trigger's cursor).
+registerUiStyles('ui/select', selectCss);
 registerUiStyles('ui/utility', utilityCss);
 // Last, so the ring wins a tie inside `@layer mullion.components` against any
 // component rule that also sets `box-shadow`: `Paper` and `Card` both do, and
@@ -166,6 +170,17 @@ export {
   type TextareaProps,
   type TextInputProps,
 } from './input';
+export {
+  MultiSelect,
+  Select,
+  TagsInput,
+  type MultiSelectProps,
+  type SelectProps,
+  type TagsInputProps,
+  type UiSelectData,
+  type UiSelectGroup,
+  type UiSelectOption,
+} from './select';
 export {
   isRoleTone,
   resolveRoleGlyph,

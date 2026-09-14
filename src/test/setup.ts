@@ -224,6 +224,14 @@ if (!window.HTMLElement.prototype.scrollIntoView) {
 // see jsdom/jsdom#2527), so @testing-library's fireEvent.pointerDown/Move/Up fall back to a
 // plain Event and silently drop clientX/buttons/pointerId. Polyfill it as a thin MouseEvent
 // subclass so drag-to-scrub controls can be tested.
+//
+// [P80-B] `pointerType` defaults to the empty string, which is what the spec
+// says and what a browser reports for a constructed PointerEvent. It used to
+// default to 'mouse', and that is not a harmless difference: libraries tell a
+// keyboard activation from a mouse one by `detail === 0 && !pointerType`, so
+// every synthesised keyboard click looked like a mouse click and a select
+// committed nothing on Enter. A polyfill that is wrong in the direction of
+// "more realistic" hides real behaviour.
 if (typeof window.PointerEvent === 'undefined') {
 	class PointerEvent extends MouseEvent {
 		public pointerId: number;
@@ -231,7 +239,7 @@ if (typeof window.PointerEvent === 'undefined') {
 		constructor(type: string, params: PointerEventInit = {}) {
 			super(type, params);
 			this.pointerId = params.pointerId ?? 0;
-			this.pointerType = params.pointerType ?? 'mouse';
+			this.pointerType = params.pointerType ?? '';
 		}
 	}
 	window.PointerEvent = PointerEvent as unknown as typeof window.PointerEvent;
