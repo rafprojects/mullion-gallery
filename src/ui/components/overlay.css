@@ -366,4 +366,23 @@
     border: 0;
     background-color: var(--mullion-menu-bd);
   }
+
+  /*
+   * [P80-C] The confirmation dialog. It is a `Modal` with an action row, so
+   * everything but that row is already styled above.
+   *
+   * The actions are end-aligned with cancel first, which puts the destructive
+   * button furthest from the pointer's resting path across the body text and
+   * last in the tab order after the escape hatch.
+   */
+  .mullion-confirm-body {
+    margin-block-end: var(--mullion-spacing-md);
+  }
+
+  .mullion-confirm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--mullion-spacing-sm);
+    justify-content: flex-end;
+  }
 }

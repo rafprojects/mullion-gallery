@@ -57,6 +57,8 @@ import {
   ColorInput,
   Modal,
   Pagination,
+  Confirmations,
+  Notifications,
   Popover,
   SegmentedControl,
   Select,
@@ -65,6 +67,8 @@ import {
   Tabs,
   TagsInput,
   Tooltip,
+  confirm,
+  notify,
 } from '../components';
 
 const params = new URLSearchParams(window.location.search);
@@ -86,6 +90,13 @@ const withOverlays = params.get('overlays') === '1';
 const withSelects = params.get('selects') === '1';
 /** P80-B's tabs, segmented control and accordion, opt-in for the same reason. */
 const withChoice = params.get('choice') === '1';
+/**
+ * P80-C's managers, opt-in for the same reason. Unlike every other section
+ * these mount once rather than per-gallery: both stores are module singletons,
+ * so a second viewport subscribed to the same manager would render every toast
+ * twice and make each one a strict-mode violation to query.
+ */
+const withManagers = params.get('managers') === '1';
 /** `?host=hostile` reproduces the P77-B probe around the whole fixture. */
 const hostileHost = params.get('host') === 'hostile';
 
@@ -483,6 +494,59 @@ function Overlays({ prefix }: { prefix: string }) {
  * portaled into the provider's container, which lives in the overlay root.
  * This is the case `adminChromeStyles()` exists to fake in the Mantine tree.
  */
+/**
+ * P80-C: the notification and confirmation managers. The triggers live here
+ * rather than in `Gallery` because `Gallery` renders twice, and a duplicated
+ * trigger is the strict-mode violation P80-B spent a batch scoping around.
+ */
+function Managers() {
+  return (
+    <Stack gap="sm" padding="md" data-testid="managers">
+      <Divider label="managers" labelPosition="left" />
+      <Group gap="sm">
+        <Button
+          data-testid="notify-success"
+          onClick={() =>
+            notify.show({ title: 'Layout saved', message: 'Your changes are live.', color: 'green' })
+          }
+        >
+          success toast
+        </Button>
+        <Button
+          data-testid="notify-danger"
+          onClick={() =>
+            notify.show({ title: 'Save failed', message: 'The server rejected it.', color: 'red', autoClose: false })
+          }
+        >
+          persistent danger toast
+        </Button>
+        <Button
+          data-testid="notify-plain"
+          onClick={() => notify.show({ message: 'Ungrouped', color: 'gray', autoClose: false })}
+        >
+          plain toast
+        </Button>
+        <Button data-testid="notify-clean" onClick={() => notify.clean()}>
+          clear toasts
+        </Button>
+        <Button
+          data-testid="confirm-open"
+          onClick={() =>
+            void confirm({
+              title: 'Discard changes?',
+              children: 'You have unsaved changes. Discard them?',
+              labels: { confirm: 'Discard', cancel: 'Keep editing' },
+              confirmProps: { color: 'red' },
+            })
+          }
+        >
+          open confirm
+        </Button>
+      </Group>
+    </Stack>
+  );
+}
+
 function Chrome() {
   const container = useMullionPortal();
   return createPortal(
@@ -509,6 +573,9 @@ function Showcase() {
   const body = (
     <Container size="lg" padding="md" style={GROUND}>
       <Gallery prefix="inline" />
+      {withManagers && <Managers />}
+      {withManagers && <Notifications label="Notifications" closeButtonLabel="Dismiss" />}
+      {withManagers && <Confirmations />}
       <MullionProvider mode={chromeMode}>
         <Chrome />
       </MullionProvider>

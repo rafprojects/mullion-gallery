@@ -159,6 +159,9 @@ export default tseslint.config({
   ignores: [
     '**/*.test.{ts,tsx}',
     '**/*.stories.{ts,tsx}',
+    // [P80-C] The browser fixture. Nothing imports it in production, so it is
+    // absent from the build, and its labels are test data rather than chrome.
+    'src/ui/showcase/**',
   ],
   plugins: { mullion: { rules: { 'no-untranslated-notification': noUntranslatedNotification } } },
   rules: {

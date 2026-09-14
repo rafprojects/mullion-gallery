@@ -93,4 +93,48 @@ describe('mullion/no-untranslated-notification gate', () => {
     );
     expect(msgs).toHaveLength(0);
   });
+
+  // [P80-C] The framework's own stores. Phase 81 renames the callee at 42
+  // notification sites and six confirm sites; without these the rename would
+  // silently switch the gate off, and the suite would still be green.
+  it('flags a hardcoded notify.show title AND message', async () => {
+    const msgs = await ruleMessages(
+      `notify.show({ title: 'Hardcoded title', message: 'Hardcoded body.' });\n`,
+    );
+    expect(msgs).toHaveLength(2);
+  });
+
+  it('flags a hardcoded notify.update message', async () => {
+    const msgs = await ruleMessages(`notify.update({ id: 'x', message: 'Loading campaigns...' });\n`);
+    expect(msgs).toHaveLength(1);
+  });
+
+  it('passes when notify chrome is routed through i18n.t', async () => {
+    const msgs = await ruleMessages(
+      `notify.show({ title: t('k_t', 'Hi'), message: i18n.t('k_m', 'There'), color: 'red' });\n`,
+    );
+    expect(msgs).toHaveLength(0);
+  });
+
+  it('flags hardcoded confirm() title and labels', async () => {
+    const msgs = await ruleMessages(
+      `confirm({ title: 'Discard changes?', labels: { confirm: 'Discard', cancel: 'Keep' } });\n`,
+    );
+    expect(msgs).toHaveLength(3);
+  });
+
+  it('passes when confirm() chrome is routed through i18n.t', async () => {
+    const msgs = await ruleMessages(
+      `confirm({ title: t('k_t', 'Discard?'), labels: { confirm: t('k_c', 'Discard'), cancel: t('k_x', 'Keep') }, children: someJsx });\n`,
+    );
+    expect(msgs).toHaveLength(0);
+  });
+
+  // The platform's own one-argument form is not a sink this rule owns, and
+  // flagging it would be a false positive in the class the rule promises not to
+  // produce.
+  it('ignores the platform confirm(string) form', async () => {
+    const msgs = await ruleMessages(`confirm('Are you sure?');\n`);
+    expect(msgs).toHaveLength(0);
+  });
 });

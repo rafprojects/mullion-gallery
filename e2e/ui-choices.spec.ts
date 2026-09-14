@@ -110,9 +110,22 @@ test.describe('the segmented control’s indicator', () => {
         };
       });
 
-    // The indicator transitions when it moves, so a reading taken mid-slide
-    // measures the animation rather than the result. Poll for the settled box.
-    await expect.poll(async () => (await read())?.dx ?? 99, { timeout: 3000 }).toBeLessThanOrEqual(1);
+    /*
+     * The indicator transitions when it moves, so a reading taken mid-slide
+     * measures the animation rather than the result. Poll for the settled box.
+     *
+     * On BOTH axes, not just position. `translate` and `inline-size` are
+     * separate transitions on the same element, so the offset can settle while
+     * the width is still animating: polling `dx` alone let the `dw` assertion
+     * below read a mid-animation width, which failed about one run in five at
+     * 1.8px and 3.5px. Settling on the worse of the two is the fix; widening
+     * the tolerance would only have hidden it.
+     */
+    const settled = async () => {
+      const box = await read();
+      return box ? Math.max(box.dx, box.dw) : 99;
+    };
+    await expect.poll(settled, { timeout: 3000 }).toBeLessThanOrEqual(1);
 
     const first = await read();
     expect(first, 'no indicator or no checked segment').not.toBeNull();
@@ -133,7 +146,7 @@ test.describe('the segmented control’s indicator', () => {
 
     await choices(page).getByRole('radio', { name: 'map' }).click();
     await expect.poll(async () => (await read())?.label).toContain('map');
-    await expect.poll(async () => (await read())?.dx ?? 99, { timeout: 3000 }).toBeLessThanOrEqual(1);
+    await expect.poll(settled, { timeout: 3000 }).toBeLessThanOrEqual(1);
     const moved = await read();
     expect(moved!.dw).toBeLessThanOrEqual(1);
   });

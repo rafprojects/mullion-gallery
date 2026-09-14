@@ -1,5 +1,5 @@
 /**
- * [P71-E / P72-A] ESLint rule: no-untranslated-notification
+ * [P71-E / P72-A / P80-C] ESLint rule: no-untranslated-notification
  *
  * Flags a hardcoded string (or non-empty template) literal passed to one of the
  * known non-JSX user-facing string sinks — the exact gap the project-wide
@@ -10,13 +10,15 @@
  * The rule name is retained from P71-E for config/continuity; as of P72-A it
  * guards three sinks, not only notifications:
  *   - Notifications: `showNotification({ title, message })`,
- *     `notifications.show({ title, message })`, `notifications.update({...})`.
+ *     `notifications.show({ title, message })`, `notifications.update({...})`,
+ *     and the framework's `notify.show`/`notify.update` (P80-C).
  *   - A11y live-region announcements: `announce('…')` — the screen-reader-only
  *     text is invisible to any visual QA, so an unenforced literal here is a
  *     silent i18n regression (P72-A).
  *   - Confirm-modal chrome: `modals.openConfirmModal({ title, labels: { confirm,
- *     cancel } })` — the modal `children` body is JSX and already covered by the
- *     `i18next` jsx rule; this guards the non-JSX `title`/`labels` props.
+ *     cancel } })` and the framework's `confirm({ ... })` (P80-C) — the modal
+ *     `children` body is JSX and already covered by the `i18next` jsx rule; this
+ *     guards the non-JSX `title`/`labels` props.
  *
  * The inspected value is checked for a bare static string — a string Literal, a
  * TemplateLiteral with static text, or such a literal reached through a
@@ -43,17 +45,25 @@
 
 const NOTIFY_METHODS = new Set(['show', 'update']);
 
+/*
+ * Both stores, not one. [P80-C] built `notify` over the framework's toast with
+ * the same call shape, and Phase 81 renames the callee at 42 sites; a rule that
+ * only knew `notifications` would have gone quietly blind the moment that
+ * rename landed, which is the failure this gate exists to prevent.
+ */
+const NOTIFY_OBJECTS = new Set(['notifications', 'notify']);
+
 function isNotificationCall(callee) {
   // showNotification(...)
   if (callee.type === 'Identifier' && callee.name === 'showNotification') {
     return true;
   }
-  // notifications.show(...) / notifications.update(...)
+  // notifications.show(...) / notify.show(...) / either one's .update(...)
   return (
     callee.type === 'MemberExpression' &&
     !callee.computed &&
     callee.object.type === 'Identifier' &&
-    callee.object.name === 'notifications' &&
+    NOTIFY_OBJECTS.has(callee.object.name) &&
     callee.property.type === 'Identifier' &&
     NOTIFY_METHODS.has(callee.property.name)
   );
@@ -64,8 +74,17 @@ function isAnnounceCall(callee) {
   return callee.type === 'Identifier' && callee.name === 'announce';
 }
 
-// modals.openConfirmModal({ ... }) — confirm-dialog chrome (P72-A).
+/*
+ * Confirm-dialog chrome (P72-A): `modals.openConfirmModal({ ... })`, and from
+ * [P80-C] the framework's `confirm({ ... })` that replaces it.
+ *
+ * The bare `confirm` form only matches when the argument is an object literal,
+ * so the platform's `window.confirm('…')` (a string argument) is not touched.
+ */
 function isOpenConfirmModalCall(callee) {
+  if (callee.type === 'Identifier' && callee.name === 'confirm') {
+    return true;
+  }
   return (
     callee.type === 'MemberExpression' &&
     !callee.computed &&

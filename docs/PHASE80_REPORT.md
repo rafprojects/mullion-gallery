@@ -1,8 +1,8 @@
 # Phase 80 - Behavioural components
 
-**Status:** In progress (P80-A and P80-B complete; P80-C Planned)
+**Status:** Complete (all three tracks landed; the manual keyboard pass is the one gate still open)
 **Created:** 2026-09-10
-**Last updated:** 2026-09-14 (P80-B complete, including both components Base UI does not ship)
+**Last updated:** 2026-09-14 (P80-C complete: the notification and confirmation managers)
 
 ### Tracks
 
@@ -10,7 +10,7 @@
 |-------|-------------|--------|--------|
 | P80-A | Overlays and the input family: the components the theme adapter fights hardest | **Done** (2026-09-14), less `ColorInput` (see notes) | Large |
 | P80-B | Selection, navigation and choice controls: the select family, tabs, accordion, checkbox, switch, chip, segmented control, slider | **Done** (2026-09-14), including the pagination and colour-picker gaps | Large |
-| P80-C | Imperative managers: notifications and confirmations | Planned | Small-Medium |
+| P80-C | Imperative managers: notifications and confirmations | **Done** (2026-09-14) | Small-Medium |
 
 ---
 
@@ -100,6 +100,8 @@ Wrap the primitive's listbox, combobox, select, tabs, accordion, checkbox, switc
 
 `@mantine/notifications` is called from 21 files with 48 `show` calls, and `@mantine/modals` from 10 files with 8 `openConfirmModal`. Both are imperative stores with their own stylesheets, and both are thin.
 
+> **Corrected by measurement, 2026-09-14.** Neither figure was right, and the phase's own Key Decision E states the confirm count a third way. Measured across `src/`, excluding test files: **42** `notifications.show` calls in **16** production files (48 including tests, which is where the plan's number came from), and **6** production `modals.openConfirmModal` call sites, not 8 and not 11. `notifications.update` and `notifications.clean` have **no** production call site at all, and `hide` has exactly one. Separately, `modals.open` and `modals.closeAll` are used in one file that `confirm()` does not cover; see the follow-on table.
+
 ### Fix
 
 A `notify` store over the primitive's toast, and a `confirm()` over the framework's own dialog, both keeping the existing call shape so Phase 81's migration is a find and replace rather than a rewrite. Notification visuals are framework components reading tokens.
@@ -107,9 +109,9 @@ A `notify` store over the primitive's toast, and a `confirm()` over the framewor
 ### Acceptance criteria
 
 - `notify.show`, `update`, `hide` and `clean` cover every existing call site's options.
-- `confirm()` covers the eight `openConfirmModal` shapes in use.
+- `confirm()` covers the eight `openConfirmModal` shapes in use. *(Six, measured.)*
 - Toasts render in the overlay root and are announced to assistive technology.
-- The existing untranslated-notification gate still passes.
+- The existing untranslated-notification gate still passes. *(Necessary but not sufficient: see the implementation note. The gate is keyed on callee names, so it would have kept passing while going blind to the code it guards.)*
 
 ### Validation
 
@@ -122,6 +124,10 @@ A `notify` store over the primitive's toast, and a `confirm()` over the framewor
 | Candidate | Why it is deferred |
 |-----------|--------------------|
 | Migrating consumers onto these components | Phase 81, by Key Decision B. |
+| **`useBroadcastStaleness` dismisses its own stale-tab warning immediately** | P80-C, 2026-09-14. `autoClose: 0` is a zero-length timer in Mantine, not "keep it up", so the warning that tells the user to close and reopen the tab disappears on the next tick. One character to fix, but fixing it is a consumer change and Key Decision B says this phase makes none. Phase 81's migration fixes it as a side effect, because `notify` reads both `0` and `false` as "keep it up". If it should be fixed sooner it is a one-line change to a production hook, not a framework one. |
+| **Two modal dialogs opened in the same commit hide each other from assistive technology** | P80-C, found while building `confirm()`; the defect is P80-A's `Modal`. Each dialog's portal is marked `aria-hidden` on the other's behalf, and the measured result is that neither is exposed. Opened a commit apart the topmost is correctly exposed, so the realistic path (a confirm raised from an open modal) works. P80-C sidesteps it by queueing confirmations; nothing stops a consumer rendering two `<Modal opened>` siblings. |
+| **Both managers are one store per page, not one per gallery** | P80-C, 2026-09-14. `notify` and `confirm` are module singletons, so two galleries on one page raise the same toast in both viewports and the same confirm in both trees. Mantine behaves identically today from its own module-level store, so the migration changes nothing and this is parity rather than a regression. Recorded because this codebase has a history of multi-instance defects of exactly this shape, and because the fix, if one is ever wanted, is a store per provider rather than a patch: it is a design change and should be taken as one. |
+| **`modals.open` and `modals.closeAll` have no replacement** | P80-C, 2026-09-14. `confirm()` covers the six `openConfirmModal` sites, which is what the track scoped. `ContextualToolbar` also uses `modals.open` for a rename form and `modals.closeAll` to dismiss it: an arbitrary-content modal raised imperatively, which is a different thing from a confirmation and was not in the track. Phase 81 either converts that call site to a rendered `<Modal>` (it is one component with local state, so this is small) or the framework grows an imperative modal store. The first is better and is the recommendation. |
 | **`FileButton`'s hidden file input has no accessible name** | P79-C, found by P80-A's axe scan of the showcase. `<input type="file" class="mullion-visually-hidden" tabindex="-1">` fails the `label` rule at critical impact. It is a real defect in a shipped framework component and it is one attribute to fix, but it is P79-C's component and not an overlay; it belongs with the input family in the rest of P80-A, where the field and label composition is being written anyway. |
 | **The menu's ground is audited; the audit just leaves no headroom** | P80-A, 2026-09-13, correcting the row below. `menu-bg` derives from `surfaceRaised`, which **is** the fourth ground `textRung` selects against: 0 of 138 semantic pairs fail on it untinted. The worst is 4.53, because the routine stops at the *nearest* rung clearing 4.5:1 rather than maximising, so the tightest theme lands 0.03 above the floor by design. That is why a 1% tint breaks it. The designer's note reasoned from a `flat` column in the outgoing brief that measured `surface` only, and concluded the ground was unaudited; the correction is in `docs/design/correspondences/tinted-grounds-answers-2026-09-13.md`. |
 | **The focus ring already covers the menu row on 20 of 23 themes** | P80-A. Menu items carry the focus attribute, so the ring paints under arrow-key navigation (measured in Chromium) and a pointer hover paints the tint alone. Against the *highlighted* row the pair clears 1.4.11's 3:1 on 20 of 23 themes, usually because the halo carries it where the core cannot. It fails on nord (2.87), tokyo-night (2.91) and gruvbox-dark (2.75), where the tint dims both tones at once. The halo is derived against the surface and nobody derived it against a lightened row. Open with the designer: a rail, a halo re-derivation for those three, or both. |
@@ -269,6 +275,49 @@ On a keyboard move a row carries the rail and the inset ring together, which is 
 **The differing silhouettes are the requirement, not a detail**, since four variations on a disc would measure identically and signal nothing. That is a test: the four `d` attributes must be four distinct values, and swapping one for another fails it. The glyphs paint in `currentColor` and are `aria-hidden`, so they take the tone their element already declares and never become the accessible name; that pairing is the one `washIconChecks` audits at the 3:1 non-text floor.
 
 **Scoped as the designer specified: `light` controls.** A `filled` control carries the role at full chroma, where the same CVD collapse is weaker but real (2.7 at worst). Left as it is rather than widened unilaterally, and noted for them.
+
+### P80-C, the notification and confirmation managers (2026-09-14)
+
+**Status: landed, and Phase 80 with it.** `notify` and `<Notifications />` in [`notification.tsx`](../src/ui/components/notification.tsx) with [`notification.css`](../src/ui/components/notification.css), on Base UI's `toast`; `confirm()` and `<Confirmations />` in [`confirm.tsx`](../src/ui/components/confirm.tsx), on the framework's own `Modal`. 32 unit tests, 13 browser tests, six new gate tests and a Storybook story. Five mutations were applied and caught, and a sixth was applied, **not** caught, and is recorded below.
+
+**The track's stated counts were all wrong, and the phase contradicted itself.** The Problem paragraph says 48 `show` calls in 21 files and 8 `openConfirmModal`; Key Decision E says 11 confirm sites. Measured: 42 production `show` calls in 16 files, and 6 production confirm sites. Two of the four methods the acceptance criteria name, `update` and `clean`, have no production caller at all. They are still implemented, because a store missing them is a store the migration has to work around, but nothing in this codebase exercises them outside the tests written here.
+
+**The finding that the acceptance criteria would have missed.** "The existing untranslated-notification gate still passes" is satisfied trivially and means nothing: [`no-untranslated-notification.js`](../eslint-rules/no-untranslated-notification.js) matches on *callee names* (`notifications.show`, `modals.openConfirmModal`), so `notify.show` and `confirm` matched nothing. The gate would have stayed green through the whole of Phase 81 while the 48 call sites it guards moved out from under it, and the suite would have reported success. The rule now matches both stores, six gate tests cover the new shapes, and reverting the rule while keeping the tests fails three of them.
+
+**A live defect, found by enumerating the call sites rather than trusting the list.** [`useBroadcastStaleness.ts`](../src/hooks/useBroadcastStaleness.ts) raises its "Template updated in another tab" warning with `autoClose: 0`. Mantine's `getAutoClose` returns early for any numeric value, so that schedules `setTimeout(hide, 0)` and the warning dismisses itself on the next tick. The message tells the user to close and reopen the tab, so the intent was plainly `false`. It is filed rather than fixed here: Key Decision B says this phase migrates no consumers. Under `notify` both spellings mean "keep it up", so the migration fixes it rather than carrying it across.
+
+**Three decisions about the visual, each forced by a measurement someone else took.**
+
+1. *A column, not a deck.* Base UI supports the collapsed-stack presentation through `--toast-index` and `--toast-offset-y`, and it was rejected. Mantine stacks notifications in a column and the migration's job is that 42 call sites keep behaving as they do; a deck would also put the second toast behind the first at partial opacity, which is a contrast measurement nobody has taken.
+2. *A border, not an elevation.* A toast floats above arbitrary page content and the token ladder cannot express that: `surfaceRaised` is ΔE00 **0.00** from `surface2` on 21 of the 23 shipped themes. This is the same workaround the segmented indicator uses and the same finding already filed with the designer in `elevation-and-selected-rows-2026-09-14.md`. It is a workaround, not a treatment.
+3. *The tone paints the leading edge, not the ground.* A washed ground would put four status colours ΔE00 0.00 apart under protanopia on the light palette, which is the measurement the role glyphs exist for. The glyph carries the meaning; the rail is the redundant cue beside it.
+
+**Two things the stores do that the primitive does not, and why.**
+
+*A pre-mount buffer.* `createToastManager` emits to whoever is subscribed at the time and holds nothing, so a `notify.show()` raised during app boot is dropped in silence. Mantine's store holds it and renders it when the container appears. "The error notification sometimes does not appear" is the worst class of regression a migration can introduce, so both stores buffer until a host mounts.
+
+*Confirmations are a queue, not a stack.* Two sibling modal dialogs each mark the other's portal `aria-hidden` on Base UI's behalf, and the measured result is that **neither** is exposed to assistive technology. It only happens when both open in the same commit: opened a commit apart, the topmost is correctly exposed, which is the realistic path (a confirm raised from inside an open modal, as `LayoutBuilderModal` does, works correctly). Rendering one at a time removes the arrangement entirely, and a queue is the better reading of a confirmation anyway. The underlying `Modal` behaviour is P80-A's and is in the follow-on table rather than patched from here.
+
+**One semantic that diverges from Mantine, deliberately.** `notifications.show` with an id already on screen is a no-op; `notify.show` updates that toast in place and restarts its timer. The only call site that passes an id is `App.tsx`'s idle-timeout warning, and `useIdleTimeout` fires `onWarning` once per idle cycle from a single timer rather than on a countdown, so nothing in this codebase can tell the two apart. Upserting is the less surprising behaviour of the two: silently dropping a notification is how a stale message survives on screen.
+
+**Base UI names its own live region in English.** The toast viewport defaults to `aria-label="Notifications"`, which would be the single untranslated string in a framework whose whole argument is that chrome is translatable. `<Notifications label>` is required rather than optional for that reason, and both suites assert the supplied name reaches the element.
+
+**An API trap worth naming, because it cost a browser run.** `Modal`'s `size` is typed `UiSpacing`, so `size="md"` compiles, reads as a sensible width and resolves to the ~16px *spacing* token. The confirm dialog rendered 16px wide, its buttons overflowed onto the backdrop, and the failure surfaced as "the backdrop intercepts pointer events" rather than as a sizing error. `UiConfirmOptions.size` is deliberately a CSS length and not a scale step.
+
+**A flaky P80-B guard, fixed here rather than rerun until green.** The full suite failed once on `the segmented control's indicator sits over the checked segment and follows it`, a P80-B test this track did not touch. Repeated in isolation it failed roughly one run in five, reading 1.8px and 3.5px against a 1px tolerance. The cause is in the test, not the component: the indicator transitions `translate` and `inline-size` as two separate transitions on one element, and the settle-poll watched only the offset, so it released while the width was still animating and the width assertion read the animation. It now settles on the worse of the two axes. Eight consecutive runs pass where four of five did before. Widening the tolerance would have hidden it, and a gate that fails one run in five trains people to rerun rather than read.
+
+**Mutations.** Each applied alone against the guarding suite and restored byte-identically.
+
+| Guard | Mutation applied | Result |
+|-------|------------------|--------|
+| the i18n gate covers the new call shapes | the rule reverted to matching `notifications`/`modals` only | three gate tests fail |
+| a toast raised before the viewport mounts still appears | the pre-mount buffer removed | the buffer test fails |
+| `autoClose: false` keeps the toast up | `false` mapped to the provider default instead of the never-dismiss value | the persistence test fails |
+| a role tone carries its glyph | the glyph forced off | the glyph test fails |
+| a palette name maps to the audited role | `green` remapped to `info` | the mapping test fails |
+| a limited toast is hidden, not merely transparent | `visibility: hidden` dropped, leaving `opacity: 0` | the browser test fails |
+
+**One mutation was applied and not caught, which is the P80-B lesson repeating.** Passing `autoClose: 0` straight through instead of clamping it changed nothing, because Base UI already reads `0` as "never dismiss" and the clamp only ever mattered for a negative value nobody passes. The test that covers it is still worth having: it pins the *contract* regardless of which layer supplies it. But the clamp is defensive rather than load-bearing, and claiming the test proved it would have been false. The replacement mutation above exercises the mapping that actually does the work.
 
 ### P80-B, pagination and the colour picker (2026-09-14)
 
@@ -421,7 +470,13 @@ The one real decision is that **the range keeps a constant width as the current 
 
 ## Outcome
 
-_Phase in progress. P80-A and P80-B are complete as of 2026-09-14; P80-C is still Planned._
+_Phase complete as of 2026-09-14. All three tracks landed. One gate, the manual keyboard pass, is outstanding across the whole phase and is recorded as such rather than waived._
+
+**What Phase 80 built.** Every `@mullion/ui` component that handles a keypress, plus the two imperative stores that raise chrome without one. Nothing was migrated onto them: Key Decision B holds, and Phase 81 owns the move.
+
+**The four gates of Key Decision C, phase-wide.** Three of four, for every component in all three tracks. The axe structural gate, the P77-F ring walk and the P79-B static sheet rules are met and mutation-checked. **The manual keyboard pass in `ACCESSIBILITY_MANUAL_AUDIT.md` §6B has never been run.** It is the same gap P80-A opened, P80-B inherited and P80-C now shares, and it is the one thing standing between this phase and a clean four-of-four.
+
+**What the phase found that none of the three plans contained.** Each track surfaced at least one defect its own acceptance criteria could not have caught, and in two cases the criterion was satisfiable while the thing it was meant to protect was broken. P80-A shipped four invented token names; the answer was a standing rule rather than a fix. P80-B reproduced P77-C exactly, a sheet rule keyed on an attribute the primitive never writes, and the unit test that should have caught it was the weak form; it is now the strong form across five components. P80-C found that the i18n gate its criteria told it to keep green was keyed on callee names and would have gone blind the moment Phase 81 renamed them. The pattern is worth carrying into Phase 81: **a criterion phrased as "X still passes" is worth nothing unless someone checks that X still looks at the thing it was written for.**
 
 **What P80-B built, and what it cost.** Twelve components across five batches: the select family, tabs, the segmented control, the accordion, the checkbox, switch, slider and chip group, and both gaps Base UI does not fill. Every one carries the four gates of Key Decision C except the fourth, which is the same outstanding item P80-A has: the manual keyboard pass in `ACCESSIBILITY_MANUAL_AUDIT.md` is written down and **not run**.
 

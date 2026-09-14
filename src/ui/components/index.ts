@@ -10,6 +10,11 @@
  * None of that behaviour is written here: Base UI owns it and the wrappers
  * supply the portal container, the classes and the tokens (study principle 6).
  *
+ * P80-C adds the two imperative stores, in `./notification` and `./confirm`.
+ * They are the only exports here that are not components: 42 call sites raise a
+ * toast from a callback rather than from a render, so a hook could not reach
+ * them and the store is a module singleton instead.
+ *
  * They are deliberately NOT re-exported from `@/ui` yet. That barrel is the
  * migration ledger: moving `Text` onto this implementation there would move
  * all 92 files that import it in one commit, which is Phase 81's job and its
@@ -37,6 +42,7 @@ import accordionCss from './accordion.css?inline';
 import toggleCss from './toggle.css?inline';
 import paginationCss from './pagination.css?inline';
 import colorCss from './color.css?inline';
+import notificationCss from './notification.css?inline';
 import utilityCss from './utility.css?inline';
 import focusCss from '../styles/focus.css?inline';
 
@@ -63,6 +69,9 @@ registerUiStyles('ui/toggle', toggleCss);
 registerUiStyles('ui/pagination', paginationCss);
 // After the toggle sheet: the picker restyles the framework Slider's track.
 registerUiStyles('ui/color', colorCss);
+// [P80-C] The toast stack. The confirm dialog has no sheet of its own: it is a
+// `Modal`, and its two extra rules sit in the overlay sheet registered above.
+registerUiStyles('ui/notification', notificationCss);
 registerUiStyles('ui/utility', utilityCss);
 // Last, so the ring wins a tie inside `@layer mullion.components` against any
 // component rule that also sets `box-shadow`: `Paper` and `Card` both do, and
@@ -247,6 +256,21 @@ export {
   type CollapseProps,
   type VisuallyHiddenProps,
 } from './utility';
+export {
+  Notifications,
+  notify,
+  type NotificationsProps,
+  type UiNotifyColor,
+  type UiNotifyOptions,
+  type UiNotifyPosition,
+} from './notification';
+export {
+  Confirmations,
+  confirm,
+  type UiConfirmButtonProps,
+  type UiConfirmColor,
+  type UiConfirmOptions,
+} from './confirm';
 export {
   Drawer,
   Menu,
