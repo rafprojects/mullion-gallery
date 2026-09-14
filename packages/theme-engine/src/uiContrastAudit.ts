@@ -39,10 +39,19 @@
  *     `surfaceRaised` are the grounds that matter for it; `surface2` is an
  *     input's own fill, where no outline ring is ever drawn.
  */
+import chroma from 'chroma-js';
 import { resolveColors, UI_CONTRAST_MIN } from './colorGen';
 import { contrastRatio } from './validation';
 import { deriveComponentTokens, type ComponentTokenKey } from './componentTokens';
-import type { ThemeColors } from './types';
+import type { ResolvedColors, ThemeColors } from './types';
+
+/**
+ * The two `light`-variant ground strengths, mirroring `tone-wash` and
+ * `tone-wash-strong` in src/ui/styles/tones.css. Kept here so the audit and
+ * the stylesheet cannot drift apart silently.
+ */
+const WASH_MIX = 0.14;
+const WASH_STRONG_MIX = 0.2;
 
 export { UI_CONTRAST_MIN };
 
@@ -136,7 +145,68 @@ export function intendedUiContrastChecks(
       bg: ct['menu-bg'],
       minRatio,
     },
+
+    /*
+     * [P80-A] The grounds a value is painted on belong in its audit set, at
+     * the floor appropriate to what the value is. Added at the designer's
+     * request on 2026-09-14 after three rounds in which every defect was a
+     * value measured against a ground nobody had audited it on.
+     *
+     * The `light` variant paints the theme's own text on its wash and the
+     * role colour only as an ICON, which is non-text and answers to this 3:1
+     * floor rather than 1.4.3's 4.5:1. Both strengths pass today with room
+     * (worst 4.24 and 3.82), but they pass by arithmetic rather than by
+     * construction: nothing in the engine constrains a text rung's behaviour
+     * on a tint of its own role, so a re-tuned theme could slide under with
+     * no gate catching it.
+     */
+    ...washIconChecks(rc, ct, minRatio),
+
+    /*
+     * [P80-A] The ring pair on the menu's ground, which is where it paints on
+     * a focused row. Largely redundant with `pairOn('surfaceRaised')` above,
+     * because `menu-bg` derives from `surfaceRaised` — but `menu-bg` is a
+     * component token a theme may override, and then the derivation check no
+     * longer covers what is actually painted. This audits the token rather
+     * than its default.
+     */
+    pairOn('menu-bg (a focused menu row)', ct['menu-bg']),
   ];
+}
+
+/**
+ * The role icon on each `light` variant ground, at rest and on hover. One
+ * check per role per strength: the ground is a mix of the role's own declared
+ * colour into the surface, so each role has a different ground.
+ */
+function washIconChecks(
+  rc: ResolvedColors,
+  ct: Record<ComponentTokenKey, string>,
+  minRatio: number,
+): UiContrastCheck[] {
+  const roles = [
+    ['primary', rc.primaryFill, ct['primary-text']],
+    ['success', rc.success, ct['success-text']],
+    ['warning', rc.warning, ct['warning-text']],
+    ['error', rc.error, ct['error-text']],
+    ['info', rc.info, ct['info-text']],
+    ['accent', rc.accent, ct['accent-text']],
+  ] as const;
+
+  return roles.flatMap(([name, base, ink]) => [
+    {
+      label: `${name}-text on its own wash (light variant icon, at rest)`,
+      fg: ink,
+      bg: chroma.mix(rc.surface, base, WASH_MIX, 'rgb').hex(),
+      minRatio,
+    },
+    {
+      label: `${name}-text on its own wash-strong (light variant icon, on hover)`,
+      fg: ink,
+      bg: chroma.mix(rc.surface, base, WASH_STRONG_MIX, 'rgb').hex(),
+      minRatio,
+    },
+  ]);
 }
 
 export function auditUiContrast(

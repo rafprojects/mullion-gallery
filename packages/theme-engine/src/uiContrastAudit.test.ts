@@ -70,9 +70,14 @@ describe('focus ring pair (P77-F)', () => {
   });
 
   it('every bundled theme reports the pair checks, and they pass', () => {
+    // Four: the pair against itself, against `surface`, against
+    // `surfaceRaised`, and [P80-A] against `menu-bg`. The last overlaps the
+    // third by derivation and earns its place only because `menu-bg` is a
+    // component token a theme may override. The count is pinned so a new
+    // ground is an explicit act with a diff.
     for (const def of bundledThemeDefinitions) {
       const checks = intendedUiContrastChecks(def.colors as ThemeColors, def.colorScheme);
-      expect(checks.filter((c) => c.label.startsWith('focus'))).toHaveLength(3);
+      expect(checks.filter((c) => c.label.startsWith('focus'))).toHaveLength(4);
     }
   });
 });

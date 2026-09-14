@@ -311,12 +311,20 @@
    * lightened ground. An un-toned row tints safely, because the plain text on
    * it measures 4.73 at worst.
    *
-   * What marks a highlighted toned row is therefore the focus ring on a
-   * keyboard move. Whether it should also carry a positional treatment for
-   * the pointer is an open design question, recorded in
-   * docs/PHASE80_REPORT.md.
+   * The same exclusion applies under `:focus-visible`, for the same reason one
+   * level up: the ring is measured against the row's ground, and a tint moves
+   * that ground too. On `menu-bg` the ring pair clears 1.4.11's 3:1 on 23 of
+   * 23 themes; on the tinted ground it fails on nord, tokyo-night and
+   * gruvbox-dark. A focused row therefore never tints, whatever its tone.
+   *
+   * So a toned row is marked by the ring alone, and has no pointer affordance
+   * at all. The designer's answer is a leading rail replacing the tint
+   * outright, which also fixes a second defect this rule cannot: the menu
+   * clips the ring. It has `overflow: auto` and no inline padding, so a row
+   * sits 1px from the menu's edge while the ring reaches 10px, and 9px of the
+   * halo is cut on each side. Measured 2026-09-14; the rail is the next track.
    */
-  .mullion-menu-item[data-highlighted]:not([data-mullion-tone]) {
+  .mullion-menu-item[data-highlighted]:not([data-mullion-tone]):not(:focus-visible) {
     background-color: var(--mullion-menu-hover-bg);
   }
 

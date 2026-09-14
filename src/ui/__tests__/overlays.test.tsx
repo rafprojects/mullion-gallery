@@ -273,6 +273,10 @@ describe('the menu', () => {
       rule,
       'the highlight tint must exclude toned rows, or a toned label drops below AA',
     ).toContain(':not([data-mullion-tone])');
+    expect(
+      rule,
+      'the highlight tint must exclude focused rows, or the ring is measured against a ground the tint moved',
+    ).toContain(':not(:focus-visible)');
   });
 
   it('sets data-highlighted on keyboard navigation, which is the attribute the sheet targets', () => {
