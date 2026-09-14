@@ -52,9 +52,12 @@ import {
   VisuallyHidden,
   Drawer,
   Menu,
+  Accordion,
   Modal,
   Popover,
+  SegmentedControl,
   Select,
+  Tabs,
   TagsInput,
   Tooltip,
 } from '../components';
@@ -76,6 +79,8 @@ const withOverlays = params.get('overlays') === '1';
  * that live in the scope under test.
  */
 const withSelects = params.get('selects') === '1';
+/** P80-B's tabs, segmented control and accordion, opt-in for the same reason. */
+const withChoice = params.get('choice') === '1';
 /** `?host=hostile` reproduces the P77-B probe around the whole fixture. */
 const hostileHost = params.get('host') === 'hostile';
 
@@ -201,6 +206,54 @@ function Gallery({ prefix }: { prefix: string }) {
       <VisuallyHidden>hidden to the eye, present to a reader</VisuallyHidden>
       {withOverlays && <Overlays prefix={prefix} />}
       {withSelects && <Selects prefix={prefix} />}
+      {withChoice && <Choices prefix={prefix} />}
+    </Stack>
+  );
+}
+
+/**
+ * P80-B: tabs, the segmented control and the accordion. The segmented
+ * indicator is the part that cannot be proved in jsdom, which reports every
+ * box as zero: its position comes from a measurement of the checked segment,
+ * so a browser is the only place it means anything.
+ */
+function Choices({ prefix }: { prefix: string }) {
+  const [view, setView] = useState('grid');
+  const [tab, setTab] = useState<string | null>('one');
+  return (
+    <Stack gap="sm" padding="md" data-testid={`${prefix}-choices`}>
+      <Divider label="choices" labelPosition="left" />
+      <SegmentedControl
+        aria-label={`${prefix} view mode`}
+        data={['grid', 'list', 'map']}
+        value={view}
+        onChange={setView}
+        data-testid={`${prefix}-segmented`}
+      />
+      <Tabs value={tab} onChange={setTab} data-testid={`${prefix}-tabs`}>
+        <Tabs.List aria-label={`${prefix} sections`} data-testid={`${prefix}-tabs-list`}>
+          <Tabs.Tab value="one" data-testid={`${prefix}-tab-one`}>
+            first
+          </Tabs.Tab>
+          <Tabs.Tab value="two" data-testid={`${prefix}-tab-two`}>
+            second tab
+          </Tabs.Tab>
+          <Tabs.Tab value="three">third</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel value="one">first panel</Tabs.Panel>
+        <Tabs.Panel value="two">second panel</Tabs.Panel>
+        <Tabs.Panel value="three">third panel</Tabs.Panel>
+      </Tabs>
+      <Accordion defaultValue="a" data-testid={`${prefix}-accordion`}>
+        <Accordion.Item value="a">
+          <Accordion.Control data-testid={`${prefix}-accordion-a`}>appearance</Accordion.Control>
+          <Accordion.Panel>appearance body</Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value="b">
+          <Accordion.Control data-testid={`${prefix}-accordion-b`}>behaviour</Accordion.Control>
+          <Accordion.Panel>behaviour body</Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>
     </Stack>
   );
 }

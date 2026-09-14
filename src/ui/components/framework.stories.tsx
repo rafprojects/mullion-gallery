@@ -12,6 +12,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import {
+  Accordion,
   ActionIcon,
   Alert,
   Anchor,
@@ -43,6 +44,8 @@ import {
   VisuallyHidden,
   MultiSelect,
   NumberInput,
+  SegmentedControl,
+  Tabs,
   PasswordInput,
   Select,
   TagsInput,
@@ -607,6 +610,97 @@ export const Selects: Story = {
               <Select key={step} size={step} label={step} data={ROLES} defaultValue="editor" />
             ))}
           </Group>
+        </Section>
+      </Stack>
+    );
+  },
+};
+
+export const Choices: Story = {
+  name: 'Tabs, segments and disclosure',
+  render: function Choices() {
+    const [view, setView] = useState('grid');
+    const [tab, setTab] = useState<string | null>('overview');
+    return (
+      <Stack gap="md" padding="md">
+        <Section title="Segmented control">
+          <Text size="sm" tone="muted">
+            A radio group, which is the pattern for picking one value. The indicator carries a
+            border rather than resting on an elevation step: measured over the 23 bundled themes,
+            <code> surfaceRaised </code> is identical to <code> surface2 </code> on 21 of them.
+          </Text>
+          <Group gap="md" align="center">
+            <SegmentedControl aria-label="View" data={['grid', 'list', 'map']} value={view} onChange={setView} />
+            <SegmentedControl
+              aria-label="Sizing"
+              size="xs"
+              data={[
+                { value: 'fill', label: 'Fill' },
+                { value: 'fit', label: 'Fit' },
+                { value: 'manual', label: 'Manual', disabled: true },
+              ]}
+              defaultValue="fill"
+            />
+          </Group>
+          <SegmentedControl aria-label="Full width" fullWidth data={['day', 'week', 'month']} defaultValue="week" />
+        </Section>
+
+        <Section title="Tabs">
+          <Text size="sm" tone="muted">
+            Arrow keys move focus and Enter selects. Selecting on focus would mount every panel on
+            the way past, and the Admin Panel&rsquo;s seven tabs each load their own data.
+          </Text>
+          <Tabs value={tab} onChange={setTab}>
+            <Tabs.List aria-label="Campaign sections">
+              <Tabs.Tab value="overview">Overview</Tabs.Tab>
+              <Tabs.Tab value="media">Media</Tabs.Tab>
+              <Tabs.Tab value="access">Access</Tabs.Tab>
+              <Tabs.Tab value="archive" disabled>
+                Archive
+              </Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value="overview">
+              <Text size="sm">The overview panel.</Text>
+            </Tabs.Panel>
+            <Tabs.Panel value="media">
+              <Text size="sm">The media panel.</Text>
+            </Tabs.Panel>
+            <Tabs.Panel value="access">
+              <Text size="sm">The access panel.</Text>
+            </Tabs.Panel>
+            <Tabs.Panel value="archive">
+              <Text size="sm">The archive panel.</Text>
+            </Tabs.Panel>
+          </Tabs>
+        </Section>
+
+        <Section title="Accordion">
+          <Text size="sm" tone="muted">
+            Every header is its own tab stop. Roving focus was removed from this pattern by the
+            Authoring Practices, and Base UI followed.
+          </Text>
+          <Accordion defaultValue="appearance">
+            <Accordion.Item value="appearance">
+              <Accordion.Control>Card appearance</Accordion.Control>
+              <Accordion.Panel>
+                <Text size="sm">Corner rounding, shadow and border.</Text>
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item value="grid">
+              <Accordion.Control rightSection={<Badge tone="primary">3</Badge>}>
+                Grid and pagination
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Text size="sm">Columns, gaps and how many cards a page holds.</Text>
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item value="locked" disabled>
+              <Accordion.Control>Locked section</Accordion.Control>
+              <Accordion.Panel>
+                <Text size="sm">Unreachable.</Text>
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
         </Section>
       </Stack>
     );

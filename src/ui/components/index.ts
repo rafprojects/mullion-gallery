@@ -32,6 +32,8 @@ import displayCss from './display.css?inline';
 import overlayCss from './overlay.css?inline';
 import inputCss from './input.css?inline';
 import selectCss from './select.css?inline';
+import tabsCss from './tabs.css?inline';
+import accordionCss from './accordion.css?inline';
 import utilityCss from './utility.css?inline';
 import focusCss from '../styles/focus.css?inline';
 
@@ -52,6 +54,8 @@ registerUiStyles('ui/input', inputCss);
 // After the field sheet: the select family wears the same shell and overrides
 // two of its rules (a chip row's height, a trigger's cursor).
 registerUiStyles('ui/select', selectCss);
+registerUiStyles('ui/tabs', tabsCss);
+registerUiStyles('ui/accordion', accordionCss);
 registerUiStyles('ui/utility', utilityCss);
 // Last, so the ring wins a tie inside `@layer mullion.components` against any
 // component rule that also sets `box-shadow`: `Paper` and `Card` both do, and
@@ -170,6 +174,24 @@ export {
   type TextareaProps,
   type TextInputProps,
 } from './input';
+export {
+  Accordion,
+  type AccordionControlProps,
+  type AccordionItemProps,
+  type AccordionPanelProps,
+  type AccordionProps,
+  type UiChevronPosition,
+} from './accordion';
+export {
+  SegmentedControl,
+  Tabs,
+  type SegmentedControlProps,
+  type TabProps,
+  type TabsListProps,
+  type TabsPanelProps,
+  type TabsProps,
+  type UiSegmentData,
+} from './tabs';
 export {
   MultiSelect,
   Select,
