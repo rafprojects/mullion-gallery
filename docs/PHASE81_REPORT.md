@@ -100,8 +100,13 @@ Then batch by surface, not by component. Settings panel, Layout Builder chrome, 
 
 The Settings batch carries one piece of design work with it: the **Typography panel redesign**, filed in [FUTURE_TASKS.md](FUTURE_TASKS.md) under Design & Brand from a user report on 2026-09-11. Its four problems all live in files this batch rewrites anyway (`TypographyEditor.tsx`, `CssValueInput.tsx`, `UnitScrubField.tsx`), and Decision B already permits the pixels to move here, so porting them forward and fixing them afterwards would be doing the same file twice. It depends on P80-A shipping a number field with a unit slot.
 
+**The select family carries a live accessibility defect that this track fixes, and it is the reason the Settings batch cannot slip quietly.** Confirmed 2026-09-14: `use-combobox` resolves `const root = getRootElement(targetRef.current)` from the **trigger** and finds the active option with `findElementBySelector('#listId [data-combobox-active]', root)`. The shipped portal default puts the dropdown in the overlay root, a *different* shadow root, so the lookup returns null and arrow keys do nothing. `Select`, `Autocomplete`, `MultiSelect`, `TagsInput` and `TreeSelect` are all keyboard-inoperable today, across 26 files, which is a WCAG 2.1.1 failure on every dropdown in the product. Proved by `?portal=shadow`, which restores it; `?portal=document` does not, because `document.querySelector` does not pierce the overlay root either. The user chose on 2026-09-14 to fix it here rather than re-plumb Mantine portals this phase deletes.
+
+**The binding constraint that follows: a listbox must live in its trigger's root.** Base UI uses ID-referenced ARIA the same way Mantine does, so migrating onto the framework's own `Select` does **not** fix this by itself — it reproduces it unless the popup stays in the trigger's tree. Verify the keyboard contract on a shadow-mounted gallery before the batch is called done, not after.
+
 ### Acceptance criteria
 
+- **Every migrated dropdown is operable by keyboard on a shadow mount**, verified in a browser rather than jsdom: arrow keys move the highlight, Enter selects, and a screen reader announces the active option.
 - The allow-list shrinks with every batch and never grows.
 - `packages/shared-ui` is gone, its eight modules rehomed, and the allow-list paths updated to match before the first surface batch.
 - Per batch: full suites green, axe gate green, and a keyboard pass on any surface whose interaction changed.
