@@ -1,14 +1,14 @@
 # Phase 80 - Behavioural components
 
-**Status:** In progress (P80-A's overlay batch landed; its input-family batch and P80-B/C are Planned)
+**Status:** In progress (P80-A complete; P80-B and P80-C are Planned)
 **Created:** 2026-09-10
-**Last updated:** 2026-09-13 (P80-A overlays: Modal, Drawer, Popover, Tooltip and Menu on Base UI 1.8.0)
+**Last updated:** 2026-09-14 (P80-A complete: the overlays, the inset ring, the rail, the role glyphs and the input family)
 
 ### Tracks
 
 | Track | Description | Status | Effort |
 |-------|-------------|--------|--------|
-| P80-A | Overlays and the input family: the components the theme adapter fights hardest | **Overlays done** (2026-09-13), input family Planned | Large |
+| P80-A | Overlays and the input family: the components the theme adapter fights hardest | **Done** (2026-09-14), less `ColorInput` (see notes) | Large |
 | P80-B | Selection, navigation and choice controls: the select family, tabs, accordion, checkbox, switch, chip, segmented control, slider | Planned | Large |
 | P80-C | Imperative managers: notifications and confirmations | Planned | Small-Medium |
 
@@ -264,6 +264,24 @@ On a keyboard move a row carries the rail and the inset ring together, which is 
 **The differing silhouettes are the requirement, not a detail**, since four variations on a disc would measure identically and signal nothing. That is a test: the four `d` attributes must be four distinct values, and swapping one for another fails it. The glyphs paint in `currentColor` and are `aria-hidden`, so they take the tone their element already declares and never become the accessible name; that pairing is the one `washIconChecks` audits at the 3:1 non-text floor.
 
 **Scoped as the designer specified: `light` controls.** A `filled` control carries the role at full chroma, where the same CVD collapse is weaker but real (2.7 at worst). Left as it is rather than widened unilaterally, and noted for them.
+
+### P80-A, the input family (2026-09-14)
+
+**Status: landed.** `TextInput`, `Textarea`, `PasswordInput` and `NumberInput` in [`input.tsx`](../src/ui/components/input.tsx) with [`input.css`](../src/ui/components/input.css), on Base UI's `Field` and `NumberField`. 17 unit tests including a structural axe gate, and a Storybook story.
+
+**The coupling is gone, which was the point.** Mantine renders all six of its input components through one `Input`, so the adapter's single entry reached every one at once, and that is why P76-D/H could collapse the borders everywhere in one change. Each component here composes the `Field` parts itself: a change to one reaches one.
+
+**The border lives on the control row, not on the input.** That one decision is what makes the unit slot work. A unit, a stepper or a section sits *inside* the field's border, so it shares the border and the height by construction. `UnitScrubField` has to fake that today with a `variant="unstyled"` `Select` in a `rightSection`, three `height: 100%` overrides and a hand-computed `rightSectionWidth`, and the seam still shows while the field ends up taller than its neighbours. Nothing here computes a width; the separator is one border. That is the named blocker for P81-B's Typography panel redesign, and it is now cleared. A static string and a full control both land in the same slot, and both forms are tested, because the second is the one the Typography panel needs.
+
+**Base UI's `ScrubArea` replaces hand-rolled pointer code.** `UnitScrubField` writes its own `onPointerDown`/`onPointerMove`/`setPointerCapture` scrubbing; `scrubbable` hands that to the primitive, which also brings cursor teleport and sensitivity. This is study principle 6 paying off rather than being argued for.
+
+**`onChange` shapes differ on purpose.** `TextInput` hands over the event, `NumberInput` the value, because that is how their 80 and 136 call sites read them. Normalising one onto the other would make every migrated site wrong in a way that still compiles, which is the worst available outcome for a mechanical migration.
+
+**One defect found by the tests, and it was mine.** Base UI's `NumberField` has **no `Label` part**, and the first draft rendered the label as a bare `span`: the control had no accessible name at all. A screen reader would have announced an unlabelled spin button. The unit tests could not find it by name either, which is how it surfaced. It now carries an explicit `id` with a real `<label for>` plus `aria-describedby` for the description and error, and the structural axe gate fails if the association is removed.
+
+**`ColorInput` is deliberately not here.** Base UI ships no colour picker; P78-B recorded that gap when it picked the primitive and called it "the expensive one, a component in its own right". Its 25 call sites belong with P80-B's gap list beside pagination and tags input, not smuggled into this batch.
+
+**Validation.** `npx tsc --noEmit` clean, `npm run lint` clean, `npm run ui:allowlist:check` green at 178 files, `npx vitest run` **4,233 of 4,233** across 272 files, `npx playwright test` **85 of 85** with no snapshot movement, `npm run build` clean. One `portal-mode` spec timed out on a cold start in the first run and passed on two subsequent runs, alone and in the full suite; recorded as flaky rather than dismissed as such.
 
 ## Outcome
 

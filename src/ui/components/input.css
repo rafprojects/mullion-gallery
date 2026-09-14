@@ -1,0 +1,222 @@
+/*
+ * The input family (P80-A).
+ *
+ * Every colour here is a component token from the engine's tier: `input-bd`,
+ * `input-bd-focus`, `input-bg`, `input-color` and `input-placeholder-color`.
+ * That tier exists so the 1.4.11 audit can name these pairs, and it already
+ * audits `input-bd on input-bg` and `input-bd-focus on input-bg`, which is the
+ * P76-D/H regression (borders that collapsed into their ground) made
+ * impossible rather than merely fixed.
+ *
+ * The border lives on the CONTROL ROW, not on the input. That is the whole
+ * reason the unit slot works: a unit, a stepper or a section sits inside the
+ * same border as the text, shares its height by construction, and needs no
+ * `height: 100%` override to line up. `UnitScrubField` needs four of those
+ * today and the seam still shows.
+ */
+@layer mullion.components {
+  .mullion-field {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--mullion-spacing-xs) / 2);
+    min-inline-size: 0;
+  }
+
+  .mullion-field-label {
+    font-size: var(--mullion-font-size-sm);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-field-required {
+    margin-inline-start: 0.25em;
+    color: var(--mullion-error-text);
+  }
+
+  /*
+   * The scrubbable label. Base UI's `ScrubArea` owns the pointer capture and
+   * the cursor teleport; this only says what it looks like and that it is a
+   * horizontal affordance.
+   */
+  .mullion-field-label-scrub {
+    cursor: ew-resize;
+    user-select: none;
+    inline-size: fit-content;
+  }
+
+  /* ── The control row ─────────────────────────────────────────────────── */
+
+  .mullion-field-control {
+    display: flex;
+    align-items: stretch;
+    min-inline-size: 0;
+    block-size: var(--mullion-control-height-md);
+    border: 1px solid var(--mullion-input-bd);
+    border-radius: var(--mullion-radius, var(--mullion-radius-sm));
+    background-color: var(--mullion-input-bg);
+    color: var(--mullion-input-color);
+    overflow: hidden;
+  }
+
+  .mullion-field[data-size='xs'] .mullion-field-control {
+    block-size: var(--mullion-control-height-xs);
+  }
+
+  .mullion-field[data-size='sm'] .mullion-field-control {
+    block-size: var(--mullion-control-height-sm);
+  }
+
+  .mullion-field[data-size='lg'] .mullion-field-control {
+    block-size: var(--mullion-control-height-lg);
+  }
+
+  .mullion-field[data-size='xl'] .mullion-field-control {
+    block-size: var(--mullion-control-height-xl);
+  }
+
+  /*
+   * A textarea sets its own height, so the row must not pin one. The autosize
+   * in `input.tsx` writes the height onto the control itself.
+   */
+  .mullion-field-control-multiline {
+    block-size: auto;
+    align-items: stretch;
+  }
+
+  /*
+   * The focus border. `input-bd-focus` is `primaryStroke`, selected at the
+   * 1.4.11 non-text floor and audited against `input-bg`, so it is legible on
+   * every theme by construction. The two-tone ring is drawn by focus.css on
+   * the control itself and is a separate signal; this is the border state.
+   */
+  .mullion-field-control:focus-within {
+    border-color: var(--mullion-input-bd-focus);
+  }
+
+  .mullion-field[data-invalid] .mullion-field-control,
+  .mullion-field-control-invalid {
+    border-color: var(--mullion-error-text);
+  }
+
+  .mullion-field[data-disabled] .mullion-field-control {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* ── The control itself ──────────────────────────────────────────────── */
+
+  .mullion-field-input {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    padding-inline: var(--mullion-spacing-xs);
+    border: 0;
+    background: none;
+    color: inherit;
+    font-family: inherit;
+    font-size: var(--mullion-font-size-sm);
+    line-height: 1.4;
+  }
+
+  .mullion-field[data-size='xs'] .mullion-field-input {
+    font-size: var(--mullion-font-size-xs);
+  }
+
+  .mullion-field[data-size='lg'] .mullion-field-input,
+  .mullion-field[data-size='xl'] .mullion-field-input {
+    font-size: var(--mullion-font-size-md);
+  }
+
+  /*
+   * The ring is drawn on the control row rather than on the bare input, so it
+   * follows the field's shape and does not cut the sections off from it. The
+   * input's own outline is suppressed because focus.css would otherwise draw
+   * a second one inside the border.
+   */
+  .mullion-field-input:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .mullion-field-control:focus-within {
+    outline: var(--mullion-focus-ring-width) solid var(--mullion-color-primary-stroke);
+    outline-offset: var(--mullion-focus-ring-offset);
+    box-shadow: 0 0 0 var(--mullion-focus-halo-width) var(--mullion-color-focus-halo);
+  }
+
+  .mullion-field-input::placeholder {
+    color: var(--mullion-input-placeholder-color);
+    opacity: 1;
+  }
+
+  .mullion-field-input textarea,
+  textarea.mullion-field-input {
+    padding-block: calc(var(--mullion-spacing-xs) / 1.5);
+    resize: none;
+  }
+
+  /* ── Sections, the unit slot and the stepper ─────────────────────────── */
+
+  .mullion-field-section {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--mullion-spacing-xs);
+    padding-inline: var(--mullion-spacing-xs);
+    color: var(--mullion-color-text-muted);
+  }
+
+  /*
+   * [P80-A] The unit slot.
+   *
+   * It shares the row's border and height because it is inside the row, which
+   * is the entire point. `UnitScrubField` posts an unstyled `Select` into a
+   * Mantine `rightSection` and then forces `height: 100%` on three style keys
+   * plus a hand-computed `rightSectionWidth` to make it line up; the seam is
+   * still visible and the field ends up taller than its neighbours. Nothing
+   * here computes a width, and the separator is one border rather than a
+   * second control's edge.
+   */
+  .mullion-field-unit {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    padding-inline: var(--mullion-spacing-xs);
+    border-inline-start: 1px solid var(--mullion-input-bd);
+    font-size: var(--mullion-font-size-xs);
+    color: var(--mullion-color-text-muted);
+    white-space: nowrap;
+  }
+
+  .mullion-field-step {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.75em;
+    border: 0;
+    background: none;
+    color: var(--mullion-color-text-muted);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .mullion-field-step:hover:not(:disabled) {
+    background-color: var(--mullion-color-surface3);
+    color: var(--mullion-color-text);
+  }
+
+  /* ── Description and error ───────────────────────────────────────────── */
+
+  .mullion-field-description {
+    font-size: var(--mullion-font-size-xs);
+    line-height: 1.4;
+    color: var(--mullion-color-text-muted);
+  }
+
+  .mullion-field-error {
+    font-size: var(--mullion-font-size-xs);
+    line-height: 1.4;
+    color: var(--mullion-error-text);
+  }
+}

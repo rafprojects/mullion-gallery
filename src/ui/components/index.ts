@@ -30,6 +30,7 @@ import controlCss from './control.css?inline';
 import feedbackCss from './feedback.css?inline';
 import displayCss from './display.css?inline';
 import overlayCss from './overlay.css?inline';
+import inputCss from './input.css?inline';
 import utilityCss from './utility.css?inline';
 import focusCss from '../styles/focus.css?inline';
 
@@ -46,6 +47,7 @@ registerUiStyles('ui/control', controlCss);
 registerUiStyles('ui/feedback', feedbackCss);
 registerUiStyles('ui/display', displayCss);
 registerUiStyles('ui/overlay', overlayCss);
+registerUiStyles('ui/input', inputCss);
 registerUiStyles('ui/utility', utilityCss);
 // Last, so the ring wins a tie inside `@layer mullion.components` against any
 // component rule that also sets `box-shadow`: `Paper` and `Card` both do, and
@@ -154,6 +156,16 @@ export {
   type TableProps,
   type TableScrollContainerProps,
 } from './display';
+export {
+  NumberInput,
+  PasswordInput,
+  Textarea,
+  TextInput,
+  type NumberInputProps,
+  type PasswordInputProps,
+  type TextareaProps,
+  type TextInputProps,
+} from './input';
 export {
   isRoleTone,
   resolveRoleGlyph,

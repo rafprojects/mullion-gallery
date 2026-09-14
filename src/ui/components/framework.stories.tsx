@@ -41,6 +41,10 @@ import {
   Title,
   UnstyledButton,
   VisuallyHidden,
+  NumberInput,
+  PasswordInput,
+  Textarea,
+  TextInput,
   type UiControlVariant,
   type UiTone,
 } from './index';
@@ -65,6 +69,69 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const Inputs: Story = {
+  name: 'Input family',
+  render: function Inputs() {
+    const [size, setSize] = useState<number | null>(16);
+    const [unit, setUnit] = useState('px');
+    return (
+      <Stack gap="md" padding="md">
+        <Section title="Text, password and multi-line">
+          <TextInput label="Campaign title" placeholder="Summer 2026" description="Shown in the listing" />
+          <TextInput label="Slug" defaultValue="summer-2026" error="Already taken" />
+          <TextInput label="Disabled" defaultValue="Locked" disabled />
+          <PasswordInput label="Password" placeholder="At least 12 characters" />
+          <Textarea label="Notes" minRows={2} maxRows={6} placeholder="Grows as you type, up to six rows" />
+        </Section>
+
+        <Section title="Numbers, the stepper and the scrub label">
+          <Group gap="md" align="flex-end">
+            <NumberInput label="Columns" defaultValue={3} min={1} max={12} withControls />
+            <NumberInput label="Gap" defaultValue={8} step={2} scrubbable description="Drag the label" />
+          </Group>
+        </Section>
+
+        <Section title="The unit slot">
+          <Text size="sm" tone="muted">
+            The slot is inside the field&rsquo;s border, so it shares the border and the height with
+            nothing to line up. A string is static text; a node is a control. The Typography panel
+            needs the second form, and it is the reason this slot exists.
+          </Text>
+          <Group gap="md" align="flex-end">
+            <NumberInput label="Static unit" defaultValue={24} unit="px" />
+            <NumberInput
+              label="Font size"
+              value={size}
+              onChange={setSize}
+              scrubbable
+              unit={
+                <select
+                  aria-label="Unit"
+                  value={unit}
+                  onChange={(e) => setUnit(e.currentTarget.value)}
+                  style={{ border: 0, background: 'none', color: 'inherit', font: 'inherit' }}
+                >
+                  {['px', 'rem', 'em', '%'].map((u) => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
+                  ))}
+                </select>
+              }
+            />
+          </Group>
+        </Section>
+
+        <Section title="Sizes">
+          {STEPS.map((step) => (
+            <NumberInput key={step} size={step} label={`size ${step}`} defaultValue={12} unit="px" withControls />
+          ))}
+        </Section>
+      </Stack>
+    );
+  },
+};
 
 export const RoleGlyphs: Story = {
   name: 'Role glyphs (CVD)',
