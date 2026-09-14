@@ -24,6 +24,24 @@ import { cx, focusableInset } from './element';
 import type { FieldStyleProps } from './field';
 import { customProperties, type UiScaleStep } from './scale';
 
+/**
+ * False until a frame after mount.
+ *
+ * Every transitioned property animates once from its initial value when the
+ * component sheet is adopted, which is after the element's first resolved
+ * style. Ungated, both indicators in this module slid in from the left edge on
+ * every page load; measured in Chromium, the segmented one read 27px wide and
+ * 2px short of its segment mid-animation.
+ */
+function useReadyAfterFirstFrame(): boolean {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+  return ready;
+}
+
 // ---------------------------------------------------------------------------
 // Tabs
 // ---------------------------------------------------------------------------
@@ -107,9 +125,11 @@ export function Tabs({ children, value, defaultValue, onChange, orientation, cla
  * The plan expected that measurement to be ours. It is not, for tabs.
  */
 function TabsList({ children, scrollable, activateOnFocus, className, style, ...rest }: TabsListProps) {
+  const ready = useReadyAfterFirstFrame();
   return (
     <BaseTabs.List
       className={cx('mullion-tabs-list', className)}
+      {...(ready ? { 'data-ready': '' } : {})}
       {...(scrollable ? { 'data-scrollable': '' } : {})}
       {...(activateOnFocus !== undefined ? { activateOnFocus } : {})}
       {...(style ? { style } : {})}
@@ -223,15 +243,15 @@ export function SegmentedControl({
   const segments = data.map(toSegment);
   const trackRef = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState<{ left: number; width: number } | null>(null);
-  /*
-   * The transition is off until a frame after the first measurement, and this
-   * is not a nicety: without it the indicator animates from zero width at the
-   * left edge to the checked segment on every mount, because the element's
-   * first resolved style has no measurement in it yet. Measured in Chromium,
-   * where it read 27px wide and 2px short of the segment mid-animation.
-   */
-  const [ready, setReady] = useState(false);
+  const ready = useReadyAfterFirstFrame();
 
+  /*
+   * Measured from the rects rather than from `offsetLeft` and `offsetWidth`.
+   * Those two round to whole pixels, and a segment whose real width is 50.45px
+   * then gets a 50px indicator, which showed up in Chromium as a 4px
+   * mismatch. The offset is taken along the INLINE axis so it agrees with the
+   * `inset-inline-start` the sheet positions from, in either direction.
+   */
   const measure = useCallback(() => {
     const track = trackRef.current;
     if (!track) return;
@@ -240,7 +260,11 @@ export function SegmentedControl({
       setBox(null);
       return;
     }
-    setBox({ left: checked.offsetLeft, width: checked.offsetWidth });
+    const trackRect = track.getBoundingClientRect();
+    const rect = checked.getBoundingClientRect();
+    const rtl = getComputedStyle(track).direction === 'rtl';
+    const start = rtl ? trackRect.right - rect.right : rect.left - trackRect.left;
+    setBox({ left: start - track.clientLeft, width: rect.width });
   }, []);
 
   /*
@@ -258,11 +282,6 @@ export function SegmentedControl({
     return () => observer.disconnect();
   }, [measure, value, defaultValue, data]);
 
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setReady(true));
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
   return (
     <RadioGroup
       ref={trackRef}
@@ -277,8 +296,8 @@ export function SegmentedControl({
       {...(name !== undefined ? { name } : {})}
       style={{
         ...customProperties({
-          '--mullion-segment-left': box ? `${box.left}px` : undefined,
-          '--mullion-segment-width': box ? `${box.width}px` : undefined,
+          '--mullion-segment-left': box ? `${box.left.toFixed(2)}px` : undefined,
+          '--mullion-segment-width': box ? `${box.width.toFixed(2)}px` : undefined,
         }),
         ...style,
       }}

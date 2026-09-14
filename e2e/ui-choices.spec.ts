@@ -44,6 +44,7 @@ async function open(page: Page, { mount = 'shadow', theme = 'default-dark' }: { 
   await serveShowcase(page);
   await page.goto(`/ui-showcase?choice=1&mount=${mount}&chrome=lock&theme=${theme}`);
   await page.locator('[data-testid="inline-choices"]').waitFor();
+  await page.locator('[data-testid="inline-toggles"]').waitFor();
 }
 
 const inline = (page: Page, id: string) => page.locator(`[data-testid="inline-${id}"]`);
@@ -55,6 +56,7 @@ const inline = (page: Page, id: string) => page.locator(`[data-testid="inline-${
  * right failure and the reason this helper exists.
  */
 const choices = (page: Page) => page.locator('[data-testid="inline-choices"]');
+const toggles = (page: Page) => page.locator('[data-testid="inline-toggles"]');
 
 test.beforeAll(async ({ browser }) => {
   test.setTimeout(180_000);
@@ -108,16 +110,18 @@ test.describe('the segmented control’s indicator', () => {
 
     // The indicator transitions when it moves, so a reading taken mid-slide
     // measures the animation rather than the result. Poll for the settled box.
-    await expect.poll(async () => (await read())?.dx ?? 99, { timeout: 3000 }).toBeLessThanOrEqual(3);
+    await expect.poll(async () => (await read())?.dx ?? 99, { timeout: 3000 }).toBeLessThanOrEqual(1);
 
     const first = await read();
     expect(first, 'no indicator or no checked segment').not.toBeNull();
     expect(first!.label).toContain('grid');
     expect(first!.width, 'the indicator has no width').toBeGreaterThan(10);
-    // Positioned from the measurement, so it should land on the segment. The
-    // 2px allowance is the track's own padding and the indicator's border.
-    expect(first!.dx).toBeLessThanOrEqual(3);
-    expect(first!.dw).toBeLessThanOrEqual(3);
+    // Positioned from the measurement, so it lands on the segment. The
+    // allowance is sub-pixel: the measurement is of the same border box the
+    // indicator draws, which is why it is a fraction of a pixel and not the
+    // four whole ones `offsetWidth` cost before.
+    expect(first!.dx).toBeLessThanOrEqual(1);
+    expect(first!.dw).toBeLessThanOrEqual(1);
 
     // The border is what makes it visible: `surfaceRaised` is identical to
     // `surface2` on 21 of the 23 bundled themes, so the ground alone is not a
@@ -127,9 +131,9 @@ test.describe('the segmented control’s indicator', () => {
 
     await choices(page).getByRole('radio', { name: 'map' }).click();
     await expect.poll(async () => (await read())?.label).toContain('map');
-    await expect.poll(async () => (await read())?.dx ?? 99, { timeout: 3000 }).toBeLessThanOrEqual(3);
+    await expect.poll(async () => (await read())?.dx ?? 99, { timeout: 3000 }).toBeLessThanOrEqual(1);
     const moved = await read();
-    expect(moved!.dw).toBeLessThanOrEqual(3);
+    expect(moved!.dw).toBeLessThanOrEqual(1);
   });
 
   test('a keyboard moves it, and the segment keeps a ring', async ({ page }) => {
@@ -278,13 +282,83 @@ test.describe('the accordion', () => {
 });
 
 // ---------------------------------------------------------------------------
+// The choice controls
+// ---------------------------------------------------------------------------
+
+test.describe('the choice controls', () => {
+  test('a checked box and a checked track paint the audited fill', async ({ page }) => {
+    await open(page);
+    const state = await page.evaluate(() => {
+      function walk(node: Document | ShadowRoot, selector: string): Element | null {
+        const hit = node.querySelector(selector);
+        if (hit) return hit;
+        for (const el of Array.from(node.querySelectorAll('*'))) {
+          if (el.shadowRoot) {
+            const nested = walk(el.shadowRoot, selector);
+            if (nested) return nested;
+          }
+        }
+        return null;
+      }
+      const box = walk(document, '[data-testid="inline-checkbox"]') as HTMLElement | null;
+      const track = walk(document, '[data-testid="inline-switch"]') as HTMLElement | null;
+      const thumb = track?.querySelector('.mullion-switch-thumb') as HTMLElement | null;
+      if (!box || !track || !thumb) return null;
+      return {
+        restingBox: getComputedStyle(box).backgroundColor,
+        checkedTrack: getComputedStyle(track).backgroundColor,
+        thumb: getComputedStyle(thumb).backgroundColor,
+        trackChecked: track.hasAttribute('data-checked'),
+      };
+    });
+
+    expect(state, 'the toggles did not render').not.toBeNull();
+    expect(state!.trackChecked, 'the fixture switch should start on').toBe(true);
+    // The checked track and the resting box must not be the same ground, or
+    // the state is invisible. This is the check the segmented indicator failed.
+    expect(state!.checkedTrack).not.toBe(state!.restingBox);
+    expect(state!.thumb).not.toBe(state!.checkedTrack);
+  });
+
+  test('the slider shows its formatted value while the thumb has focus', async ({ page }) => {
+    await open(page);
+    const bubble = toggles(page).locator('.mullion-slider-value');
+    await expect(bubble).toHaveCSS('visibility', 'hidden');
+
+    // A keyboard interaction, because the bubble keys on `:focus-visible` and
+    // a programmatic focus on a range input is not that.
+    await toggles(page).getByRole('slider', { name: /opacity/ }).focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(bubble).toHaveCSS('visibility', 'visible');
+    await expect(bubble).toHaveCSS('opacity', '1');
+    await expect(bubble).toHaveText('55%');
+  });
+
+  test('a single-choice chip group is one tab stop with arrow keys', async ({ page }) => {
+    await open(page);
+    const group = toggles(page).locator('[data-testid="inline-chip-group"]');
+    const all = group.getByRole('radio', { name: 'all' });
+    const mine = group.getByRole('radio', { name: 'mine' });
+
+    await all.focus();
+    await page.keyboard.press('ArrowRight');
+    // Native radio behaviour: the arrow key moves and selects in one move.
+    await expect(mine).toBeChecked();
+    await expect(mine).toBeFocused();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // The structural axe gate
 // ---------------------------------------------------------------------------
 
 test.describe('the axe gate', () => {
   test('all three have valid roles, names and ARIA', async ({ page }) => {
     await open(page, { mount: 'light' });
-    const results = await new AxeBuilder({ page }).include('[data-testid="inline-choices"]').analyze();
+    const results = await new AxeBuilder({ page })
+      .include('[data-testid="inline-choices"]')
+      .include('[data-testid="inline-toggles"]')
+      .analyze();
     const serious = results.violations.filter((v) => v.impact === 'critical' || v.impact === 'serious');
     expect(serious, serious.map((v) => `${v.id} (${v.impact}): ${v.help}`).join('\n')).toHaveLength(0);
   });

@@ -8,6 +8,11 @@
  *     CSS wins; an important declaration would invert that.
  *  3. No ancestor colour-scheme selector. Scheme is a token and a declaration
  *     on the scope (principle 4), and an ancestor rule breaks under a portal.
+ *  4. [P80-B] No reference to a `--mullion-*` token the engine does not emit
+ *     and no sheet sets. A sheet reading an invented name paints nothing and
+ *     says nothing: P80-A shipped four of them in one draft and P80-B two
+ *     more, and both times the only thing that caught it was someone
+ *     enumerating the emitter's output by hand. This is that step, standing.
  *
  * The scan covers every .css and .scss file under src/ui outside __tests__.
  * P79-C's component sheets land under this guard with no change here.
@@ -16,6 +21,8 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
+import { buildTokenSheet } from '../provider/tokenSheet';
+import { listThemes } from '../provider/registry';
 
 const UI_DIR = path.resolve(__dirname, '..');
 
@@ -25,6 +32,19 @@ function walk(dir: string, out: string[] = []): string[] {
     if (statSync(full).isDirectory()) {
       if (name !== '__tests__') walk(full, out);
     } else if (/\.s?css$/.test(name)) {
+      out.push(full);
+    }
+  }
+  return out;
+}
+
+/** Every .ts and .tsx under src/ui, for the inline custom properties they set. */
+function walkSource(dir: string, out: string[] = []): string[] {
+  for (const name of readdirSync(dir)) {
+    const full = path.join(dir, name);
+    if (statSync(full).isDirectory()) {
+      if (name !== '__tests__') walkSource(full, out);
+    } else if (/\.tsx?$/.test(name)) {
       out.push(full);
     }
   }
@@ -118,6 +138,56 @@ describe('framework component sheets', () => {
 
   it('contain no ancestor colour-scheme selector', () => {
     expect(offendersOf(files, SCHEME_SELECTOR), 'scheme is a token and a color-scheme declaration on the scope').toEqual([]);
+  });
+
+  /*
+   * [P80-B] Rule 4. Two classes of `--mullion-*` name are legitimate: a token
+   * the engine emits, and a component-local property something sets. The
+   * second class is mostly set INLINE from TSX through `customProperties`
+   * (`--mullion-radius`, `--mullion-segment-left`, `--mullion-slider-mark`),
+   * so the scan has to read the components as well as the sheets. Anything
+   * else is a name nobody writes, and a rule reading one paints nothing and
+   * reports nothing.
+   */
+  it('reference no --mullion-* name that nothing emits and nothing sets', () => {
+    const emitted = new Set(
+      [...buildTokenSheet(listThemes()[0]!, ':root').matchAll(/(--mullion-[a-z0-9-]+)\s*:/g)].map(
+        (m) => m[1]!,
+      ),
+    );
+    const sheets = files.map((f) => stripComments(readFileSync(f, 'utf8')));
+    const written = new Set([
+      ...sheets.flatMap((src) => [...src.matchAll(/(--mullion-[a-z0-9-]+)\s*:/g)].map((m) => m[1]!)),
+      ...walkSource(UI_DIR).flatMap((f) =>
+        [...readFileSync(f, 'utf8').matchAll(/'(--mullion-[a-z0-9-]+)'/g)].map((m) => m[1]!),
+      ),
+    ]);
+
+    const unknown: string[] = [];
+    for (const [index, src] of sheets.entries()) {
+      for (const match of src.matchAll(/var\(\s*(--mullion-[a-z0-9-]+)/g)) {
+        const name = match[1]!;
+        if (emitted.has(name) || written.has(name)) continue;
+        unknown.push(`${path.relative(UI_DIR, files[index]!)}: ${name}`);
+      }
+    }
+    expect(
+      [...new Set(unknown)],
+      'these names are read by a sheet and written by nothing',
+    ).toEqual([]);
+  });
+
+  it('the token check can tell an invented name from a real one', () => {
+    // The guard above is only worth having if it fails on a name that does not
+    // exist, so the two halves of its input are asserted here directly.
+    const emitted = new Set(
+      [...buildTokenSheet(listThemes()[0]!, ':root').matchAll(/(--mullion-[a-z0-9-]+)\s*:/g)].map(
+        (m) => m[1]!,
+      ),
+    );
+    expect(emitted.has('--mullion-color-primary')).toBe(true);
+    expect(emitted.has('--mullion-color-primary-fill'), 'P80-B read this name and it does not exist').toBe(false);
+    expect(emitted.has('--mullion-primary-on-fill'), 'P80-B read this name and it does not exist').toBe(false);
   });
 
   it('the literal pattern catches each form it claims to', () => {

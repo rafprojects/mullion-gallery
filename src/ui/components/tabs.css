@@ -105,6 +105,15 @@
     inline-size: var(--active-tab-width);
     translate: var(--active-tab-left) 0;
     background-color: var(--mullion-tab-indicator-color);
+  }
+
+  /*
+   * The transition waits for `data-ready`, exactly as the segmented one does
+   * and for the same measured reason: a transitioned property animates once
+   * from its initial value when the component sheet is adopted, so an
+   * ungated indicator slides in from the left edge on every page load.
+   */
+  .mullion-tabs-list[data-ready] .mullion-tabs-indicator {
     transition:
       translate var(--mullion-duration-fast) ease,
       inline-size var(--mullion-duration-fast) ease;
@@ -121,7 +130,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .mullion-tabs-indicator {
+    .mullion-tabs-list[data-ready] .mullion-tabs-indicator {
       transition: none;
     }
   }
@@ -182,6 +191,8 @@
    */
   .mullion-segmented-indicator {
     position: absolute;
+    /* The measurement is of a border box, so the indicator has to be one. */
+    box-sizing: border-box;
     inset-block: 2px;
     inset-inline-start: 0;
     inline-size: var(--mullion-segment-width, 0);

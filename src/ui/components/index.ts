@@ -34,6 +34,7 @@ import inputCss from './input.css?inline';
 import selectCss from './select.css?inline';
 import tabsCss from './tabs.css?inline';
 import accordionCss from './accordion.css?inline';
+import toggleCss from './toggle.css?inline';
 import utilityCss from './utility.css?inline';
 import focusCss from '../styles/focus.css?inline';
 
@@ -56,6 +57,7 @@ registerUiStyles('ui/input', inputCss);
 registerUiStyles('ui/select', selectCss);
 registerUiStyles('ui/tabs', tabsCss);
 registerUiStyles('ui/accordion', accordionCss);
+registerUiStyles('ui/toggle', toggleCss);
 registerUiStyles('ui/utility', utilityCss);
 // Last, so the ring wins a tie inside `@layer mullion.components` against any
 // component rule that also sets `box-shadow`: `Paper` and `Card` both do, and
@@ -131,12 +133,14 @@ export {
   ActionIcon,
   Button,
   Chip,
+  ChipGroup,
   CloseButton,
   CopyButton,
   FileButton,
   UnstyledButton,
   type ActionIconProps,
   type ButtonProps,
+  type ChipGroupProps,
   type ChipProps,
   type CloseButtonProps,
   type CopyButtonProps,
@@ -182,6 +186,15 @@ export {
   type AccordionProps,
   type UiChevronPosition,
 } from './accordion';
+export {
+  Checkbox,
+  Slider,
+  Switch,
+  type CheckboxProps,
+  type SliderProps,
+  type SwitchProps,
+  type UiSliderMark,
+} from './toggle';
 export {
   SegmentedControl,
   Tabs,

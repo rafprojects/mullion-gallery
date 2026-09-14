@@ -53,10 +53,13 @@ import {
   Drawer,
   Menu,
   Accordion,
+  Checkbox,
   Modal,
   Popover,
   SegmentedControl,
   Select,
+  Slider,
+  Switch,
   Tabs,
   TagsInput,
   Tooltip,
@@ -207,6 +210,7 @@ function Gallery({ prefix }: { prefix: string }) {
       {withOverlays && <Overlays prefix={prefix} />}
       {withSelects && <Selects prefix={prefix} />}
       {withChoice && <Choices prefix={prefix} />}
+      {withChoice && <Toggles prefix={prefix} />}
     </Stack>
   );
 }
@@ -254,6 +258,52 @@ function Choices({ prefix }: { prefix: string }) {
           <Accordion.Panel>behaviour body</Accordion.Panel>
         </Accordion.Item>
       </Accordion>
+    </Stack>
+  );
+}
+
+/**
+ * P80-B: the choice controls. The slider's thumb and its value bubble are the
+ * parts a browser has to measure; jsdom reports every box as zero.
+ */
+function Toggles({ prefix }: { prefix: string }) {
+  const [on, setOn] = useState(true);
+  const [opacity, setOpacity] = useState(0.5);
+  const [filter, setFilter] = useState('all');
+  return (
+    <Stack gap="sm" padding="md" data-testid={`${prefix}-toggles`}>
+      <Divider label="toggles" labelPosition="left" />
+      <Checkbox
+        label={`${prefix} purge analytics`}
+        description="cannot be undone"
+        data-testid={`${prefix}-checkbox`}
+      />
+      <Checkbox label={`${prefix} select all`} indeterminate data-testid={`${prefix}-checkbox-mixed`} />
+      <Switch
+        label={`${prefix} backdrop blur`}
+        description="blurs content behind open drawers"
+        checked={on}
+        onChange={setOn}
+        data-testid={`${prefix}-switch`}
+      />
+      <Slider
+        aria-label={`${prefix} opacity`}
+        value={opacity}
+        onChange={setOpacity}
+        min={0}
+        max={1}
+        step={0.05}
+        label={(v) => `${Math.round(v * 100)}%`}
+        marks={[{ value: 0, label: '0' }, { value: 0.5, label: '0.5' }, { value: 1, label: '1' }]}
+        data-testid={`${prefix}-slider`}
+      />
+      <Chip.Group multiple={false} value={filter} onChange={(v) => setFilter((v as string) || 'all')}>
+        <Group gap="xs" data-testid={`${prefix}-chip-group`}>
+          <Chip value="all">all</Chip>
+          <Chip value="mine">mine</Chip>
+          <Chip value="shared">shared</Chip>
+        </Group>
+      </Chip.Group>
     </Stack>
   );
 }

@@ -42,9 +42,12 @@ import {
   Title,
   UnstyledButton,
   VisuallyHidden,
+  Checkbox,
   MultiSelect,
   NumberInput,
   SegmentedControl,
+  Slider,
+  Switch,
   Tabs,
   PasswordInput,
   Select,
@@ -701,6 +704,71 @@ export const Choices: Story = {
               </Accordion.Panel>
             </Accordion.Item>
           </Accordion>
+        </Section>
+      </Stack>
+    );
+  },
+};
+
+export const Toggles: Story = {
+  name: 'Checkbox, switch and slider',
+  render: function Toggles() {
+    const [blur, setBlur] = useState(true);
+    const [opacity, setOpacity] = useState(0.5);
+    const [filter, setFilter] = useState('all');
+    return (
+      <Stack gap="md" padding="md">
+        <Section title="Checkbox and switch">
+          <Text size="sm" tone="muted">
+            Both hand <code>onChange</code> the new state rather than an event. The description is
+            carried to the control by Base UI&rsquo;s Field, so no id relationship is written here.
+          </Text>
+          <Checkbox label="Purge analytics" description="Cannot be undone" />
+          <Checkbox label="Select all" indeterminate />
+          <Checkbox label="Locked" disabled defaultChecked />
+          <Switch
+            label="Settings drawer backdrop blur"
+            description="Blurs content behind open settings drawers"
+            checked={blur}
+            onChange={setBlur}
+          />
+          <Switch label="Disabled and on" defaultChecked disabled />
+        </Section>
+
+        <Section title="Slider">
+          <Text size="sm" tone="muted">
+            Arrow keys step, Home and End reach the ends, and the page keys move by
+            <code> largeStep</code>. The bubble is the call site&rsquo;s own formatter.
+          </Text>
+          <Slider
+            aria-label="Locked card opacity"
+            value={opacity}
+            onChange={setOpacity}
+            min={0}
+            max={1}
+            step={0.05}
+            label={(v) => `${Math.round(v * 100)}%`}
+            marks={[
+              { value: 0, label: '0' },
+              { value: 0.5, label: '0.5' },
+              { value: 1, label: '1' },
+            ]}
+          />
+          <Slider aria-label="Angle" defaultValue={45} min={0} max={360} step={1} largeStep={45} label={(v) => `${v}deg`} />
+        </Section>
+
+        <Section title="Chip group">
+          <Text size="sm" tone="muted">
+            One choice renders radios, so the arrow keys and the single tab stop come from the
+            platform. Several renders checkboxes.
+          </Text>
+          <Chip.Group multiple={false} value={filter} onChange={(v) => setFilter((v as string) || 'all')}>
+            <Group gap="xs">
+              <Chip value="all">All</Chip>
+              <Chip value="mine">My access</Chip>
+              <Chip value="shared">Shared with me</Chip>
+            </Group>
+          </Chip.Group>
         </Section>
       </Stack>
     );

@@ -2,14 +2,14 @@
 
 **Status:** In progress (P80-A complete; P80-B underway, select family landed; P80-C Planned)
 **Created:** 2026-09-10
-**Last updated:** 2026-09-14 (P80-B: the select family, then tabs, the segmented control and the accordion)
+**Last updated:** 2026-09-14 (P80-B: the select family, the navigation controls, then the choice controls)
 
 ### Tracks
 
 | Track | Description | Status | Effort |
 |-------|-------------|--------|--------|
 | P80-A | Overlays and the input family: the components the theme adapter fights hardest | **Done** (2026-09-14), less `ColorInput` (see notes) | Large |
-| P80-B | Selection, navigation and choice controls: the select family, tabs, accordion, checkbox, switch, chip, segmented control, slider | **In progress** (select family, tabs, segmented control and accordion done 2026-09-14) | Large |
+| P80-B | Selection, navigation and choice controls: the select family, tabs, accordion, checkbox, switch, chip, segmented control, slider | **In progress** (everything named is done 2026-09-14; pagination and the colour picker remain) | Large |
 | P80-C | Imperative managers: notifications and confirmations | Planned | Small-Medium |
 
 ---
@@ -267,6 +267,35 @@ On a keyboard move a row carries the rail and the inset ring together, which is 
 **The differing silhouettes are the requirement, not a detail**, since four variations on a disc would measure identically and signal nothing. That is a test: the four `d` attributes must be four distinct values, and swapping one for another fails it. The glyphs paint in `currentColor` and are `aria-hidden`, so they take the tone their element already declares and never become the accessible name; that pairing is the one `washIconChecks` audits at the 3:1 non-text floor.
 
 **Scoped as the designer specified: `light` controls.** A `filled` control carries the role at full chroma, where the same CVD collapse is weaker but real (2.7 at worst). Left as it is rather than widened unilaterally, and noted for them.
+
+### P80-B, the choice controls (2026-09-14)
+
+**Status: landed.** `Checkbox`, `Switch` and `Slider` in [`toggle.tsx`](../src/ui/components/toggle.tsx) with [`toggle.css`](../src/ui/components/toggle.css), and `Chip.Group` beside the existing `Chip` in [`control.tsx`](../src/ui/components/control.tsx). 25 unit tests, 3 more browser tests and a Storybook story. **Pagination and the colour picker are what is left of P80-B.**
+
+**`onChange` hands over the value, not the event, and that is a migration cost taken on purpose.** The 76 `Switch` and 11 `Checkbox` call sites read `event.currentTarget.checked` today, so every one changes in P81. It is taken because `Chip` has handed a boolean since P79-C and these are the same kind of control, and because a site left unconverted **does not compile**: a `boolean` has no `currentTarget`. The input family kept the event shape for a different reason, which still holds: its call sites were already split between the two shapes, so normalising there would have been a change with no single right answer.
+
+**`Chip.Group` is ours, and the reason is the markup.** A chip is already a real `<input>` inside a `<label>`, so the group only has to say which input type to render and hold the value. Under `multiple={false}` the chips become **radios**, which is what gives the group its arrow keys and its single tab stop from the platform rather than from code here; under `multiple` they stay checkboxes. Wrapping Base UI's `RadioGroup` would have meant replacing the chip's own element to gain behaviour the platform already provides. A lone chip is untouched from P79-C, and there is a test that says so.
+
+**Three defects found by the tests, all mine.**
+
+1. *The slider had no accessible name.* Base UI renders the root as a `role="group"` and the control itself as a visually hidden `<input type="range">` inside the thumb, so `aria-label` on the root named the group and left the slider unnamed. This is the same shape as P80-A's `NumberInput` defect and it surfaced the same way, by a test failing to find the control by name. The label goes on the thumb.
+2. *The value bubble failed an axe contrast check on text nobody can see.* An element at `opacity: 0` is still rendered as far as axe is concerned: it composited the bubble against the page ground and reported **1.01:1**. `visibility: hidden` removes it from that calculation and from the accessibility tree, and it is the honest fix rather than a suppression, because the element genuinely is not shown.
+3. *A `:focus-visible` selector on the thumb matched nothing,* because the focus target is the hidden input inside it, and Base UI's `data-focused` is a `Field` state a standalone slider never receives. `:has(:focus-visible)` is what works, and the test names both dead ends so the next person does not retry them.
+
+**One finding that is not about these components.** A transitioned property animates once from its initial value when the component sheet is adopted, because that happens after the element's first resolved style. Ungated, the tab indicator and the segmented indicator both slid in from the left edge on every page load, and the slider's bubble faded out on every load; the segmented one was caught mid-animation by a browser test reading **27px wide and 2px short of its segment**. Both indicators now gate their transition on a `data-ready` attribute that arrives a frame after mount, through one shared hook, and the bubble has no transition at all. **Any framework component that transitions a property has this, and it is worth remembering before the next one adds one.**
+
+**A four-pixel indicator gap, and the cause is worth keeping.** The segmented indicator was positioned from `offsetLeft` and `offsetWidth`, which round to whole pixels: a segment 50.45px wide got a 50px indicator. It now measures the same border box it draws, through `getBoundingClientRect`, with `box-sizing: border-box` on the indicator so the two agree, and the offset taken along the inline axis so it holds in either direction. The browser test's tolerance went from 3px to 1px, which is what made the remaining error visible.
+
+**A standing guard against a defect this phase has now shipped twice.** P80-A's first overlay sheet read four `--mullion-*` names the engine does not emit; this batch's first draft read two more (`--mullion-color-primary-fill`, `--mullion-primary-on-fill`, which are really `--mullion-color-primary` and `--mullion-color-primary-on`). Both times the only thing that caught it was someone enumerating the emitter's output by hand. That step is now rule 4 in [`componentSheets.test.ts`](../src/ui/__tests__/componentSheets.test.ts): every `var(--mullion-*)` in every framework sheet must be a name the engine emits or one a sheet or component sets itself, the second class read out of the TSX because most of them are set inline through `customProperties`. Putting either invented name back fails it.
+
+**Mutations.** Each applied alone against the guarding suite and restored byte-identically.
+
+| Guard | Mutation applied | Result |
+|-------|------------------|--------|
+| the slider names its control | `aria-label` moved from the thumb back to the root | two tests fail, including the axe gate |
+| the checked state keys on an attribute the primitive writes | `[data-checked]` renamed to `[data-on]` on the switch | the generalised P77-C test fails |
+| a single-choice chip group renders radios | the input type forced to `checkbox` | three tests fail |
+| no sheet reads a name nothing emits | `--mullion-color-primary` put back to `--mullion-color-primary-fill` | the new rule-4 test fails, naming the file and the token |
 
 ### P80-B, tabs, the segmented control and the accordion (2026-09-14)
 

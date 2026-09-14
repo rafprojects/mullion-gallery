@@ -165,6 +165,12 @@ describe('SegmentedControl', () => {
     expect(onChange.mock.calls.every(([v]) => typeof v === 'string')).toBe(true);
   });
 
+  it('does not animate the tab indicator into place on mount either', () => {
+    const { container } = mount(<TabFixture />);
+    const list = container.querySelector('.mullion-tabs-list') as HTMLElement;
+    expect(list.hasAttribute('data-ready'), 'the transition is live on the first render').toBe(false);
+  });
+
   it('does not animate the indicator into place on mount', () => {
     /*
      * Found in Chromium: the indicator slid in from zero width at the left
@@ -425,10 +431,34 @@ describe('the sheet', () => {
     for (const selector of ['.mullion-tabs-indicator', '.mullion-segmented-indicator', '.mullion-accordion-panel']) {
       const escaped = selector.replace('.', '\\.');
       const reduced = new RegExp(
-        `prefers-reduced-motion[^@]*${escaped}\\s*\\{[^}]*transition:\\s*none`,
+        `prefers-reduced-motion[^@]*${escaped}[^@]*?\\{[^}]*transition:\\s*none`,
         's',
       );
       expect(reduced.test(css), `${selector} keeps animating under reduced motion`).toBe(true);
+    }
+  });
+
+  it('gates both indicators’ transitions on data-ready', () => {
+    /*
+     * A transitioned property animates once from its initial value when the
+     * component sheet is adopted, so an ungated indicator slides in from the
+     * left edge on every page load. Both are gated the same way and the
+     * attribute arrives a frame after mount.
+     */
+    const css = uiStylesText();
+    for (const rule of [
+      '.mullion-tabs-list[data-ready] .mullion-tabs-indicator',
+      '.mullion-segmented[data-ready] .mullion-segmented-indicator',
+    ]) {
+      expect(css.includes(rule), `${rule} is not what carries the transition`).toBe(true);
+    }
+    for (const bare of ['.mullion-tabs-indicator', '.mullion-segmented-indicator']) {
+      const escaped = bare.replace('.', '\\.');
+      const block = css
+        .split('}')
+        .find((b) => new RegExp(`(^|\\s)${escaped}\\s*\\{`).test(b));
+      expect(block, `${bare} has no base rule`).toBeDefined();
+      expect(block, `${bare} declares a transition outside the gate`).not.toMatch(/transition:/);
     }
   });
 
