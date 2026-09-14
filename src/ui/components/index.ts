@@ -155,6 +155,11 @@ export {
   type TableScrollContainerProps,
 } from './display';
 export {
+  isRoleTone,
+  resolveRoleGlyph,
+  type UiRoleTone,
+} from './roleGlyph';
+export {
   Collapse,
   VisuallyHidden,
   type CollapseProps,

@@ -10,6 +10,7 @@
 
 import type { ReactNode } from 'react';
 import { renderElement, cx, type UiElementProps, type UiTone } from './element';
+import { resolveRoleGlyph } from './roleGlyph';
 import {
   customProperties,
   splitPadding,
@@ -23,7 +24,12 @@ export type UiSurfaceVariant = 'filled' | 'light' | 'outline';
 
 export interface AlertProps extends UiElementProps, UiPaddingProps {
   title?: ReactNode;
-  icon?: ReactNode;
+  /**
+   * The leading icon. Omitted, a status tone supplies its role glyph; pass
+   * `false` to decline it. See `./roleGlyph.tsx` for why the default is the
+   * signal rather than an option.
+   */
+  icon?: ReactNode | false;
   tone?: UiTone | undefined;
   variant?: UiSurfaceVariant | undefined;
   children?: ReactNode;
@@ -41,6 +47,7 @@ export function Alert({
   ...props
 }: AlertProps) {
   const [pad, rest] = splitPadding(props);
+  const glyph = resolveRoleGlyph(tone, icon);
   return renderElement(
     'div',
     {
@@ -52,7 +59,7 @@ export function Alert({
       style: { ...customProperties(pad), ...style },
       children: (
         <>
-          {icon ? <span className="mullion-alert-icon">{icon}</span> : null}
+          {glyph ? <span className="mullion-alert-icon">{glyph}</span> : null}
           <div className="mullion-alert-body">
             {title ? <div className="mullion-alert-title">{title}</div> : null}
             {children}
@@ -66,6 +73,16 @@ export function Alert({
 
 export interface BadgeProps extends UiElementProps {
   size?: UiScaleStep | undefined;
+  /**
+   * The leading icon. Omitted, a status tone supplies its role glyph; pass
+   * `false` to decline it.
+   *
+   * The slot is new in P80-A and it is the point of the change: a `Badge`
+   * had no icon at all, which is why `tone="success"` reading "Tier 2" was a
+   * legal call conveying its meaning by colour alone. On the light palette
+   * under protanopia that badge is the same colour as a warning one.
+   */
+  icon?: ReactNode | false;
   tone?: UiTone | undefined;
   variant?: UiSurfaceVariant | undefined;
   radius?: UiRadius | undefined;
@@ -78,11 +95,13 @@ export function Badge({
   render,
   children,
   size = 'sm',
+  icon,
   tone = 'primary',
   variant = 'light',
   radius,
   ...rest
 }: BadgeProps) {
+  const glyph = resolveRoleGlyph(tone, icon);
   return renderElement(
     'span',
     {
@@ -92,7 +111,14 @@ export function Badge({
       'data-variant': variant,
       'data-size': size,
       style: { ...customProperties({ '--mullion-radius': radiusValue(radius) }), ...style },
-      children,
+      children: glyph ? (
+        <>
+          <span className="mullion-badge-icon">{glyph}</span>
+          {children}
+        </>
+      ) : (
+        children
+      ),
     },
     render,
   );

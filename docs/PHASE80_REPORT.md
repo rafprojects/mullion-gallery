@@ -247,6 +247,24 @@ Plain `text` is unaffected: its worst on the menu highlight is 4.73. Only the si
 
 **Still clipped and not fixed here.** `Show Title` and `Show Subtitle` in the Typography panel are Mantine `Switch` controls inside a `Popover` with a `backdrop-filter`. The framework's inset variant does not reach them, because it keys on an attribute only framework components stamp. Diagnosing them needs a measurement on a surface no test can reach, and the durable fix is P81-B migrating them onto the framework. Recorded rather than guessed at.
 
+### P80-A, the rail and the role glyphs (2026-09-14)
+
+**Status: landed.** The last two items the designer specified.
+
+**The rail replaces the menu's highlight tint outright.** `data-highlighted` no longer moves the row's ground; a 3px leading rail in `primary-stroke` marks it instead, on pointer and on keyboard alike. The designer's case, and it is the right one: it closes the class of defect rather than narrowing it. No ground in the menu moves, so nothing painted on a row can be measured against a ground it was not audited on, which is the failure mode that cost three rounds of correspondence. It also collapses two conditions back to none: the tint had grown a `:not([data-mullion-tone])` because a toned label fell below AA on 22 of 23 themes, and a `:not(:focus-visible)` because the ring fell below 3:1 on three. The guard is now the stronger property rather than the two exclusions: **no rule may tint a highlighted row's ground at all**, proved by a mutation that re-adds one.
+
+The tint it replaced measured 1.17 to 1.28:1 against the untinted row on every theme, which is why findability was the designer's argument rather than compliance. Stepping the row down the elevation ladder instead was measured by them and rejected: `surfaceRaised` to `surface` is 1.23:1 on default-dark and 1.05:1 on default-light, so no ground change is a strong signal on these palettes. `primary-stroke` needed no new audit, being the ring's own core.
+
+On a keyboard move a row carries the rail and the inset ring together, which is deliberate: two states, two marks. They overlap at the leading edge and are both drawn in `primary-stroke`, so it reads as the ring with a heavier leading edge rather than as two indicators fighting. Verified in a browser by reading the row's computed background before and after highlighting (unchanged) and the `::before` rail's painted width and colour.
+
+**The role glyphs close the colour-vision gap.** [`roleGlyph.tsx`](../src/ui/components/roleGlyph.tsx) carries the designer's four, delivered in `docs/design/glyphs/`: a stroked check, a filled triangle with a bang, a stroked cross, a filled disc with an i. `Alert`, `Button` and `Badge` supply the glyph for a status tone by default; an explicit icon wins and `false` declines it, so a label that already names its role opts out on purpose rather than by omission.
+
+**`Badge` gained an icon slot, and that was the point.** It had none, which is why `tone="success"` reading "Tier 2" was a legal call conveying its meaning by colour alone — and on the light palette under protanopia that badge is `deltaE00` **0.00** from a warning one. The designer measured the same pairs at full chroma and found 2.7 to 8.8 under CVD, so no ink escapes it: a role-coloured rail or border would be a signal measuring 2.7 instead of 0.00, and neither is a signal. Only shape and words survive.
+
+**The differing silhouettes are the requirement, not a detail**, since four variations on a disc would measure identically and signal nothing. That is a test: the four `d` attributes must be four distinct values, and swapping one for another fails it. The glyphs paint in `currentColor` and are `aria-hidden`, so they take the tone their element already declares and never become the accessible name; that pairing is the one `washIconChecks` audits at the 3:1 non-text floor.
+
+**Scoped as the designer specified: `light` controls.** A `filled` control carries the role at full chroma, where the same CVD collapse is weaker but real (2.7 at worst). Left as it is rather than widened unilaterally, and noted for them.
+
 ## Outcome
 
 _Phase in progress. P80-A's overlay batch landed 2026-09-13; the track's input family, P80-B and P80-C are still Planned._

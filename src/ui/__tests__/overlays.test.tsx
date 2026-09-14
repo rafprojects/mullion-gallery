@@ -262,24 +262,39 @@ describe('the menu', () => {
     }
   });
 
-  it('tints a highlighted row only when it carries no tone', () => {
-    // control.css's rule, applied here: tint the ground or colour the ink,
-    // never both. A toned row has coloured its ink, and its ink clears 4.5:1
-    // against the menu's own ground with as little as 0.03 to spare, so a
-    // lightened ground under it fails AA on 22 of 23 themes.
+  it('never moves a highlighted row\'s ground, whatever its tone or focus state', () => {
+    /*
+     * The rail replaced the tint outright, and this guards the property that
+     * bought: no ground in the menu moves, so nothing painted on a row can be
+     * measured against a ground it was not audited on.
+     *
+     * That is the stronger form of the two exclusions it replaced. The tint
+     * had grown a `:not([data-mullion-tone])` because a toned label fell below
+     * AA on 22 of 23 themes, and a `:not(:focus-visible)` because the ring
+     * fell below 3:1 on three. Conditional grounds are how the defect got in.
+     */
     const sheet = uiStylesText();
-    const rule = sheet
+    const offenders = sheet
       .split('}')
-      .find((block) => block.includes('.mullion-menu-item[data-highlighted]'));
-    expect(rule, 'the highlight rule is gone').toBeDefined();
+      .filter((block) => /\.mullion-menu-item\[data-highlighted\]/.test(block))
+      .filter((block) => /background(-color)?\s*:/.test(block))
+      .filter((block) => !/::before/.test(block));
     expect(
-      rule,
-      'the highlight tint must exclude toned rows, or a toned label drops below AA',
-    ).toContain(':not([data-mullion-tone])');
-    expect(
-      rule,
-      'the highlight tint must exclude focused rows, or the ring is measured against a ground the tint moved',
-    ).toContain(':not(:focus-visible)');
+      offenders,
+      'a rule tints the highlighted row\'s own ground; the rail exists so that no rule does',
+    ).toEqual([]);
+  });
+
+  it('marks a highlighted row with a leading rail in the audited stroke colour', () => {
+    const sheet = uiStylesText();
+    const rail = sheet
+      .split('}')
+      .find((block) => block.includes('.mullion-menu-item[data-highlighted]::before'));
+    expect(rail, 'the rail rule is missing').toBeDefined();
+    expect(rail, 'the rail must read the audited stroke token').toContain(
+      'var(--mullion-color-primary-stroke)',
+    );
+    expect(rail, 'the rail sits on the leading edge, full row height').toContain('inset-block: 0');
   });
 
   it('sets data-highlighted on keyboard navigation, which is the attribute the sheet targets', () => {

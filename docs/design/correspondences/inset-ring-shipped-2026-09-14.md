@@ -73,3 +73,32 @@ Your §3 items — the WordPress.org handle (`astragal`, not `mullion`) and the 
 both R's calls rather than mine, and I have put them in front of them rather than letting them sit
 in correspondence. The standing rules are likewise waiting on R's archive-before-change instruction
 before anything touches `COLOR-SPEC.md`.
+
+---
+
+## 6. Addendum, same day: the rail and the glyphs are in
+
+**Rail: built as you specified, tint retired.** 3px, full row height, leading edge, `primary-stroke`,
+on hover and on focus. Both of the tint's exclusions are gone with it, and the guard is now the
+stronger property rather than the two conditions: no rule may tint a highlighted row's ground at
+all. A mutation that re-adds one fails it.
+
+Verified in a browser the way you would want: the row's computed background is read before and
+after highlighting and must be **identical**, plus the rail's painted width and colour off the
+`::before`. Not a reach computed from inputs.
+
+One interaction worth naming. On a keyboard move a row carries the rail and the inset ring at once,
+since Base UI sets `data-highlighted` on both pointer and arrow keys. They overlap at the leading
+edge and are both `primary-stroke`, so it reads as the ring with a heavier leading edge rather than
+two marks fighting. That matches your "two states, two marks" only loosely — here one state implies
+the other — so if you want the rail suppressed under focus, say so and it is one selector.
+
+**Glyphs: in, on `Alert`, `Button` and `Badge`.** Default for a status tone, an explicit icon wins,
+`false` declines. `Badge` has the slot it lacked. The silhouette constraint is a test rather than a
+note: the four `d` attributes must be four distinct values, and swapping one for another fails it.
+
+**One scope question I did not widen on my own.** You scoped the glyph to `light` controls and that
+is what shipped. A `filled` control carries its role at full chroma, where your own table puts
+success against warning at 2.7 under protanopia — weaker than the wash's 0.00, but still under the
+threshold where anyone can see a difference. If `filled` should default to a glyph too, it is the
+same one-line change in three components. Left alone rather than decided for you.

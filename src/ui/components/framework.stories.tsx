@@ -66,6 +66,55 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+export const RoleGlyphs: Story = {
+  name: 'Role glyphs (CVD)',
+  render: () => (
+    <Stack gap="md" padding="md">
+      <Section title="A status tone supplies its glyph by default">
+        <Text size="sm" tone="muted">
+          On the light palette under protanopia the success and warning washes are deltaE00 0.00
+          apart. The glyph is the non-colour signal, and the silhouettes differ on purpose: four
+          variations on a disc would measure identically and signal nothing. Check this story
+          through a CVD simulator with the colour removed.
+        </Text>
+        <Group gap="xs">
+          {(['success', 'warning', 'danger', 'info'] as const).map((tone) => (
+            <Badge key={tone} tone={tone}>
+              Tier 2
+            </Badge>
+          ))}
+        </Group>
+        <Group gap="sm">
+          {(['success', 'warning', 'danger', 'info'] as const).map((tone) => (
+            <Button key={tone} variant="light" tone={tone}>
+              Continue
+            </Button>
+          ))}
+        </Group>
+        {(['success', 'warning', 'danger', 'info'] as const).map((tone) => (
+          <Alert key={tone} tone={tone} title={`A ${tone} alert`}>
+            The glyph takes the tone through currentColor, audited at the 3:1 non-text floor.
+          </Alert>
+        ))}
+      </Section>
+      <Section title="Declining it is a deliberate act">
+        <Group gap="xs">
+          <Badge tone="success" icon={false}>
+            Passed
+          </Badge>
+          <Button variant="light" tone="danger" leftSection={false}>
+            Delete campaign
+          </Button>
+        </Group>
+        <Text size="sm" tone="muted">
+          Both labels name the role, so the glyph is redundant and declined explicitly rather than
+          by omission.
+        </Text>
+      </Section>
+    </Stack>
+  ),
+};
+
 export const Typography: Story = {
   render: () => (
     <Stack gap="md" padding="md">

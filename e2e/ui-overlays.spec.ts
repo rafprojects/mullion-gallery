@@ -326,6 +326,43 @@ test.describe('the overlays read tokens, not fallbacks', () => {
     expect(backdrop!.painted).not.toBe('rgba(0, 0, 0, 0)');
   });
 
+  test('a highlighted row paints the rail, and its ground does not move', async ({ page }) => {
+    await open(page);
+    await inline(page, 'menu-trigger').click();
+    await expect(page.locator('.mullion-menu')).toBeVisible();
+
+    const before = await page.evaluate(() => {
+      const root = document.querySelector('[data-mullion-overlay-root]')?.shadowRoot;
+      const row = root?.querySelector('.mullion-menu-item') as HTMLElement | null;
+      return row ? getComputedStyle(row).backgroundColor : null;
+    });
+
+    await page.keyboard.press('ArrowDown');
+
+    const after = await page.evaluate(() => {
+      const root = document.querySelector('[data-mullion-overlay-root]')?.shadowRoot;
+      const row = root?.querySelector('.mullion-menu-item[data-highlighted]') as HTMLElement | null;
+      if (!row) return null;
+      const rail = getComputedStyle(row, '::before');
+      return {
+        background: getComputedStyle(row).backgroundColor,
+        railWidth: rail.width,
+        railColour: rail.backgroundColor,
+        strokeToken: getComputedStyle(row).getPropertyValue('--mullion-color-primary-stroke').trim(),
+      };
+    });
+
+    expect(after, 'no highlighted row after ArrowDown').not.toBeNull();
+    // The whole point of the rail: highlighting a row moves no ground, so
+    // nothing painted on it can be measured against a ground it was not
+    // audited on.
+    expect(after!.background, 'highlighting the row moved its ground').toBe(before);
+    expect(parseFloat(after!.railWidth), 'the rail is not painted').toBeGreaterThan(0);
+    expect(after!.railColour, 'the rail is not the audited stroke colour').not.toBe(
+      'rgba(0, 0, 0, 0)',
+    );
+  });
+
   test('the inset ring on a menu row is painted, and not clipped', async ({ page }) => {
     await open(page);
     await inline(page, 'menu-trigger').click();

@@ -273,6 +273,7 @@
   }
 
   .mullion-menu-item {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--mullion-spacing-xs);
@@ -295,37 +296,44 @@
   }
 
   /*
-   * `data-highlighted` is Base UI's roving-focus marker and is what the
-   * pointer and the arrow keys both set. The ring in `../styles/focus.css`
-   * paints on top of it for a keyboard focus, which is the pair the product
-   * already ships: a hover tint plus a ring only when the keyboard moved.
+   * [P80-A] The row-state mark is a leading rail, and the ground never moves.
    *
-   * The tint is deliberately NOT applied to a row that carries a tone, and
-   * that is control.css's rule rather than a new one: tint the ground or
-   * colour the ink, never both. A toned row has already coloured its ink, and
-   * its ink is selected against `surfaceRaised` with as little as 0.03 to
-   * spare, so lightening the ground under it drops the label below 4.5:1 on
-   * 22 of the 23 themes. Re-inking instead was measured and rejected: it
-   * moves 57 of 138 colours at a median CIELAB dE*ab of 11.0 and still leaves
-   * three pairs failing, because the ramp cannot reach the floor against the
-   * lightened ground. An un-toned row tints safely, because the plain text on
-   * it measures 4.73 at worst.
+   * `data-highlighted` is Base UI's roving-focus marker, set by both the
+   * pointer and the arrow keys. It used to tint the ground, and that tint was
+   * retired on the designer's recommendation for reasons worth keeping:
    *
-   * The same exclusion applies under `:focus-visible`, for the same reason one
-   * level up: the ring is measured against the row's ground, and a tint moves
-   * that ground too. On `menu-bg` the ring pair clears 1.4.11's 3:1 on 23 of
-   * 23 themes; on the tinted ground it fails on nord, tokyo-night and
-   * gruvbox-dark. A focused row therefore never tints, whatever its tone.
+   *  - It closes the class of defect rather than narrowing it. No ground in
+   *    the menu moves, so nothing painted on a row can be measured against a
+   *    ground it was not audited on. That failure mode cost three rounds.
+   *  - It is one rule with no conditions. The tint had grown two exclusions,
+   *    toned rows and focused rows, and conditional grounds are how the
+   *    original defect got in.
+   *  - A toned row had no pointer affordance at all once it stopped tinting.
+   *    The rail gives every row the same one.
+   *  - Findability. The tint measured 1.17 to 1.28:1 against the untinted row
+   *    on all 23 themes, which is hard to locate while arrowing quickly. A
+   *    rail is a positional signal, and positional signals do not compete
+   *    with how compressed a theme's surface ladder is.
+   *  - It is already audited. `primary-stroke` is the focus ring's core and
+   *    clears 3:1 against `menu-bg` on all 23 themes.
    *
-   * So a toned row is marked by the ring alone, and has no pointer affordance
-   * at all. The designer's answer is a leading rail replacing the tint
-   * outright, which also fixes a second defect this rule cannot: the menu
-   * clips the ring. It has `overflow: auto` and no inline padding, so a row
-   * sits 1px from the menu's edge while the ring reaches 10px, and 9px of the
-   * halo is cut on each side. Measured 2026-09-14; the rail is the next track.
+   * Stepping the row DOWN the elevation ladder instead was measured and
+   * rejected by the designer: `surfaceRaised` to `surface` is 1.23:1 on
+   * default-dark and 1.05:1 on default-light, so no ground change is a strong
+   * enough signal on these palettes.
+   *
+   * On a keyboard move the row carries the rail and the inset ring together,
+   * which is deliberate: two states, two marks. They overlap at the leading
+   * edge and both are drawn in `primary-stroke`, so the result reads as the
+   * ring with a heavier leading edge rather than as two fighting indicators.
    */
-  .mullion-menu-item[data-highlighted]:not([data-mullion-tone]):not(:focus-visible) {
-    background-color: var(--mullion-menu-hover-bg);
+  .mullion-menu-item[data-highlighted]::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: 3px;
+    background-color: var(--mullion-color-primary-stroke);
   }
 
   .mullion-menu-item[data-disabled] {

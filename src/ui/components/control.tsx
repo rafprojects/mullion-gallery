@@ -21,6 +21,7 @@ import {
   type UiTone,
 } from './element';
 import { Loader } from './feedback';
+import { resolveRoleGlyph } from './roleGlyph';
 import { customProperties, radiusValue, type UiRadius, type UiScaleStep } from './scale';
 
 export type UiControlVariant = 'filled' | 'light' | 'outline' | 'subtle' | 'default' | 'transparent';
@@ -78,7 +79,12 @@ export interface ButtonProps extends ControlBaseProps {
   /** Trade the label's vertical padding for a denser row, as Mantine's `compact-*` sizes do. */
   compact?: boolean | undefined;
   fullWidth?: boolean | undefined;
-  leftSection?: ReactNode;
+  /**
+   * Content before the label. Omitted, a status tone supplies its role glyph;
+   * pass `false` to decline it. Most toned buttons name their action in the
+   * label and will decline it, but they decline it on purpose.
+   */
+  leftSection?: ReactNode | false;
   rightSection?: ReactNode;
   /** Swap the left section for a spinner and stop taking clicks. */
   loading?: boolean | undefined;
@@ -101,6 +107,7 @@ export function Button({
   disabled,
   ...rest
 }: ButtonProps) {
+  const glyph = resolveRoleGlyph(tone, leftSection);
   return (
     <ControlBase
       className={cx('mullion-button', className)}
@@ -116,8 +123,8 @@ export function Button({
     >
       {loading ? (
         <Loader className="mullion-button-section" size={size} />
-      ) : leftSection ? (
-        <span className="mullion-button-section">{leftSection}</span>
+      ) : glyph ? (
+        <span className="mullion-button-section">{glyph}</span>
       ) : null}
       <span className="mullion-button-label">{children}</span>
       {rightSection ? <span className="mullion-button-section">{rightSection}</span> : null}

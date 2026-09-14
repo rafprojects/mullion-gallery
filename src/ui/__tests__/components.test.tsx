@@ -669,3 +669,83 @@ describe('the component sheets on the framework list', () => {
     expect(text).toContain('box-shadow: 0 0 0 var(--mullion-focus-halo-width) var(--mullion-color-focus-halo);');
   });
 });
+
+describe('the role glyph (P80-A)', () => {
+  /*
+   * A `light` control carries its role in a 14% tint, and dichromatic vision
+   * collapses it: on the shipped light palette the success and warning washes
+   * are deltaE00 0.00 apart under protanopia. The glyph is the non-colour
+   * signal, and a differing silhouette is the requirement rather than a
+   * detail.
+   */
+  const glyphOf = (el: HTMLElement) => el.querySelector('.mullion-role-glyph');
+
+  it.each(['success', 'warning', 'danger', 'info'] as const)(
+    'a %s Badge supplies its role glyph by default',
+    (tone) => {
+      const { container } = render(<Badge tone={tone}>Tier 2</Badge>);
+      const badge = container.querySelector('.mullion-badge') as HTMLElement;
+      expect(glyphOf(badge), `a ${tone} badge has no non-colour signal`).not.toBeNull();
+      expect(glyphOf(badge)!.getAttribute('aria-hidden')).toBe('true');
+    },
+  );
+
+  it.each(['default', 'muted', 'primary'] as const)(
+    'a %s Badge supplies none, because it carries no status meaning',
+    (tone) => {
+      const { container } = render(<Badge tone={tone}>Tier 2</Badge>);
+      expect(glyphOf(container.querySelector('.mullion-badge') as HTMLElement)).toBeNull();
+    },
+  );
+
+  it('the four silhouettes differ from each other', () => {
+    // Four variations on a disc would measure identically and signal nothing.
+    const paths = (['success', 'warning', 'danger', 'info'] as const).map((tone) => {
+      const { container } = render(<Badge tone={tone}>x</Badge>);
+      return container.querySelector('.mullion-role-glyph path')!.getAttribute('d');
+    });
+    expect(new Set(paths).size, 'two roles share a glyph outline').toBe(4);
+  });
+
+  it('an explicit icon wins, and `false` declines the default', () => {
+    const { container: given } = render(
+      <Badge tone="success" icon={<span data-testid="mine" />}>
+        Tier 2
+      </Badge>,
+    );
+    expect(given.querySelector('[data-testid="mine"]')).not.toBeNull();
+    expect(given.querySelector('.mullion-role-glyph')).toBeNull();
+
+    const { container: declined } = render(
+      <Badge tone="success" icon={false}>
+        Tier 2
+      </Badge>,
+    );
+    expect(declined.querySelector('.mullion-role-glyph')).toBeNull();
+  });
+
+  it('Alert and Button take the same default', () => {
+    const { container: alert } = render(<Alert tone="danger">Something failed</Alert>);
+    expect(alert.querySelector('.mullion-role-glyph')).not.toBeNull();
+
+    const { container: button } = render(<Button tone="warning">Continue</Button>);
+    expect(button.querySelector('.mullion-role-glyph')).not.toBeNull();
+
+    const { container: declined } = render(
+      <Button tone="warning" leftSection={false}>
+        Continue
+      </Button>,
+    );
+    expect(declined.querySelector('.mullion-role-glyph')).toBeNull();
+  });
+
+  it('the glyph is never the accessible name', () => {
+    // It is a redundant signal beside the label. A screen-reader user has the
+    // text, and an aria-hidden glyph keeps it that way.
+    render(<Alert tone="danger" title="Upload failed">body</Alert>);
+    expect(screen.getByRole('alert')).toHaveTextContent('Upload failed');
+    for (const g of document.querySelectorAll('.mullion-role-glyph')) {
+      expect(g.getAttribute('aria-hidden')).toBe('true');
+    }
+  });
+});
