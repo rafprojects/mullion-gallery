@@ -17,6 +17,7 @@ import type { ThemeDefinition, ResolvedColors } from '@mullion/theme-engine';
 import { resolveColors, withAlpha } from '@mullion/theme-engine';
 
 const TABS_TAB_CLASS = 'mullion-mantine-tabs-tab';
+const TABS_LIST_CLASS = 'mullion-mantine-tabs-list';
 const SEGMENTED_CONTROL_LABEL_CLASS = 'mullion-mantine-segmented-control-label';
 const SELECT_OPTION_CLASS = 'mullion-mantine-select-option';
 const CHECKBOX_INPUT_CLASS = 'mullion-mantine-checkbox-input';
@@ -180,18 +181,28 @@ function generateComponentOverrides(
     Tabs: {
       classNames: {
         tab: TABS_TAB_CLASS,
+        // [P80-A] The list needs a class so the sheet can give the active
+        // tab's underline a rule to seat on. Mantine draws that underline
+        // itself; the bar it sits on was missing.
+        list: TABS_LIST_CLASS,
       },
       vars: () => ({
         root: {
           '--tabs-color': stroke,
           '--mullion-tabs-tab-color': rc.textMuted,
           '--mullion-tabs-tab-active-color': rc.text,
+          // [P80-A] Weight travels as a variable for the same reason the
+          // colours above do: the inline `styles.tab` below outranks any rule
+          // in chrome-portable.scss, so a sheet setting `font-weight` on the
+          // active tab would never paint. That is the P77-C defect exactly,
+          // and it would have been reintroduced here.
+          '--mullion-tabs-tab-weight': String(FONT_WEIGHT_MEDIUM),
         },
       }),
       styles: () => ({
         root: { borderColor: rc.border },
         tab: {
-          fontWeight: FONT_WEIGHT_MEDIUM,
+          fontWeight: 'var(--mullion-tabs-tab-weight)',
         },
         panel: { color: rc.text },
       }),

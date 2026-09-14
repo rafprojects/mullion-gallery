@@ -56,6 +56,7 @@ export {
   cx,
   focusable,
   focusableSibling,
+  focusableInset,
   renderElement,
   FOCUS_ATTR,
   type UiElementProps,

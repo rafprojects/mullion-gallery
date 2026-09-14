@@ -252,10 +252,13 @@ describe('the menu', () => {
     );
   }
 
-  it('stamps the focus attribute on every item, so the ring rule reaches them', () => {
+  it('stamps the INSET focus attribute on every item, because a row is flush with the menu', () => {
+    // The outset ring reaches 6px and a row has 1px, inside `overflow: auto`,
+    // so 5px of it was cut on each inline edge. A row's ground is `menu-bg`,
+    // a neutral, so the inset pair is in bounds.
     openMenu();
     for (const item of screen.getAllByRole('menuitem')) {
-      expect(item.getAttribute(FOCUS_ATTR)).toBe('');
+      expect(item.getAttribute(FOCUS_ATTR)).toBe('inset');
     }
   });
 

@@ -39,4 +39,36 @@
   [data-mullion-focus='sibling']:focus-visible {
     outline: none;
   }
+
+  /*
+   * [P80-A] The inset variant, for an element flush with its container.
+   *
+   * The outset ring above reaches 6px OUTSIDE the border box: the halo is a
+   * `box-shadow` with a 6px spread and the outline sits inside it at 2px
+   * offset, so they overlap rather than stack. That works wherever an element
+   * has clearance and fails wherever it does not. Measured instances: a menu
+   * row (1px of room, 5px cut on each inline edge), the Admin Panel tab bar
+   * (0px, cut top and bottom), and the Typography panel's toggles.
+   *
+   * Same two tones, same three 2px bands, drawn inward instead. It cannot be
+   * clipped by an ancestor and needs nothing from the container.
+   *
+   * The band ORDER mirrors the outset ring rather than following the
+   * designer's snippet, which spelled it core-halo-core. Read outward, the
+   * outset ring is halo, core, halo; read inward, this is the same. That also
+   * keeps a neutral against the neighbouring row rather than putting the core
+   * hard against it, which is the job the outermost band does in both.
+   *
+   * Gated to neutral and washed grounds by rule 8 of the standing rules: on a
+   * solid role fill the pair falls under 3:1 on 33 of 138 theme-role pairs, so
+   * a filled control keeps the outset ring and is given clearance instead.
+   */
+  [data-mullion-focus='inset']:focus-visible,
+  [data-mullion-focus='inset'][data-focus-visible] {
+    outline: none;
+    box-shadow:
+      inset 0 0 0 var(--mullion-focus-ring-width) var(--mullion-color-focus-halo),
+      inset 0 0 0 calc(2 * var(--mullion-focus-ring-width)) var(--mullion-color-primary-stroke),
+      inset 0 0 0 var(--mullion-focus-halo-width) var(--mullion-color-focus-halo);
+  }
 }

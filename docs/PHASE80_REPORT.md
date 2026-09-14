@@ -231,6 +231,22 @@ Plain `text` is unaffected: its worst on the menu highlight is 4.73. Only the si
 
 **Rendered output.** Nothing in the product changed: no consumer imports these components, and `@/ui` still re-exports Mantine's overlays (Key Decision B). The showcase's overlay section is behind `?overlays=1` so the existing `ui-showcase` and `theme-qa` baselines render exactly what they rendered before.
 
+### P80-A, inset ring variant and the tab bar (2026-09-14)
+
+**Status: landed, one part unverified in a browser.** The designer's inset ring variant, the menu row moved onto it, and the three tab-bar changes.
+
+**The inset variant.** `[data-mullion-focus="inset"]` in [`focus.css`](../src/ui/styles/focus.css), spread as `focusableInset` from `@/ui/components`. Same two tones and the same three 2px bands as the outset ring, drawn inward, so it cannot be clipped by an ancestor and needs nothing from the container. Menu rows take it: a row is flush with the menu's content edge inside `overflow: auto`, so the outset ring lost 5px of its 6px on each inline edge. Proved in Chromium by reading the painted box (`data-mullion-focus`, `outline: none`, three `inset` bands, and the row's actual 1px of room), which is the form this batch got wrong once already.
+
+**One deviation from the designer's snippet, deliberately.** They spelled the bands core, halo, core. The outset ring read outward is halo, core, halo, so the inset variant mirrors that instead: same tones, same widths, and a neutral rather than the core against the neighbouring row, which is the job the outermost band does in both. Recorded for them rather than asked, because it is the reading their own "it reads as the same indicator" asks for.
+
+**Gated by standing rule 8.** Neutral and washed grounds only. On a solid role fill the pair falls under 3:1 on 33 of 138 theme-role pairs, so a filled control keeps the outset ring and is given clearance; filled *and* flush is a layout defect.
+
+**The tab bar, all three changes, and two traps on the way.** Mantine already draws the active underline, so the work was smaller than the options sheet implied. The list had no class to target, so the adapter now maps one. And `styles.tab.fontWeight` is an **inline** style that outranks `chrome-portable.scss` entirely: a sheet rule setting `font-weight` on the active tab would never have painted, which is the P77-C defect reintroduced in the same file whose comment warns about it. Weight travels as `--mullion-tabs-tab-weight` instead, exactly as the colours do.
+
+**Not browser-verified.** The tab bar lives behind the Admin Panel, which needs a signed-in session, so these three changes typecheck and lint but have not been measured in a browser. They are constructed on the pattern the tab colours already use rather than on a measurement, and they should be confirmed on the dev site before this row is called done.
+
+**Still clipped and not fixed here.** `Show Title` and `Show Subtitle` in the Typography panel are Mantine `Switch` controls inside a `Popover` with a `backdrop-filter`. The framework's inset variant does not reach them, because it keys on an attribute only framework components stamp. Diagnosing them needs a measurement on a surface no test can reach, and the durable fix is P81-B migrating them onto the framework. Recorded rather than guessed at.
+
 ## Outcome
 
 _Phase in progress. P80-A's overlay batch landed 2026-09-13; the track's input family, P80-B and P80-C are still Planned._

@@ -24,7 +24,7 @@ import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { Separator as BaseSeparator } from '@base-ui/react/separator';
 import type { ReactElement, ReactNode } from 'react';
-import { cx, focusable, type UiElementProps } from './element';
+import { cx, focusableInset, type UiElementProps } from './element';
 import { CloseButton } from './control';
 import { customProperties, radiusValue, spacingValue, type UiRadius, type UiSpacing } from './scale';
 import { uiLayer, type UiLayer } from '../styles/layers';
@@ -595,6 +595,11 @@ function MenuContent({
  * focus through the list, so arrowing to an item is a keyboard focus change
  * and WCAG 2.4.7 asks for an indicator; that is also what the product does
  * today, where `.mantine-focus-auto:focus-visible` reaches every menu item.
+ *
+ * The INSET variant, because a row is flush with the menu's content edge and
+ * the menu is `overflow: auto`: the outset ring reaches 6px and the row has
+ * 1px, so 5px of it was cut on each inline edge. A row's ground is `menu-bg`,
+ * a neutral, so the inset pair is in bounds (rule 8).
  */
 function MenuItem({
   children,
@@ -618,7 +623,7 @@ function MenuItem({
       {...(closeOnClick !== undefined ? { closeOnClick } : {})}
       {...(tone ? { 'data-mullion-tone': tone } : {})}
       {...(render ? { render } : {})}
-      {...focusable}
+      {...focusableInset}
       {...rest}
     >
       {leftSection !== undefined && <span className="mullion-menu-item-section">{leftSection}</span>}

@@ -326,6 +326,48 @@ test.describe('the overlays read tokens, not fallbacks', () => {
     expect(backdrop!.painted).not.toBe('rgba(0, 0, 0, 0)');
   });
 
+  test('the inset ring on a menu row is painted, and not clipped', async ({ page }) => {
+    await open(page);
+    await inline(page, 'menu-trigger').click();
+    await expect(page.locator('.mullion-menu')).toBeVisible();
+    await page.keyboard.press('ArrowDown');
+
+    /*
+     * Read back what was PAINTED, not what the inputs imply. The outset ring's
+     * reach was reported as 10px by a test that added `outlineWidth`,
+     * `outlineOffset` and the halo spread; the real figure is 6px, because the
+     * outline sits inside the spread. This samples the row's own box instead.
+     */
+    const ring = await page.evaluate(() => {
+      const root = document.querySelector('[data-mullion-overlay-root]')?.shadowRoot;
+      const item = root?.querySelector('.mullion-menu-item[data-highlighted]') as HTMLElement | null;
+      const menu = root?.querySelector('.mullion-menu') as HTMLElement | null;
+      if (!item || !menu) return null;
+      const cs = getComputedStyle(item);
+      const ib = item.getBoundingClientRect();
+      const mb = menu.getBoundingClientRect();
+      return {
+        variant: item.getAttribute('data-mullion-focus'),
+        outline: cs.outlineStyle,
+        boxShadow: cs.boxShadow,
+        insetCount: (cs.boxShadow.match(/inset/g) ?? []).length,
+        // An inset ring is drawn within the row's own box, so it cannot be cut
+        // by the menu however little room the row has.
+        roomLeft: +(ib.left - mb.left).toFixed(1),
+        roomRight: +(mb.right - ib.right).toFixed(1),
+        rowWidth: +ib.width.toFixed(1),
+      };
+    });
+
+    expect(ring, 'no highlighted row').not.toBeNull();
+    expect(ring!.variant).toBe('inset');
+    expect(ring!.outline, 'the inset variant must not also draw an outset outline').toBe('none');
+    expect(ring!.insetCount, 'three inset bands, halo core halo').toBe(3);
+    // The row still has almost no clearance; that is the point of the variant.
+    expect(ring!.roomLeft).toBeLessThan(6);
+    expect(ring!.boxShadow).not.toBe('none');
+  });
+
   test('a keyboard-highlighted menu item paints the two-tone ring', async ({ page }) => {
     await open(page);
     await inline(page, 'menu-trigger').click();
@@ -349,12 +391,16 @@ test.describe('the overlays read tokens, not fallbacks', () => {
 
     expect(ring, 'no highlighted menu item after ArrowDown').not.toBeNull();
     expect(ring!.hasFocusAttr, 'the item does not carry the attribute the ring rule keys on').toBe(true);
-    // The ring rule is `:focus-visible`, and a keyboard-driven highlight is a
-    // focus-visible move, so both halves of the P77-F pair must be painted.
-    expect(ring!.outlineStyle).toBe('solid');
-    expect(parseFloat(ring!.outlineWidth)).toBeGreaterThanOrEqual(2);
+    /*
+     * Both tones of the P77-F pair must be painted on a keyboard move. A row
+     * takes the INSET variant, so the pair arrives as three inset bands rather
+     * than an outline plus a halo: same two tokens, different geometry, and no
+     * outset outline at all.
+     */
+    expect(ring!.outlineStyle, 'the inset variant must not also draw an outline').toBe('none');
     expect(ring!.haloToken, 'the halo token did not reach the item').toMatch(/^#[0-9a-f]{6}$/i);
-    expect(ring!.boxShadow, 'the halo half of the ring is missing').not.toBe('none');
+    expect(ring!.boxShadow, 'the ring is not painted at all').not.toBe('none');
+    expect(ring!.boxShadow, 'the pair is not drawn inward').toContain('inset');
   });
 });
 
