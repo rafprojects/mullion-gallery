@@ -10,6 +10,9 @@
  *   ?theme=<id>           the provider's theme
  *   ?chrome=lock|follow   what the nested provider paints
  *
+ * A person can open it too, since P80-D: `src/ui/showcase/index.html` on the
+ * dev server, with `?keyboard=1` turning every opt-in section on.
+ *
  * Nothing in production imports this module, so it is absent from the build;
  * it is here rather than in `e2e/` so `tsc` and ESLint hold it to the same
  * rules as the components it renders.
@@ -56,7 +59,10 @@ import {
   Checkbox,
   ColorInput,
   Modal,
+  MultiSelect,
+  NumberInput,
   Pagination,
+  PasswordInput,
   Confirmations,
   Notifications,
   Popover,
@@ -66,6 +72,8 @@ import {
   Switch,
   Tabs,
   TagsInput,
+  Textarea,
+  TextInput,
   Tooltip,
   confirm,
   notify,
@@ -81,22 +89,28 @@ const chromeMode = params.get('chrome') === 'follow' ? 'follow' : 'lock';
  * checks do not look at, so `?overlays=1` appends them and every existing URL
  * renders exactly what it rendered before.
  */
-const withOverlays = params.get('overlays') === '1';
+/**
+ * P80-D's keyboard suite, and the person running the screen-reader pass, want
+ * every section at once plus fixtures nothing else needs. One flag turns them
+ * all on, so no existing spec's page changes.
+ */
+const withKeyboard = params.get('keyboard') === '1';
+const withOverlays = withKeyboard || params.get('overlays') === '1';
 /**
  * P80-B's select family, opt-in for the same reason. A select's popup goes
  * somewhere different from an overlay's, so the browser suite needs triggers
  * that live in the scope under test.
  */
-const withSelects = params.get('selects') === '1';
+const withSelects = withKeyboard || params.get('selects') === '1';
 /** P80-B's tabs, segmented control and accordion, opt-in for the same reason. */
-const withChoice = params.get('choice') === '1';
+const withChoice = withKeyboard || params.get('choice') === '1';
 /**
  * P80-C's managers, opt-in for the same reason. Unlike every other section
  * these mount once rather than per-gallery: both stores are module singletons,
  * so a second viewport subscribed to the same manager would render every toast
  * twice and make each one a strict-mode violation to query.
  */
-const withManagers = params.get('managers') === '1';
+const withManagers = withKeyboard || params.get('managers') === '1';
 /** `?host=hostile` reproduces the P77-B probe around the whole fixture. */
 const hostileHost = params.get('host') === 'hostile';
 
@@ -225,6 +239,7 @@ function Gallery({ prefix }: { prefix: string }) {
       {withChoice && <Choices prefix={prefix} />}
       {withChoice && <Toggles prefix={prefix} />}
       {withChoice && <Gaps prefix={prefix} />}
+      {withKeyboard && <KeyboardExtras prefix={prefix} />}
     </Stack>
   );
 }
@@ -348,6 +363,67 @@ function Toggles({ prefix }: { prefix: string }) {
           <Chip value="shared">shared</Chip>
         </Group>
       </Chip.Group>
+    </Stack>
+  );
+}
+
+/**
+ * P80-D: the fixtures a keyboard contract needs and no earlier section has.
+ * The input family has never been on this page, `MultiSelect` neither, and
+ * the overlay menu is too short for typeahead and has no disabled item.
+ */
+function KeyboardExtras({ prefix }: { prefix: string }) {
+  const [name, setName] = useState('');
+  const [width, setWidth] = useState<number | null>(12);
+  const [roles, setRoles] = useState<string[]>([]);
+  const [picked, setPicked] = useState('none');
+  return (
+    <Stack gap="sm" padding="md" data-testid={`${prefix}-keyboard`}>
+      <Divider label="keyboard extras" labelPosition="left" />
+      <TextInput
+        label={`${prefix} gallery name`}
+        description="shown above the gallery"
+        value={name}
+        onChange={(event) => setName(event.currentTarget.value)}
+        data-testid={`${prefix}-text-input`}
+      />
+      <Textarea label={`${prefix} caption`} minRows={2} data-testid={`${prefix}-textarea`} />
+      <PasswordInput label={`${prefix} api key`} data-testid={`${prefix}-password`} />
+      <NumberInput
+        label={`${prefix} gap`}
+        value={width}
+        onChange={setWidth}
+        min={0}
+        max={20}
+        step={2}
+        unit="px"
+        data-testid={`${prefix}-number`}
+      />
+      <MultiSelect
+        label={`${prefix} roles`}
+        data={SELECT_ROLES}
+        value={roles}
+        onChange={setRoles}
+        placeholder="pick roles"
+        data-testid={`${prefix}-multiselect`}
+      />
+      <Group gap="sm" align="center">
+        <Menu>
+          <Menu.Trigger render={<Button variant="outline" data-testid={`${prefix}-long-menu-trigger`} />}>
+            {prefix} long menu
+          </Menu.Trigger>
+          <Menu.Content data-testid={`${prefix}-long-menu`}>
+            <Menu.Item onClick={() => setPicked('archive')}>archive</Menu.Item>
+            <Menu.Item onClick={() => setPicked('copy')}>copy link</Menu.Item>
+            <Menu.Item disabled>disabled export</Menu.Item>
+            <Menu.Item onClick={() => setPicked('rename')}>rename</Menu.Item>
+            <Menu.Item onClick={() => setPicked('share')}>share</Menu.Item>
+          </Menu.Content>
+        </Menu>
+        <Text size="sm" data-testid={`${prefix}-long-menu-picked`}>
+          picked: {picked}
+        </Text>
+      </Group>
     </Stack>
   );
 }

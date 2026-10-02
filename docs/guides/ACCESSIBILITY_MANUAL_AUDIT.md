@@ -236,62 +236,126 @@ from the free build) — audit them in a Pro/dev build.
 
 ---
 
-## 6B. Framework overlays (P80-A) — **not yet run**
+## 6B. Framework components (Phase 80): the keyboard gate
 
-> **Section 0 does not apply here, and its two console snippets will fail.** They address the
-> plugin's own mount, where the gallery lives in a shadow root under `#root` and the overlays
-> live in a second shadow root under `[data-mullion-overlay-root]`. **Storybook has neither.**
-> Its decorator renders `<MullionProvider scope="document">`, so everything below is in the
-> ordinary light DOM: `document.styleSheets` works normally, DevTools needs no special handling,
-> and `document.getElementById('root')` is `null` because Storybook's own root is
-> `#storybook-root`. If you ran §0's snippets here and got
-> `can't access property "shadowRoot", document.getElementById(...) is null`, that is expected
-> and nothing is wrong.
+Phase 80 Key Decision C counts a framework component done only when its keyboard gate is closed.
+Since 2026-10-02 the gate has two halves:
+
+- **The keyboard contract, automated** (P80-D). Every key press this section used to ask a person
+  to make is now asserted in a browser by `e2e/ui-keyboard.spec.ts` and the specs it references,
+  on the configuration the product ships: the `overlay-root` portal default, on both the shadow and
+  the light mount. Nothing in table 6B.1 needs doing by hand.
+- **The screen-reader pass, manual** (P80-E). What a screen reader actually *says* cannot be
+  asserted from the test environment. Table 6B.3 is the script, and 6B.4 is where the result goes.
+
+> **The page to test on is the showcase, not Storybook.** Storybook renders in the light DOM with
+> no shadow root, so it cannot show the defects this framework exists to remove: focus returning
+> across a shadow boundary, and ARIA references between two roots. Start the dev server with
+> `npm run dev` and open
+> `http://localhost:5173/src/ui/showcase/index.html?keyboard=1&mount=shadow&theme=default-dark`.
+> Swap `theme=default-light` for the light pass. `?keyboard=1` turns every section on.
 >
-> The one selector worth knowing in Storybook: with no `portal` prop the provider makes its own
-> container and appends it to `document.body`, so every overlay renders inside
-> `document.querySelector('[data-mullion-portal]')`.
+> **Section 0's console snippets do not apply here either.** The showcase's host is `#showcase`,
+> not `#root`. Its own styles are on `document.getElementById('showcase').shadowRoot`, and every
+> popup is in `document.querySelector('[data-mullion-overlay-root]').shadowRoot`.
 
+The page renders each family twice: once in the gallery's shadow root (labels start `inline`) and
+once inside the overlay root (labels start `overlay`). Use the `inline` copies: that is where a
+real gallery's controls live, and the `overlay` copies exist to prove what changes when a trigger
+and its popup share a root.
 
-The framework's own `Modal`, `Drawer`, `Popover`, `Tooltip` and `Menu` landed on 2026-09-13 and
-nothing in the product renders them yet (Phase 80 Key Decision B), so this script tests them in
-Storybook rather than on a screen. Key Decision C counts a component done only once this pass is
-recorded, so until the table below has ticks the overlays have three of their four gates.
+### 6B.1 The keyboard contract, per family (automated)
 
-Run `npm run storybook` and open **Framework/Overlays**. Do each story on at least one light and
-one dark theme using the toolbar theme picker.
+The contracts are the WAI-ARIA Authoring Practices' patterns as Phase 80 built them. Two depart
+from Mantine on purpose: tabs activate manually (arrows move focus, Enter selects), and the
+accordion takes no arrow keys. One corrects the script this section used to carry: **a disabled
+menu item is focusable and does nothing when activated.** The Authoring Practices recommend that,
+so a screen-reader user can discover it; the old check 6 asked for it to be skipped.
 
-| # | Check | Criterion |
-|---|-------|-----------|
-| 1 | Every trigger is reachable by Tab and shows the two-tone ring | 2.1.1, 2.4.7 |
-| 2 | Enter and Space open the overlay from a focused trigger | 2.1.1 |
-| 3 | Focus lands inside the overlay when it opens | 2.4.3 |
-| 4 | Tab and Shift+Tab cycle **within** the overlay and never reach the page behind it | 2.1.2 |
-| 5 | Escape closes it, and focus returns to the trigger that opened it | 2.1.2, 2.4.3 |
-| 6 | In **Menus**: Up/Down move the highlight, Home/End jump to the ends, typing a letter jumps to a matching item, and a disabled item is skipped | 2.1.1 |
-| 7 | In **Menus**: the ring appears only on a keyboard move, and a pointer hover paints the tint alone | 2.4.7 |
-| 8 | **Tooltip** appears on keyboard focus and not only on hover, and Escape dismisses it | 1.4.13 |
-| 9 | With a screen reader: the dialog is announced with its title, and the menu as a menu with its item count | 4.1.2 |
-| 10 | The **Hostile host** story: every overlay still covers the sticky header after scrolling | — |
+| Family | What is asserted | Where |
+|---|---|---|
+| Modal, drawer | Enter opens with focus inside; Tab and Shift+Tab stay inside; Escape closes and returns focus to the trigger; named by its title | `ui-keyboard` "modal and drawer"; `ui-overlays` "focus" |
+| Popover | Enter and Space open with focus inside; Escape returns focus | `ui-keyboard` "popover and tooltip" |
+| Tooltip | Opens on keyboard focus; Escape dismisses | `ui-keyboard` "popover and tooltip" |
+| Menu | Enter, Space and ArrowDown open on the first item; arrows, Home, End and typeahead move; a disabled item is focusable and inert; Enter activates and Escape closes, both returning focus | `ui-keyboard` "menu"; `ui-overlays` "dismissal" |
+| Text, textarea, password, number | Tab order and names; the password reveal toggles by keyboard and reports `aria-pressed`; number arrows step, Home and End go to the bounds, values clamp | `ui-keyboard` "the input family" |
+| Select | Space opens with focus on an option; typing on the closed field picks; arrows and Enter commit; Escape returns focus across the shadow boundary | `ui-keyboard` "the select family"; `ui-selects` "a keyboard can operate it" |
+| Searchable select, multiselect, tags | Typing filters; focus stays in the field; Enter picks and the multiselect stays open; Enter adds a tag; Backspace removes the last | `ui-keyboard` "the select family"; `ui-selects` |
+| Tabs | Arrows move focus without switching; Enter switches; Home and End; Tab moves into the panel | `ui-keyboard`; `ui-choices` "the tab bar" |
+| Segmented control, chip group | One tab stop; arrows move the choice | `ui-keyboard`; `ui-choices` |
+| Accordion | Enter and Space toggle; arrows do nothing | `ui-keyboard` |
+| Checkbox, switch | Space toggles both; Enter toggles only the switch | `ui-keyboard` |
+| Slider | Arrows step; Page keys take the large step; Home and End go to the bounds | `ui-keyboard`; `ui-choices` |
+| Pagination | Every page is a tab stop; Enter makes it current | `ui-keyboard` |
+| Colour input | The swatch opens the picker with focus on its surface; arrows on the surface change the value; Tab walks hue, opacity and swatches; Escape returns to the swatch | `ui-keyboard` |
+| Toasts | F6 reaches the stack; Tab reaches the close button, which has the ring; Enter dismisses and restores focus to where it was | `ui-keyboard` "the managers" |
+| Confirm dialog | Focus moves in; Tab and Shift+Tab stay inside; Escape closes and returns focus | `ui-keyboard`; `ui-managers` |
+| Every family | The accessibility tree a screen reader is given: role, name, state | `ui-keyboard` "what a screen reader is given" |
 
-**Known, and changed on 2026-09-13 — read before check 7.** A menu row that carries a tone (the
-red `Delete` in the **Menus** story) **deliberately does not tint when highlighted**, while an
-un-toned row does. That is the framework's rule applied: tint the ground or colour the ink, never
-both. So on the `Delete` row, a pointer hover shows **no visible change at all** and only a
-keyboard move shows the focus ring. That is current intended behaviour, not a bug, and the missing
-hover affordance on toned rows is an open design question with the designer.
+### 6B.2 Known defects the gate found (2026-10-02)
 
-What is still worth reporting from check 7: whether the ring appears on un-toned rows on a keyboard
-move only, and whether you can actually *find* the highlighted row while arrowing quickly through a
-long menu.
+Each is written in `ui-keyboard.spec.ts` as the contract it should meet and marked as an expected
+failure, owned by Phase 80 track P80-F. When a fix lands its test starts passing, Playwright
+reports the unexpected pass, and the mark has to come off.
 
-| Story | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
-|-------|---|---|---|---|---|---|---|---|---|----|
-| Modals | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | n/a | n/a | n/a | ⬜ | n/a |
-| Drawers | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | n/a | n/a | n/a | ⬜ | n/a |
-| Menus | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | n/a | ⬜ | n/a |
-| Popovers and tooltips | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | n/a | n/a | ⬜ | ⬜ | n/a |
-| Hostile host | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | n/a | ⬜ |
+| Defect | Where it shows | Owner |
+|---|---|---|
+| Tab cannot leave an open menu or popover: focus stays in the popup and it stays open | Every menu and popover whose trigger is in a different root from the overlay root; the `overlay` copies, where they share a root, behave correctly | P80-F item 4 |
+| An open menu has no accessible name: its `aria-labelledby` points at the trigger in another root and cannot resolve | Same | P80-F item 4 |
+| The password field is not masked: it renders as plain text until "revealed" | `PasswordInput` | P80-F |
+| The slider shows no focus ring: focus is on the hidden input inside the thumb and the ring rule only matches the thumb | `Slider`, and the colour picker's hue and opacity rails | P80-F |
+| A toast takes focus on the F6 path but shows no focus indicator | The toast itself, not its close button | P80-F |
+| Every dialog exposes a second `banner` landmark, because its header is a `<header>` | Modal, drawer, confirm | P80-F |
+
+One more is a decision rather than a test: **the tooltip's text is not exposed to assistive
+technology at all.** The trigger has no `aria-describedby` and the popup no role, so anything only
+in a tooltip is invisible to a screen reader. Whether it should be is P80-F's to settle.
+
+### 6B.3 The screen-reader script (P80-E)
+
+One screen reader is enough: NVDA with Firefox, or VoiceOver with Safari. Do it on the shadow mount,
+once on `default-dark` and once on `default-light`. Listen for what each row names; anything
+different is a row in §7.
+
+| Family | Do | Listen for |
+|---|---|---|
+| Modal, drawer | Open from the trigger, Escape | "dialog" and its title on opening; the Close button named; the trigger announced again after Escape |
+| Popover | Open, Escape | The content read on opening |
+| Tooltip | Tab onto the tooltip button | Whether the tooltip text is spoken. It is expected **not** to be (6B.2); confirm |
+| Menu | Open the long menu, arrow through it | "menu" with an item count; each item; "disabled export" announced as unavailable. The menu is expected to have **no name** (6B.2); confirm |
+| Text, textarea | Tab through | Each label, and the description under "gallery name" |
+| Password | Type, then Tab to the reveal and press Space | Characters not echoed while hidden (they will be, until the 6B.2 fix); "Show password, toggle button, not pressed", then "pressed" |
+| Number | Arrow up and down | The value after each press. The field is a text box rather than a spin button, so check the change is announced at all |
+| Select | Open the role select and arrow | "combobox", its name and value; each option with its position; the selected one marked selected |
+| Searchable select, multiselect, tags | Type, arrow, Enter | The highlighted option read while focus stays in the field; picked items and added tags announced |
+| Tabs, segmented, accordion | Arrow and activate | "tab, selected, 1 of 3"; "radio button, checked"; "button, expanded" or "collapsed" |
+| Checkbox, switch, chips | Toggle each | Checked state; the second checkbox as "mixed" or "half checked"; the switch as on or off |
+| Slider | Arrow | The value spoken on each step. Expect "0.5" rather than "50%": the visible label is not the announced value |
+| Pagination | Tab to page 2, Enter | "navigation, inline pages"; "Page 2" and then "current page" |
+| Colour input | Open the picker, arrow on the surface | The surface's value in words; hue and opacity values; the swatches named by their colour |
+| Toasts | Raise one from "managers" without moving focus | **The message read aloud as it appears**, with focus left where it was. This is the one thing on the list no machine can check |
+| Confirm dialog | Open it, Tab, Escape | "dialog, Discard changes?", the body, both buttons |
+
+Two visual checks belong with the pass, because a person is already looking. On both themes at
+100% zoom: is the two-tone ring easy to see on every control (standing rule 9: judge it at true
+size), and can you find the highlighted row while arrowing quickly through the long menu?
+
+### 6B.4 Results (P80-E)
+
+| Family | Screen reader and browser | Date | Result | Notes |
+|---|---|---|---|---|
+| Modal, drawer | | | ⬜ | |
+| Popover, tooltip | | | ⬜ | |
+| Menu | | | ⬜ | |
+| Input family | | | ⬜ | |
+| Select family | | | ⬜ | |
+| Tabs, segmented, accordion | | | ⬜ | |
+| Checkbox, switch, chips, slider | | | ⬜ | |
+| Pagination | | | ⬜ | |
+| Colour input | | | ⬜ | |
+| Toasts | | | ⬜ | |
+| Confirm dialog | | | ⬜ | |
+| Ring visibility, light and dark | | | ⬜ | |
 
 ---
 
@@ -320,7 +384,7 @@ One row per distinct problem. Severity: **Blocker** (fails a core task) / **Seri
 | 5B Settings | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | — | — |
 | 5C Modals | ⬜ | ⬜ | ⬜ | ⬜ | n/a | ⬜ | — | — |
 | 6 LayoutBuilder | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | — | — |
-| 6B Framework overlays (P80-A) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | — | — |
+| 6B Framework components (Phase 80) | ✅ automated | ✅ automated | ⬜ P80-E | n/a | n/a | n/a | 2026-10-02 (automated half) | P80-D |
 
 Legend: ⬜ not started · 🟡 partial · ✅ done. Update after each run.
 
@@ -328,6 +392,11 @@ Legend: ⬜ not started · 🟡 partial · ✅ done. Update after each run.
 
 ## 9. Changelog (living doc)
 
+- **2026-10-02** Rewrote §6B for every Phase 80 component family. The keyboard checks are now
+  automated by `e2e/ui-keyboard.spec.ts` (Phase 80 Key Decision C, revised that day), and the
+  section is the screen-reader script for track P80-E. The test page moved from Storybook to the
+  showcase, which renders the shadow mount the product ships. Old check 6 was corrected: a disabled
+  menu item stays focusable.
 - **2026-09-13** — Added §6B, the keyboard and screen-reader script for the framework overlays
   built in P80-A. Not yet run: it is the fourth of the four gates in Phase 80 Key Decision C, and
   those components are complete on the other three until someone works through it.
