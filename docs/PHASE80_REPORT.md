@@ -1,6 +1,6 @@
 # Phase 80 - Behavioural components
 
-**Status:** In progress (P80-A, P80-B and P80-C complete; P80-D to P80-G added 2026-10-02 to close the keyboard gate, the framework follow-ons and the designer's answers before Phase 81)
+**Status:** In progress (P80-A to P80-D complete; P80-E, P80-F and P80-G remain: the screen-reader pass, the framework fixes and the designer's answers)
 **Created:** 2026-09-10
 **Last updated:** 2026-10-02 (Key Decision C redefined, Key Decision E corrected, four tracks added, every follow-on given an owner, `COLOR-SPEC.md` gained the standing rules)
 
@@ -11,7 +11,7 @@
 | P80-A | Overlays and the input family: the components the theme adapter fights hardest | **Done** (2026-09-14), less `ColorInput` (see notes) | Large |
 | P80-B | Selection, navigation and choice controls: the select family, tabs, accordion, checkbox, switch, chip, segmented control, slider | **Done** (2026-09-14), including the pagination and colour-picker gaps | Large |
 | P80-C | Imperative managers: notifications and confirmations | **Done** (2026-09-14) | Small-Medium |
-| P80-D | The keyboard gate, automated: a browser suite asserting every component's keyboard contract on the shipped configuration, and §6B of the manual audit extended to every component family | Planned | Medium |
+| P80-D | The keyboard gate, automated: a browser suite asserting every component's keyboard contract on the shipped configuration, and §6B of the manual audit extended to every component family | **Done** (2026-10-02); found six defects, filed in P80-F | Medium |
 | P80-E | The keyboard gate, manual: one recorded screen-reader pass over every component family | Planned (human) | Small |
 | P80-F | Framework defects and decisions that must land before Phase 81 builds on them | Planned | Medium |
 | P80-G | The designer's 2026-10-02 answers: the elevation ladder's resolution, the rail under focus, the glyph on `filled` controls, the selected row's geometry | Planned | Medium |
@@ -199,15 +199,23 @@ Four of Phase 80's follow-ons are about the framework itself rather than about a
 1. **`FileButton`'s hidden input has no accessible name** (axe `label`, critical). Found by P80-A, deferred to the input-family batch, and not fixed there. The visible button is the control and the input is already `tabIndex={-1}`, so the input should leave the accessibility tree rather than gain a second name. Add `FileButton` to a scoped axe gate so it cannot come back.
 2. **Two modals opened in the same commit hide each other from assistive technology.** Each dialog marks the other's portal `aria-hidden` and neither stays exposed (measured in jsdom, P80-C). Opened a commit apart, the topmost is correctly exposed. P80-C sidesteps it by queueing confirmations; nothing stops a consumer rendering two `<Modal opened>` siblings. Find where Base UI's outside-element hiding goes wrong for sibling dialogs and fix it in `Modal`; if it cannot be fixed without forking the primitive, add a development warning and write the constraint down.
 3. **One store per page.** `notify` and `confirm` are module singletons and `main.tsx` mounts the hosts once per gallery root. Today's Mantine setup has the same shape, with a consequence the P80-C note underrated: each root's `<Notifications />` renders every toast, so a toast appears in every gallery on the page, and Mantine's modals manager broadcasts on `window`, so a confirm opens once per gallery with one shared `onConfirm`. An admin who confirms both runs a delete or a revoke twice. That mechanism is read from source and the first step is to reproduce it on a two-gallery page. Two fixes keep the defect out of the migration: (a) mount one host per page rather than per root, which keeps Key Decision E's call shape and is the default unless a reason against it appears; (b) scope each store to its provider, which changes the call shape at 42 sites. Either way it lands before P81-B migrates a single call site.
-4. **Should the overlays keep portalling out, and what about `aria-owns`?** The overlays portal into the overlay root and the select family deliberately stays in the trigger's root, so the framework has two answers to one question. The select family's hostile-host probe passes without leaving, which weakens the case for the split, and Base UI points `aria-owns` at an id in another root (axe critical, cannot resolve) only on components that leave. Settle both together, with P80-D's suite proving the contracts survive whichever way it goes.
+4. **Should the overlays keep portalling out, and what about `aria-owns`?** The overlays portal into the overlay root and the select family deliberately stays in the trigger's root, so the framework has two answers to one question. The select family's hostile-host probe passes without leaving, which weakens the case for the split, and Base UI points `aria-owns` at an id in another root (axe critical, cannot resolve) only on components that leave. Settle both together, with P80-D's suite proving the contracts survive whichever way it goes. **Measured 2026-10-02 by P80-D, which turns this from a question into a defect with three symptoms.** When a menu or popover's trigger is in a different root from the overlay root, which is every one in the shipped configuration on both mounts: (a) Tab cannot leave the open popup, so focus stays inside and the popup stays open, where the Authoring Practices close it and move on; (b) the open menu has no accessible name, because its `aria-labelledby` points at the trigger's id in another root and does not resolve; (c) the `aria-owns` finding above. The control is decisive: the showcase's `overlay` copies, whose triggers live in the overlay root beside their popups, pass both (a) and (b). Escape and Shift+Tab still leave, so this is not a keyboard trap under 2.1.2, but it is the wrong focus order and an unnamed menu. Moving the menu, popover and tooltip into the trigger's root, as the select family already does, is the expected answer; the modal and drawer trap focus by design and are unaffected.
 5. **The designer's answers.** Moved to P80-G on 2026-10-02, when they arrived.
+6. **`PasswordInput` does not mask the password.** Found by P80-D. It passes `type={revealed ? 'text' : undefined}`, and an input with no type is a text field, so the value is in plain text until "revealed". Probably written that way because `TextInputProps.type` does not admit `'password'`. The unit test checked the toggle's name and `aria-pressed` and never the field. No product screen renders it yet (Key Decision B), which is the only reason this is not urgent.
+7. **The slider has no visible focus indicator.** Found by P80-D. Keyboard focus lands on the visually hidden range input inside the thumb; the ring rule matches a thumb that is itself `:focus-visible` or carries `data-focus-visible`, and Base UI sets neither on it. The value bubble shows, through `:has(:focus-visible)`, so the fix is the same selector for the ring. It also covers the colour picker's hue and opacity rails, which are this slider.
+8. **A toast shows no focus indicator when it has focus.** Found by P80-D. On the F6 path Tab lands on the toast itself (`tabIndex` 0, from Base UI) before its close button, and the toast carries no framework focus attribute. A WCAG 2.4.7 failure on a stop every keyboard user passes through.
+9. **Every dialog adds a `banner` landmark.** Found by P80-D's accessibility snapshots. The shared dialog header is a `<header>`, which a browser exposes as a banner landmark when it is not inside a sectioning element, so a screen reader announces "banner" inside every modal, drawer and confirm. A `<div>` fixes it.
+10. **The tooltip's text is not exposed to assistive technology.** A decision rather than a defect. Base UI's tooltip popup has no role and its trigger no `aria-describedby`, so the framework `Tooltip` is visual only, as Mantine's is today. Anything only in a tooltip is invisible to a screen reader, and 115 call sites move onto this component in Phase 81. Decide whether the framework exposes the label as a description, or writes down that a tooltip must never carry information the control's own name does not.
+11. **Two small naming gaps**, recorded so they are not lost. The select family's listbox has no accessible name in either root (the combobox is named, so a screen reader still says what is being chosen), and the searchable `Select` exposes a second control, a button, with the same name as its text field.
 
 ### Acceptance criteria
 
 - `FileButton` passes a scoped axe gate.
 - Two sibling `<Modal opened>` rendered in one commit leave exactly one dialog exposed, the topmost, asserted by role query rather than by DOM presence.
 - On a two-gallery fixture, one `confirm()` opens one dialog and one `notify.show()` renders one toast, asserted in a browser.
-- The portal question has a recorded answer and the overlays match it.
+- The portal question has a recorded answer and the overlays match it, and the cross-root symptoms in item 4 are gone on the `inline` copies.
+- **Every `test.fail()` in `e2e/ui-keyboard.spec.ts` is removed, and its test passes.** Each is one of items 4 and 6 to 9, written as the contract it should meet.
+- Item 10 has a recorded decision; item 11's two gaps are fixed or written off with a reason.
 - P80-D's suite green after every change.
 
 ### Validation
@@ -241,7 +249,7 @@ Their diagnosis of the *cause* does not hold, and they asked for it to be checke
 
 1. **Resolve `surfaceRaised` to a real rung.** Fix it in `resolveColors()` rather than by authoring 21 values, because user-authored themes go through the same fallback and would keep the defect otherwise: dark themes take `surface3` when `surfaceRaised` is not authored. Light themes take whatever the designer answers. Then measure before writing anything down: resolve all 23 themes before and after, diff every resolved token and every component token, and list each one that moved, by theme, with its old and new value. Both CI contrast audits must stay green. Resolve the `border` collisions the measurement finds, on cyberpunk and nord at least, by the rule the designer gives rather than by nudging hex values.
 2. **Rebuild the segmented indicator on the ladder.** Track on `surface`, indicator on `surfaceRaised`, which on default-dark is a whole rung (5.09) rather than two-thirds of one (3.51). On dark themes the indicator then reads by lightness and loses its border; on light themes it keeps the `borderStrong` hairline, by rule 13. The toast keeps its border on both, because it floats over arbitrary content rather than over a known ground.
-3. **Suppress the menu rail under `:focus-visible`.** One selector, with the existing rail guard extended so a mutation that re-enables it under focus fails. Check the select family first rather than applying the same selector there: a select option never takes focus (it stays in the input, with `aria-activedescendant` naming the option), so on a select the rail is the only keyboard mark and must stay.
+3. **Suppress the menu rail under `:focus-visible`.** One selector, with the existing rail guard extended so a mutation that re-enables it under focus fails. Apply it to the plain `Select` as well, whose options take real focus and carry the inset ring, measured 2026-10-02. Not to the searchable `Select`, `MultiSelect` or `TagsInput`: they keep focus in the text field and name the option with `aria-activedescendant`, so the rail is their only keyboard mark and must stay.
 4. **Default the role glyph on `filled` status controls**, in `Alert`, `Button` and `Badge`, and confirm that every framework component rendering a filled status button where the label already names the role declines it explicitly, as `confirm()` does.
 5. **Send the designer a capture** of a highlighted-and-selected row in the select family and in the menu, at true size, on one light and one dark theme. If the check sits on the rail, move it to the row's normal padding.
 
@@ -252,7 +260,7 @@ Their diagnosis of the *cause* does not hold, and they asked for it to be checke
 - `border` differs from `surfaceRaised` on every bundled theme.
 - `theme-qa` diffs are reviewed with an explicit pixel diff, since menus, popovers and tooltips change ground on 21 themes.
 - The segmented indicator has no border on dark themes and keeps it on light.
-- On a keyboard move a menu row shows the ring and not the rail; on hover it shows the rail. A select option still shows the rail under the keyboard.
+- On a keyboard move a menu row and a plain `Select` option show the ring and not the rail; on hover they show the rail. An option in a searchable field still shows the rail under the keyboard.
 - `filled` status controls carry the glyph by default, and the opt-out still works.
 - The designer has the capture.
 
@@ -339,6 +347,51 @@ Three rows below say "FUTURE_TASKS" and were **never actually filed there**: the
 | Dropping `@mantine/hooks` | Seven hooks, about 150 lines. Cheap, and it can wait for Phase 81's removal track. |
 
 ## Implementation Notes
+
+### P80-D, the keyboard gate automated (2026-10-02)
+
+**Status: landed, the automated half.** [`e2e/ui-keyboard.spec.ts`](../e2e/ui-keyboard.spec.ts), 64 tests: 52 contracts that pass and 12 expected failures, each a defect written as the contract it should meet. The human half is P80-E, and [§6B of the manual audit](guides/ACCESSIBILITY_MANUAL_AUDIT.md) is now its script: what each family's keyboard contract is, which test proves it, the defects found, and what to listen for with a screen reader.
+
+**A page a person can open.** The showcase was reachable only by intercepting a route inside Playwright. It now has [`src/ui/showcase/index.html`](../src/ui/showcase/index.html), which the dev server serves and the build ignores, and a `?keyboard=1` flag that turns every opt-in section on. A new extras section adds what no contract had a fixture for: the whole input family, `MultiSelect`, and a menu long enough for typeahead with a disabled item. No existing spec passes the flag, so no baseline moved.
+
+**Every contract was probed before it was written.** Each family was driven by keyboard on both mounts and its behaviour read back, and the tests state what was observed when it matched the Authoring Practices, and the Practices when it did not. Three times the probe corrected the expectation rather than the component:
+
+- A disabled menu item is **focusable and inert**, not skipped. The Authoring Practices recommend it so a screen-reader user can discover the item; the old §6B check 6 asked for the opposite and is corrected.
+- A Space pressed inside a typeahead session is **a character of the search**, not a command to open, so "type, then press Space" on a closed `Select` correctly does not open it.
+- Base UI's tooltip popup has **no `role="tooltip"`**, so the first probe's locator found nothing and the tooltip looked broken. It opens on keyboard focus and Escape closes it. What the probe did find is item 10 below.
+
+**What the gate found.** Six defects and a decision, none of them known before, all filed in P80-F with the evidence:
+
+| Finding | Severity | P80-F |
+|---|---|---|
+| Tab cannot leave an open menu or popover in the shipped configuration | Focus order (2.4.3) | item 4 |
+| An open menu has no accessible name in the shipped configuration | Name (4.1.2) | item 4 |
+| `PasswordInput` shows the password in plain text | Privacy; would be severe if anything rendered it | item 6 |
+| The slider, and the colour picker's two rails, show no focus ring | Focus visible (2.4.7) | item 7 |
+| A focused toast shows no focus indicator | Focus visible (2.4.7) | item 8 |
+| Every dialog exposes a stray `banner` landmark | Noise for a screen reader | item 9 |
+| A tooltip's text is not exposed to assistive technology | Decision | item 10 |
+
+**The first two settle P80-F's open portal question with a control.** Both appear only when the trigger and its popup live in different roots, which is every menu and popover the product ships, on both mounts. The showcase's `overlay` copies, whose triggers sit in the overlay root beside their popups, pass both. The `aria-owns` finding is the third symptom of the same cause.
+
+**One thing told to the designer was wrong and is corrected.** The follow-up note said a select option never takes focus. A plain `Select` does move focus onto its options, and they carry the inset ring, so the designer's answer to question 5 (suppress the rail under focus) applies there too. Only the searchable fields keep focus in the text box. The correction went to the designer the same day, and P80-G's text says so.
+
+**Mutations.** One seeded break per family, in the framework's own code, each run against its family's tests and restored byte-identically.
+
+| Family | Mutation applied | Result |
+|---|---|---|
+| Modal and drawer | `closeOnEscape` defaulted to false | 4 tests fail |
+| Menu | `disabled` no longer forwarded to the menu item | 2 fail, after the fix below |
+| Input family | `step` no longer forwarded to the number field | 2 fail |
+| Select family | Enter-to-create in `TagsInput` disabled | 2 fail |
+| Segmented control | every segment given `tabIndex={0}` | 2 fail |
+| Pagination | `aria-current` removed | 2 fail |
+| Colour input | the picker surface's key handler removed | 2 fail |
+| Toasts | the close button removed | 2 fail |
+
+**One mutation was not caught at first, for the reason P80-A's tooltip guard was not.** The menu's "a disabled item does nothing" check asserted the menu was still open with a retrying `toBeVisible()`, which passes at once, before a menu that is about to close has had time to. A guard that can pass by not waiting proves nothing. It now waits out the close transition, reads visibility once, and also asserts the item's `aria-disabled`; the mutation fails it on both mounts and the unmutated code passes.
+
+**Validation.** `npx tsc --noEmit` clean, `npm run lint` clean, `npm run ui:allowlist:check` green at 178 files, `npx vitest run` **4,390 of 4,390** across 277 files (P80-D adds no unit tests), `npm run build` clean apart from the pre-existing chunk-size notice. `npx playwright test` run **twice consecutively, each from a cold Vite cache**, as the acceptance criteria require: **191 of 191 both times**, with identical results. Two of those were a throwaway probe left in `e2e/` by mistake and deleted afterwards; the suite itself is 189, the 125 existing tests plus the 64 new. The 12 expected failures were then run on their own and all 12 fail as written, which is what Playwright reports as passing.
 
 ### `COLOR-SPEC.md` gains the standing rules (2026-10-02)
 

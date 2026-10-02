@@ -81,3 +81,17 @@ in the same dated-folder form as the two archives already there. Your previous c
 was behind the repo (it lacked the P77-F focus-halo row), so the live copy now matches the repo.
 
 The capture of a highlighted-and-selected row comes with P80-G.
+
+---
+
+## Correction, same day: the plain `Select` does move focus onto its options
+
+Measured an hour after I wrote the section above, and it was wrong for one of the four. **A plain
+`Select` moves real keyboard focus onto its options**, and each option carries the inset ring, so
+on a keyboard move a plain `Select` row shows the rail and the ring together, exactly like a menu
+row. Your question 5 answer applies to it as written, and I will suppress the rail there too.
+
+What I described is true of the other three: the searchable `Select`, `MultiSelect` and `TagsInput`
+keep focus in their text field and name the highlighted option with `aria-activedescendant`. Their
+options never take focus, so the rail is their only keyboard mark and it stays.
+
