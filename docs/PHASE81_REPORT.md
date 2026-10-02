@@ -2,7 +2,7 @@
 
 **Status:** Planned, no code yet
 **Created:** 2026-09-10
-**Last updated:** 2026-09-11 (P78-A measurements folded into B and D; Decision J gives B a batch zero; the Typography panel redesign is claimed by B's Settings batch)
+**Last updated:** 2026-10-02 (Phase 80's follow-ons placed into B and D, including `useBroadcastStaleness` and the notification and confirm migration; the Settings panel clipping defect added to B on 2026-09-14)
 
 ### Tracks
 
@@ -50,6 +50,7 @@
 
 ## Execution Priority
 
+0. **Phase 80's P80-D, P80-E and P80-F land first.** P80-F settles two things that change what this phase migrates onto (whether `notify` and `confirm` are one store per page, and whether the overlays stay in the overlay root), and P80-D's keyboard suite is the regression net for every surface batch below.
 1. **P81-A** first. It is mechanical, it touches almost every file, and doing it before the component swap means each file is touched once for props and once for imports rather than churned twice in one diff.
 2. **P81-B** next, theming-critical surfaces first: the Settings panel, the Layout Builder chrome and the admin panel, because those are where Phase 76's defects lived and where a regression is most likely.
 3. **P81-C** alongside B, per batch. A migrated component with an unmigrated test harness is untested.
@@ -106,10 +107,33 @@ The Settings batch carries one piece of design work with it: the **Typography pa
 
 **The binding constraint that follows: a listbox must live in its trigger's root.** Base UI uses ID-referenced ARIA the same way Mantine does, so migrating onto the framework's own `Select` does **not** fix this by itself — it reproduces it unless the popup stays in the trigger's tree. Verify the keyboard contract on a shadow-mounted gallery before the batch is called done, not after.
 
+**The notification and confirmation call sites (filed 2026-10-02).** 42 `notifications.show` calls in 16 files become `notify.show`, and 6 `modals.openConfirmModal` sites become `confirm`, by renaming the callee (Phase 80 Key Decision E). Three things ride along:
+
+- **`useBroadcastStaleness` stops dismissing its own warning.** It passes `autoClose: 0`, which Mantine reads as a zero-length timer, so the "Template updated in another tab" warning, whose message tells the user to close and reopen the tab, disappears on the next tick. `notify` reads `0` as "keep it up", so the rename fixes it. The user chose on 2026-10-02 to let this phase fix it rather than patch Mantine first; it is named here so the fix is verified rather than assumed.
+- **`ContextualToolbar` stops using `modals.open` and `modals.closeAll`.** It raises a rename form imperatively, which `confirm()` does not cover and should not. Render it as a `<Modal>` with local state.
+- **The hosts are mounted the way P80-F decides.** Mantine's setup mounts `<Notifications />` and `ModalsProvider` per gallery root over one page-wide store, so today a toast shows in every gallery on the page and a confirm opens once per gallery with a shared `onConfirm`. Mount `<Notifications label={t(...)}>` and `<Confirmations />` as P80-F settles it, not by copying the Mantine layout.
+
+**What each batch carries from Phase 80 (filed 2026-10-02).** Phase 80 found these while building the components; each lives on a surface a batch below rewrites anyway, so each is fixed in that batch rather than patched first and migrated second.
+
+| Batch | Item | Source |
+|-------|------|--------|
+| Settings | The panel is clipped about 20px on the right (above). | User report, 2026-09-14 |
+| Settings | `Show Title` and `Show Subtitle` in the Typography panel lose the focus ring's left edge. Same class as the menu row: a 6px outset ring inside a container that clips. Fix with the redesign the batch already carries. | P80 follow-on; held for this phase by user decision 2026-09-14 |
+| Layout Builder | `useLayoutBuilderKeyboardHandlers` handles ArrowUp and ArrowDown on `document` with no guard for an event from an `input`, `textarea` or `contenteditable`, so typing in any builder field moves the selected slots. | P80 follow-on |
+| Admin Panel | Three filled controls sit flush with their container, which standing rule 8 calls a layout defect: `Add Media` and `Rescan Types` (0px clearance) and the Media sort mode (3px). Give each 6px of clearance for the outset ring. | Designer, live Admin Panel, 2026-09-14 |
+| Gallery | Forward Tab moves backwards on screen: Typography icon, then Access Mode to its left, then the campaign filters further left. A WCAG 2.4.3 focus-order failure; fix the DOM order on the migrated surface rather than patching it twice. | P80-A manual pass, 2026-09-14 |
+| Any | `link-in-text-block`: P79-0's tone probe measures an `Anchor` inside muted `Text` at 1.11:1 against its surroundings with no underline. It may be fixture-only. Confirm on the first real surface that composes the two, and if it reproduces, fix it on `Anchor` rather than in the theme. | P79-0 |
+| wp-admin Spaces | `SpaceManagementView` selects a space with a bare `<tr onClick>`: no role, no tab stop, no key handling, so the primary control of the screen cannot be reached from the keyboard. Make it a real control with the ring. The rest of that screen's UX pass (master and detail, restoring archived spaces) stays in FUTURE_TASKS. | FUTURE_TASKS, Spaces UX pass item 3 |
+| Every batch | Two Phase 80 contracts differ from Mantine on purpose and must not be read as regressions: tabs activate manually (arrow moves focus, Enter selects; `activateOnFocus` restores the old behaviour per bar), and the accordion has no arrow-key navigation. Both are asserted by tests. | P80-B |
+| Every surface on a raised ground | The elevation ladder has two usable rungs at most: `surfaceRaised` equals `surface2` on 21 of 23 themes. With the designer since 2026-09-14 (re-sent 2026-10-02). If they want three rungs, the engine's derivation changes and that becomes its own track before the first surface batch; if two is the intent, write it down and stop treating the third as available. | P80-B |
+
 ### Acceptance criteria
 
 - **Every migrated dropdown is operable by keyboard on a shadow mount**, verified in a browser rather than jsdom: arrow keys move the highlight, Enter selects, and a screen reader announces the active option.
 - **The Settings panel is not clipped on any axis**, measured in a browser at more than one viewport width rather than eyeballed, since the reported symptom is the panel's own right edge being cut off.
+- **`useBroadcastStaleness`'s stale-tab warning stays on screen until dismissed**, checked in a browser after the notification sites move.
+- No call site uses `modals.open`, `modals.closeAll` or `modals.openConfirmModal`.
+- Every row of the "carried from Phase 80" table is closed, or re-filed with its reason.
 - The allow-list shrinks with every batch and never grows.
 - `packages/shared-ui` is gone, its eight modules rehomed, and the allow-list paths updated to match before the first surface batch.
 - Per batch: full suites green, axe gate green, and a keyboard pass on any surface whose interaction changed.
@@ -153,6 +177,8 @@ Six pieces of this codebase exist only to make Mantine fit: `adapter.ts` (601 li
 
 Delete them, drop `@mantine/core`, `@mantine/hooks`, `@mantine/modals`, `@mantine/notifications` and `@mantine/form` from `package.json`, and remove Mantine's stylesheet imports from `main.tsx` and `shadowStyles.ts`.
 
+Retire `option-checked-bg` and `option-checked-color` from the component-token tier. The framework's select marks a selected option with a check and `primary-text` rather than a fill (P80-B, under standing rule 8), so the only readers left are the Mantine adapter and `chrome-portable.scss`, and both go in this track.
+
 `@mantine/dates` goes too, and it can go at any time: P78-A found it has zero importers anywhere in `src/`, `packages/`, `e2e/` or the stories, so it is a dependency the tree already does not use. It is excluded from the P78-A lint rule for the same reason, a rule with no subject being noise.
 
 Retarget rather than delete the guards that still describe something true: the style-delivery tests, the P77-F ring walk and the 1.4.11 audit all continue to hold, against framework tokens instead of Mantine variables. Delete only the guards whose subject is gone, such as the `styles`-prop flatness tests, and say so in this document so their absence is not later read as a gap.
@@ -176,7 +202,7 @@ Retarget rather than delete the guards that still describe something true: the s
 |-----------|--------------------|
 | Publishing `@mullion/ui` | A product decision, and it converts an internal API into a public commitment. Worth deciding after the framework has shipped in the product, not before. |
 | Dropping `@mantine/dates` | Listed in Phase 80's follow-ons; confirm it is genuinely unused before removing. |
-| Row-selection keyboard support in `Table` | A real a11y gap with its own FUTURE_TASKS entry. Fix it as a feature, not inside a migration batch. |
+| ~~Row-selection keyboard support in `Table`~~ | **Moved into P81-B 2026-10-02.** The gap is `SpaceManagementView`'s `<tr onClick>`, and migrating that screen while keeping it would fail this phase's own per-batch keyboard pass. Only the keyboard fix moved; the screen's wider UX pass stays in FUTURE_TASKS. |
 
 ## Implementation Notes
 

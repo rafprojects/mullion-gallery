@@ -1,8 +1,8 @@
 # Phase 80 - Behavioural components
 
-**Status:** Complete (all three tracks landed; the manual keyboard pass is the one gate still open)
+**Status:** In progress (P80-A, P80-B and P80-C complete; P80-D, P80-E and P80-F added 2026-10-02 to close the keyboard gate and the framework follow-ons before Phase 81)
 **Created:** 2026-09-10
-**Last updated:** 2026-09-14 (P80-C complete: the notification and confirmation managers)
+**Last updated:** 2026-10-02 (Key Decision C redefined, Key Decision E corrected, three tracks added, every follow-on given an owner)
 
 ### Tracks
 
@@ -11,6 +11,9 @@
 | P80-A | Overlays and the input family: the components the theme adapter fights hardest | **Done** (2026-09-14), less `ColorInput` (see notes) | Large |
 | P80-B | Selection, navigation and choice controls: the select family, tabs, accordion, checkbox, switch, chip, segmented control, slider | **Done** (2026-09-14), including the pagination and colour-picker gaps | Large |
 | P80-C | Imperative managers: notifications and confirmations | **Done** (2026-09-14) | Small-Medium |
+| P80-D | The keyboard gate, automated: a browser suite asserting every component's keyboard contract on the shipped configuration, and §6B of the manual audit extended to every component family | Planned | Medium |
+| P80-E | The keyboard gate, manual: one recorded screen-reader pass over every component family | Planned (human) | Small |
+| P80-F | Framework defects and decisions that must land before Phase 81 builds on them | Planned | Medium |
 
 ---
 
@@ -30,15 +33,18 @@
 |---|----------|------------|
 | A | Compound parts or flat props? | **Both.** Compound parts where the primitive has them, plus a flat convenience component for the common case, because 26 files use the flat Mantine `Select` form and rewriting them into parts is migration cost with no benefit. The flat form is a wrapper over the parts, never a fork of them. |
 | B | Does this phase migrate any consumers? | **No.** Components are built and proved in Storybook and tests. Consumers move in Phase 81. Mixing the two would make every component's completion contingent on a file migration, and would put pixel movement and behaviour change in the same diff. |
-| C | How is a component proved done? | **Four gates:** the axe structural gate, the P77-F ring walk, the P79-B static sheet tests, and a manual keyboard pass recorded in `ACCESSIBILITY_MANUAL_AUDIT.md`. A component with green unit tests and no keyboard pass is not done. |
+| C | How is a component proved done? | **Four gates:** the axe structural gate, the P77-F ring walk, the P79-B static sheet tests, and the keyboard gate. The keyboard gate has two halves: an **automated keyboard-contract suite** run in a browser against the shipped configuration (P80-D), and a **manual screen-reader pass** recorded in `ACCESSIBILITY_MANUAL_AUDIT.md` (P80-E). A component with green unit tests and no keyboard gate is not done. *Revised 2026-10-02 by user decision; it was "a manual keyboard pass". Every keyboard check in that pass except the screen reader's actual speech is mechanical, a one-off manual pass is stale the first time the component changes, and Phase 81 changes the code around every one of these components. Only what a screen reader says still needs a person.* |
 | D | What about components the primitive lacks? | **Named, owned and reviewed as behaviour.** Resolved 2026-09-11 by P78-B's pick of Base UI 1.8.0, so the gap list is no longer conditional: **pagination** (10 files), **tags input** (5 files) and **colour picker** (20 files). Pagination is a button list with roving focus and is cheap. Tags input is Base UI's `Combobox` plus chips. The colour picker is a saturation and hue surface and is a component in its own right, so P80-B should budget for writing or vendoring it rather than wrapping it. Each gap carries the same four gates. **All three built 2026-09-14, and the pricing held with one correction:** pagination is a button list without roving focus, because the Authoring Practices treat pagination as a set of links and each control is its own tab stop. |
-| E | Do the notification and confirmation managers keep their call shape? | **Yes.** `notify.show()` and `confirm()` mirror the 48 and 11 existing call sites, so Phase 81's migration of those sites is mechanical rather than a rewrite. |
+| E | Do the notification and confirmation managers keep their call shape? | **Yes.** `notify.show()` and `confirm()` mirror the existing call sites, so Phase 81's migration of those sites is mechanical rather than a rewrite. Measured 2026-09-14: **42** production `notifications.show` calls in 16 files and **6** production `openConfirmModal` sites. *Corrected 2026-10-02: this row first said 48 and 11; the 48 counted test files and the 11 matched nothing.* |
 
 ## Execution Priority
 
 1. **P80-A**, and it is the phase's real risk. Land it before anything else so a design problem surfaces early.
 2. **P80-B** second, in the order the adapter fights hardest: select family first (P77-C's `data-checked` and the unforwarded `vars` both lived there), then tabs and segmented control, then the simple choice controls.
 3. **P80-C** last and independently. It is small, it has no styling subtleties, and it can slip without blocking anything.
+4. **P80-D** next, because it is the regression net for P80-F. Every change F makes is to a component the suite will already be asserting.
+5. **P80-F** after D. Two of its items are decisions that change the shape Phase 81 migrates onto, so they must be settled before P81-B touches the call sites, not during it.
+6. **P80-E** last. It is the one step that costs a person's time, so it runs once, on the code as it will ship, rather than before F changes it.
 
 ---
 
@@ -119,14 +125,145 @@ A `notify` store over the primitive's toast, and a `confirm()` over the framewor
 
 ---
 
+## Track P80-D - The keyboard gate, automated
+
+### Problem
+
+Key Decision C made a keyboard pass the fourth gate for every component, and it has never been run. Two things stand in the way, and only one of them is time.
+
+The script in §6B of `ACCESSIBILITY_MANUAL_AUDIT.md` was written for P80-A's five overlays and nothing else. The input family, all twelve of P80-B's components and P80-C's two managers have no script, so a person working through §6B today would cover 5 of roughly 30 components and believe the gate was closed.
+
+Most of what the script asks a person to do is mechanical. Of its ten checks, nine are key presses and an observation a browser can make, and parts of them are already asserted in scattered places: focus return after Escape for the modal, menu and confirm dialog, the drawer's focus trap, the hostile-host probe, the menu row's keyboard ring, the tab bar's arrow-then-Enter contract and the select family's `aria-activedescendant`. What is missing is not hard: Tab and Shift+Tab containment in the modal and popover, opening by Enter and Space, Home, End, typeahead and disabled-item skipping in the menu, focus return from the drawer and popover, and the tooltip on keyboard focus. Only check 9, what a screen reader actually says, needs a person.
+
+### Fix
+
+One browser suite that states each family's keyboard contract and asserts it, on the showcase fixture, under the shipped `overlay-root` portal default, on both the shadow and the light mount. The shadow mount is the point: focus returning across a shadow boundary and ID-referenced ARIA resolving between roots are the defect classes this framework exists to remove, and neither can occur in Storybook, which renders in the light DOM.
+
+- **The contracts** are the Authoring Practices' patterns as Phase 80 implemented them, including its two deliberate departures: tabs activate manually (arrow moves focus, Enter selects) and the accordion has no arrow-key navigation. Each family gets the checks that apply to it: reach by Tab with the ring painted, open by Enter and Space, focus moved inside, Tab and Shift+Tab contained, Escape closing with focus back on the trigger, the composite keys, the tooltip on focus, the ring on a keyboard move and not on hover, the toast stack reached by F6, and the colour picker's text-field path.
+- **Accessibility-tree snapshots** per family (`toMatchAriaSnapshot`) pin what a screen reader is *given*: role, name, state, item count and the live region. That is the half of check 9 a machine can prove. P80-E proves the other half, what is said.
+- **Fixtures where a contract has none.** A disabled menu item, a menu long enough for typeahead to mean something, and anything else the contracts need, behind the existing opt-in parameters so no snapshot baseline moves.
+- **A showcase a person can open.** The fixture is currently served only by intercepting a route inside Playwright, so nobody can open it in a browser. P80-E's screen-reader pass should run on the shadow mount the product ships, not on Storybook's light DOM, so the fixture gets a dev-server entry.
+- **§6B rewritten for every family**: for each, which checks are automated (named by test) and which remain for the screen reader. The coverage tracker row is renamed from "Framework overlays (P80-A)" to the whole framework.
+
+Existing assertions stay where they are. The suite references them rather than restating them.
+
+### Acceptance criteria
+
+- Every component built in P80-A, P80-B and P80-C has its keyboard contract asserted in a browser, on both mounts.
+- Each family's contract is mutation-checked: one seeded break per family fails it, and the file is restored byte-identically. The mutation must change behaviour in the browser the guard runs in; P80-B found two that did not.
+- No timing guard can pass by waiting, and every settle-poll watches every quantity its assertions read (the P80-C flake).
+- §6B covers every family and says, per check, whether it is automated and where.
+- The showcase opens in an ordinary browser on the shadow mount.
+- Full suites green, no movement in existing snapshot baselines.
+
+### Validation
+
+- `npx playwright test` twice consecutively from a cold Vite cache. The suite is timing-heavy by nature, so one green run is not evidence it is stable.
+- The mutation table in the implementation note.
+
+---
+
+## Track P80-E - The keyboard gate, manual
+
+### Problem
+
+What a screen reader says cannot be asserted from this environment. Playwright can pin the accessibility tree a screen reader receives, but not NVDA's or VoiceOver's speech, nor how either treats a live region or a dialog title inside a shadow root. Tools that drive NVDA exist, but they need a Windows machine set up for them and their announcement timing is unreliable; not worth it for one pass. Two perceptual questions also need eyes: whether the highlighted row can be found while arrowing quickly through a long menu, and whether the ring reads at true size on a light and a dark theme (standing rule 9).
+
+### Fix
+
+A person runs §6B's screen-reader script, as rewritten by P80-D, once over every component family: one screen reader (NVDA with Firefox, or VoiceOver with Safari), on the showcase's shadow mount, on one light and one dark theme. Results go into §6B and the coverage tracker; failures go into §7 with an owner.
+
+This is component-level. It does not replace P83-G's product-wide audit, which tests surfaces rather than components.
+
+### Acceptance criteria
+
+- Every family row in §6B has a recorded result with screen reader, browser and date.
+- Every failure is in §7 with an owner, and anything that is a framework defect is fixed or filed before Phase 81 starts.
+- The coverage tracker row is updated.
+
+### Validation
+
+- The recorded table itself. This track is the person's half of the gate, and its evidence is the record.
+
+---
+
+## Track P80-F - Framework defects and decisions before Phase 81
+
+### Problem
+
+Four of Phase 80's follow-ons are about the framework itself rather than about any consumer. Two are defects in shipped framework components and two are decisions that change the shape Phase 81 migrates onto. All four are cheaper now than after 142 files depend on the current behaviour. The designer's pending answers land here too, because each is a one-line framework change.
+
+### Fix
+
+1. **`FileButton`'s hidden input has no accessible name** (axe `label`, critical). Found by P80-A, deferred to the input-family batch, and not fixed there. The visible button is the control and the input is already `tabIndex={-1}`, so the input should leave the accessibility tree rather than gain a second name. Add `FileButton` to a scoped axe gate so it cannot come back.
+2. **Two modals opened in the same commit hide each other from assistive technology.** Each dialog marks the other's portal `aria-hidden` and neither stays exposed (measured in jsdom, P80-C). Opened a commit apart, the topmost is correctly exposed. P80-C sidesteps it by queueing confirmations; nothing stops a consumer rendering two `<Modal opened>` siblings. Find where Base UI's outside-element hiding goes wrong for sibling dialogs and fix it in `Modal`; if it cannot be fixed without forking the primitive, add a development warning and write the constraint down.
+3. **One store per page.** `notify` and `confirm` are module singletons and `main.tsx` mounts the hosts once per gallery root. Today's Mantine setup has the same shape, with a consequence the P80-C note underrated: each root's `<Notifications />` renders every toast, so a toast appears in every gallery on the page, and Mantine's modals manager broadcasts on `window`, so a confirm opens once per gallery with one shared `onConfirm`. An admin who confirms both runs a delete or a revoke twice. That mechanism is read from source and the first step is to reproduce it on a two-gallery page. Two fixes keep the defect out of the migration: (a) mount one host per page rather than per root, which keeps Key Decision E's call shape and is the default unless a reason against it appears; (b) scope each store to its provider, which changes the call shape at 42 sites. Either way it lands before P81-B migrates a single call site.
+4. **Should the overlays keep portalling out, and what about `aria-owns`?** The overlays portal into the overlay root and the select family deliberately stays in the trigger's root, so the framework has two answers to one question. The select family's hostile-host probe passes without leaving, which weakens the case for the split, and Base UI points `aria-owns` at an id in another root (axe critical, cannot resolve) only on components that leave. Settle both together, with P80-D's suite proving the contracts survive whichever way it goes.
+5. **The designer's answers, as they arrive.** Four of the questions in `catching-up-2026-10-02.md` are one-line framework changes: whether `filled` controls default to the role glyph, whether the menu rail is suppressed under focus, the selected-row treatment, and the inset ring's band order, plus the toast's leading-edge tone border. Each lands here when answered. Any still unanswered when the rest of this track is done moves to P81-B with a note, so this track does not wait on correspondence. The elevation ladder is not here: it is an engine change, and its owner is Phase 81.
+
+### Acceptance criteria
+
+- `FileButton` passes a scoped axe gate.
+- Two sibling `<Modal opened>` rendered in one commit leave exactly one dialog exposed, the topmost, asserted by role query rather than by DOM presence.
+- On a two-gallery fixture, one `confirm()` opens one dialog and one `notify.show()` renders one toast, asserted in a browser.
+- The portal question has a recorded answer and the overlays match it.
+- P80-D's suite green after every change.
+
+### Validation
+
+- Full suites at CI parity, with each fix's test shown failing before the fix.
+
+---
+
 ## Follow-On Candidates
+
+### Where each follow-on went (2026-10-02)
+
+The user's direction: nothing here is deferred past release, and nothing is left without an owner. Each row of the table below is placed in a phase, or marked resolved with the reason. Every placement fitted an existing phase, so no new phase was created. The one item that could still grow into its own track is the elevation ladder, and only if the designer wants three real rungs.
+
+Three rows below say "FUTURE_TASKS" and were **never actually filed there**: the builder's arrow-key nudge, the backwards tab order and the broken-tab-after-deploy. Each is placed in a phase now.
+
+| Follow-on | Owner | Note |
+|-----------|-------|------|
+| Migrating consumers | P81 | Unchanged. |
+| `useBroadcastStaleness` dismisses its own warning | **P81-B** | Named in P81-B with its own acceptance criterion, per user decision 2026-10-02. |
+| Two modals in one commit hide each other | **P80-F** | Framework defect. |
+| One store per page | **P80-F** | Raised in severity: the confirm case can run a destructive callback twice. Must land before P81-B migrates a call site. |
+| `modals.open` and `modals.closeAll` | **P81-B** | `ContextualToolbar` becomes a rendered `<Modal>`. |
+| `FileButton` has no accessible name | **P80-F** | Framework defect, axe critical. |
+| The menu's ground is audited | Resolved | A correction, no work. |
+| Focus ring on the menu row, 20 of 23 themes | Resolved | The rail retired the tint the failing pairs were measured against (P80-A). |
+| The tinted-ground finding was wrong | Resolved | The menu-item tone defect it found is fixed with a guard. |
+| Option D | Resolved | Withdrawn. |
+| Semantic rungs against tinted grounds | Resolved | Superseded by the row above: no framework rule paints a tone on a wash except icons, which clear 3:1. |
+| Builder arrow keys nudge slots while typing | **P81-B** | Layout Builder batch. Never filed in FUTURE_TASKS. |
+| Ring reach is 6px | Resolved | A correction, adopted as standing rule 7. |
+| Clipped rings, Typography panel and Admin Panel | **P81-B** | Admin Panel confirmed fixed 2026-09-14. Typography's left-edge clip goes to the Settings batch, as the user decided on 2026-09-14. |
+| Tab bar clips the ring | Resolved | Fixed in P80-A, confirmed on the live site. |
+| Tab bar and accordion behaviour changes | **P81-B** | Recorded there so the migration does not read them as regressions. |
+| A filled select option | **P81-D** | Retire `option-checked-bg` and `-color` when the adapter goes. The visual change is with the designer. |
+| Every dropdown is keyboard-inoperable | P81-B | Already there. |
+| ID-based ARIA across the overlay root | Resolved | Superseded by the row above it. |
+| Filled-and-flush controls | **P81-B** | Admin Panel batch: `Add Media`, `Rescan Types`, the Media sort mode. |
+| `aria-owns` across a shadow boundary | **P80-F** | Settled with the portal question. |
+| The elevation ladder | **P81-B** | With the designer; re-sent 2026-10-02. If they want three rungs it becomes an engine track ahead of P81-B's first surface batch. |
+| The colour picker has no manual pass | **P80-E** | Part of the screen-reader pass. |
+| Should the overlays keep portalling out? | **P80-F** | Decision. |
+| Tab order jumps backwards in the gallery | **P81-B** | Gallery batch, a DOM-order fix on the migrated surface. Never filed in FUTURE_TASKS. |
+| A deploy breaks any open tab | **P82-D** | New track. Never filed in FUTURE_TASKS. |
+| `link-in-text-block` on `Anchor` | **P81-B** | Confirm on a real surface; fix on `Anchor` if it reproduces. |
+| `Table` and row selection | **P81-B** | The keyboard gap is `SpaceManagementView`'s `<tr onClick>`; the wp-admin Spaces batch makes it a real control. The rest of that screen's UX pass stays in FUTURE_TASKS. |
+| Date pickers | P81-D | Already there: `@mantine/dates` has no importers. |
+| Dropping `@mantine/hooks` | P81 | Already decided, Key Decision E. |
+
+### The table as filed
 
 | Candidate | Why it is deferred |
 |-----------|--------------------|
 | Migrating consumers onto these components | Phase 81, by Key Decision B. |
 | **`useBroadcastStaleness` dismisses its own stale-tab warning immediately** | P80-C, 2026-09-14. `autoClose: 0` is a zero-length timer in Mantine, not "keep it up", so the warning that tells the user to close and reopen the tab disappears on the next tick. One character to fix, but fixing it is a consumer change and Key Decision B says this phase makes none. Phase 81's migration fixes it as a side effect, because `notify` reads both `0` and `false` as "keep it up". If it should be fixed sooner it is a one-line change to a production hook, not a framework one. |
 | **Two modal dialogs opened in the same commit hide each other from assistive technology** | P80-C, found while building `confirm()`; the defect is P80-A's `Modal`. Each dialog's portal is marked `aria-hidden` on the other's behalf, and the measured result is that neither is exposed. Opened a commit apart the topmost is correctly exposed, so the realistic path (a confirm raised from an open modal) works. P80-C sidesteps it by queueing confirmations; nothing stops a consumer rendering two `<Modal opened>` siblings. |
-| **Both managers are one store per page, not one per gallery** | P80-C, 2026-09-14. `notify` and `confirm` are module singletons, so two galleries on one page raise the same toast in both viewports and the same confirm in both trees. Mantine behaves identically today from its own module-level store, so the migration changes nothing and this is parity rather than a regression. Recorded because this codebase has a history of multi-instance defects of exactly this shape, and because the fix, if one is ever wanted, is a store per provider rather than a patch: it is a design change and should be taken as one. |
+| **Both managers are one store per page, not one per gallery** | P80-C, 2026-09-14. `notify` and `confirm` are module singletons, so two galleries on one page raise the same toast in both viewports and the same confirm in both trees. Mantine behaves identically today from its own module-level store, so the migration changes nothing and this is parity rather than a regression. Recorded because this codebase has a history of multi-instance defects of exactly this shape, and because the fix, if one is ever wanted, is a store per provider rather than a patch: it is a design change and should be taken as one. **Raised 2026-10-02:** "parity" undersold it. Mantine's modals manager broadcasts on `window` and every root mounts its own `ModalsProvider`, so on a two-gallery page a confirm opens once per gallery with one shared `onConfirm`, and confirming both runs the action twice. Moved to P80-F. |
 | **`modals.open` and `modals.closeAll` have no replacement** | P80-C, 2026-09-14. `confirm()` covers the six `openConfirmModal` sites, which is what the track scoped. `ContextualToolbar` also uses `modals.open` for a rename form and `modals.closeAll` to dismiss it: an arbitrary-content modal raised imperatively, which is a different thing from a confirmation and was not in the track. Phase 81 either converts that call site to a rendered `<Modal>` (it is one component with local state, so this is small) or the framework grows an imperative modal store. The first is better and is the recommendation. |
 | **`FileButton`'s hidden file input has no accessible name** | P79-C, found by P80-A's axe scan of the showcase. `<input type="file" class="mullion-visually-hidden" tabindex="-1">` fails the `label` rule at critical impact. It is a real defect in a shipped framework component and it is one attribute to fix, but it is P79-C's component and not an overlay; it belongs with the input family in the rest of P80-A, where the field and label composition is being written anyway. |
 | **The menu's ground is audited; the audit just leaves no headroom** | P80-A, 2026-09-13, correcting the row below. `menu-bg` derives from `surfaceRaised`, which **is** the fourth ground `textRung` selects against: 0 of 138 semantic pairs fail on it untinted. The worst is 4.53, because the routine stops at the *nearest* rung clearing 4.5:1 rather than maximising, so the tightest theme lands 0.03 above the floor by design. That is why a 1% tint breaks it. The designer's note reasoned from a `flat` column in the outgoing brief that measured `surface` only, and concluded the ground was unaudited; the correction is in `docs/design/correspondences/tinted-grounds-answers-2026-09-13.md`. |
@@ -470,11 +607,11 @@ The one real decision is that **the range keeps a constant width as the current 
 
 ## Outcome
 
-_Phase complete as of 2026-09-14. All three tracks landed. One gate, the manual keyboard pass, is outstanding across the whole phase and is recorded as such rather than waived._
+_Reopened 2026-10-02. P80-A, P80-B and P80-C landed by 2026-09-14; P80-D, P80-E and P80-F were added to close the keyboard gate (redefined in Key Decision C) and to fix the framework follow-ons before Phase 81 builds on them. The section below describes the first three tracks and is updated when the rest land._
 
 **What Phase 80 built.** Every `@mullion/ui` component that handles a keypress, plus the two imperative stores that raise chrome without one. Nothing was migrated onto them: Key Decision B holds, and Phase 81 owns the move.
 
-**The four gates of Key Decision C, phase-wide.** Three of four, for every component in all three tracks. The axe structural gate, the P77-F ring walk and the P79-B static sheet rules are met and mutation-checked. **The manual keyboard pass in `ACCESSIBILITY_MANUAL_AUDIT.md` §6B has never been run.** It is the same gap P80-A opened, P80-B inherited and P80-C now shares, and it is the one thing standing between this phase and a clean four-of-four.
+**The four gates of Key Decision C, phase-wide.** Three of four, for every component in all three tracks. The axe structural gate, the P77-F ring walk and the P79-B static sheet rules are met and mutation-checked. **The manual keyboard pass in `ACCESSIBILITY_MANUAL_AUDIT.md` §6B has never been run.** *(Redefined 2026-10-02 as an automated suite plus a screen-reader pass; P80-D and P80-E close it.)* It is the same gap P80-A opened, P80-B inherited and P80-C now shares, and it is the one thing standing between this phase and a clean four-of-four.
 
 **What the phase found that none of the three plans contained.** Each track surfaced at least one defect its own acceptance criteria could not have caught, and in two cases the criterion was satisfiable while the thing it was meant to protect was broken. P80-A shipped four invented token names; the answer was a standing rule rather than a fix. P80-B reproduced P77-C exactly, a sheet rule keyed on an attribute the primitive never writes, and the unit test that should have caught it was the weak form; it is now the strong form across five components. P80-C found that the i18n gate its criteria told it to keep green was keyed on callee names and would have gone blind the moment Phase 81 renamed them. The pattern is worth carrying into Phase 81: **a criterion phrased as "X still passes" is worth nothing unless someone checks that X still looks at the thing it was written for.**
 

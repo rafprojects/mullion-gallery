@@ -2,7 +2,7 @@
 
 **Status:** Planned — no code yet
 **Created:** 2026-08-25
-**Last updated:** 2026-08-28 (renumbered 77 → 79; content unchanged)
+**Last updated:** 2026-10-02 (P82-D added from Phase 80's follow-ons: recover from a stale chunk after a deploy)
 
 ### Tracks
 
@@ -11,6 +11,7 @@
 | P82-A | Single-source the distribution exclude list — `release.yml`'s inline `zip -x` consumes `.distignore` instead of duplicating it | Planned | Small-Medium |
 | P82-B | Add `actionlint` to CI so the four workflow YAMLs are linted, closing Phase 75's "manual review substitutes for tooling" gap | Planned | Small |
 | P82-C | Make `mullion_fs()`'s no-op result actually cache — `isset()` is false for `null`, so the credential-less path re-runs on every entitlement check | Planned | Small |
+| P82-D | Recover from a stale chunk after a deploy, instead of showing an error to every tab that was open when the release landed | Planned | Small |
 
 ---
 
@@ -42,7 +43,7 @@
 
 ## Execution Priority
 
-All three are independent. **P82-B** is the smallest and validates itself on its own PR, so land it first if they are split. **P82-C** touches PHP only and cannot collide with A or B.
+All four are independent. **P82-B** is the smallest and validates itself on its own PR, so land it first if they are split. **P82-C** touches PHP only and cannot collide with A or B. **P82-D** touches only the front end's loading path and must land before the first public release, since the first release is also the first deploy a real user's open tab will meet.
 
 ---
 
@@ -187,6 +188,37 @@ Nothing else in the plugin reads `global $mullion_fs` (grep confirms the only oc
 
 ---
 
+## Track P82-D - Recover from a stale chunk after a deploy
+
+### Problem
+
+Found 2026-09-14 during Phase 80 testing, filed in that phase's follow-ons as a FUTURE_TASKS entry and never actually written there; placed here on 2026-10-02.
+
+A tab that was open before a deploy holds the previous build's entry bundle. When the user then opens something loaded lazily, the entry asks for a hashed chunk that the new build has deleted, the import rejects, and the error boundary shows "Something went wrong" over an "error loading dynamically imported module" message. The deployed build was verified self-consistent and the service worker correctly declines to cache hashed assets, so nothing is broken on the server: the client is simply stale, and a reload fixes it.
+
+It reaches every lazy boundary: `AdminPanel` and `SettingsPanel` in `App.tsx`, `CampaignViewer` in `CardGallery.tsx`, the gallery config editor in two places, `ArchiveCompanyModal`, and the two wp-admin apps `main.tsx` imports dynamically. Nothing in `src/` handles a failed dynamic import today.
+
+It belongs in this phase because it is about what a release does to a running client, and because the first public release is the first time a stranger's open tab meets a deploy.
+
+### Fix
+
+Catch the failure where it happens and reload the page once before showing an error. Vite fires `vite:preloadError` on `window` when a chunk's preload fails, and the import itself rejects when the chunk is gone; handle both. Guard the reload with a flag in `sessionStorage` so a chunk that is genuinely missing after a reload falls through to the error boundary instead of looping.
+
+One constraint is specific to this product: a reload discards whatever is on screen. The Settings panel and the Layout Builder already autosave drafts and offer to restore them, so a reload there loses nothing; anything else that holds unsaved input when it triggers a lazy import should be checked before the reload is made unconditional.
+
+### Acceptance criteria
+
+- With the entry bundle from one build and the chunks of the next, opening a lazily loaded panel reloads the page once and the panel opens.
+- If the chunk is still missing after that reload, the error boundary shows, and the page does not reload again.
+- Both failure paths are covered: the preload event and the rejected import.
+
+### Validation
+
+- A browser test that serves a fresh entry, deletes or renames a chunk, and opens a lazy panel, asserting one reload and then success; and the same with the chunk kept missing, asserting the error boundary and no second reload.
+- A manual check on the dev site: deploy twice with a tab left open in between.
+
+---
+
 ## Follow-On Candidates
 
 | Candidate | Why it is deferred |
@@ -197,7 +229,7 @@ Nothing else in the plugin reads `global $mullion_fs` (grep confirms the only oc
 
 ## Implementation Notes
 
-Not started. All three tracks are the residue of the [Phase 75 branch review](archive/phases/PHASE75_REPORT.md#branch-review-2026-08-25) after its findings were placed into Phase 76 — the items that were not blocked on a human gate and had nowhere else to go. With P82-C filed, every item that review surfaced has an owner.
+Not started. A, B and C are the residue of the [Phase 75 branch review](archive/phases/PHASE75_REPORT.md#branch-review-2026-08-25) after its findings were placed into Phase 76: the items that were not blocked on a human gate and had nowhere else to go. With P82-C filed, every item that review surfaced has an owner. P82-D came later, from Phase 80's follow-ons (2026-10-02).
 
 ## Outcome
 
