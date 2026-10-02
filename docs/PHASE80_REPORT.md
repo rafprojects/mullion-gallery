@@ -1,8 +1,8 @@
 # Phase 80 - Behavioural components
 
-**Status:** In progress (P80-A, P80-B and P80-C complete; P80-D, P80-E and P80-F added 2026-10-02 to close the keyboard gate and the framework follow-ons before Phase 81)
+**Status:** In progress (P80-A, P80-B and P80-C complete; P80-D to P80-G added 2026-10-02 to close the keyboard gate, the framework follow-ons and the designer's answers before Phase 81)
 **Created:** 2026-09-10
-**Last updated:** 2026-10-02 (Key Decision C redefined, Key Decision E corrected, three tracks added, every follow-on given an owner)
+**Last updated:** 2026-10-02 (Key Decision C redefined, Key Decision E corrected, four tracks added, every follow-on given an owner, `COLOR-SPEC.md` gained the standing rules)
 
 ### Tracks
 
@@ -14,6 +14,7 @@
 | P80-D | The keyboard gate, automated: a browser suite asserting every component's keyboard contract on the shipped configuration, and §6B of the manual audit extended to every component family | Planned | Medium |
 | P80-E | The keyboard gate, manual: one recorded screen-reader pass over every component family | Planned (human) | Small |
 | P80-F | Framework defects and decisions that must land before Phase 81 builds on them | Planned | Medium |
+| P80-G | The designer's 2026-10-02 answers: the elevation ladder's resolution, the rail under focus, the glyph on `filled` controls, the selected row's geometry | Planned | Medium |
 
 ---
 
@@ -43,7 +44,7 @@
 2. **P80-B** second, in the order the adapter fights hardest: select family first (P77-C's `data-checked` and the unforwarded `vars` both lived there), then tabs and segmented control, then the simple choice controls.
 3. **P80-C** last and independently. It is small, it has no styling subtleties, and it can slip without blocking anything.
 4. **P80-D** next, because it is the regression net for P80-F. Every change F makes is to a component the suite will already be asserting.
-5. **P80-F** after D. Two of its items are decisions that change the shape Phase 81 migrates onto, so they must be settled before P81-B touches the call sites, not during it.
+5. **P80-F** and **P80-G** after D, in either order. Two of F's items are decisions that change the shape Phase 81 migrates onto, so they must be settled before P81-B touches the call sites. G moves resolved colours on 21 themes, so it must land before P81-B migrates surfaces onto the ladder.
 6. **P80-E** last. It is the one step that costs a person's time, so it runs once, on the code as it will ship, rather than before F changes it.
 
 ---
@@ -191,7 +192,7 @@ This is component-level. It does not replace P83-G's product-wide audit, which t
 
 ### Problem
 
-Four of Phase 80's follow-ons are about the framework itself rather than about any consumer. Two are defects in shipped framework components and two are decisions that change the shape Phase 81 migrates onto. All four are cheaper now than after 142 files depend on the current behaviour. The designer's pending answers land here too, because each is a one-line framework change.
+Four of Phase 80's follow-ons are about the framework itself rather than about any consumer. Two are defects in shipped framework components and two are decisions that change the shape Phase 81 migrates onto. All four are cheaper now than after 142 files depend on the current behaviour. The designer's answers, which this track was going to absorb, arrived on 2026-10-02 with more in them than one-line changes and have their own track, P80-G.
 
 ### Fix
 
@@ -199,7 +200,7 @@ Four of Phase 80's follow-ons are about the framework itself rather than about a
 2. **Two modals opened in the same commit hide each other from assistive technology.** Each dialog marks the other's portal `aria-hidden` and neither stays exposed (measured in jsdom, P80-C). Opened a commit apart, the topmost is correctly exposed. P80-C sidesteps it by queueing confirmations; nothing stops a consumer rendering two `<Modal opened>` siblings. Find where Base UI's outside-element hiding goes wrong for sibling dialogs and fix it in `Modal`; if it cannot be fixed without forking the primitive, add a development warning and write the constraint down.
 3. **One store per page.** `notify` and `confirm` are module singletons and `main.tsx` mounts the hosts once per gallery root. Today's Mantine setup has the same shape, with a consequence the P80-C note underrated: each root's `<Notifications />` renders every toast, so a toast appears in every gallery on the page, and Mantine's modals manager broadcasts on `window`, so a confirm opens once per gallery with one shared `onConfirm`. An admin who confirms both runs a delete or a revoke twice. That mechanism is read from source and the first step is to reproduce it on a two-gallery page. Two fixes keep the defect out of the migration: (a) mount one host per page rather than per root, which keeps Key Decision E's call shape and is the default unless a reason against it appears; (b) scope each store to its provider, which changes the call shape at 42 sites. Either way it lands before P81-B migrates a single call site.
 4. **Should the overlays keep portalling out, and what about `aria-owns`?** The overlays portal into the overlay root and the select family deliberately stays in the trigger's root, so the framework has two answers to one question. The select family's hostile-host probe passes without leaving, which weakens the case for the split, and Base UI points `aria-owns` at an id in another root (axe critical, cannot resolve) only on components that leave. Settle both together, with P80-D's suite proving the contracts survive whichever way it goes.
-5. **The designer's answers, as they arrive.** Four of the questions in `catching-up-2026-10-02.md` are one-line framework changes: whether `filled` controls default to the role glyph, whether the menu rail is suppressed under focus, the selected-row treatment, and the inset ring's band order, plus the toast's leading-edge tone border. Each lands here when answered. Any still unanswered when the rest of this track is done moves to P81-B with a note, so this track does not wait on correspondence. The elevation ladder is not here: it is an engine change, and its owner is Phase 81.
+5. **The designer's answers.** Moved to P80-G on 2026-10-02, when they arrived.
 
 ### Acceptance criteria
 
@@ -215,11 +216,57 @@ Four of Phase 80's follow-ons are about the framework itself rather than about a
 
 ---
 
+## Track P80-G - The designer's 2026-10-02 answers
+
+### Problem
+
+`designer-answers-catching-up-2026-10-02.md` answered all six questions from `catching-up-2026-10-02.md`. Two need no work: the toast keeps its leading-edge tone border (question 3), and the inset ring's band order stays halo, core, halo (question 6). The other four are work, and the first is larger than either side expected.
+
+**The elevation ladder (question 1).** The designer's answer: the ladder is three rungs by design on dark themes (`background`, `surface`, `surfaceRaised`), two plus a hairline and shadow on light themes, and on the homage ports `surfaceRaised` resolves to the same grey as `surface2` when it should be the rung above. Measured live on gruvbox-dark. They wrote the rule down, and it is now rule 13 of `COLOR-SPEC.md` §8.
+
+Their diagnosis of the *cause* does not hold, and they asked for it to be checked rather than taken on trust. **None of the 21 homage themes authors `surfaceRaised`.** The engine resolves it with `colors.surfaceRaised ?? colors.surface2 ?? colors.surface` in `resolveColors()` (`colorGen.ts`, P74-N, commented "flatter, safe"), so the collapse is the engine's fallback rather than a mapping error in each port. Two consequences follow from a plain comparison of the authored hex values:
+
+- **The fix differs by scheme.** On the 13 dark homage themes `surface3` is lighter than `surface2`, and resolving `surfaceRaised` to it is exactly the designer's gruvbox fix (`#665c54`). On the 8 light ones `surface2` and `surface3` step *darker* than `surface`, so today a raised menu on catppuccin-latte, github-light, material-light, solarized-light and four others is darker than the surface it sits on, and `surface3` would make it darker still. Rule 13 gives light themes elevation by hairline and shadow rather than lightness, but which ground a raised element takes on a light homage theme is the designer's call, and it has been asked.
+- **The `border` collision is two themes, and the fix creates two more.** `border` equals the resolved `surfaceRaised` on catppuccin-mocha and gruvbox-dark today, so a 1px `border` on a menu or popover is not drawn there. Moving `surfaceRaised` to `surface3` clears both but creates the same collision on cyberpunk and nord, whose authored `border` *is* `surface3`.
+
+`surfaceRaised` is also an input to more than the menu ground: the semantic text rungs are selected against it (`componentTokens.ts`), `primaryStroke` is selected against it, `borderStrong` is derived against it, and `menu-bg`, `tooltip-bg` and `table-hover-bg` are it. So the designer's "no signed-off colour moves" is a prediction to measure, not an assumption to build on.
+
+**The rail under keyboard focus (question 5): suppress it.** The designer's reason is a geometry measurement, not a preference: when both paint, the 3px rail covers the inset ring's halo band on the leading edge, so the ring loses its two-tone guarantee on that side. One mark per input mode: pointer gets the rail, keyboard gets the ring.
+
+**The role glyph on `filled` controls (question 4): yes.** Status tones only (success, warning, danger, info), on `Alert`, `Button` and `Badge`, with the same opt-out. A danger confirm button keeps declining it, because its label is the role word.
+
+**The selected row's geometry (question 2).** The check-and-`primary-text` treatment is confirmed and the 6px-padding alternative rejected. The open point is the row that is both highlighted and selected: the rail and the check share the leading edge, and the check must start where a normal row's padding starts, clear of the rail. The designer asked for a capture rather than specifying pixels blind.
+
+### Fix
+
+1. **Resolve `surfaceRaised` to a real rung.** Fix it in `resolveColors()` rather than by authoring 21 values, because user-authored themes go through the same fallback and would keep the defect otherwise: dark themes take `surface3` when `surfaceRaised` is not authored. Light themes take whatever the designer answers. Then measure before writing anything down: resolve all 23 themes before and after, diff every resolved token and every component token, and list each one that moved, by theme, with its old and new value. Both CI contrast audits must stay green. Resolve the `border` collisions the measurement finds, on cyberpunk and nord at least, by the rule the designer gives rather than by nudging hex values.
+2. **Rebuild the segmented indicator on the ladder.** Track on `surface`, indicator on `surfaceRaised`, which on default-dark is a whole rung (5.09) rather than two-thirds of one (3.51). On dark themes the indicator then reads by lightness and loses its border; on light themes it keeps the `borderStrong` hairline, by rule 13. The toast keeps its border on both, because it floats over arbitrary content rather than over a known ground.
+3. **Suppress the menu rail under `:focus-visible`.** One selector, with the existing rail guard extended so a mutation that re-enables it under focus fails. Check the select family first rather than applying the same selector there: a select option never takes focus (it stays in the input, with `aria-activedescendant` naming the option), so on a select the rail is the only keyboard mark and must stay.
+4. **Default the role glyph on `filled` status controls**, in `Alert`, `Button` and `Badge`, and confirm that every framework component rendering a filled status button where the label already names the role declines it explicitly, as `confirm()` does.
+5. **Send the designer a capture** of a highlighted-and-selected row in the select family and in the menu, at true size, on one light and one dark theme. If the check sits on the rail, move it to the row's normal padding.
+
+### Acceptance criteria
+
+- On every bundled dark theme, `surfaceRaised` differs from `surface2`. On every light theme, the raised ground is the one the designer chose.
+- A before-and-after table of every resolved token that moved, for all 23 themes, is in this report, and both contrast audits pass.
+- `border` differs from `surfaceRaised` on every bundled theme.
+- `theme-qa` diffs are reviewed with an explicit pixel diff, since menus, popovers and tooltips change ground on 21 themes.
+- The segmented indicator has no border on dark themes and keeps it on light.
+- On a keyboard move a menu row shows the ring and not the rail; on hover it shows the rail. A select option still shows the rail under the keyboard.
+- `filled` status controls carry the glyph by default, and the opt-out still works.
+- The designer has the capture.
+
+### Validation
+
+- `npx vitest run` (the engine tests and `colorGen.test.ts` in particular), `npm run themes:catalog:check`, `npx playwright test` including `theme-qa`, and the token diff above.
+
+---
+
 ## Follow-On Candidates
 
 ### Where each follow-on went (2026-10-02)
 
-The user's direction: nothing here is deferred past release, and nothing is left without an owner. Each row of the table below is placed in a phase, or marked resolved with the reason. Every placement fitted an existing phase, so no new phase was created. The one item that could still grow into its own track is the elevation ladder, and only if the designer wants three real rungs.
+The user's direction: nothing here is deferred past release, and nothing is left without an owner. Each row of the table below is placed in a phase, or marked resolved with the reason. Every placement fitted an existing phase, so no new phase was created. The elevation ladder, the one item that could have grown, was answered the same day and became part of P80-G.
 
 Three rows below say "FUTURE_TASKS" and were **never actually filed there**: the builder's arrow-key nudge, the backwards tab order and the broken-tab-after-deploy. Each is placed in a phase now.
 
@@ -246,7 +293,7 @@ Three rows below say "FUTURE_TASKS" and were **never actually filed there**: the
 | ID-based ARIA across the overlay root | Resolved | Superseded by the row above it. |
 | Filled-and-flush controls | **P81-B** | Admin Panel batch: `Add Media`, `Rescan Types`, the Media sort mode. |
 | `aria-owns` across a shadow boundary | **P80-F** | Settled with the portal question. |
-| The elevation ladder | **P81-B** | With the designer; re-sent 2026-10-02. If they want three rungs it becomes an engine track ahead of P81-B's first surface batch. |
+| The elevation ladder | **P80-G** | Answered 2026-10-02: three rungs on dark by design, two plus a hairline on light. The cause is the engine's `surfaceRaised` fallback; P80-G fixes it before P81-B migrates surfaces onto it. |
 | The colour picker has no manual pass | **P80-E** | Part of the screen-reader pass. |
 | Should the overlays keep portalling out? | **P80-F** | Decision. |
 | Tab order jumps backwards in the gallery | **P81-B** | Gallery batch, a DOM-order fix on the migrated surface. Never filed in FUTURE_TASKS. |
@@ -292,6 +339,16 @@ Three rows below say "FUTURE_TASKS" and were **never actually filed there**: the
 | Dropping `@mantine/hooks` | Seven hooks, about 150 lines. Cheap, and it can wait for Phase 81's removal track. |
 
 ## Implementation Notes
+
+### `COLOR-SPEC.md` gains the standing rules (2026-10-02)
+
+**What changed.** [`COLOR-SPEC.md`](design/COLOR-SPEC.md) gained a §8, "Standing rules", and a dated line in its header pointing at it. Rules 1 to 12 are the designer's text, verbatim. Rule 13, on elevation, is from their answers the same day. No existing section was edited.
+
+**Why.** The designer's 2026-09-14 reply consolidated a week of correspondence into twelve rules, explicitly as an addendum for this spec, because "they are currently spread across nine correspondence files and that is where rules go to die." It waited three weeks on R's standing instruction that a spec document is archived before it changes. The user authorised the change on 2026-10-02.
+
+**Where the old copy is.** [`docs/design/archive/2026-10-02-pre-standing-rules/`](design/archive/2026-10-02-pre-standing-rules/), with a README saying what changed. The same archive is in the designer's folder, following the dated-folder convention already used there (`archive/2026-09-01-pre-designer-review/`, `archive/2026-09-09-pre-designer-corrections/`). The folder's live copy had fallen behind the repo, missing the P77-F `focusHalo` row and ring paragraph, so it was replaced with the repo's version; the folder's previous copy is archived beside the repo's as `COLOR-SPEC.folder-copy.md`.
+
+**One rule is not yet true of the code, and the spec says so.** Rule 13 requires `surfaceRaised` strictly above `surface2` on every theme. It is not, on 21 of 23, because of the engine's fallback described in P80-G. The spec carries a dated engineering note saying exactly that, rather than stating a rule the bundled themes break without comment.
 
 ### P80-A, overlays batch (2026-09-13)
 
