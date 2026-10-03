@@ -1,8 +1,8 @@
 # Phase 80 - Behavioural components
 
-**Status:** In progress (P80-A to P80-D complete; P80-E, P80-F and P80-G remain: the screen-reader pass, the framework fixes and the designer's answers)
+**Status:** In progress (P80-A to P80-D and P80-F complete; P80-G and P80-E remain: the designer's answers and the screen-reader pass)
 **Created:** 2026-09-10
-**Last updated:** 2026-10-02 (Key Decision C redefined, Key Decision E corrected, four tracks added, every follow-on given an owner, `COLOR-SPEC.md` gained the standing rules)
+**Last updated:** 2026-10-02 (P80-F landed, including a live double-action fix in `main.tsx`; earlier the same day Key Decision C was redefined, Key Decision E corrected, four tracks added, every follow-on given an owner, and `COLOR-SPEC.md` gained the standing rules)
 
 ### Tracks
 
@@ -13,7 +13,7 @@
 | P80-C | Imperative managers: notifications and confirmations | **Done** (2026-09-14) | Small-Medium |
 | P80-D | The keyboard gate, automated: a browser suite asserting every component's keyboard contract on the shipped configuration, and §6B of the manual audit extended to every component family | **Done** (2026-10-02); found six defects, filed in P80-F | Medium |
 | P80-E | The keyboard gate, manual: one recorded screen-reader pass over every component family | Planned (human) | Small |
-| P80-F | Framework defects and decisions that must land before Phase 81 builds on them | Planned | Medium |
+| P80-F | Framework defects and decisions that must land before Phase 81 builds on them | **Done** (2026-10-02); also found the overlay-root axe gates had never scanned anything, and a live double-action defect on two-gallery pages | Medium |
 | P80-G | The designer's 2026-10-02 answers: the elevation ladder's resolution, the rail under focus, the glyph on `filled` controls, the selected row's geometry | Planned | Medium |
 
 ---
@@ -37,6 +37,7 @@
 | C | How is a component proved done? | **Four gates:** the axe structural gate, the P77-F ring walk, the P79-B static sheet tests, and the keyboard gate. The keyboard gate has two halves: an **automated keyboard-contract suite** run in a browser against the shipped configuration (P80-D), and a **manual screen-reader pass** recorded in `ACCESSIBILITY_MANUAL_AUDIT.md` (P80-E). A component with green unit tests and no keyboard gate is not done. *Revised 2026-10-02 by user decision; it was "a manual keyboard pass". Every keyboard check in that pass except the screen reader's actual speech is mechanical, a one-off manual pass is stale the first time the component changes, and Phase 81 changes the code around every one of these components. Only what a screen reader says still needs a person.* |
 | D | What about components the primitive lacks? | **Named, owned and reviewed as behaviour.** Resolved 2026-09-11 by P78-B's pick of Base UI 1.8.0, so the gap list is no longer conditional: **pagination** (10 files), **tags input** (5 files) and **colour picker** (20 files). Pagination is a button list with roving focus and is cheap. Tags input is Base UI's `Combobox` plus chips. The colour picker is a saturation and hue surface and is a component in its own right, so P80-B should budget for writing or vendoring it rather than wrapping it. Each gap carries the same four gates. **All three built 2026-09-14, and the pricing held with one correction:** pagination is a button list without roving focus, because the Authoring Practices treat pagination as a set of links and each control is its own tab stop. |
 | E | Do the notification and confirmation managers keep their call shape? | **Yes.** `notify.show()` and `confirm()` mirror the existing call sites, so Phase 81's migration of those sites is mechanical rather than a rewrite. Measured 2026-09-14: **42** production `notifications.show` calls in 16 files and **6** production `openConfirmModal` sites. *Corrected 2026-10-02: this row first said 48 and 11; the 48 counted test files and the 11 matched nothing.* |
+| F | Where does a popup mount? | **By what it is wired to.** A popup tied to its trigger by an ID reference or by Tab order (menu, popover, tooltip, the select family) mounts in the trigger's own root, through `anchor.ts`. A popup that traps focus and hides the page (modal, drawer, confirm) mounts in the overlay root, and `modalStack.ts` hides what is beside it there. The toast viewport is neither and stays in the provider's container, where `modalStack.ts` keeps it exposed as a live region. *Decided 2026-10-02 by P80-F, after P80-D measured what the split cost the anchored popups.* |
 
 ## Execution Priority
 
@@ -205,7 +206,7 @@ Four of Phase 80's follow-ons are about the framework itself rather than about a
 7. **The slider has no visible focus indicator.** Found by P80-D. Keyboard focus lands on the visually hidden range input inside the thumb; the ring rule matches a thumb that is itself `:focus-visible` or carries `data-focus-visible`, and Base UI sets neither on it. The value bubble shows, through `:has(:focus-visible)`, so the fix is the same selector for the ring. It also covers the colour picker's hue and opacity rails, which are this slider.
 8. **A toast shows no focus indicator when it has focus.** Found by P80-D. On the F6 path Tab lands on the toast itself (`tabIndex` 0, from Base UI) before its close button, and the toast carries no framework focus attribute. A WCAG 2.4.7 failure on a stop every keyboard user passes through.
 9. **Every dialog adds a `banner` landmark.** Found by P80-D's accessibility snapshots. The shared dialog header is a `<header>`, which a browser exposes as a banner landmark when it is not inside a sectioning element, so a screen reader announces "banner" inside every modal, drawer and confirm. A `<div>` fixes it.
-10. **The tooltip's text is not exposed to assistive technology.** A decision rather than a defect. Base UI's tooltip popup has no role and its trigger no `aria-describedby`, so the framework `Tooltip` is visual only, as Mantine's is today. Anything only in a tooltip is invisible to a screen reader, and 115 call sites move onto this component in Phase 81. Decide whether the framework exposes the label as a description, or writes down that a tooltip must never carry information the control's own name does not.
+10. **The tooltip's text is not exposed to assistive technology.** A decision rather than a defect. Base UI's tooltip popup has no role and its trigger no `aria-describedby`, so the framework `Tooltip` is visual only, as Mantine's is today. *(Corrected by P80-F: Mantine's is not visual only. It sets `aria-describedby` while open, which resolves on a light mount and not across the overlay root.)* Anything only in a tooltip is invisible to a screen reader, and 115 call sites move onto this component in Phase 81. Decide whether the framework exposes the label as a description, or writes down that a tooltip must never carry information the control's own name does not.
 11. **Two small naming gaps**, recorded so they are not lost. The select family's listbox has no accessible name in either root (the combobox is named, so a screen reader still says what is being chosen), and the searchable `Select` exposes a second control, a button, with the same name as its text field.
 
 ### Acceptance criteria
@@ -282,10 +283,10 @@ Three rows below say "FUTURE_TASKS" and were **never actually filed there**: the
 |-----------|-------|------|
 | Migrating consumers | P81 | Unchanged. |
 | `useBroadcastStaleness` dismisses its own warning | **P81-B** | Named in P81-B with its own acceptance criterion, per user decision 2026-10-02. |
-| Two modals in one commit hide each other | **P80-F** | Framework defect. |
-| One store per page | **P80-F** | Raised in severity: the confirm case can run a destructive callback twice. Must land before P81-B migrates a call site. |
+| Two modals in one commit hide each other | **P80-F** | Framework defect. Done: in the shipped configuration it was worse, since no modal hid anything in the overlay root. |
+| One store per page | **P80-F** | Raised in severity: the confirm case can run a destructive callback twice. Must land before P81-B migrates a call site. Done, and reproduced in today's product, which is fixed too. |
 | `modals.open` and `modals.closeAll` | **P81-B** | `ContextualToolbar` becomes a rendered `<Modal>`. |
-| `FileButton` has no accessible name | **P80-F** | Framework defect, axe critical. |
+| `FileButton` has no accessible name | **P80-F** | Framework defect, axe critical. Done. |
 | The menu's ground is audited | Resolved | A correction, no work. |
 | Focus ring on the menu row, 20 of 23 themes | Resolved | The rail retired the tint the failing pairs were measured against (P80-A). |
 | The tinted-ground finding was wrong | Resolved | The menu-item tone defect it found is fixed with a guard. |
@@ -300,10 +301,10 @@ Three rows below say "FUTURE_TASKS" and were **never actually filed there**: the
 | Every dropdown is keyboard-inoperable | P81-B | Already there. |
 | ID-based ARIA across the overlay root | Resolved | Superseded by the row above it. |
 | Filled-and-flush controls | **P81-B** | Admin Panel batch: `Add Media`, `Rescan Types`, the Media sort mode. |
-| `aria-owns` across a shadow boundary | **P80-F** | Settled with the portal question. |
+| `aria-owns` across a shadow boundary | **P80-F** | Settled with the portal question. Done: the popup is in the trigger's root, so the id resolves. |
 | The elevation ladder | **P80-G** | Answered 2026-10-02: three rungs on dark by design, two plus a hairline on light. The cause is the engine's `surfaceRaised` fallback; P80-G fixes it before P81-B migrates surfaces onto it. |
 | The colour picker has no manual pass | **P80-E** | Part of the screen-reader pass. |
-| Should the overlays keep portalling out? | **P80-F** | Decision. |
+| Should the overlays keep portalling out? | **P80-F** | Decision. Done: dialogs do, anchored popups do not. |
 | Tab order jumps backwards in the gallery | **P81-B** | Gallery batch, a DOM-order fix on the migrated surface. Never filed in FUTURE_TASKS. |
 | A deploy breaks any open tab | **P82-D** | New track. Never filed in FUTURE_TASKS. |
 | `link-in-text-block` on `Anchor` | **P81-B** | Confirm on a real surface; fix on `Anchor` if it reproduces. |
@@ -347,6 +348,92 @@ Three rows below say "FUTURE_TASKS" and were **never actually filed there**: the
 | Dropping `@mantine/hooks` | Seven hooks, about 150 lines. Cheap, and it can wait for Phase 81's removal track. |
 
 ## Implementation Notes
+
+### P80-F, framework defects and decisions (2026-10-02)
+
+**Status: landed.** Every item is fixed or decided, every `test.fail()` in `e2e/ui-keyboard.spec.ts` is gone and its test passes, and each fix's test was run against the unfixed code first and failed. Fixing them turned up four more defects, two of them in the test gates themselves, and a live production defect behind item 3. All are fixed here.
+
+| Item | Outcome | Proved by |
+|---|---|---|
+| 1. `FileButton`'s input has no name | The input is `aria-hidden`: the caller's button is the control. | A jsdom axe gate in `components.test.tsx`. |
+| 2. Two modals hide each other | Fixed for the shipped configuration by a modal stack; a development warning in the one case Base UI leaves no hook for. | Three browser tests and three unit tests. |
+| 3. One store per page | Both framework hosts are page singletons. Today's Mantine hosts are fixed too. | A two-gallery browser test on both mounts. |
+| 4. The portal question | Menu, popover and tooltip portal into their trigger's root. Modal and drawer stay in the overlay root. | Six keyboard tests un-marked and passing; axe gates around trigger and popup. |
+| 6. `PasswordInput` is unmasked | `type="password"` until revealed. | Unit and browser. |
+| 7. The slider has no ring | A `within` focus variant: the thumb rings when it contains focus. | Unit and browser. |
+| 8. A focused toast has no ring | The toast carries the focus attribute. | Unit and browser. |
+| 9. Dialogs expose a `banner` | The header is a `div`. | Browser. |
+| 10. Tooltip text | **Decided: visual only.** | Recorded below and in the component. |
+| 11. Two naming gaps | The listbox is named by the field label; the searchable select's chevron reads "Show options" and the field label. | Unit and the browser snapshots. |
+
+#### Item 4: anchored popups live in their trigger's root
+
+The rule is now one sentence, and it is in [`anchor.ts`](../src/ui/components/anchor.ts): **a popup wired to its trigger by an ID reference or by Tab order mounts in the trigger's root; a popup that traps focus and hides the page mounts in the overlay root.** The select family already followed the first half (P80-B); its resolver moved into `anchor.ts` and the menu, popover and tooltip use it. The tooltip carries no reference, but it moved too, so there is one rule rather than an exception.
+
+All three P80-D symptoms went with it, and the mechanism is now known rather than inferred. Base UI renders the portal's focus guards and its `aria-owns` span **beside the trigger**, and a guard finds "the next tabbable after the trigger" from there. With the popup in another shadow root, the guard's search and the `aria-owns` id both point across a boundary. The six cross-root keyboard tests pass on both mounts. The Tab-out tests were also tightened: focus must land on the stop Tab reaches from the closed trigger, not merely somewhere outside.
+
+**What leaving the overlay root costs, measured.** The overlay root exists because a host page's transform, clipping and z-index break popups inside the gallery (P77-B). An anchored popup is now inside the gallery again. Measured with a clipping, transformed wrapper around the gallery host that ends 8px below the trigger, as a WordPress theme's wrapper would: the menu and the popover **flip above the trigger and stay whole**, because Base UI's positioner treats clipping ancestors as its collision boundary. That is a permanent test now. One case is not covered: a host page's sticky header can paint over an anchored popup that opens beneath it, which the overlay root prevented. The select family has carried the same exposure since P80-B; it is accepted here for the same reason, because a menu that cannot be left by Tab and has no name is a worse failure than one a sticky header can overlap.
+
+**A popover is now a named dialog.** Base UI names a popover only from a `Title` part, which this API does not expose, so every popover was a `role="dialog"` with no name (axe `aria-dialog-name`, serious). It was never caught because of the next finding. It is now named by its trigger, as a menu is, unless the caller passes a name.
+
+#### The overlay-root axe gates never ran
+
+P80-A's axe gates for the modal, drawer, menu and popover, and P80-C's for the toast and the confirm dialog, scoped their scan with `include(['[data-mullion-overlay-root]', selector])`. **axe reads a plain array as a chain of frames, not of shadow roots.** The selector matched nothing, axe scanned **zero nodes**, and all six gates passed on an empty result from the day they were written. The comment above the helper said the array form crossed shadow boundaries, and nothing checked the claim.
+
+They now use `{ fromShadowDom: [...] }`, each gate first asserts that axe reached the element it was written for, and each waits for the open transition, because a popup scanned mid-fade reported a contrast failure that does not exist. Run for real, they found two serious violations at once: the unnamed popover above, and **a toast with no title is an unnamed dialog**. Base UI names a toast only by its title, so `notify.show({ message })`, the common form, produced one. A message-only toast is now named by its message, rendered as a paragraph rather than a heading. One thing is excluded and says why: Base UI's focus-guard spans are `aria-hidden` with `tabindex="0"`, which axe flags as `aria-hidden-focus`, and they hand focus on the moment they receive it. P80-A recorded them as primitive machinery.
+
+#### Item 2: what a modal hides
+
+The P80-C finding was measured in jsdom, where the provider's portal container sits in the light DOM. Measured in Chrome, by role query and by the browser's own accessibility tree, the shipped configuration fails the other way:
+
+| Container | Two modals opened in one commit | A modal stacked a commit later |
+|---|---|---|
+| Overlay root (shipped) | **both exposed** | **both exposed** |
+| Provider's own container, light DOM | both `aria-hidden` (Chrome rescues the focused one) | correct: only the top one |
+
+The cause is in Base UI's `markOthers`. It hides everything outside an open modal by walking from `document.body`, and the walk does not enter shadow roots: a popup inside one is kept by keeping its host. So in the overlay root, a modal hides nothing beside it. That covers the modal underneath a confirm, which is the everyday case of a confirm raised from an open dialog, and also any chrome a provider portals there.
+
+`aria-modal="true"` was tried first, because it is the declarative fix and Base UI does not set it. It changed nothing in Chrome's accessibility tree and was dropped. The fix is [`modalStack.ts`](../src/ui/components/modalStack.ts): each open modal registers its portal node, and inside the topmost one's shadow root everything not on the path to that modal or to a live region is marked `aria-hidden`. It finishes the walk Base UI cannot make and acts nowhere else, so the light DOM stays Base UI's. Live regions are kept because Base UI keeps them, so a toast raised behind a dialog is still announced, and a test asserts it. One owner recomputes the whole set on each open and close, so no counters can drift.
+
+The light-DOM same-commit pair is not fixed. Base UI's hook for extra inside elements (`getInsideElements`) is not exposed through `Dialog`, so stopping two dialogs hiding each other would mean forking the primitive. It warns in development instead and the constraint is written into `confirm.tsx` and `modalStack.ts`: open the second modal from the first, or queue it as `confirm()` does. It reaches only a light-DOM container, which no shipped mount uses for framework overlays today.
+
+#### Item 3: one store per page, and a live defect
+
+**Reproduced first, on today's product.** A page with two `.mullion-gallery` shortcodes, calling the very Mantine module instances the page had loaded: one `notifications.show` rendered **two toasts**, one `modals.openConfirmModal` opened **two dialogs**, confirming the first left the second open, and confirming that one too ran `onConfirm` **twice**. Both mounts behave the same. Any confirmed action on a page with two galleries could run twice: a delete, a revoke, a discard.
+
+**The framework.** [`pageHost.ts`](../src/ui/components/pageHost.ts): a host may be mounted in every gallery, which keeps Key Decision E's call shape, but only the first mounted renders, and the next takes over if it unmounts. `<Notifications>` and `<Confirmations>` both use it. A browser test opens a second gallery root (`?twin=1`) and asserts one toast and one dialog on both mounts; with the claim disabled it sees two of each.
+
+**The product, now.** `main.tsx` renders Mantine's `<Notifications>` and `<ModalsProvider>` in the first gallery only, beside the app rather than around it so a handover never remounts the app. That is safe because nothing reads the modals context (every call site uses the imperative `modals` object) and all seven modal call sites render plain components whose text and callbacks are bound at the call site. Re-measured afterwards: one toast, one dialog and one `onConfirm` on two galleries and on one, on both mounts. **This touches a consumer file in a phase that migrates none (Key Decision B).** It is a mount fix for a live double-action defect rather than a migration, and P81-B replaces both lines with the framework hosts.
+
+#### Item 10: a tooltip is visual only
+
+The decision is recorded in the `Tooltip` docstring: **the framework tooltip gives assistive technology nothing, so a tooltip must never carry information the control's own name or visible text does not.** A shortcut belongs in `aria-keyshortcuts`, an explanation in a `Popover`, and an icon-only control needs its own `aria-label`.
+
+**A correction first.** P80-D wrote that the framework tooltip is "visual only, as Mantine's is today". That was wrong about Mantine. Its tooltip uses floating-ui's `useRole({ role: 'tooltip' })`, which sets `role="tooltip"` and puts `aria-describedby` on the target while open. In the shipped shadow configuration the tooltip is in the overlay root, so that reference points across a boundary and does not resolve; on a light mount it works. So the migration does remove something on the light mount, and that is why the decision needed the call sites counted rather than assumed.
+
+**Why not expose it as a description.** All 115 production tooltips were classified. On 90 the tooltip repeats the control's `aria-label` or visible text, so a description would make a screen reader say the name twice. Of the remaining 25, three are already conveyed by an `aria-label`. Most of the other 22 sit on a disabled control or a non-focusable element (a badge, an icon), which takes neither focus nor hover, so a description cannot reach anyone there; their text has to move into the element. Wiring a description would also mean cloning the child to put `aria-describedby` on the focusable element, which is the interaction code the study's principle 6 keeps out of the wrappers. The 22 are listed in P81-B by file and by the channel each needs, and P81-B's acceptance criteria require each to have one.
+
+#### Item 11, and a third gap found beside it
+
+**The listbox is named by the field's label** in all four select forms. The first attempt copied the trigger's `aria-labelledby` when its ref attached and failed in jsdom: Base UI's label registers its id in an effect, after the ref. `FieldShell` now takes an explicit `labelId` that `Field.Label` uses, and the listbox points at that. **The searchable select's chevron** had Base UI's field labelling on top of its own `aria-label`, so it was announced as a second control with the field's exact name. It is now labelled by itself and the field ("Show options inline font"), the Authoring Practices' pattern for a button that acts on a named thing.
+
+Found beside them: `MultiSelect` and `TagsInput` put a `<label htmlFor>` inside `Field.Label`, which is itself a `<label>`, and that is invalid nesting. `FieldShell` now takes a `labelFor`, and the field has one label pointing at its input. A unit test checks there is no nested label and that clicking the label focuses the input.
+
+#### The smaller fixes
+
+- **`FileButton`**: the input is `aria-hidden` as well as `tabIndex={-1}`, and a jsdom axe gate covers the rendered pair. The overlay suite's comment that described the defect as current is corrected.
+- **`PasswordInput`**: `type="password"` until revealed. `TextInputProps.type` admits `'password'`, with a note pointing callers at `PasswordInput`. The unit test now checks the field, not only the toggle.
+- **The slider ring**: a fourth focus variant, `within`, rings a part that contains focus (`:has(:focus-visible)`). That is the same selector the value bubble already used, so no new browser floor. The thumb takes it, and the colour picker's hue and opacity rails get it with no change of their own.
+- **The toast ring**: `Toast.Root` carries `data-mullion-focus`. A toast is a neutral surface with a gap around it, so it takes the outset ring.
+- **The dialog header** is a `div`, and the banner landmark is gone.
+
+**Showcase additions**, all behind the existing opt-in flags: a modal stacked from inside the inline modal and a same-commit pair of modals in the overlay section, `?portal=provider` for the provider's own light-DOM container, and `?twin=1` for a second gallery root with its own hosts.
+
+**Validation.** `npx tsc --noEmit` clean, `npm run lint` clean, `npm run ui:allowlist:check` green at 178 files, `npx vitest run` **4,407 of 4,407** across 277 files (17 new), `npm run build` clean apart from the pre-existing chunk-size notice. The browser suite is **199 tests**, the 189 from P80-D plus 10 new. Getting two consecutive cold-cache runs took three tries, and the record is here because it found a harness defect:
+
+- **Before the fix, two of four cold runs failed one or two tests with `route.fetch: read ECONNRESET`**, always inside `serveShowcase` fetching the dev server's index and before any assertion; every other test passed. The cause is in Playwright: its HTTP agent is `keepAlive: true`, so a socket the dev server closes at its idle timeout can be reused at that instant, and `route.fetch` retries an `ECONNRESET` only when told to. P80-F's new tests went through `serveShowcase` more often, which is why it surfaced now. An orphaned dev server and a Vite re-optimisation were each ruled out by measurement first. All six `serveShowcase` helpers now pass `maxRetries: 2`.
+- **After it, one of four cold runs failed the select family's axe gate once**, with the error text cut off by the runner. It did not reproduce in 25 isolated repetitions, in 162 runs under 12 workers, or in the next pair. That gate was the only scoped axe gate still scanning without waiting for the open transition, which this track found produces false contrast failures, so it now waits and checks its reach too, and passed 20 repetitions after. Whether that was the cause is not confirmed.
+- **The final pair: 199 of 199, twice consecutively, each from a cold Vite cache**, with full logs kept. The select gate's change came after that pair and was checked by its own spec and the 20 repetitions above.
 
 ### P80-D, the keyboard gate automated (2026-10-02)
 

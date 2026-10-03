@@ -256,8 +256,10 @@ Since 2026-10-02 the gate has two halves:
 > Swap `theme=default-light` for the light pass. `?keyboard=1` turns every section on.
 >
 > **Section 0's console snippets do not apply here either.** The showcase's host is `#showcase`,
-> not `#root`. Its own styles are on `document.getElementById('showcase').shadowRoot`, and every
-> popup is in `document.querySelector('[data-mullion-overlay-root]').shadowRoot`.
+> not `#root`. Its own styles are on `document.getElementById('showcase').shadowRoot`. Since P80-F
+> a menu, popover, tooltip or listbox opens in its trigger's root, which for the `inline` copies is
+> that same shadow root; dialogs, drawers, confirms and toasts are in
+> `document.querySelector('[data-mullion-overlay-root]').shadowRoot`.
 
 The page renders each family twice: once in the gallery's shadow root (labels start `inline`) and
 once inside the overlay root (labels start `overlay`). Use the `inline` copies: that is where a
@@ -275,41 +277,45 @@ so a screen-reader user can discover it; the old check 6 asked for it to be skip
 | Family | What is asserted | Where |
 |---|---|---|
 | Modal, drawer | Enter opens with focus inside; Tab and Shift+Tab stay inside; Escape closes and returns focus to the trigger; named by its title | `ui-keyboard` "modal and drawer"; `ui-overlays` "focus" |
-| Popover | Enter and Space open with focus inside; Escape returns focus | `ui-keyboard` "popover and tooltip" |
+| Popover | Enter and Space open with focus inside; Escape returns focus; Tab closes it and lands on the next stop after the trigger; named by its trigger | `ui-keyboard` "popover and tooltip"; `ui-overlays` "the axe gate" |
 | Tooltip | Opens on keyboard focus; Escape dismisses | `ui-keyboard` "popover and tooltip" |
-| Menu | Enter, Space and ArrowDown open on the first item; arrows, Home, End and typeahead move; a disabled item is focusable and inert; Enter activates and Escape closes, both returning focus | `ui-keyboard` "menu"; `ui-overlays` "dismissal" |
+| Menu | Enter, Space and ArrowDown open on the first item; arrows, Home, End and typeahead move; a disabled item is focusable and inert; Enter activates and Escape closes, both returning focus; Tab closes it and lands on the next stop; named by its trigger | `ui-keyboard` "menu"; `ui-overlays` "dismissal" |
+| Stacked modals | A modal opened over another, or two opened at once, leaves only the top one exposed; closing it exposes the one below; the toast region stays exposed | `ui-overlays` "a modal hides what is behind it" |
 | Text, textarea, password, number | Tab order and names; the password reveal toggles by keyboard and reports `aria-pressed`; number arrows step, Home and End go to the bounds, values clamp | `ui-keyboard` "the input family" |
-| Select | Space opens with focus on an option; typing on the closed field picks; arrows and Enter commit; Escape returns focus across the shadow boundary | `ui-keyboard` "the select family"; `ui-selects` "a keyboard can operate it" |
+| Select | Space opens with focus on an option; typing on the closed field picks; arrows and Enter commit; Escape returns focus across the shadow boundary; the listbox is named by the field | `ui-keyboard` "the select family"; `ui-selects` "a keyboard can operate it" |
 | Searchable select, multiselect, tags | Typing filters; focus stays in the field; Enter picks and the multiselect stays open; Enter adds a tag; Backspace removes the last | `ui-keyboard` "the select family"; `ui-selects` |
 | Tabs | Arrows move focus without switching; Enter switches; Home and End; Tab moves into the panel | `ui-keyboard`; `ui-choices` "the tab bar" |
 | Segmented control, chip group | One tab stop; arrows move the choice | `ui-keyboard`; `ui-choices` |
 | Accordion | Enter and Space toggle; arrows do nothing | `ui-keyboard` |
 | Checkbox, switch | Space toggles both; Enter toggles only the switch | `ui-keyboard` |
-| Slider | Arrows step; Page keys take the large step; Home and End go to the bounds | `ui-keyboard`; `ui-choices` |
+| Slider | Arrows step; Page keys take the large step; Home and End go to the bounds; the thumb shows the ring | `ui-keyboard`; `ui-choices` |
 | Pagination | Every page is a tab stop; Enter makes it current | `ui-keyboard` |
 | Colour input | The swatch opens the picker with focus on its surface; arrows on the surface change the value; Tab walks hue, opacity and swatches; Escape returns to the swatch | `ui-keyboard` |
-| Toasts | F6 reaches the stack; Tab reaches the close button, which has the ring; Enter dismisses and restores focus to where it was | `ui-keyboard` "the managers" |
+| Toasts | F6 reaches the stack; Tab reaches the toast and then its close button, both with the ring; Enter dismisses and restores focus to where it was; one toast per page however many galleries | `ui-keyboard` "the managers"; `ui-managers` "a page with two galleries" |
 | Confirm dialog | Focus moves in; Tab and Shift+Tab stay inside; Escape closes and returns focus | `ui-keyboard`; `ui-managers` |
 | Every family | The accessibility tree a screen reader is given: role, name, state | `ui-keyboard` "what a screen reader is given" |
 
-### 6B.2 Known defects the gate found (2026-10-02)
+### 6B.2 Known defects the gate found (2026-10-02), all fixed
 
-Each is written in `ui-keyboard.spec.ts` as the contract it should meet and marked as an expected
-failure, owned by Phase 80 track P80-F. When a fix lands its test starts passing, Playwright
-reports the unexpected pass, and the mark has to come off.
+P80-D wrote each as the contract it should meet, marked as an expected failure. P80-F fixed every
+one the same day, and the marks are gone. Running the overlay-root axe gates for real (they had
+been scanning nothing) found three more, fixed in the same track.
 
-| Defect | Where it shows | Owner |
+| Defect | Where it showed | Status |
 |---|---|---|
-| Tab cannot leave an open menu or popover: focus stays in the popup and it stays open | Every menu and popover whose trigger is in a different root from the overlay root; the `overlay` copies, where they share a root, behave correctly | P80-F item 4 |
-| An open menu has no accessible name: its `aria-labelledby` points at the trigger in another root and cannot resolve | Same | P80-F item 4 |
-| The password field is not masked: it renders as plain text until "revealed" | `PasswordInput` | P80-F |
-| The slider shows no focus ring: focus is on the hidden input inside the thumb and the ring rule only matches the thumb | `Slider`, and the colour picker's hue and opacity rails | P80-F |
-| A toast takes focus on the F6 path but shows no focus indicator | The toast itself, not its close button | P80-F |
-| Every dialog exposes a second `banner` landmark, because its header is a `<header>` | Modal, drawer, confirm | P80-F |
+| Tab could not leave an open menu or popover | Every menu and popover whose trigger was in a different root from the overlay root | ✓ Fixed: anchored popups open in their trigger's root |
+| An open menu had no accessible name | Same | ✓ Fixed, same cause |
+| The password field was not masked | `PasswordInput` | ✓ Fixed |
+| The slider showed no focus ring | `Slider`, and the colour picker's hue and opacity rails | ✓ Fixed |
+| A focused toast showed no indicator | The toast itself, not its close button | ✓ Fixed |
+| Every dialog exposed a second `banner` landmark | Modal, drawer, confirm | ✓ Fixed |
+| A popover was an unnamed dialog | Every popover | ✓ Fixed: named by its trigger |
+| A toast with no title was an unnamed dialog | `notify.show({ message })` | ✓ Fixed: named by its message |
+| A modal opened over another hid nothing in the overlay root | Stacked modals, and anything else in the overlay root | ✓ Fixed |
 
-One more is a decision rather than a test: **the tooltip's text is not exposed to assistive
-technology at all.** The trigger has no `aria-describedby` and the popup no role, so anything only
-in a tooltip is invisible to a screen reader. Whether it should be is P80-F's to settle.
+**The tooltip is visual only, by decision** (P80-F item 10). Its text is not exposed to assistive
+technology, so no tooltip may carry information its control does not. Phase 81 owns the 22
+product tooltips that do today.
 
 ### 6B.3 The screen-reader script (P80-E)
 
@@ -320,11 +326,12 @@ different is a row in §7.
 | Family | Do | Listen for |
 |---|---|---|
 | Modal, drawer | Open from the trigger, Escape | "dialog" and its title on opening; the Close button named; the trigger announced again after Escape |
-| Popover | Open, Escape | The content read on opening |
-| Tooltip | Tab onto the tooltip button | Whether the tooltip text is spoken. It is expected **not** to be (6B.2); confirm |
-| Menu | Open the long menu, arrow through it | "menu" with an item count; each item; "disabled export" announced as unavailable. The menu is expected to have **no name** (6B.2); confirm |
+| Popover | Open, Escape | "dialog, inline popover", then the content |
+| Tooltip | Tab onto the tooltip button | The button's own name only. The tooltip text is expected **not** to be spoken, by decision (6B.2); confirm |
+| Menu | Open the long menu, arrow through it | "inline long menu, menu" with an item count; each item; "disabled export" announced as unavailable |
+| Stacked modals | Open the inline modal, then "stack another" | In browse mode, only the stacked dialog's content is reachable; after Escape, the first dialog's is again |
 | Text, textarea | Tab through | Each label, and the description under "gallery name" |
-| Password | Type, then Tab to the reveal and press Space | Characters not echoed while hidden (they will be, until the 6B.2 fix); "Show password, toggle button, not pressed", then "pressed" |
+| Password | Type, then Tab to the reveal and press Space | Characters not echoed while hidden; "Show password, toggle button, not pressed", then "pressed" |
 | Number | Arrow up and down | The value after each press. The field is a text box rather than a spin button, so check the change is announced at all |
 | Select | Open the role select and arrow | "combobox", its name and value; each option with its position; the selected one marked selected |
 | Searchable select, multiselect, tags | Type, arrow, Enter | The highlighted option read while focus stays in the field; picked items and added tags announced |
@@ -333,7 +340,7 @@ different is a row in §7.
 | Slider | Arrow | The value spoken on each step. Expect "0.5" rather than "50%": the visible label is not the announced value |
 | Pagination | Tab to page 2, Enter | "navigation, inline pages"; "Page 2" and then "current page" |
 | Colour input | Open the picker, arrow on the surface | The surface's value in words; hue and opacity values; the swatches named by their colour |
-| Toasts | Raise one from "managers" without moving focus | **The message read aloud as it appears**, with focus left where it was. This is the one thing on the list no machine can check |
+| Toasts | Raise one from "managers" without moving focus | **The message read aloud as it appears**, with focus left where it was. This is the one thing on the list no machine can check. Then raise one with a modal open: it should still be read |
 | Confirm dialog | Open it, Tab, Escape | "dialog, Discard changes?", the body, both buttons |
 
 Two visual checks belong with the pass, because a person is already looking. On both themes at
@@ -384,13 +391,18 @@ One row per distinct problem. Severity: **Blocker** (fails a core task) / **Seri
 | 5B Settings | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | — | — |
 | 5C Modals | ⬜ | ⬜ | ⬜ | ⬜ | n/a | ⬜ | — | — |
 | 6 LayoutBuilder | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | — | — |
-| 6B Framework components (Phase 80) | ✅ automated | ✅ automated | ⬜ P80-E | n/a | n/a | n/a | 2026-10-02 (automated half) | P80-D |
+| 6B Framework components (Phase 80) | ✅ automated | ✅ automated | ⬜ P80-E | n/a | n/a | n/a | 2026-10-02 (automated half; defects fixed by P80-F) | P80-D, P80-F |
 
 Legend: ⬜ not started · 🟡 partial · ✅ done. Update after each run.
 
 ---
 
 ## 9. Changelog (living doc)
+
+- **2026-10-02** P80-F fixed every defect in §6B.2 and three more, and decided the tooltip is
+  visual only. Menus, popovers, tooltips and listboxes now open in their trigger's root. The script
+  in §6B.3 is updated to what should now be heard, with a stacked-modal row added and a check
+  that a toast raised behind a dialog is still read.
 
 - **2026-10-02** Rewrote §6B for every Phase 80 component family. The keyboard checks are now
   automated by `e2e/ui-keyboard.spec.ts` (Phase 80 Key Decision C, revised that day), and the
