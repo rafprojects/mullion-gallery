@@ -17,7 +17,7 @@
  * module singletons.
  */
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 const ROOT_MARKUP = '<div id="root"></div>';
@@ -29,7 +29,8 @@ type Mount = 'shadow' | 'light';
 async function serveShowcase(page: Page) {
   await page.route('**/ui-showcase*', async (route) => {
     const origin = new URL(route.request().url()).origin;
-    const index = await (await route.fetch({ url: `${origin}/` })).text();
+    // Playwright reuses keep-alive sockets, and one the dev server has just closed resets (P80-F).
+    const index = await (await route.fetch({ url: `${origin}/`, maxRetries: 2 })).text();
     if (!index.includes(ROOT_MARKUP)) {
       throw new Error(`dev index page no longer contains ${ROOT_MARKUP}; update the showcase fixture`);
     }
@@ -43,22 +44,30 @@ async function serveShowcase(page: Page) {
 
 async function open(
   page: Page,
-  { mount = 'shadow', theme = 'default-dark' }: { mount?: Mount; theme?: string } = {},
+  { mount = 'shadow', theme = 'default-dark', extra = '' }: { mount?: Mount; theme?: string; extra?: string } = {},
 ) {
   await serveShowcase(page);
-  await page.goto(`/ui-showcase?managers=1&mount=${mount}&chrome=lock&theme=${theme}`);
+  await page.goto(`/ui-showcase?managers=1&mount=${mount}&chrome=lock&theme=${theme}${extra}`);
   await page.locator('[data-testid="managers"]').waitFor();
 }
 
 const trigger = (page: Page, id: string) => page.locator(`[data-testid="${id}"]`);
 
 /**
- * axe's `include` takes a plain CSS selector, which stops at a shadow boundary;
- * the array form crosses one. Both the toast viewport and the confirm dialog
- * live in the overlay root, which is a shadow tree in every mount mode, so
- * neither is reachable without this. P80-A's suite has the same helper.
+ * axe's `include` takes a plain CSS selector, which stops at a shadow boundary.
+ * Both the toast viewport and the confirm dialog live in the overlay root,
+ * which is a shadow tree in every mount mode. The crossing is `fromShadowDom`:
+ * a plain array is a FRAME chain, matched nothing, and these gates passed on an
+ * empty scan until P80-F, so each now proves it reached its target.
  */
-const within = (selector: string): [string, string] => ['[data-mullion-overlay-root]', selector];
+const within = (selector: string) => ({ fromShadowDom: ['[data-mullion-overlay-root]', selector] as [string, string] });
+
+type AxeResults = Awaited<ReturnType<AxeBuilder['analyze']>>;
+/** Scan after the entry transition: a popup mid-fade reads as a contrast failure. */
+const settle = (target: Locator) =>
+  target.evaluate((el) => Promise.all(el.getAnimations({ subtree: true }).map((a) => a.finished)));
+const reached = (results: AxeResults, cls: string) =>
+  [...results.passes, ...results.violations, ...results.incomplete].flatMap((r) => r.nodes).some((n) => n.html.includes(cls));
 
 /** The viewport lives in the overlay root, which is a second shadow tree. */
 const viewport = (page: Page) => page.locator('.mullion-toast-viewport');
@@ -278,6 +287,35 @@ test.describe('the confirm dialog', () => {
 });
 
 // ---------------------------------------------------------------------------
+// One host per page (P80-F)
+// ---------------------------------------------------------------------------
+
+/*
+ * A second gallery on the page mounts its own hosts. Mantine's hosts, mounted
+ * that way until P80-F, rendered each toast twice and opened each confirmation
+ * twice, and confirming both ran the action twice (measured 2026-10-02).
+ */
+test.describe('a page with two galleries', () => {
+  for (const mount of ['shadow', 'light'] as const) {
+    test(`one notify shows one toast and one confirm opens one dialog (${mount})`, async ({ page }) => {
+      await open(page, { mount, extra: '&twin=1' });
+      await page.locator('[data-testid="twin-ready"]').waitFor();
+      expect(await page.locator('.mullion-toast-viewport').count(), 'one viewport for the page').toBe(1);
+
+      await trigger(page, 'notify-danger').click();
+      await expect(toasts(page)).toHaveCount(1);
+      await page.waitForTimeout(400);
+      await expect(toasts(page), 'a second host rendered the same toast').toHaveCount(1);
+
+      await trigger(page, 'confirm-open').click();
+      await expect(page.locator('.mullion-confirm')).toHaveCount(1);
+      await page.waitForTimeout(400);
+      await expect(page.locator('.mullion-confirm'), 'a second host opened the same confirmation').toHaveCount(1);
+    });
+  }
+});
+
+// ---------------------------------------------------------------------------
 // The axe gate
 // ---------------------------------------------------------------------------
 
@@ -287,8 +325,10 @@ test.describe('the axe gate', () => {
     await trigger(page, 'notify-danger').click();
     await trigger(page, 'notify-plain').click();
     await expect(toasts(page)).toHaveCount(2);
+    await settle(viewport(page));
 
     const results = await new AxeBuilder({ page }).include(within('.mullion-toast-viewport')).analyze();
+    expect(reached(results, 'mullion-toast'), 'axe never reached the toasts').toBe(true);
     const serious = results.violations.filter(
       (v) => v.impact === 'critical' || v.impact === 'serious',
     );
@@ -299,8 +339,10 @@ test.describe('the axe gate', () => {
     await open(page, { mount: 'light' });
     await trigger(page, 'confirm-open').click();
     await expect(page.getByRole('dialog')).toBeVisible();
+    await settle(page.locator('.mullion-confirm'));
 
     const results = await new AxeBuilder({ page }).include(within('.mullion-confirm')).analyze();
+    expect(reached(results, 'mullion-confirm'), 'axe never reached the dialog').toBe(true);
     const serious = results.violations.filter(
       (v) => v.impact === 'critical' || v.impact === 'serious',
     );

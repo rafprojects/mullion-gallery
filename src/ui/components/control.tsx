@@ -387,11 +387,13 @@ export function FileButton({ onChange, accept, multiple, disabled, children }: F
   return (
     <>
       {children({ onClick: open, disabled: disabled === true })}
+      {/* Out of the tab order and the accessibility tree: the caller's button is the control. */}
       <input
         ref={setInput}
         type="file"
         className="mullion-visually-hidden"
         tabIndex={-1}
+        aria-hidden
         {...(accept !== undefined ? { accept } : {})}
         {...(multiple ? { multiple: true } : {})}
         {...(disabled ? { disabled: true } : {})}

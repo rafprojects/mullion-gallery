@@ -26,7 +26,8 @@ type Mount = 'shadow' | 'light';
 async function serveShowcase(page: Page) {
   await page.route('**/ui-showcase*', async (route) => {
     const origin = new URL(route.request().url()).origin;
-    const index = await (await route.fetch({ url: `${origin}/` })).text();
+    // Playwright reuses keep-alive sockets, and one the dev server has just closed resets (P80-F).
+    const index = await (await route.fetch({ url: `${origin}/`, maxRetries: 2 })).text();
     if (!index.includes(ROOT_MARKUP)) {
       throw new Error(`dev index page no longer contains ${ROOT_MARKUP}; update the showcase fixture`);
     }
@@ -310,10 +311,16 @@ test.describe('the axe gate', () => {
     await open(page, { mount: 'light' });
     await inline(page, 'select-trigger').click();
     await page.getByRole('listbox').waitFor();
+    // As every scoped gate does since P80-F: scan after the open transition, and prove the scan reached it.
+    await page
+      .locator('.mullion-select-popup')
+      .evaluate((el) => Promise.all(el.getAnimations({ subtree: true }).map((a) => a.finished)));
 
     const results = await new AxeBuilder({ page })
       .include('[role="listbox"]')
       .analyze();
+    const scanned = [...results.passes, ...results.violations].flatMap((r) => r.nodes);
+    expect(scanned.some((n) => n.html.includes('role="listbox"')), 'axe never reached the listbox').toBe(true);
 
     const serious = results.violations.filter((v) => v.impact === 'critical' || v.impact === 'serious');
     expect(

@@ -498,6 +498,9 @@ function Selects({ prefix }: { prefix: string }) {
 function Overlays({ prefix }: { prefix: string }) {
   const [modal, setModal] = useState(false);
   const [drawer, setDrawer] = useState(false);
+  // P80-F item 2: a modal stacked on another a commit later, and two siblings opened in one commit.
+  const [stacked, setStacked] = useState(false);
+  const [pair, setPair] = useState(false);
   return (
     <Stack gap="sm" padding="md" data-testid={`${prefix}-overlays`}>
       <Divider label="overlays" labelPosition="left" />
@@ -535,6 +538,9 @@ function Overlays({ prefix }: { prefix: string }) {
             {prefix} tooltip
           </Button>
         </Tooltip>
+        <Button variant="default" data-testid={`${prefix}-pair-trigger`} onClick={() => setPair(true)}>
+          {prefix} two modals
+        </Button>
       </Group>
 
       <Modal
@@ -546,7 +552,21 @@ function Overlays({ prefix }: { prefix: string }) {
         <Stack gap="sm">
           <Text size="sm">modal body</Text>
           <Button data-testid={`${prefix}-modal-inside`}>inside the modal</Button>
+          <Button variant="light" data-testid={`${prefix}-stack-trigger`} onClick={() => setStacked(true)}>
+            stack another
+          </Button>
         </Stack>
+      </Modal>
+
+      <Modal opened={stacked} onClose={() => setStacked(false)} title={`${prefix} stacked modal`}>
+        <Button data-testid={`${prefix}-stacked-inside`}>inside the stacked modal</Button>
+      </Modal>
+
+      <Modal opened={pair} onClose={() => setPair(false)} title={`${prefix} first of two`}>
+        <Text size="sm">first</Text>
+      </Modal>
+      <Modal opened={pair} onClose={() => setPair(false)} title={`${prefix} second of two`}>
+        <Text size="sm">second</Text>
       </Modal>
 
       <Drawer
@@ -706,7 +726,8 @@ const host = document.getElementById('showcase') ?? document.body.appendChild(do
 host.id = 'showcase';
 
 const rootId = 'showcase';
-const portal = overlayRoot(rootId);
+/** `?portal=provider` uses the provider's own container in the light DOM rather than an overlay root. */
+const portal = params.get('portal') === 'provider' ? undefined : overlayRoot(rootId);
 
 if (useShadow) {
   const shadow = host.attachShadow({ mode: 'open' });
@@ -728,6 +749,30 @@ if (useShadow) {
     <StrictMode>
       <MullionProvider theme={themeId} scope="document" portal={portal} instanceId={rootId}>
         <Showcase />
+      </MullionProvider>
+    </StrictMode>,
+  );
+}
+
+/*
+ * `?twin=1`: a second gallery root on the page with its own provider and its
+ * own manager hosts, as a page with two shortcodes has (P80-F). One `notify` or
+ * `confirm()` must still produce one toast or one dialog.
+ */
+if (params.get('twin') === '1') {
+  const twinId = 'showcase-twin';
+  const twinHost = document.body.appendChild(document.createElement('div'));
+  twinHost.id = twinId;
+  const twinShadow = twinHost.attachShadow({ mode: 'open' });
+  const twinMount = twinShadow.appendChild(document.createElement('div'));
+  createRoot(twinMount).render(
+    <StrictMode>
+      <MullionProvider theme={themeId} scope={twinShadow} portal={overlayRoot(twinId)} instanceId={twinId}>
+        <Notifications label="Notifications" closeButtonLabel="Dismiss" />
+        <Confirmations />
+        <Text size="sm" data-testid="twin-ready">
+          second gallery
+        </Text>
       </MullionProvider>
     </StrictMode>,
   );

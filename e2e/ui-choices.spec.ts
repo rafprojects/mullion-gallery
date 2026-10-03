@@ -28,7 +28,8 @@ type Mount = 'shadow' | 'light';
 async function serveShowcase(page: Page) {
   await page.route('**/ui-showcase*', async (route) => {
     const origin = new URL(route.request().url()).origin;
-    const index = await (await route.fetch({ url: `${origin}/` })).text();
+    // Playwright reuses keep-alive sockets, and one the dev server has just closed resets (P80-F).
+    const index = await (await route.fetch({ url: `${origin}/`, maxRetries: 2 })).text();
     if (!index.includes(ROOT_MARKUP)) {
       throw new Error(`dev index page no longer contains ${ROOT_MARKUP}; update the showcase fixture`);
     }

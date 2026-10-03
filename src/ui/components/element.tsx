@@ -96,6 +96,13 @@ export const focusable = { [FOCUS_ATTR]: '' } as const;
 export const focusableSibling = { [FOCUS_ATTR]: 'sibling' } as const;
 
 /**
+ * Spread onto a visible part whose focus target is a hidden input inside it,
+ * which is how a slider thumb works. Neither element matches `:focus-visible`
+ * with the ring on the right box, so the part rings when it contains focus.
+ */
+export const focusableWithin = { [FOCUS_ATTR]: 'within' } as const;
+
+/**
  * Spread onto a focusable element that is flush with its container, so the
  * ring is drawn inward instead of outward (P80-A).
  *

@@ -17,11 +17,12 @@
 import { Toast } from '@base-ui/react/toast';
 import type { ToastRootToastObject } from '@base-ui/react/toast';
 import { useEffect, type ReactNode } from 'react';
-import type { UiTone } from './element';
+import { focusable, type UiTone } from './element';
 import { CloseButton } from './control';
 import { customProperties } from './scale';
 import { resolveRoleGlyph } from './roleGlyph';
 import { uiLayer } from '../styles/layers';
+import { usePageHost } from './pageHost';
 import { useMullionPortal } from '../provider/hooks';
 
 /** Where the stack sits. Mantine's spelling, so a migrated call reads the same. */
@@ -216,16 +217,25 @@ function NotificationItem({
   const data = toast.data;
   const tone: UiTone = data?.tone ?? 'default';
   const glyph = resolveRoleGlyph(tone, data?.icon);
+  const hasTitle = toast.title !== undefined && toast.title !== null;
+  const hasMessage = toast.description !== undefined && toast.description !== null;
 
   return (
-    <Toast.Root toast={toast} className="mullion-toast" data-mullion-tone={tone}>
+    // Base UI makes the toast itself a tab stop on the F6 path, so it rings like any control (WCAG 2.4.7).
+    <Toast.Root toast={toast} className="mullion-toast" data-mullion-tone={tone} {...focusable}>
       {glyph ? <span className="mullion-toast-icon">{glyph}</span> : null}
       <div className="mullion-toast-body">
-        {toast.title !== undefined && toast.title !== null ? (
-          <Toast.Title className="mullion-toast-title" />
-        ) : null}
-        {toast.description !== undefined && toast.description !== null ? (
-          <Toast.Description className="mullion-toast-message" />
+        {hasTitle ? <Toast.Title className="mullion-toast-title" /> : null}
+        {hasMessage && hasTitle ? <Toast.Description className="mullion-toast-message" /> : null}
+        {/*
+          * The toast is a dialog and Base UI names it only by its title, so a
+          * message-only toast was an unnamed dialog (axe `aria-dialog-name`,
+          * P80-F). With no title the message is the name, in a paragraph.
+          */}
+        {hasMessage && !hasTitle ? (
+          <Toast.Title className="mullion-toast-message" render={<p />}>
+            {toast.description}
+          </Toast.Title>
         ) : null}
       </div>
       {data?.withCloseButton !== false ? (
@@ -263,15 +273,19 @@ function NotificationList({ closeButtonLabel }: { closeButtonLabel: string | und
 }
 
 /**
- * Mount once, near the provider. Everything else calls `notify`.
+ * Mount it near the provider, in every root if that is convenient. Everything
+ * else calls `notify`.
  *
- * One store, so two galleries on one page render the same toast in both
- * viewports. That is what Mantine does today from its own module-level store,
- * so the migration changes nothing; it is written down because this codebase
- * has multi-instance defects of exactly this shape and the property should not
- * have to be rediscovered.
+ * One store, so one viewport per page: only the first host mounted renders,
+ * and the rest stand by (`./pageHost`). Before P80-F every host rendered every
+ * toast, so a page with two galleries showed each toast twice, as the Mantine
+ * hosts did until the same track.
  */
-export function Notifications({
+export function Notifications(props: NotificationsProps) {
+  return usePageHost('notifications') ? <NotificationsHost {...props} /> : null;
+}
+
+function NotificationsHost({
   container,
   position = 'bottom-right',
   limit = 5,

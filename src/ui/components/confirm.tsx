@@ -14,6 +14,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Button } from './control';
 import { Modal } from './overlay';
+import { usePageHost } from './pageHost';
 import type { UiTone } from './element';
 import type { UiControlVariant } from './control';
 
@@ -209,7 +210,9 @@ function ConfirmDialog({ record }: { record: ConfirmRecord }) {
 }
 
 /**
- * Mount once, near the provider. Everything else calls `confirm()`.
+ * Mount it near the provider, in every root if that is convenient. Everything
+ * else calls `confirm()`. Only the first host mounted renders (`./pageHost`):
+ * before P80-F a page with two galleries opened every confirmation twice.
  *
  * One at a time, in the order asked. Two confirmations raised in the same
  * commit render two sibling modal dialogs, and Base UI then marks each one's
@@ -217,10 +220,15 @@ function ConfirmDialog({ record }: { record: ConfirmRecord }) {
  * *neither* exposed to assistive technology, where opening them a commit apart
  * correctly exposes the topmost. Serialising removes that case, and a queue is
  * the better reading of a confirmation anyway, since the user answers one
- * question at a time. The underlying Modal behaviour is P80-A's and is recorded
- * as a follow-on rather than patched from here.
+ * question at a time. P80-F settled the underlying Modal behaviour: inside the
+ * overlay root `./modalStack` exposes the topmost, and in a light-DOM container
+ * a same-commit pair warns in development.
  */
 export function Confirmations() {
+  return usePageHost('confirmations') ? <ConfirmationsHost /> : null;
+}
+
+function ConfirmationsHost() {
   const [open, setOpen] = useState<ConfirmRecord[]>(records);
 
   useEffect(() => {

@@ -1,9 +1,9 @@
 /**
  * The select family (P80-B): `Select`, `MultiSelect` and `TagsInput`.
  *
- * **Where the listbox goes is the whole story of this module.** Every other
- * popup in the framework portals into `useMullionPortal()`, the container the
- * nearest provider paints (P79-A, P80-A). A listbox may not: a combobox wires
+ * **Where the listbox goes is the whole story of this module.** P80-A's
+ * overlays portalled into `useMullionPortal()`, the container the nearest
+ * provider paints (P79-A). A listbox may not: a combobox wires
  * its trigger to its list with `aria-controls` and, when it has an input, with
  * `aria-activedescendant`, and an **ID reference cannot resolve across a shadow
  * boundary**. The shipped `overlay-root` portal mode puts popups in a second
@@ -13,10 +13,8 @@
  * in PHASE80 and deferred to P81-B.
  *
  * So these components portal into the trigger's own root, resolved from the
- * trigger element at mount (`resolveListboxContainer`). The nearest scope
- * element is preferred, because it carries the tokens of the provider that
- * paints the trigger; the root node itself is the fallback, where the tokens
- * arrive through `:host`.
+ * trigger element at mount (`./anchor`). P80-F moved the menu, popover and
+ * tooltip onto the same rule after P80-D measured what leaving cost them.
  *
  * **Two primitives behind three components.** A plain `Select` is Base UI's
  * `Select`, which is a listbox with no input and the accessibility that goes
@@ -39,7 +37,7 @@ import { cx, focusableInset } from './element';
 import { FieldShell, type FieldShellProps, type FieldStyleProps } from './field';
 import { customProperties, spacingValue, type UiSpacing } from './scale';
 import { uiLayer } from '../styles/layers';
-import { SCOPE_ATTR } from '../provider/scope';
+import { useAnchorContainer } from './anchor';
 
 // ---------------------------------------------------------------------------
 // Data
@@ -146,43 +144,21 @@ const COLLECTION_ACCESSORS = {
 };
 
 // ---------------------------------------------------------------------------
-// Where the popup mounts
-// ---------------------------------------------------------------------------
-
-/**
- * The container a listbox portals into: an element or root in the trigger's
- * own tree, so `aria-controls` and `aria-activedescendant` resolve.
- *
- * The nearest `[data-mullion-scope]` element is preferred over the root node
- * because a nested provider paints its subtree with its own tokens, and a
- * popup hoisted to the root would take the root provider's instead. When the
- * scope is a shadow root there is no such element and the root node is right:
- * the token sheet is keyed on `:host` there and reaches everything in it.
- */
-export function resolveListboxContainer(el: Element): HTMLElement | ShadowRoot {
-  const scoped = el.closest(`[${SCOPE_ATTR}]`);
-  if (scoped instanceof HTMLElement) return scoped;
-  const root = el.getRootNode();
-  return root instanceof ShadowRoot ? root : document.body;
-}
-
-/**
- * Resolve the container once, from whichever element the ref lands on. The
- * popup renders only when open, which is at least one commit after the
- * trigger mounted, so the container is always resolved by the time a portal
- * reads it.
- */
-function useListboxContainer(override: HTMLElement | null | undefined) {
-  const [resolved, setResolved] = useState<HTMLElement | ShadowRoot | null>(null);
-  const anchorRef = useCallback((el: HTMLElement | null) => {
-    if (el) setResolved(resolveListboxContainer(el));
-  }, []);
-  return { container: override !== undefined ? override : resolved, anchorRef };
-}
-
-// ---------------------------------------------------------------------------
 // Shared chrome
 // ---------------------------------------------------------------------------
+
+/**
+ * A listbox's name: the field's label, else the control's own `aria-label`.
+ * Base UI names neither popup, and a listbox with no name was a P80-D finding.
+ * The label is referenced by an id we choose, because Base UI's own label id
+ * reaches the control only after an effect.
+ */
+type ListboxName = { 'aria-labelledby': string } | { 'aria-label': string } | Record<string, never>;
+
+function listboxNameFor(label: ReactNode, labelId: string, ariaLabel: string | undefined): ListboxName {
+  if (label !== undefined) return { 'aria-labelledby': labelId };
+  return ariaLabel !== undefined ? { 'aria-label': ariaLabel } : {};
+}
 
 /** The trigger's chevron. `aria-hidden`: the control is already named. */
 function ChevronIcon() {
@@ -307,9 +283,12 @@ export function Select({
   ...rest
 }: SelectProps) {
   const model = useMemo(() => prepare(data), [data]);
-  const { container: target, anchorRef } = useListboxContainer(container);
+  const { container: target, anchorRef } = useAnchorContainer(container);
+  const labelId = useId();
+  const listboxName = listboxNameFor(label, labelId, rest['aria-label']);
 
   const shell = {
+    labelId,
     label,
     description,
     error,
@@ -343,6 +322,7 @@ export function Select({
         maxHeight={maxHeight}
         target={target}
         anchorRef={anchorRef}
+        listboxName={listboxName}
       />
     );
   }
@@ -389,7 +369,8 @@ export function Select({
           style={popupStyle({ width, maxHeight })}
         >
           <BaseSelect.Popup className="mullion-select-popup">
-            <BaseSelect.List className="mullion-select-list">
+            {/* Named as the trigger is: a listbox with no name was P80-D's finding. */}
+            <BaseSelect.List className="mullion-select-list" {...listboxName}>
               {model.groups.map((group, index) =>
                 group.group === null ? (
                   <SelectOptions key={`run-${index}`} items={group.items} />
@@ -456,6 +437,9 @@ interface ComboboxShellProps extends FieldShellProps, FieldStyleProps {
   maxHeight?: number | undefined;
   target: HTMLElement | ShadowRoot | null;
   anchorRef: (el: HTMLElement | null) => void;
+  /** The field's label id, set on the label so parts outside the input can reference it. */
+  labelId: string;
+  listboxName: ListboxName;
   'aria-label'?: string | undefined;
 }
 
@@ -489,6 +473,8 @@ function SearchableSelect({
   maxHeight,
   target,
   anchorRef,
+  labelId,
+  listboxName,
   label,
   description,
   error,
@@ -502,6 +488,7 @@ function SearchableSelect({
   style,
   ...rest
 }: SearchableSelectProps) {
+  const chevronId = useId();
   /*
    * No `itemToStringLabel` here or in `ChipCombobox`. Base UI already
    * stringifies a `{ value, label }` item by its label, and the argument it
@@ -522,6 +509,7 @@ function SearchableSelect({
       modal={false}
     >
       <FieldShell
+        labelId={labelId}
         label={label}
         description={description}
         error={error}
@@ -553,14 +541,23 @@ function SearchableSelect({
           * The chevron is a pointer affordance and is out of the tab order:
           * the input it sits beside opens the same popup with Alt+ArrowDown,
           * so a tab stop here would be a second stop doing one thing. It
-          * keeps an accessible name for anything that reaches it another way.
+          * keeps an accessible name for anything that reaches it another way:
+          * its own label then the field's, since Base UI's field labelling alone
+          * made it a second control with the input's exact name (P80-D).
           */}
-        <Combobox.Trigger className="mullion-select-icon" aria-label={openLabel} tabIndex={-1}>
+        <Combobox.Trigger
+          id={chevronId}
+          className="mullion-select-icon"
+          aria-label={openLabel}
+          {...(label !== undefined ? { 'aria-labelledby': `${chevronId} ${labelId}` } : {})}
+          tabIndex={-1}
+        >
           <ChevronIcon />
         </Combobox.Trigger>
       </FieldShell>
       <ComboboxPopup
         model={model}
+        name={listboxName}
         target={target}
         width={width}
         maxHeight={maxHeight}
@@ -572,6 +569,7 @@ function SearchableSelect({
 
 interface ComboboxPopupProps {
   model: NormalisedData;
+  name: ListboxName;
   target: HTMLElement | ShadowRoot | null;
   width?: UiSpacing | number | undefined;
   maxHeight?: number | undefined;
@@ -584,7 +582,7 @@ interface ComboboxPopupProps {
  * when the filter drops it, which is what `Combobox.Collection` does for the
  * flat case and what a group needs done by hand.
  */
-function ComboboxPopup({ model, target, width, maxHeight, nothingFoundMessage }: ComboboxPopupProps) {
+function ComboboxPopup({ model, name, target, width, maxHeight, nothingFoundMessage }: ComboboxPopupProps) {
   return (
     <Combobox.Portal container={target}>
       <Combobox.Positioner
@@ -596,7 +594,7 @@ function ComboboxPopup({ model, target, width, maxHeight, nothingFoundMessage }:
           {nothingFoundMessage !== undefined && (
             <Combobox.Empty className="mullion-select-empty">{nothingFoundMessage}</Combobox.Empty>
           )}
-          <Combobox.List className="mullion-select-list">
+          <Combobox.List className="mullion-select-list" {...name}>
             {model.grouped
               ? (group: { value: string; items: UiSelectOption[] }) => (
                   <ComboboxGroup key={group.value} group={group} />
@@ -733,8 +731,9 @@ function ChipCombobox({
   style,
   ...rest
 }: ChipComboboxProps) {
-  const { container: target, anchorRef } = useListboxContainer(container);
+  const { container: target, anchorRef } = useAnchorContainer(container);
   const inputId = useId();
+  const labelId = useId();
   const [query, setQuery] = useState('');
   /*
    * The component holds the value when the caller does not, so the chips and
@@ -791,7 +790,10 @@ function ChipCombobox({
       modal={false}
     >
       <FieldShell
-        label={label !== undefined ? <label htmlFor={inputId}>{label}</label> : undefined}
+        labelId={labelId}
+        // A label inside Field.Label's own <label> was invalid nesting (found in P80-F).
+        labelFor={inputId}
+        label={label}
         description={description}
         error={error}
         required={required}
@@ -831,6 +833,7 @@ function ChipCombobox({
       </FieldShell>
       <ComboboxPopup
         model={model}
+        name={listboxNameFor(label, labelId, rest['aria-label'])}
         target={target}
         width={width}
         maxHeight={maxHeight}

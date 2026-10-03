@@ -18,14 +18,17 @@
 @layer mullion.components {
   /*
    * `sibling` is for a control whose visible box is the next element: the
-   * chip's clipped checkbox. `[data-focus-visible]` is the attribute form
-   * Base UI sets on its own parts, so Phase 80's components land under this
-   * rule without changing it.
+   * chip's clipped checkbox. `within` is for a visible part whose focus target
+   * is a hidden input inside it: the slider thumb, which matched nothing here
+   * until P80-F. `[data-focus-visible]` is the attribute form Base UI sets on
+   * its own parts, so Phase 80's components land under this rule without
+   * changing it.
    */
   [data-mullion-focus='']:focus-visible,
   [data-mullion-focus=''][data-focus-visible],
   [data-mullion-focus='sibling']:focus-visible + *,
-  [data-mullion-focus='sibling'][data-focus-visible] + * {
+  [data-mullion-focus='sibling'][data-focus-visible] + *,
+  [data-mullion-focus='within']:has(:focus-visible) {
     outline: var(--mullion-focus-ring-width) solid var(--mullion-color-primary-stroke);
     outline-offset: var(--mullion-focus-ring-offset);
     box-shadow: 0 0 0 var(--mullion-focus-halo-width) var(--mullion-color-focus-halo);

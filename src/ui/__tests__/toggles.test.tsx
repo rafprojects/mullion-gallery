@@ -325,4 +325,12 @@ describe('the sheet', () => {
       /\.mullion-slider-thumb:focus-visible\s/,
     );
   });
+
+  it('rings the thumb through the same reach, not just the bubble', () => {
+    // The bubble used `:has()` while the ring rule did not, so the slider had no indicator (P80-D).
+    const { container } = mount(<Slider aria-label="Gap" value={10} min={0} max={100} />);
+    const thumb = container.ownerDocument.querySelector('.mullion-slider-thumb');
+    expect(thumb?.getAttribute('data-mullion-focus')).toBe('within');
+    expect(uiStylesText()).toContain("[data-mullion-focus='within']:has(:focus-visible)");
+  });
 });

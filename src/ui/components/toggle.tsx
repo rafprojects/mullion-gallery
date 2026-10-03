@@ -21,7 +21,7 @@ import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox';
 import { Switch as BaseSwitch } from '@base-ui/react/switch';
 import { Slider as BaseSlider } from '@base-ui/react/slider';
 import { Field } from '@base-ui/react/field';
-import { cx, focusable } from './element';
+import { cx, focusable, focusableWithin } from './element';
 import type { FieldStyleProps } from './field';
 import { customProperties, type UiScaleStep } from './scale';
 
@@ -324,7 +324,7 @@ export function Slider({
             className="mullion-slider-thumb"
             {...(ariaLabel !== undefined ? { 'aria-label': ariaLabel } : {})}
             {...(ariaLabelledBy !== undefined ? { 'aria-labelledby': ariaLabelledBy } : {})}
-            {...focusable}
+            {...focusableWithin}
           >
             {label && (
               <span className="mullion-slider-value" aria-hidden>

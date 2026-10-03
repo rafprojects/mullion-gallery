@@ -25,7 +25,8 @@ type Mount = 'shadow' | 'light';
 async function serveShowcase(page: Page) {
   await page.route('**/ui-showcase*', async (route) => {
     const origin = new URL(route.request().url()).origin;
-    const index = await (await route.fetch({ url: `${origin}/` })).text();
+    // Playwright reuses keep-alive sockets, and one the dev server has just closed resets (P80-F).
+    const index = await (await route.fetch({ url: `${origin}/`, maxRetries: 2 })).text();
     if (!index.includes(ROOT_MARKUP)) {
       throw new Error(`dev index page no longer contains ${ROOT_MARKUP}; update the showcase fixture`);
     }
@@ -39,11 +40,16 @@ async function serveShowcase(page: Page) {
 
 async function open(
   page: Page,
-  { mount = 'shadow', theme = 'default-dark', host = '' }: { mount?: Mount; theme?: string; host?: string } = {},
+  {
+    mount = 'shadow',
+    theme = 'default-dark',
+    host = '',
+    extra = '',
+  }: { mount?: Mount; theme?: string; host?: string; extra?: string } = {},
 ) {
   await serveShowcase(page);
   const hostParam = host ? `&host=${host}` : '';
-  await page.goto(`/ui-showcase?overlays=1&mount=${mount}&chrome=lock&theme=${theme}${hostParam}`);
+  await page.goto(`/ui-showcase?overlays=1&mount=${mount}&chrome=lock&theme=${theme}${hostParam}${extra}`);
   await page.waitForFunction(() => {
     const root = document.querySelector('[data-mullion-overlay-root]');
     return !!root?.shadowRoot?.querySelector('[data-testid="overlay-panel"]');
@@ -71,7 +77,13 @@ test.beforeAll(async ({ browser }) => {
 // The portal container
 // ---------------------------------------------------------------------------
 
-test.describe('every overlay lands in the provider’s container', () => {
+/*
+ * Two rules since P80-F. A modal or drawer goes to the overlay root, which is
+ * how it escapes a hostile host. A menu, popover or tooltip goes to its
+ * trigger's own root, because its ARIA and its Tab order are references to the
+ * trigger and those do not resolve across a shadow boundary (P80-D).
+ */
+test.describe('where each overlay lands', () => {
   for (const mount of ['shadow', 'light'] as const) {
     test(`a modal opened from the ${mount} mount renders in the overlay root`, async ({ page }) => {
       await open(page, { mount });
@@ -90,24 +102,86 @@ test.describe('every overlay lands in the provider’s container', () => {
     });
   }
 
-  test('a menu, a popover and a tooltip all portal to the same container', async ({ page }) => {
-    await open(page);
+  for (const mount of ['shadow', 'light'] as const) {
+    test(`a menu, a popover and a tooltip opened from the ${mount} mount land in the trigger's root, with its tokens`, async ({
+      page,
+    }) => {
+      await open(page, { mount });
+      const opens = [
+        { trigger: 'menu-trigger', popup: '.mullion-menu', how: 'click' },
+        { trigger: 'popover-trigger', popup: '.mullion-popover', how: 'click' },
+        { trigger: 'tooltip-trigger', popup: '.mullion-tooltip', how: 'hover' },
+      ] as const;
 
-    await inline(page, 'menu-trigger').click();
-    await expect(page.locator('.mullion-menu')).toBeVisible();
-    await page.keyboard.press('Escape');
+      for (const { trigger, popup, how } of opens) {
+        await inline(page, trigger)[how]();
+        await expect(page.locator(popup)).toBeVisible();
+        const where = await page.locator(popup).evaluate((el, id) => {
+          const host = document.querySelector('#showcase');
+          const triggerEl = (host?.shadowRoot ?? document).querySelector(`[data-testid="${id}"]`);
+          return {
+            sameRoot: !!triggerEl && el.getRootNode() === triggerEl.getRootNode(),
+            primary: getComputedStyle(el).getPropertyValue('--mullion-color-primary').trim(),
+          };
+        }, `inline-${trigger}`);
+        expect(where.sameRoot, `${popup} is not in its trigger's root`).toBe(true);
+        // A popup hoisted past the scope element, or into a bare body, reads no tokens.
+        expect(where.primary, `the theme's tokens did not reach ${popup}`).toMatch(/^#/);
+        await page.keyboard.press('Escape');
+        await page.mouse.move(0, 0);
+        await expect(page.locator(popup)).toHaveCount(0);
+      }
+    });
+  }
+});
 
-    await inline(page, 'popover-trigger').click();
-    await expect(page.locator('.mullion-popover')).toBeVisible();
-    await page.keyboard.press('Escape');
+// ---------------------------------------------------------------------------
+// What a modal hides
+// ---------------------------------------------------------------------------
 
-    await inline(page, 'tooltip-trigger').hover();
-    await expect(page.locator('.mullion-tooltip')).toBeVisible();
-
-    const strays = await page.evaluate(
-      () => document.body.querySelectorAll(':scope > .mullion-menu, :scope > .mullion-popover, :scope > .mullion-tooltip').length,
+/*
+ * Base UI hides the page behind a modal with `aria-hidden`, walking from
+ * `document.body`, and that walk cannot enter the overlay root's shadow tree
+ * where every modal lives. Before P80-F a stacked modal left both dialogs
+ * exposed, and so did a same-commit pair. Asserted by role query, which honours
+ * `aria-hidden`, rather than by what is in the DOM.
+ */
+test.describe('a modal hides what is behind it, inside the overlay root too', () => {
+  const dialogNames = (page: Page) =>
+    page.getByRole('dialog').evaluateAll((els) =>
+      els.map((el) => {
+        const id = el.getAttribute('aria-labelledby');
+        return id ? ((el.getRootNode() as ShadowRoot).getElementById(id)?.textContent ?? '') : '';
+      }),
     );
-    expect(strays, 'a popup rendered straight into document.body, where no tokens reach it').toBe(0);
+
+  test('a stacked modal leaves only itself exposed, and closing it gives the lower one back', async ({ page }) => {
+    await open(page);
+    await inline(page, 'modal-trigger').click();
+    await expect(page.getByRole('dialog', { name: 'inline modal' })).toBeVisible();
+    await inline(page, 'stack-trigger').click();
+    await expect(page.getByRole('dialog', { name: 'inline stacked modal' })).toBeVisible();
+    await expect.poll(() => dialogNames(page)).toEqual(['inline stacked modal']);
+
+    await page.keyboard.press('Escape');
+    await expect.poll(() => dialogNames(page)).toEqual(['inline modal']);
+  });
+
+  test('two modals opened in one commit leave only the second exposed', async ({ page }) => {
+    await open(page);
+    await inline(page, 'pair-trigger').click();
+    await expect.poll(() => dialogNames(page)).toEqual(['inline second of two']);
+  });
+
+  test('the chrome beside it in the overlay root is hidden, and the toast region is not', async ({ page }) => {
+    await open(page, { extra: '&managers=1' });
+    await expect(page.getByRole('button', { name: 'overlay modal' })).toHaveCount(1);
+    await inline(page, 'modal-trigger').click();
+    await expect(page.getByRole('dialog', { name: 'inline modal' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'overlay modal' }), 'the overlay-root chrome is still exposed').toHaveCount(0);
+    await expect(page.getByRole('region', { name: 'Notifications' }), 'a toast behind the dialog would go unannounced').toHaveCount(1);
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('button', { name: 'overlay modal' })).toHaveCount(1);
   });
 });
 
@@ -274,6 +348,48 @@ test.describe('a hostile host page', () => {
       'the sticky header at z-index 9999 painted over the overlay',
     ).toBe(true);
   });
+
+  /*
+   * An anchored popup stays in its trigger's root since P80-F, so a host
+   * page's clipping wrapper is now its ancestor too. The wrapper here is in the
+   * document around the gallery host, as a WordPress theme's would be, and it
+   * ends 8px below the trigger: the popup must flip above rather than be cut.
+   */
+  for (const which of ['menu', 'popover'] as const) {
+    test(`a ${which} inside a clipping host wrapper flips into view rather than being cut`, async ({ page }) => {
+      await open(page);
+      const trigger = inline(page, `${which}-trigger`);
+      await trigger.scrollIntoViewIfNeeded();
+      await trigger.evaluate((t) => {
+        const host = document.getElementById('showcase')!;
+        const wrap = document.createElement('div');
+        wrap.id = 'theme-wrap';
+        host.parentNode!.insertBefore(wrap, host);
+        wrap.appendChild(host);
+        const bottom = t.getBoundingClientRect().bottom;
+        Object.assign(wrap.style, {
+          transform: 'translateZ(0)',
+          position: 'relative',
+          overflow: 'hidden',
+          height: `${bottom - wrap.getBoundingClientRect().top + 8}px`,
+        });
+      });
+      await trigger.click();
+      const popup = page.locator(`.mullion-${which}`);
+      await expect(popup).toBeVisible();
+      await page.waitForTimeout(300);
+
+      const fit = await popup.evaluate((el) => {
+        const box = el.getBoundingClientRect();
+        const wrap = document.getElementById('theme-wrap')!.getBoundingClientRect();
+        const root = el.getRootNode() as ShadowRoot | Document;
+        const hit = root.elementFromPoint(box.left + box.width / 2, box.bottom - 4);
+        return { inside: box.top >= wrap.top - 1 && box.bottom <= wrap.bottom + 1, reached: !!hit && el.contains(hit) };
+      });
+      expect(fit.inside, `the ${which} extends past the clipping wrapper`).toBe(true);
+      expect(fit.reached, `the ${which}'s far edge is not painted`).toBe(true);
+    });
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -286,10 +402,7 @@ test.describe('the overlays read tokens, not fallbacks', () => {
     await inline(page, 'menu-trigger').click();
     await expect(page.locator('.mullion-menu')).toBeVisible();
 
-    const reading = await page.evaluate(() => {
-      const root = document.querySelector('[data-mullion-overlay-root]')?.shadowRoot;
-      const menu = root?.querySelector('.mullion-menu') as HTMLElement | null;
-      if (!menu) return null;
+    const reading = await page.locator('.mullion-menu').evaluate((menu) => {
       const cs = getComputedStyle(menu);
       const toRgb = (value: string) => {
         const probe = document.createElement('div');
@@ -306,9 +419,8 @@ test.describe('the overlays read tokens, not fallbacks', () => {
       };
     });
 
-    expect(reading, 'no menu in the overlay root').not.toBeNull();
-    expect(reading!.borderToken, 'the menu-bd token did not reach the popup').toMatch(/^#|^rgb/);
-    expect(reading!.background).toBe(reading!.expectedBackground);
+    expect(reading.borderToken, 'the menu-bd token did not reach the popup').toMatch(/^#|^rgb/);
+    expect(reading.background).toBe(reading.expectedBackground);
   });
 
   test('the scrim is the theme’s overlay token rather than a hard-coded black', async ({ page }) => {
@@ -331,18 +443,14 @@ test.describe('the overlays read tokens, not fallbacks', () => {
     await inline(page, 'menu-trigger').click();
     await expect(page.locator('.mullion-menu')).toBeVisible();
 
-    const before = await page.evaluate(() => {
-      const root = document.querySelector('[data-mullion-overlay-root]')?.shadowRoot;
-      const row = root?.querySelector('.mullion-menu-item') as HTMLElement | null;
-      return row ? getComputedStyle(row).backgroundColor : null;
-    });
+    const before = await page
+      .locator('.mullion-menu-item')
+      .first()
+      .evaluate((row) => getComputedStyle(row).backgroundColor);
 
     await page.keyboard.press('ArrowDown');
 
-    const after = await page.evaluate(() => {
-      const root = document.querySelector('[data-mullion-overlay-root]')?.shadowRoot;
-      const row = root?.querySelector('.mullion-menu-item[data-highlighted]') as HTMLElement | null;
-      if (!row) return null;
+    const after = await page.locator('.mullion-menu-item[data-highlighted]').evaluate((row) => {
       const rail = getComputedStyle(row, '::before');
       return {
         background: getComputedStyle(row).backgroundColor,
@@ -352,13 +460,12 @@ test.describe('the overlays read tokens, not fallbacks', () => {
       };
     });
 
-    expect(after, 'no highlighted row after ArrowDown').not.toBeNull();
     // The whole point of the rail: highlighting a row moves no ground, so
     // nothing painted on it can be measured against a ground it was not
     // audited on.
-    expect(after!.background, 'highlighting the row moved its ground').toBe(before);
-    expect(parseFloat(after!.railWidth), 'the rail is not painted').toBeGreaterThan(0);
-    expect(after!.railColour, 'the rail is not the audited stroke colour').not.toBe(
+    expect(after.background, 'highlighting the row moved its ground').toBe(before);
+    expect(parseFloat(after.railWidth), 'the rail is not painted').toBeGreaterThan(0);
+    expect(after.railColour, 'the rail is not the audited stroke colour').not.toBe(
       'rgba(0, 0, 0, 0)',
     );
   });
@@ -375,11 +482,9 @@ test.describe('the overlays read tokens, not fallbacks', () => {
      * `outlineOffset` and the halo spread; the real figure is 6px, because the
      * outline sits inside the spread. This samples the row's own box instead.
      */
-    const ring = await page.evaluate(() => {
-      const root = document.querySelector('[data-mullion-overlay-root]')?.shadowRoot;
-      const item = root?.querySelector('.mullion-menu-item[data-highlighted]') as HTMLElement | null;
-      const menu = root?.querySelector('.mullion-menu') as HTMLElement | null;
-      if (!item || !menu) return null;
+    const ring = await page.locator('.mullion-menu-item[data-highlighted]').evaluate((item) => {
+      const menu = item.closest('.mullion-menu');
+      if (!menu) return null;
       const cs = getComputedStyle(item);
       const ib = item.getBoundingClientRect();
       const mb = menu.getBoundingClientRect();
@@ -411,10 +516,7 @@ test.describe('the overlays read tokens, not fallbacks', () => {
     await expect(page.locator('.mullion-menu')).toBeVisible();
     await page.keyboard.press('ArrowDown');
 
-    const ring = await page.evaluate(() => {
-      const root = document.querySelector('[data-mullion-overlay-root]')?.shadowRoot;
-      const item = root?.querySelector('.mullion-menu-item[data-highlighted]') as HTMLElement | null;
-      if (!item) return null;
+    const ring = await page.locator('.mullion-menu-item[data-highlighted]').evaluate((item) => {
       const cs = getComputedStyle(item);
       return {
         hasFocusAttr: item.hasAttribute('data-mullion-focus'),
@@ -426,18 +528,17 @@ test.describe('the overlays read tokens, not fallbacks', () => {
       };
     });
 
-    expect(ring, 'no highlighted menu item after ArrowDown').not.toBeNull();
-    expect(ring!.hasFocusAttr, 'the item does not carry the attribute the ring rule keys on').toBe(true);
+    expect(ring.hasFocusAttr, 'the item does not carry the attribute the ring rule keys on').toBe(true);
     /*
      * Both tones of the P77-F pair must be painted on a keyboard move. A row
      * takes the INSET variant, so the pair arrives as three inset bands rather
      * than an outline plus a halo: same two tokens, different geometry, and no
      * outset outline at all.
      */
-    expect(ring!.outlineStyle, 'the inset variant must not also draw an outline').toBe('none');
-    expect(ring!.haloToken, 'the halo token did not reach the item').toMatch(/^#[0-9a-f]{6}$/i);
-    expect(ring!.boxShadow, 'the ring is not painted at all').not.toBe('none');
-    expect(ring!.boxShadow, 'the pair is not drawn inward').toContain('inset');
+    expect(ring.outlineStyle, 'the inset variant must not also draw an outline').toBe('none');
+    expect(ring.haloToken, 'the halo token did not reach the item').toMatch(/^#[0-9a-f]{6}$/i);
+    expect(ring.boxShadow, 'the ring is not painted at all').not.toBe('none');
+    expect(ring.boxShadow, 'the pair is not drawn inward').toContain('inset');
   });
 });
 
@@ -450,59 +551,74 @@ test.describe('the overlays read tokens, not fallbacks', () => {
  *
  * The showcase renders P79-C's whole presentational set beside the overlays,
  * and a full-page scan reports its violations rather than this track's: the
- * `FileButton`'s hidden `<input type="file">` has no accessible name, and the
- * fixture's tone probe puts a link inside muted text at 1.11:1. Both are real
- * and both are P79-C's; they are recorded in the phase document with a home
- * rather than absorbed into a P80-A gate that would then be measuring
- * something else. A full-page gate belongs with the surfaces Phase 81
- * migrates, where the page is a product screen rather than a fixture.
+ * fixture's tone probe puts a link inside muted text at 1.11:1, which is
+ * P79-C's and recorded with a home in the phase document. (`FileButton`'s
+ * unnamed input was the other; P80-F fixed it and gates it in jsdom.) A
+ * full-page gate belongs with the surfaces Phase 81 migrates, where the page
+ * is a product screen rather than a fixture.
  */
 test.describe('the axe gate', () => {
   /*
-   * The overlay root is a shadow root, and axe's `include` does not cross one
-   * with a plain selector: it reports "No elements found for include". The
-   * array form is the shadow-piercing chain, host first.
+   * axe reads a plain array in `include` as a FRAME chain, not a shadow one, so
+   * the `['[data-mullion-overlay-root]', selector]` form these gates used from
+   * P80-A until P80-F matched nothing and passed on an empty scan. The shadow
+   * chain is `fromShadowDom`, and every gate now proves it reached its target.
    */
-  const within = (selector: string): [string, string] => ['[data-mullion-overlay-root]', selector];
+  const inOverlayRoot = (selector: string) => ({ fromShadowDom: ['[data-mullion-overlay-root]', selector] as [string, string] });
+  const inMount = (mount: Mount, selector: string) =>
+    mount === 'shadow' ? { fromShadowDom: ['#showcase', selector] as [string, string] } : selector;
 
-  const serious = (results: { violations: Array<{ impact?: string | null; id: string; nodes: unknown[] }> }) =>
+  type Results = Awaited<ReturnType<AxeBuilder['analyze']>>;
+  const serious = (results: Results) =>
     results.violations
       .filter((v) => v.impact === 'critical' || v.impact === 'serious')
       .map((v) => `${v.id} (${v.impact}) x${v.nodes.length}`);
+  const reached = (results: Results, cls: string) =>
+    [...results.passes, ...results.violations, ...results.incomplete]
+      .flatMap((r) => r.nodes)
+      .some((n) => n.html.includes(cls));
 
-  test('an open modal has no critical or serious violations', async ({ page }) => {
-    await open(page, { mount: 'light' });
-    await inline(page, 'modal-trigger').click();
-    await expect(page.locator('.mullion-modal')).toBeVisible();
+  /** Scan after the open transition: a popup mid-fade reads as a contrast failure. */
+  const settle = (page: Page, cls: string) =>
+    page.locator(`.${cls}`).evaluate((el) => Promise.all(el.getAnimations({ subtree: true }).map((a) => a.finished)));
 
-    const results = await new AxeBuilder({ page }).include(within('.mullion-overlay-popup')).analyze();
-    expect(serious(results), 'axe found violations inside the modal').toEqual([]);
-  });
+  for (const which of ['modal', 'drawer'] as const) {
+    test(`an open ${which} has no critical or serious violations`, async ({ page }) => {
+      await open(page, { mount: 'light' });
+      await inline(page, `${which}-trigger`).click();
+      await expect(page.locator(`.mullion-${which}`)).toBeVisible();
+      await settle(page, `mullion-${which}`);
 
-  test('an open drawer has no critical or serious violations', async ({ page }) => {
-    await open(page, { mount: 'light' });
-    await inline(page, 'drawer-trigger').click();
-    await expect(page.locator('.mullion-drawer')).toBeVisible();
+      const results = await new AxeBuilder({ page }).include(inOverlayRoot('.mullion-overlay-popup')).analyze();
+      expect(reached(results, `mullion-${which}`), `axe never reached the ${which}`).toBe(true);
+      expect(serious(results), `axe found violations inside the ${which}`).toEqual([]);
+    });
+  }
 
-    const results = await new AxeBuilder({ page }).include(within('.mullion-overlay-popup')).analyze();
-    expect(serious(results), 'axe found violations inside the drawer').toEqual([]);
-  });
+  /*
+   * Scanned with the trigger's section, because Base UI renders an `aria-owns`
+   * span beside the trigger that pointed into another root until P80-F. Its
+   * focus guards are excluded: `aria-hidden` spans with `tabindex="0"` that
+   * hand focus on at once, which `aria-hidden-focus` cannot see (PHASE80, P80-A).
+   */
+  for (const mount of ['shadow', 'light'] as const) {
+    for (const which of ['menu', 'popover'] as const) {
+      test(`an open ${which} on the ${mount} mount, with its trigger, has no critical or serious violations`, async ({
+        page,
+      }) => {
+        await open(page, { mount });
+        await inline(page, `${which}-trigger`).click();
+        await expect(page.locator(`.mullion-${which}`)).toBeVisible();
+        await settle(page, `mullion-${which}`);
 
-  test('an open menu has no critical or serious violations', async ({ page }) => {
-    await open(page, { mount: 'light' });
-    await inline(page, 'menu-trigger').click();
-    await expect(page.locator('.mullion-menu')).toBeVisible();
-
-    const results = await new AxeBuilder({ page }).include(within('.mullion-menu')).analyze();
-    expect(serious(results), 'axe found violations inside the menu').toEqual([]);
-  });
-
-  test('an open popover has no critical or serious violations', async ({ page }) => {
-    await open(page, { mount: 'light' });
-    await inline(page, 'popover-trigger').click();
-    await expect(page.locator('.mullion-popover')).toBeVisible();
-
-    const results = await new AxeBuilder({ page }).include(within('.mullion-popover')).analyze();
-    expect(serious(results), 'axe found violations inside the popover').toEqual([]);
-  });
+        const results = await new AxeBuilder({ page })
+          .include(inMount(mount, '[data-testid="inline-overlays"]'))
+          .include(inMount(mount, `.mullion-${which}`))
+          .exclude(inMount(mount, '[data-base-ui-focus-guard]'))
+          .analyze();
+        expect(reached(results, `mullion-${which}`), `axe never reached the ${which}`).toBe(true);
+        expect(serious(results), `axe found violations around the ${which}`).toEqual([]);
+      });
+    }
+  }
 });

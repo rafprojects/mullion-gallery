@@ -34,10 +34,6 @@ import { test, expect, type Page } from '@playwright/test';
 type Mount = 'shadow' | 'light';
 const MOUNTS: Mount[] = ['shadow', 'light'];
 
-/** The owner of the cross-root defects below, so the annotations agree. */
-const PORTAL_SPLIT =
-  'P80-F item 4: the popup is portalled into the overlay root, a different root from its trigger';
-
 async function open(page: Page, mount: Mount) {
   await page.goto(`/src/ui/showcase/index.html?keyboard=1&mount=${mount}&theme=default-dark&chrome=lock`);
   await page.locator('[data-testid="inline-keyboard"]').waitFor();
@@ -118,6 +114,23 @@ async function indicator(page: Page): Promise<string | null> {
 
 const focusName = async (page: Page) => (await focused(page))?.name ?? null;
 
+/** Who has focus, by the two things a person could tell apart. */
+const stop = async (page: Page) => {
+  const f = await focused(page);
+  return { testid: f?.testid ?? null, name: f?.name ?? null };
+};
+
+/**
+ * What Tab reaches from a trigger whose popup is closed. Tab out of the open
+ * popup must land on the same stop: the Authoring Practices close the popup
+ * and move on, as if it had never opened.
+ */
+async function nextStopAfter(page: Page, id: string) {
+  await byId(page, id).focus();
+  await press(page, 'Tab');
+  return stop(page);
+}
+
 // ---------------------------------------------------------------------------
 // Modal and drawer
 // ---------------------------------------------------------------------------
@@ -160,7 +173,6 @@ test.describe('modal and drawer', () => {
   // `<header>` inside a dialog is exposed as a second `banner` landmark, so a
   // screen reader announces "banner" inside every modal and drawer.
   test('a dialog adds no landmark of its own', async ({ page }) => {
-    test.fail(true, 'P80-F: the dialog header is a <header>, exposed as a banner landmark');
     await open(page, 'shadow');
     await byId(page, 'inline-modal-trigger').click();
     await expect(page.locator('.mullion-modal')).toBeVisible();
@@ -186,14 +198,15 @@ test.describe('popover and tooltip', () => {
     });
 
     // The Authoring Practices' non-modal dialog: Tab leaves it and it closes.
+    // This failed while the popup lived in the overlay root (P80-D, fixed by P80-F).
     test(`popover (${mount}): Tab closes it and moves on`, async ({ page }) => {
-      test.fail(true, PORTAL_SPLIT);
       await open(page, mount);
+      const next = await nextStopAfter(page, 'inline-popover-trigger');
       await byId(page, 'inline-popover-trigger').focus();
       await press(page, 'Enter');
       await expect.poll(async () => (await focused(page))?.popup).toBe('mullion-popover');
       await press(page, 'Tab');
-      await expect.poll(async () => (await focused(page))?.popup ?? 'outside', { timeout: 1500 }).toBe('outside');
+      await expect.poll(() => stop(page), { timeout: 1500 }).toEqual(next);
       await expect(page.locator('.mullion-popover')).toHaveCount(0, { timeout: 1500 });
     });
 
@@ -281,20 +294,21 @@ test.describe('menu', () => {
     });
 
     // The Authoring Practices: Tab in a menu closes it and moves focus on.
+    // This failed while the menu lived in the overlay root (P80-D, fixed by P80-F).
     test(`menu (${mount}): Tab closes it and moves on`, async ({ page }) => {
-      test.fail(true, PORTAL_SPLIT);
       await open(page, mount);
+      const next = await nextStopAfter(page, 'inline-long-menu-trigger');
       await byId(page, 'inline-long-menu-trigger').focus();
       await press(page, 'Enter');
       await expect.poll(() => focusName(page)).toBe('archive');
       await press(page, 'Tab');
-      await expect.poll(async () => (await focused(page))?.popup ?? 'outside', { timeout: 1500 }).toBe('outside');
+      await expect.poll(() => stop(page), { timeout: 1500 }).toEqual(next);
+      await expect(byId(page, 'inline-long-menu')).toHaveCount(0, { timeout: 1500 });
     });
 
     // The menu is labelled by its trigger through `aria-labelledby`, an ID
-    // reference that cannot resolve from the overlay root into another root.
+    // reference that did not resolve while the menu lived in the overlay root.
     test(`menu (${mount}): the menu is named by its trigger`, async ({ page }) => {
-      test.fail(true, PORTAL_SPLIT);
       await open(page, mount);
       await byId(page, 'inline-long-menu-trigger').click();
       await expect(byId(page, 'inline-long-menu')).toMatchAriaSnapshot(
@@ -304,7 +318,8 @@ test.describe('menu', () => {
     });
   }
 
-  // The controls for the two defects above: trigger and menu in the same root.
+  // The same two contracts on the overlay copy, whose trigger already shared
+  // the overlay root with its menu. It was the control that located P80-D's defect.
   test('menu: Tab closes it and the menu is named, when trigger and menu share a root', async ({ page }) => {
     await open(page, 'shadow');
     await byId(page, 'overlay-long-menu-trigger').click();
@@ -363,7 +378,6 @@ test.describe('the input family', () => {
     });
 
     test(`password (${mount}): the value is masked until it is revealed`, async ({ page }) => {
-      test.fail(true, "P80-F: PasswordInput passes type undefined rather than 'password' while hidden");
       await open(page, mount);
       const field = page.getByRole('textbox', { name: 'inline api key' });
       await field.fill('secret');
@@ -529,10 +543,9 @@ test.describe('the choice controls, pagination and the colour picker', () => {
       expect(values).toEqual(['0.55', '0.5', '0', '1', '1', '0']);
     });
 
-    // Focus lands on the hidden range input inside the thumb, and the ring rule
-    // only matches a thumb that is itself focused.
+    // Focus lands on the hidden range input inside the thumb, so the thumb has
+    // to ring when it contains focus rather than when it has it.
     test(`slider (${mount}): the thumb paints the ring under keyboard focus`, async ({ page }) => {
-      test.fail(true, 'P80-F: the ring rule never matches the thumb, so the slider has no visible focus');
       await open(page, mount);
       await page.getByRole('switch', { name: 'inline backdrop blur' }).focus();
       await press(page, 'Tab');
@@ -621,7 +634,6 @@ test.describe('the managers', () => {
   // The toast root takes focus on the F6 path, so it needs the ring like any
   // other keyboard stop (WCAG 2.4.7).
   test('toast: the toast itself paints an indicator when it has focus', async ({ page }) => {
-    test.fail(true, 'P80-F: the toast root is focusable but carries no framework focus attribute');
     await open(page, 'shadow');
     await byId(page, 'notify-danger').click();
     await byId(page, 'inline-tab-one').focus();
@@ -662,11 +674,13 @@ test.describe('what a screen reader is given', () => {
     await expect(byId(page, 'inline-selects')).toMatchAriaSnapshot(`
       - combobox "inline role": pick a role
       - combobox "inline font"
+      - button "Show options inline font"
       - combobox "inline tags"
     `);
     await byId(page, 'inline-select-trigger').click();
+    // Named by the field's label since P80-F; it was unnamed in both roots.
     await expect(page.getByRole('listbox')).toMatchAriaSnapshot(`
-      - listbox:
+      - listbox "inline role":
         - option "Administrator"
         - option "Editor"
         - option "Viewer"

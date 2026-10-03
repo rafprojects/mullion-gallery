@@ -82,6 +82,7 @@ export {
   cx,
   focusable,
   focusableSibling,
+  focusableWithin,
   focusableInset,
   renderElement,
   FOCUS_ATTR,

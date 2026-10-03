@@ -10,12 +10,15 @@
  * its own focus trap it inherits the class of defect this codebase has
  * already shipped twice.
  *
- * The one rule that makes these correct where Mantine's are not: every
- * overlay portals into `useMullionPortal()`, the container the nearest
- * provider created and painted with its own tokens (P79-A). A popup is
- * therefore inside an element carrying the tokens it reads, whatever tree the
- * trigger lives in, so nothing has to be mirrored inline across the boundary
- * the way `adminChromeStyles()` does today.
+ * The rule that makes these correct where Mantine's are not: every overlay
+ * portals into a container that carries the tokens it reads, so nothing has to
+ * be mirrored inline across a boundary the way `adminChromeStyles()` does
+ * today. Which container depends on the overlay. The modal and drawer go to
+ * `useMullionPortal()`, the container the nearest provider created and painted
+ * (P79-A), because they must escape a hostile host. The menu, popover and
+ * tooltip go to their trigger's own root (`./anchor`, P80-F), because their
+ * ARIA and their Tab order are references to the trigger, and those do not
+ * resolve across a shadow boundary.
  */
 
 import { Dialog } from '@base-ui/react/dialog';
@@ -23,7 +26,9 @@ import { Popover as BasePopover } from '@base-ui/react/popover';
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { Separator as BaseSeparator } from '@base-ui/react/separator';
-import type { ReactElement, ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, type ReactElement, type ReactNode } from 'react';
+import { useAnchorContainer, type AnchorContainer } from './anchor';
+import { registerModal } from './modalStack';
 import { cx, focusableInset, type UiElementProps } from './element';
 import { CloseButton } from './control';
 import { customProperties, radiusValue, spacingValue, type UiRadius, type UiSpacing } from './scale';
@@ -50,17 +55,18 @@ export type UiAlign = 'start' | 'center' | 'end';
 export type UiDrawerSide = 'left' | 'right' | 'top' | 'bottom';
 
 /**
- * Where an overlay portals to. Callers pass nothing; the provider's container
- * is the answer in every shipped case. The prop exists for the test harness
- * and for a host that has to place a popup somewhere specific, and it is the
- * only way any of these components can leave the provider's tokens behind.
+ * Where an overlay portals to. Callers pass nothing: a dialog goes to the
+ * provider's container and an anchored popup to its trigger's root. The prop
+ * exists for the test harness and for a host that has to place a popup
+ * somewhere specific, and it is the only way any of these components can leave
+ * the tokens it reads behind.
  */
 interface PortalProps {
   container?: HTMLElement | null | undefined;
 }
 
 /**
- * Resolve the container once per overlay. `useMullionPortal` throws outside a
+ * Resolve a dialog's container once. `useMullionPortal` throws outside a
  * provider, which is the right failure: an overlay with no token-carrying
  * container paints unthemed, and doing that silently is the defect this whole
  * phase exists to remove.
@@ -68,6 +74,42 @@ interface PortalProps {
 function usePortalContainer(override: HTMLElement | null | undefined): HTMLElement | null {
   const provided = useMullionPortal();
   return override !== undefined ? override : provided;
+}
+
+/**
+ * The trigger's root, handed from a compound overlay's root part to its
+ * trigger (which resolves it) and its content (which portals into it).
+ */
+const AnchorContext = createContext<AnchorContainer | null>(null);
+
+/**
+ * Own the anchor for a compound overlay. It still asks for the provider's
+ * container, for the throw outside a provider, and the context value is
+ * memoised so a re-render of the root does not re-render every part.
+ */
+function useAnchorScope(override: HTMLElement | null | undefined): AnchorContainer {
+  useMullionPortal();
+  const { container, anchorId, anchorRef } = useAnchorContainer(override);
+  return useMemo(() => ({ container, anchorId, anchorRef }), [container, anchorId, anchorRef]);
+}
+
+/** Where a compound overlay's content portals: its own override, else the trigger's root. */
+function useAnchorTarget(override: HTMLElement | null | undefined): HTMLElement | ShadowRoot | null {
+  const anchor = useContext(AnchorContext);
+  if (override !== undefined) return override;
+  return anchor ? anchor.container : null;
+}
+
+/**
+ * A popover's name. Base UI names its dialog only from a `Title` part, which
+ * this API does not have, so every popover was an unnamed dialog (axe
+ * `aria-dialog-name`, P80-F). It is named by its trigger unless the caller
+ * names it, the way a menu already is.
+ */
+function usePopoverName(props: { 'aria-label'?: unknown; 'aria-labelledby'?: unknown }) {
+  const anchor = useContext(AnchorContext);
+  if (props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined) return {};
+  return anchor?.anchorId ? { 'aria-labelledby': anchor.anchorId } : {};
 }
 
 /**
@@ -169,6 +211,21 @@ function DialogShell({
     '--mullion-radius': radiusValue(radius),
   });
 
+  /*
+   * A modal registers its portal node so the page behind it is hidden inside a
+   * shadow root too, where Base UI's own walk cannot reach (`./modalStack`).
+   * The callback is stable on purpose: a new one would unregister and
+   * re-register, and move a lower modal to the top.
+   */
+  const stackRef = useCallback(
+    (popup: HTMLElement | null) => {
+      const portalNode = popup?.closest('[data-base-ui-portal]');
+      if (!portalNode || modal === false) return undefined;
+      return registerModal(portalNode);
+    },
+    [modal],
+  );
+
   return (
     <Dialog.Root
       open={opened}
@@ -191,13 +248,16 @@ function DialogShell({
           }}
         />
         <Dialog.Popup
+          ref={stackRef}
           className={cx('mullion-overlay-popup', popupClassName, className)}
           style={{ ...layerStyle(layer, zIndex), ...vars, ...style }}
           {...dataAttrs}
           {...rest}
         >
           {(title !== undefined || withCloseButton) && (
-            <header className="mullion-overlay-header">
+            // A div, not a <header>: outside a sectioning element that is a banner
+            // landmark, and a screen reader announced one inside every dialog (P80-D).
+            <div className="mullion-overlay-header">
               {title !== undefined ? (
                 <Dialog.Title className="mullion-overlay-title">{title}</Dialog.Title>
               ) : (
@@ -213,7 +273,7 @@ function DialogShell({
                   }
                 />
               )}
-            </header>
+            </div>
           )}
           <div className="mullion-overlay-body">{children}</div>
         </Dialog.Popup>
@@ -287,6 +347,15 @@ export interface TooltipProps extends OverlayStyleProps, PortalProps {
 /**
  * A hover and focus label on its child.
  *
+ * **Visual only, by decision (P80-F item 10).** The popup has no role and the
+ * child gets no `aria-describedby`, which is Base UI's design, so a tooltip
+ * must never carry information the control's own name or visible text does
+ * not. A shortcut belongs in `aria-keyshortcuts`, an explanation in a
+ * `Popover`, and an icon-only control needs its own `aria-label`. Exposing the
+ * label as a description was weighed and rejected: on 90 of the product's 115
+ * tooltips it would repeat the control's name, and it reaches none of the
+ * disabled or non-focusable children where most of the rest sit.
+ *
  * Base UI 1.8.0 puts `delay` on `TooltipProvider` and not on the root, so a
  * per-tooltip delay means a provider per tooltip. That is a context value and
  * nothing more, and it keeps `openDelay` meaning what it means at the 16 call
@@ -308,7 +377,8 @@ export function Tooltip({
   style,
   ...rest
 }: TooltipProps) {
-  const target = usePortalContainer(container);
+  useMullionPortal();
+  const { container: target, anchorRef } = useAnchorContainer(container);
 
   const body = (
     <BaseTooltip.Root {...(disabled ? { disabled: true } : {})}>
@@ -319,7 +389,7 @@ export function Tooltip({
           * render as a span, and focus events from the real control inside it
           * bubble to this element, so a keyboard focus still opens the tooltip.
           */}
-        <BaseTooltip.Trigger render={<span className="mullion-tooltip-trigger" />}>
+        <BaseTooltip.Trigger ref={anchorRef} render={<span className="mullion-tooltip-trigger" />}>
           {children}
         </BaseTooltip.Trigger>
         <BaseTooltip.Portal container={target}>
@@ -407,16 +477,19 @@ export interface PopoverContentProps extends OverlayStyleProps, PortalProps {
  * The parts take our names rather than Mantine's, per the boundary's rule
  * that a vendor's vocabulary does not become the framework's.
  */
-export function Popover({ children, opened, defaultOpened, onChange, modal }: PopoverProps) {
+export function Popover({ children, opened, defaultOpened, onChange, modal, container }: PopoverProps) {
+  const anchor = useAnchorScope(container);
   return (
-    <BasePopover.Root
-      {...(opened !== undefined ? { open: opened } : {})}
-      {...(defaultOpened !== undefined ? { defaultOpen: defaultOpened } : {})}
-      {...(onChange ? { onOpenChange: (next: boolean) => onChange(next) } : {})}
-      {...(modal !== undefined ? { modal } : {})}
-    >
-      {children}
-    </BasePopover.Root>
+    <AnchorContext.Provider value={anchor}>
+      <BasePopover.Root
+        {...(opened !== undefined ? { open: opened } : {})}
+        {...(defaultOpened !== undefined ? { defaultOpen: defaultOpened } : {})}
+        {...(onChange ? { onOpenChange: (next: boolean) => onChange(next) } : {})}
+        {...(modal !== undefined ? { modal } : {})}
+      >
+        {children}
+      </BasePopover.Root>
+    </AnchorContext.Provider>
   );
 }
 
@@ -430,8 +503,13 @@ export function Popover({ children, opened, defaultOpened, onChange, modal }: Po
  * unannounced control. Compose with `render={<Button />}` instead.
  */
 function PopoverTrigger({ children, render }: { children?: ReactNode; render?: ReactElement | undefined }) {
+  const anchor = useContext(AnchorContext);
   return (
-    <BasePopover.Trigger className="mullion-popover-trigger" {...(render ? { render } : {})}>
+    <BasePopover.Trigger
+      ref={anchor?.anchorRef}
+      className="mullion-popover-trigger"
+      {...(render ? { render } : {})}
+    >
       {children}
     </BasePopover.Trigger>
   );
@@ -452,7 +530,8 @@ function PopoverContent({
   render,
   ...rest
 }: PopoverContentProps) {
-  const target = usePortalContainer(container);
+  const target = useAnchorTarget(container);
+  const name = usePopoverName(rest);
   const vars = customProperties({
     '--mullion-popover-width': spacingValue(width),
     '--mullion-pad': spacingValue(padding),
@@ -472,6 +551,7 @@ function PopoverContent({
           className={cx('mullion-popover', className)}
           style={{ ...vars, ...style }}
           {...(render ? { render } : {})}
+          {...name}
           {...rest}
         >
           {children}
@@ -527,24 +607,28 @@ export interface MenuItemProps extends OverlayStyleProps {
  * A dropdown of commands. Base UI owns the roving focus, the typeahead and the
  * Home and End keys; the sheet owns what `data-highlighted` looks like.
  */
-export function Menu({ children, opened, defaultOpened, onChange, loop, modal }: MenuProps) {
+export function Menu({ children, opened, defaultOpened, onChange, loop, modal, container }: MenuProps) {
+  const anchor = useAnchorScope(container);
   return (
-    <BaseMenu.Root
-      {...(opened !== undefined ? { open: opened } : {})}
-      {...(defaultOpened !== undefined ? { defaultOpen: defaultOpened } : {})}
-      {...(onChange ? { onOpenChange: (next: boolean) => onChange(next) } : {})}
-      {...(loop !== undefined ? { loopFocus: loop } : {})}
-      {...(modal !== undefined ? { modal } : {})}
-    >
-      {children}
-    </BaseMenu.Root>
+    <AnchorContext.Provider value={anchor}>
+      <BaseMenu.Root
+        {...(opened !== undefined ? { open: opened } : {})}
+        {...(defaultOpened !== undefined ? { defaultOpen: defaultOpened } : {})}
+        {...(onChange ? { onOpenChange: (next: boolean) => onChange(next) } : {})}
+        {...(loop !== undefined ? { loopFocus: loop } : {})}
+        {...(modal !== undefined ? { modal } : {})}
+      >
+        {children}
+      </BaseMenu.Root>
+    </AnchorContext.Provider>
   );
 }
 
 /** The control that opens the menu. A native `<button>` unless `render` says otherwise. */
 function MenuTrigger({ children, render }: { children?: ReactNode; render?: ReactElement | undefined }) {
+  const anchor = useContext(AnchorContext);
   return (
-    <BaseMenu.Trigger className="mullion-menu-trigger" {...(render ? { render } : {})}>
+    <BaseMenu.Trigger ref={anchor?.anchorRef} className="mullion-menu-trigger" {...(render ? { render } : {})}>
       {children}
     </BaseMenu.Trigger>
   );
@@ -563,7 +647,7 @@ function MenuContent({
   style,
   ...rest
 }: MenuContentProps) {
-  const target = usePortalContainer(container);
+  const target = useAnchorTarget(container);
   const vars = customProperties({
     '--mullion-menu-width': spacingValue(width),
     '--mullion-radius': radiusValue(radius),

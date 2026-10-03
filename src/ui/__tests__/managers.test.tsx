@@ -264,6 +264,29 @@ describe('the toast, as a rendered thing', () => {
     const toast = (await screen.findByText('toned')).closest('.mullion-toast')!;
     expect(toast.getAttribute('data-mullion-tone')).toBe('danger');
   });
+
+  it('a toast is a named dialog, by its title or, with none, by its message', async () => {
+    // Base UI names the toast only by its title, so a message-only toast was unnamed (P80-F).
+    mountNotifications();
+    act(() => {
+      notify.show({ title: 'Saved', message: 'Layout saved' });
+      notify.show({ message: 'Copied to the clipboard' });
+    });
+    const titled = await screen.findByRole('dialog', { name: 'Saved' });
+    expect(titled).toHaveAccessibleDescription('Layout saved');
+    const bare = await screen.findByRole('dialog', { name: 'Copied to the clipboard' });
+    expect(bare.querySelector('h2'), 'the message is a paragraph, not a heading').toBeNull();
+  });
+
+  it('the toast carries the focus attribute, because Base UI makes it a tab stop', async () => {
+    mountNotifications();
+    act(() => {
+      notify.show({ message: 'focusable' });
+    });
+    const toast = (await screen.findByText('focusable')).closest('.mullion-toast')!;
+    expect(toast.getAttribute('tabindex')).toBe('0');
+    expect(toast.getAttribute('data-mullion-focus')).toBe('');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -414,5 +437,54 @@ describe('confirm()', () => {
     });
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// One host per page (P80-F)
+// ---------------------------------------------------------------------------
+
+describe('a page with two galleries', () => {
+  // Measured against the Mantine hosts before P80-F: one confirm opened a dialog
+  // per gallery, and confirming both ran onConfirm twice.
+  function TwoGalleries({ first = true }: { first?: boolean }) {
+    return (
+      <>
+        {first && (
+          <MullionProvider>
+            <Notifications label="Notifications" />
+            <Confirmations />
+          </MullionProvider>
+        )}
+        <MullionProvider>
+          <Notifications label="Notifications" />
+          <Confirmations />
+        </MullionProvider>
+      </>
+    );
+  }
+
+  it('renders one toast and one dialog, whichever gallery asked', async () => {
+    render(<TwoGalleries />);
+    act(() => {
+      notify.show({ message: 'once' });
+    });
+    expect(await screen.findAllByText('once')).toHaveLength(1);
+    expect(screen.getAllByRole('region')).toHaveLength(1);
+
+    const onConfirm = vi.fn();
+    act(() => {
+      void confirm({ title: 'Delete it?', labels: LABELS, onConfirm });
+    });
+    expect(await screen.findAllByRole('dialog', { name: 'Delete it?' })).toHaveLength(1);
+  });
+
+  it('hands over to the second host when the first unmounts', async () => {
+    const { rerender } = render(<TwoGalleries />);
+    rerender(<TwoGalleries first={false} />);
+    act(() => {
+      notify.show({ message: 'still shown' });
+    });
+    expect(await screen.findAllByText('still shown')).toHaveLength(1);
   });
 });

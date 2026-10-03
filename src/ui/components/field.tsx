@@ -51,6 +51,10 @@ export type FieldShellInternal = FieldShellProps &
     variantClass?: string | undefined;
     /** Rendered after the control row, inside the field. Where a popup mounts. */
     after?: ReactNode | undefined;
+    /** The label's id, for a part outside the control that is named by it: a listbox. */
+    labelId?: string | undefined;
+    /** The control the label points at, when it is not the field's own control. */
+    labelFor?: string | undefined;
   };
 
 /**
@@ -77,6 +81,8 @@ export function FieldShell({
   children,
   variantClass,
   after,
+  labelId,
+  labelFor,
 }: FieldShellInternal) {
   const invalid = error !== undefined && error !== false;
   return (
@@ -88,7 +94,11 @@ export function FieldShell({
       style={{ ...customProperties({ '--mullion-radius': radiusValue(radius) }), ...style }}
     >
       {label !== undefined && (
-        <Field.Label className="mullion-field-label">
+        <Field.Label
+          className="mullion-field-label"
+          {...(labelId !== undefined ? { id: labelId } : {})}
+          {...(labelFor !== undefined ? { htmlFor: labelFor } : {})}
+        >
           {label}
           {required && (
             <span className="mullion-field-required" aria-hidden>

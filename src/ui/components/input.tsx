@@ -53,7 +53,8 @@ export interface TextInputProps extends FieldShellProps, FieldStyleProps {
    */
   onChange?: ((event: ChangeEvent<HTMLInputElement>) => void) | undefined;
   placeholder?: string | undefined;
-  type?: 'text' | 'email' | 'url' | 'search' | 'tel' | undefined;
+  /** `PasswordInput` is the field to reach for; `'password'` is here so it can set it. */
+  type?: 'text' | 'email' | 'url' | 'search' | 'tel' | 'password' | undefined;
   name?: string | undefined;
   readOnly?: boolean | undefined;
   autoComplete?: string | undefined;
@@ -117,7 +118,7 @@ export const PasswordInput = forwardRef(function PasswordInput(
   return (
     <TextInput
       ref={ref}
-      type={revealed ? 'text' : undefined}
+      type={revealed ? 'text' : 'password'}
       {...rest}
       rightSection={
         <>

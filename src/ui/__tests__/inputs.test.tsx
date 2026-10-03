@@ -83,6 +83,18 @@ describe('PasswordInput', () => {
     await user.click(toggle);
     expect(toggle.getAttribute('aria-pressed')).toBe('true');
   });
+
+  it('masks the value until it is revealed', async () => {
+    // This test once checked only the toggle, and the field shipped unmasked (P80-D).
+    const user = userEvent.setup();
+    mount(<PasswordInput label="Password" revealLabel="Show password" />);
+    const field = screen.getByLabelText('Password') as HTMLInputElement;
+    expect(field.type).toBe('password');
+    await user.click(screen.getByRole('button', { name: 'Show password' }));
+    expect(field.type).toBe('text');
+    await user.click(screen.getByRole('button', { name: 'Show password' }));
+    expect(field.type).toBe('password');
+  });
 });
 
 describe('Textarea', () => {

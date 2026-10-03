@@ -114,6 +114,35 @@ describe('a searchable field', () => {
   });
 });
 
+describe('names (P80-F)', () => {
+  // Both gaps were found by P80-D's accessibility snapshots.
+  it.each([
+    ['Select', <Select key="s" label="Fruit" data={FRUIT} />],
+    ['Select searchable', <Select key="ss" label="Fruit" searchable data={FRUIT} />],
+    ['MultiSelect', <MultiSelect key="m" label="Fruit" data={FRUIT} />],
+  ])('%s names its listbox as its field is named', async (_label, ui) => {
+    const user = userEvent.setup();
+    mount(ui);
+    await user.click(control());
+    expect(await screen.findByRole('listbox', { name: 'Fruit' })).toBeTruthy();
+  });
+
+  it('a chip field\'s label is one label that still points at its input', async () => {
+    const user = userEvent.setup();
+    const { container } = mount(<MultiSelect label="Fruit" data={FRUIT} />);
+    expect(container.ownerDocument.querySelector('label label'), 'a label nested in a label').toBeNull();
+    await user.click(screen.getByText('Fruit'));
+    expect(document.activeElement).toBe(screen.getByRole('combobox', { name: 'Fruit' }));
+  });
+
+  it('a searchable field has one control with the field\'s name, not two', () => {
+    mount(<Select label="Fruit" searchable data={FRUIT} openLabel="Show options" />);
+    expect(screen.getAllByRole('combobox', { name: 'Fruit' })).toHaveLength(1);
+    expect(screen.queryByRole('button', { name: 'Fruit' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Show options Fruit' })).toBeTruthy();
+  });
+});
+
 describe('the keyboard contract', () => {
   it('opens on ArrowDown, moves the highlight and commits on Enter', async () => {
     const user = userEvent.setup();

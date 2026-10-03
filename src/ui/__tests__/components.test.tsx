@@ -12,6 +12,7 @@
 import { createRef } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { expectNoA11yViolations } from '@/test/axe';
 import { listUiStyles, uiStylesText } from '../styles/uiStyles';
 import {
   ActionIcon,
@@ -320,6 +321,17 @@ describe('controls', () => {
     fireEvent.change(input, { target: { files: [] } });
     expect(onChange).toHaveBeenCalledWith([]);
     expect(input.value).toBe('');
+  });
+
+  it('expose one control to assistive technology, the visible one', async () => {
+    // The hidden input once carried no name (axe `label`, critical); it is the button's mechanism, not a control.
+    const { container } = render(
+      <FileButton onChange={() => undefined}>
+        {(props) => <Button {...props}>Upload</Button>}
+      </FileButton>,
+    );
+    await expectNoA11yViolations(container);
+    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['Upload']);
   });
 
   it('report a copy that worked and one that did not', async () => {

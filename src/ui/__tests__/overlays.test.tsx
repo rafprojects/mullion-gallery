@@ -19,11 +19,13 @@
  */
 
 import { useRef, useState } from 'react';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { MullionProvider } from '@/ui';
 import { SCOPE_ATTR } from '../provider/scope';
+import { resolveAnchorContainer } from '../components/anchor';
+import { registerModal } from '../components/modalStack';
 import { listUiStyles, uiStylesText } from '../styles/uiStyles';
 import { Button, Drawer, Menu, Modal, Popover, Tooltip, FOCUS_ATTR } from '../components';
 
@@ -80,6 +82,74 @@ describe('the portal container', () => {
     );
     expect(within(target).getByRole('dialog')).toBeTruthy();
     target.remove();
+  });
+});
+
+describe('the modal stack inside a shadow root (P80-F)', () => {
+  // Base UI's aria-hidden walk starts at body and cannot enter a shadow root, so
+  // a modal in the overlay root hid nothing beside it. `registerModal` finishes that walk.
+  function overlayRoot() {
+    const host = document.createElement('div');
+    const shadow = host.attachShadow({ mode: 'open' });
+    const target = shadow.appendChild(document.createElement('div'));
+    const chrome = target.appendChild(document.createElement('div'));
+    const toasts = target.appendChild(document.createElement('section'));
+    toasts.setAttribute('aria-live', 'polite');
+    const lower = target.appendChild(document.createElement('div'));
+    const upper = target.appendChild(document.createElement('div'));
+    document.body.appendChild(host);
+    return { host, chrome, toasts, lower, upper };
+  }
+  const hidden = (el: Element) => el.getAttribute('aria-hidden') === 'true';
+
+  it('hides everything beside the topmost modal except live regions, and gives it back', () => {
+    const { host, chrome, toasts, lower, upper } = overlayRoot();
+    const offLower = registerModal(lower);
+    expect([chrome, toasts, lower, upper].map(hidden)).toEqual([true, false, false, true]);
+
+    const offUpper = registerModal(upper);
+    expect([chrome, toasts, lower, upper].map(hidden), 'a stacked modal hides the one under it').toEqual([
+      true,
+      false,
+      true,
+      false,
+    ]);
+
+    offUpper();
+    expect([chrome, toasts, lower, upper].map(hidden), 'closing it exposes the lower again').toEqual([
+      true,
+      false,
+      false,
+      true,
+    ]);
+    offLower();
+    expect([chrome, toasts, lower, upper].some(hidden)).toBe(false);
+    host.remove();
+  });
+
+  it('leaves an aria-hidden it did not set alone', () => {
+    const { host, chrome, lower } = overlayRoot();
+    chrome.setAttribute('aria-hidden', 'true');
+    const off = registerModal(lower);
+    off();
+    expect(hidden(chrome), 'someone else hid it, so it stays hidden').toBe(true);
+    host.remove();
+  });
+
+  it('touches nothing in the light DOM, where Base UI walks, and warns on a same-commit pair there', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const a = document.body.appendChild(document.createElement('div'));
+    const b = document.body.appendChild(document.createElement('div'));
+    const offA = registerModal(a);
+    const offB = registerModal(b);
+    expect(hidden(a) || hidden(b)).toBe(false);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0]?.[0])).toMatch(/same commit/);
+    offB();
+    offA();
+    a.remove();
+    b.remove();
+    warn.mockRestore();
   });
 });
 
@@ -471,6 +541,45 @@ describe('the popover', () => {
     expect(vars(popup)['--mullion-pad']).toBe('var(--mullion-spacing-md)');
     const positioner = document.querySelector('.mullion-overlay-positioner')!;
     expect(vars(positioner)['--mullion-overlay-layer']).toBe('var(--mullion-layer-popover)');
+  });
+
+  it('is a dialog named by its trigger, unless the caller names it', async () => {
+    // Base UI names it only from a Title part, which this API lacks (axe `aria-dialog-name`, P80-F).
+    mount(
+      <Popover defaultOpened>
+        <Popover.Trigger>Spacing</Popover.Trigger>
+        <Popover.Content>c</Popover.Content>
+      </Popover>,
+    );
+    expect(await screen.findByRole('dialog', { name: 'Spacing' })).toBeTruthy();
+    cleanup();
+    mount(
+      <Popover defaultOpened>
+        <Popover.Trigger>Spacing</Popover.Trigger>
+        <Popover.Content aria-label="Spacing options">c</Popover.Content>
+      </Popover>,
+    );
+    expect(await screen.findByRole('dialog', { name: 'Spacing options' })).toBeTruthy();
+  });
+});
+
+describe('where an anchored popup mounts (P80-F)', () => {
+  it('in the trigger\'s scope element, else its shadow root, else the body', () => {
+    const scoped = document.createElement('div');
+    scoped.setAttribute(SCOPE_ATTR, 'x');
+    const inScope = scoped.appendChild(document.createElement('button'));
+    const host = document.createElement('div');
+    const shadow = host.attachShadow({ mode: 'open' });
+    const inShadow = shadow.appendChild(document.createElement('button'));
+    const loose = document.createElement('button');
+    document.body.append(scoped, host, loose);
+
+    expect(resolveAnchorContainer(inScope)).toBe(scoped);
+    expect(resolveAnchorContainer(inShadow)).toBe(shadow);
+    expect(resolveAnchorContainer(loose)).toBe(document.body);
+    scoped.remove();
+    host.remove();
+    loose.remove();
   });
 });
 
