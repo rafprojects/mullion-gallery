@@ -751,6 +751,45 @@ describe('the role glyph (P80-A)', () => {
     expect(declined.querySelector('.mullion-role-glyph')).toBeNull();
   });
 
+  /*
+   * P80-G, the designer's answer to question 4: yes on `filled`, status tones
+   * only. It turned out to have been the behaviour since P80-A, because the
+   * default never looked at the variant; this pins it so it cannot narrow.
+   */
+  it.each(['success', 'warning', 'danger', 'info'] as const)(
+    'a filled %s Alert, Badge and Button carry the glyph by default and can decline it',
+    (tone) => {
+      const filled = render(
+        <>
+          <Alert tone={tone} variant="filled">a</Alert>
+          <Badge tone={tone} variant="filled">b</Badge>
+          <Button tone={tone} variant="filled">c</Button>
+        </>,
+      );
+      expect(filled.container.querySelectorAll('.mullion-role-glyph')).toHaveLength(3);
+      filled.unmount();
+
+      const declined = render(
+        <>
+          <Alert tone={tone} variant="filled" icon={false}>a</Alert>
+          <Badge tone={tone} variant="filled" icon={false}>b</Badge>
+          <Button tone={tone} variant="filled" leftSection={false}>c</Button>
+        </>,
+      );
+      expect(declined.container.querySelectorAll('.mullion-role-glyph')).toHaveLength(0);
+    },
+  );
+
+  it('a filled primary or neutral control takes no glyph: emphasis is not a status', () => {
+    const { container } = render(
+      <>
+        <Button variant="filled">Save</Button>
+        <Badge tone="primary" variant="filled">New</Badge>
+      </>,
+    );
+    expect(container.querySelector('.mullion-role-glyph')).toBeNull();
+  });
+
   it('the glyph is never the accessible name', () => {
     // It is a redundant signal beside the label. A screen-reader user has the
     // text, and an aria-hidden glyph keeps it that way.

@@ -362,8 +362,10 @@ describe('the sheet', () => {
   });
 
   it('marks the highlighted row with a rail in the ring\'s own colour', () => {
-    const rail = blocks().find((b) => /\.mullion-select-item\[data-highlighted\]::before\s*\{/.test(b));
+    const rail = blocks().find((b) => /\.mullion-select-item\[data-highlighted\][^{]*::before\s*\{/.test(b));
     expect(rail, 'the highlight rail is missing').toBeDefined();
+    // P80-G: a focused option takes the ring instead; searchable options never take focus and keep it.
+    expect(rail).toContain(':not(:focus-visible, [data-focus-visible])::before');
     expect(rail).toMatch(/background-color:\s*var\(--mullion-color-primary-stroke\)/);
   });
 

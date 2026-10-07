@@ -359,8 +359,12 @@ describe('the menu', () => {
     const sheet = uiStylesText();
     const rail = sheet
       .split('}')
-      .find((block) => block.includes('.mullion-menu-item[data-highlighted]::before'));
+      .find((block) => /\.mullion-menu-item\[data-highlighted\][^{]*::before/.test(block));
     expect(rail, 'the rail rule is missing').toBeDefined();
+    // P80-G: the keyboard's row takes the ring instead, so the rail steps aside for either focus signal.
+    expect(rail, 'the rail must step aside under keyboard focus').toContain(
+      ':not(:focus-visible, [data-focus-visible])::before',
+    );
     expect(rail, 'the rail must read the audited stroke token').toContain(
       'var(--mullion-color-primary-stroke)',
     );

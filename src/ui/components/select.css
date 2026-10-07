@@ -124,12 +124,13 @@
 
   /*
    * The highlight, as the menu draws it: a leading rail, and the ground stays
-   * put. `data-highlighted` is set by the pointer and by the arrow keys alike,
-   * so one rule covers both. Base UI moves real DOM focus through the list, so
-   * a keyboard move also paints the inset ring; the two overlap at the leading
-   * edge and are both `primary-stroke`, which reads as one indicator.
+   * put. As in the menu (P80-G), a row the keyboard has focused takes the
+   * inset ring instead, because the rail covers the ring's inner halo band.
+   * Only a plain `Select` moves focus onto its options; a searchable field
+   * keeps focus in its input, so its options never match and keep the rail,
+   * which is their only keyboard mark.
    */
-  .mullion-select-item[data-highlighted]::before {
+  .mullion-select-item[data-highlighted]:not(:focus-visible, [data-focus-visible])::before {
     content: '';
     position: absolute;
     inset-block: 0;

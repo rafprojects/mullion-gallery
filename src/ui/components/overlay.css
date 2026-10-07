@@ -322,12 +322,15 @@
    * default-dark and 1.05:1 on default-light, so no ground change is a strong
    * enough signal on these palettes.
    *
-   * On a keyboard move the row carries the rail and the inset ring together,
-   * which is deliberate: two states, two marks. They overlap at the leading
-   * edge and both are drawn in `primary-stroke`, so the result reads as the
-   * ring with a heavier leading edge rather than as two fighting indicators.
+   * [P80-G] One mark per input mode: the pointer gets the rail and the
+   * keyboard gets the inset ring, never both. The designer's reason is a
+   * geometry measurement rather than taste: painted together, the 3px rail
+   * covers the ring's inner halo band on the leading edge, so the ring loses
+   * its two-tone guarantee on that side. A keyboard-focused row matches
+   * `:focus-visible` or Base UI's `data-focus-visible`, and the rail steps
+   * aside for either.
    */
-  .mullion-menu-item[data-highlighted]::before {
+  .mullion-menu-item[data-highlighted]:not(:focus-visible, [data-focus-visible])::before {
     content: '';
     position: absolute;
     inset-block: 0;

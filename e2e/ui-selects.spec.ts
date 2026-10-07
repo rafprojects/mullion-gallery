@@ -208,41 +208,69 @@ test.describe('a keyboard can operate it', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('the painted result', () => {
-  test('the highlighted row takes a rail and moves no ground', async ({ page }) => {
+  /** What the highlighted option paints, next to a resting one: grounds, the rail, and the ring. */
+  const optionMarks = (page: Page) =>
+    page.locator('.mullion-select-item[data-highlighted]').evaluate((row) => {
+      const resting = Array.from(row.parentElement?.children ?? []).find(
+        (r) => r !== row && !r.hasAttribute('data-highlighted'),
+      );
+      const rail = getComputedStyle(row, '::before');
+      return {
+        highlightedGround: getComputedStyle(row).backgroundColor,
+        restingGround: resting ? getComputedStyle(resting).backgroundColor : null,
+        rail: rail.content !== 'none' ? rail.width : null,
+        railColor: rail.backgroundColor,
+        ring: /inset/.test(getComputedStyle(row).boxShadow),
+      };
+    });
+
+  /*
+   * One mark per input mode (P80-G): the pointer gets the rail and a focused
+   * option gets the inset ring, because the rail covers the ring's inner halo.
+   * Only a plain Select focuses its options; a searchable field keeps focus in
+   * its input, so its rail is the only keyboard mark it has and must stay.
+   */
+  test('a plain Select option under the pointer takes the rail, no ring, and moves no ground', async ({
+    page,
+  }) => {
+    await open(page);
+    await inline(page, 'select-trigger').click();
+    const option = page.getByRole('option', { name: 'Editor' });
+    await option.hover();
+    await expect(option).toHaveAttribute('data-highlighted', '');
+    const marks = await optionMarks(page);
+    expect(marks.highlightedGround).toBe(marks.restingGround);
+    expect(marks.rail).toBe('3px');
+    expect(marks.railColor).not.toBe('rgba(0, 0, 0, 0)');
+    expect(marks.ring, 'a pointer highlight painted the keyboard ring').toBe(false);
+  });
+
+  test('a plain Select option under the keyboard takes the ring and no rail', async ({ page }) => {
     await open(page);
     await inline(page, 'select-trigger').focus();
     await page.keyboard.press('ArrowDown');
     await page.getByRole('listbox').waitFor();
+    await page.keyboard.press('ArrowDown');
+    await page.waitForTimeout(150);
+    const marks = await optionMarks(page);
+    expect(marks.highlightedGround).toBe(marks.restingGround);
+    // A keyboard move focuses the option for real, so the inset ring paints.
+    expect(marks.ring, 'the focused option has no ring').toBe(true);
+    expect(marks.rail, 'the rail still paints under keyboard focus, over the ring\'s halo').toBeNull();
+  });
 
-    const measured = await page.evaluate(() => {
-      function walk(node: Document | ShadowRoot, selector: string): Element[] {
-        const hits = Array.from(node.querySelectorAll(selector));
-        for (const el of Array.from(node.querySelectorAll('*'))) {
-          if (el.shadowRoot) hits.push(...walk(el.shadowRoot, selector));
-        }
-        return hits;
-      }
-      const rows = walk(document, '.mullion-select-item') as HTMLElement[];
-      const highlighted = rows.find((r) => r.hasAttribute('data-highlighted'));
-      const resting = rows.find((r) => !r.hasAttribute('data-highlighted'));
-      if (!highlighted || !resting) return null;
-      const rail = getComputedStyle(highlighted, '::before');
-      return {
-        highlightedGround: getComputedStyle(highlighted).backgroundColor,
-        restingGround: getComputedStyle(resting).backgroundColor,
-        railWidth: rail.width,
-        railColor: rail.backgroundColor,
-        ringShadow: getComputedStyle(highlighted).boxShadow,
-      };
-    });
-
-    expect(measured, 'no highlighted row was found').not.toBeNull();
-    // The property P80-A's rail bought and this batch keeps: no ground moves.
-    expect(measured!.highlightedGround).toBe(measured!.restingGround);
-    expect(measured!.railWidth).toBe('3px');
-    expect(measured!.railColor).not.toBe('rgba(0, 0, 0, 0)');
-    // A keyboard move focuses the row for real, so the inset ring paints too.
-    expect(measured!.ringShadow).toContain('inset');
+  test('a searchable field keeps the rail under the keyboard, because its options never take focus', async ({
+    page,
+  }) => {
+    await open(page);
+    await inline(page, 'select-search').focus();
+    await page.keyboard.press('ArrowDown');
+    await page.getByRole('listbox').waitFor();
+    await page.keyboard.press('ArrowDown');
+    await page.waitForTimeout(150);
+    await expect(inline(page, 'select-search')).toBeFocused();
+    const marks = await optionMarks(page);
+    expect(marks.rail, 'the only keyboard mark a searchable option has is gone').toBe('3px');
   });
 
   test('a selected row is marked by a shape as well as a colour', async ({ page }) => {

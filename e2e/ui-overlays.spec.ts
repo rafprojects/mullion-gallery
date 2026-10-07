@@ -149,10 +149,13 @@ test.describe('where each overlay lands', () => {
 test.describe('a modal hides what is behind it, inside the overlay root too', () => {
   const dialogNames = (page: Page) =>
     page.getByRole('dialog').evaluateAll((els) =>
-      els.map((el) => {
-        const id = el.getAttribute('aria-labelledby');
-        return id ? ((el.getRootNode() as ShadowRoot).getElementById(id)?.textContent ?? '') : '';
-      }),
+      // A dialog mid-exit can detach between the query and this read; it is no longer exposed.
+      els
+        .filter((el) => el.isConnected)
+        .map((el) => {
+          const id = el.getAttribute('aria-labelledby');
+          return id ? ((el.getRootNode() as ShadowRoot).getElementById(id)?.textContent ?? '') : '';
+        }),
     );
 
   test('a stacked modal leaves only itself exposed, and closing it gives the lower one back', async ({ page }) => {
@@ -162,6 +165,17 @@ test.describe('a modal hides what is behind it, inside the overlay root too', ()
     await inline(page, 'stack-trigger').click();
     await expect(page.getByRole('dialog', { name: 'inline stacked modal' })).toBeVisible();
     await expect.poll(() => dialogNames(page)).toEqual(['inline stacked modal']);
+    // The stack hides the lower dialog the moment the new one mounts, a frame before focus
+    // arrives; an Escape in that frame closes the lower one, so wait for focus as a person would.
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          let el: Element | null = document.activeElement;
+          while (el?.shadowRoot?.activeElement) el = el.shadowRoot.activeElement;
+          return el?.closest('[role="dialog"]')?.textContent?.includes('inside the stacked modal') ?? false;
+        }),
+      )
+      .toBe(true);
 
     await page.keyboard.press('Escape');
     await expect.poll(() => dialogNames(page)).toEqual(['inline modal']);
@@ -438,36 +452,55 @@ test.describe('the overlays read tokens, not fallbacks', () => {
     expect(backdrop!.painted).not.toBe('rgba(0, 0, 0, 0)');
   });
 
-  test('a highlighted row paints the rail, and its ground does not move', async ({ page }) => {
-    await open(page);
-    await inline(page, 'menu-trigger').click();
-    await expect(page.locator('.mullion-menu')).toBeVisible();
-
-    const before = await page
-      .locator('.mullion-menu-item')
-      .first()
-      .evaluate((row) => getComputedStyle(row).backgroundColor);
-
-    await page.keyboard.press('ArrowDown');
-
-    const after = await page.locator('.mullion-menu-item[data-highlighted]').evaluate((row) => {
+  /** What a highlighted row paints: its ground, the rail, and the ring. */
+  const rowMarks = (page: Page) =>
+    page.locator('.mullion-menu-item[data-highlighted]').evaluate((row) => {
       const rail = getComputedStyle(row, '::before');
       return {
         background: getComputedStyle(row).backgroundColor,
-        railWidth: rail.width,
+        rail: rail.content !== 'none' ? rail.width : null,
         railColour: rail.backgroundColor,
-        strokeToken: getComputedStyle(row).getPropertyValue('--mullion-color-primary-stroke').trim(),
+        ring: /inset/.test(getComputedStyle(row).boxShadow),
       };
     });
+
+  /*
+   * One mark per input mode (P80-G, the designer's answer to question 5): the
+   * pointer gets the rail and the keyboard gets the inset ring. Painted
+   * together, the rail covered the ring's inner halo band on the leading edge.
+   */
+  test('a row the pointer highlights paints the rail and no ring, and its ground does not move', async ({
+    page,
+  }) => {
+    await open(page);
+    await inline(page, 'menu-trigger').click();
+    await expect(page.locator('.mullion-menu')).toBeVisible();
+    const items = page.locator('.mullion-menu-item');
+    const before = await items.nth(1).evaluate((row) => getComputedStyle(row).backgroundColor);
+
+    await items.nth(1).hover();
+    await expect(items.nth(1)).toHaveAttribute('data-highlighted', '');
+    const marks = await rowMarks(page);
 
     // The whole point of the rail: highlighting a row moves no ground, so
     // nothing painted on it can be measured against a ground it was not
     // audited on.
-    expect(after.background, 'highlighting the row moved its ground').toBe(before);
-    expect(parseFloat(after.railWidth), 'the rail is not painted').toBeGreaterThan(0);
-    expect(after.railColour, 'the rail is not the audited stroke colour').not.toBe(
-      'rgba(0, 0, 0, 0)',
-    );
+    expect(marks.background, 'highlighting the row moved its ground').toBe(before);
+    expect(marks.rail, 'the rail is not painted').toBe('3px');
+    expect(marks.railColour, 'the rail is not the audited stroke colour').not.toBe('rgba(0, 0, 0, 0)');
+    expect(marks.ring, 'a pointer highlight painted the keyboard ring').toBe(false);
+  });
+
+  test('a row the keyboard highlights paints the ring and no rail', async ({ page }) => {
+    await open(page);
+    await inline(page, 'menu-trigger').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.mullion-menu-item[data-highlighted]')).toHaveCount(1);
+    await page.keyboard.press('ArrowDown');
+    await page.waitForTimeout(150);
+    const marks = await rowMarks(page);
+    expect(marks.ring, 'the keyboard row has no ring').toBe(true);
+    expect(marks.rail, 'the rail still paints under keyboard focus, over the ring\'s halo').toBeNull();
   });
 
   test('the inset ring on a menu row is painted, and not clipped', async ({ page }) => {
