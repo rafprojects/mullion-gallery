@@ -69,6 +69,7 @@
     background-color: var(--mullion-color-surface);
     box-shadow: var(--mullion-shadow-lg);
     color: var(--mullion-color-text);
+    font-family: var(--mullion-font-family);
     font-size: var(--mullion-font-size-sm);
     transition:
       opacity var(--mullion-duration-base) ease,

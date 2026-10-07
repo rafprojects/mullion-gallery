@@ -414,16 +414,15 @@ describe('the sheet', () => {
     expect(rule).toMatch(/var\(--active-tab-left\)/);
   });
 
-  it('gives the segmented indicator a border, because a ground step is invisible', () => {
-    /*
-     * Measured over the 23 bundled themes: `surfaceRaised` is identical to
-     * `surface2` on 21 of them (deltaE00 0.00), so an indicator distinguished
-     * only by its ground would not be visible. `border-strong` on `surface2`
-     * clears 3:1 on all 23 because the engine audits that pair.
-     */
-    const rule = blocks().find((b) => /\.mullion-segmented-indicator\s*\{/.test(b));
-    expect(rule, 'the segmented indicator rule is missing').toBeDefined();
-    expect(rule).toMatch(/border:\s*1px solid var\(--mullion-color-border-strong\)/);
+  it('puts the segmented control on the elevation ladder, with the rule-13 hairline', () => {
+    // P80-G: track on `surface`, indicator on `surfaceRaised`, and a border that is
+    // `border-strong` on a light theme and transparent on a dark one (`raised-bd`).
+    const indicator = blocks().find((b) => /\.mullion-segmented-indicator\s*\{/.test(b));
+    expect(indicator, 'the segmented indicator rule is missing').toBeDefined();
+    expect(indicator).toMatch(/border:\s*1px solid var\(--mullion-raised-bd\)/);
+    expect(indicator).toMatch(/background-color:\s*var\(--mullion-color-surface-raised\)/);
+    const track = blocks().find((b) => /\.mullion-segmented\s*\{/.test(b));
+    expect(track).toMatch(/background-color:\s*var\(--mullion-color-surface\)/);
   });
 
   it('stills every transition under prefers-reduced-motion', () => {

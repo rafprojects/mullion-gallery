@@ -273,6 +273,57 @@ test.describe('the painted result', () => {
     expect(marks.rail, 'the only keyboard mark a searchable option has is gone').toBe('3px');
   });
 
+  /*
+   * P80-G, the designer's §6. The popup is never narrower than its field, as
+   * wide as its longest label, and capped; past the cap a label wraps. A list
+   * you choose from must never cut part of a choice off with an ellipsis.
+   */
+  const optionLayout = (page: Page, name: string) =>
+    page.getByRole('option', { name }).evaluate((row) => {
+      const text = row.querySelector('.mullion-select-item-text') as HTMLElement;
+      const check = row.querySelector('.mullion-select-item-indicator svg');
+      const lineHeight = parseFloat(getComputedStyle(text).lineHeight) || text.getBoundingClientRect().height;
+      const t = text.getBoundingClientRect();
+      const popup = row.closest('.mullion-select-popup')!.getBoundingClientRect();
+      return {
+        lines: Math.round(t.height / lineHeight),
+        clipped: text.scrollWidth > text.clientWidth + 1,
+        insidePopup: t.right <= popup.right + 0.5,
+        popupWidth: popup.width,
+        checkMid: check ? check.getBoundingClientRect().top + check.getBoundingClientRect().height / 2 - t.top : null,
+        lineHeight,
+      };
+    });
+
+  test('the popup grows past a narrow field to show its longest label whole', async ({ page }) => {
+    await open(page);
+    const trigger = inline(page, 'select-trigger');
+    const fieldWidth = (await trigger.boundingBox())!.width;
+    await trigger.click();
+    const admin = await optionLayout(page, 'Administrator');
+    expect(admin.clipped, 'the longest label is cut off').toBe(false);
+    expect(admin.lines, 'it fits on one line once the popup grows').toBe(1);
+    expect(admin.insidePopup).toBe(true);
+    expect(admin.popupWidth).toBeGreaterThanOrEqual(fieldWidth - 0.5);
+  });
+
+  test('past the cap a label wraps, whole, with its check on the first line', async ({ page }) => {
+    // The light mount, so a page style can stand in for a cap the label exceeds.
+    await open(page, { mount: 'light' });
+    await page.addStyleTag({
+      content: '.mullion-select-popup { min-inline-size: 0 !important; max-inline-size: 5.5rem !important; }',
+    });
+    const trigger = inline(page, 'select-trigger');
+    await trigger.click();
+    await page.getByRole('option', { name: 'Administrator' }).click();
+    await trigger.click();
+    const admin = await optionLayout(page, 'Administrator');
+    expect(admin.lines, 'the label did not wrap at the cap').toBeGreaterThanOrEqual(2);
+    expect(admin.clipped, 'a wrapped label is still cut').toBe(false);
+    expect(admin.checkMid, 'the check left the first line').not.toBeNull();
+    expect(admin.checkMid!).toBeLessThan(admin.lineHeight);
+  });
+
   test('a selected row is marked by a shape as well as a colour', async ({ page }) => {
     await open(page);
     const trigger = inline(page, 'select-trigger');

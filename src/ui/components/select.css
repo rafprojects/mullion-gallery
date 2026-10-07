@@ -79,15 +79,22 @@
    * no explicit width is exactly as wide as the control that opened it. A
    * caller asking for a width gets one; nothing here computes one.
    */
+  /*
+   * [P80-G] Never narrower than its field, as wide as its longest label, and
+   * capped; a label longer than the cap wraps rather than losing its end,
+   * because a list you choose from should not hide part of a choice. The
+   * designer's §6, 2026-10-06. A caller's `width` still sets it outright.
+   */
   .mullion-select-popup {
-    inline-size: var(--mullion-select-popup-width, var(--anchor-width));
-    min-inline-size: 8rem;
-    max-inline-size: calc(100vw - 2 * var(--mullion-spacing-md));
+    inline-size: var(--mullion-select-popup-width, max-content);
+    min-inline-size: max(8rem, var(--anchor-width, 0px));
+    max-inline-size: min(24rem, calc(100vw - 16px));
     padding-block: var(--mullion-spacing-xs);
     border: 1px solid var(--mullion-menu-bd);
     border-radius: var(--mullion-radius, var(--mullion-radius-md));
     background-color: var(--mullion-menu-bg);
     color: var(--mullion-color-text);
+    font-family: var(--mullion-font-family);
     box-shadow: var(--mullion-shadow-md);
     transition:
       opacity var(--mullion-duration-fast) ease,
@@ -112,7 +119,7 @@
     position: relative;
     display: grid;
     grid-template-columns: 1rem 1fr;
-    align-items: center;
+    align-items: start;
     gap: var(--mullion-spacing-xs);
     padding-block: calc(var(--mullion-spacing-xs) / 1.5);
     padding-inline: var(--mullion-spacing-sm);
@@ -156,9 +163,11 @@
     cursor: not-allowed;
   }
 
+  /* One line tall, so a wrapped row keeps its check on the first line. */
   .mullion-select-item-indicator {
     display: inline-flex;
     grid-column: 1;
+    block-size: 1lh;
     align-items: center;
     justify-content: center;
   }
@@ -168,11 +177,10 @@
     block-size: 0.875em;
   }
 
+  /* Wraps, and a single long word breaks, so no option is ever cut. The closed field keeps its ellipsis. */
   .mullion-select-item-text {
     grid-column: 2;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
   }
 
   .mullion-select-group-label {

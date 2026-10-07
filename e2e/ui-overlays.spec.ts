@@ -136,6 +136,39 @@ test.describe('where each overlay lands', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Popup typography (P80-G)
+// ---------------------------------------------------------------------------
+
+/*
+ * The fixture ground sets no font, so it shows the page's body font (here the
+ * dev index's system stack) and a popup that inherited its type would too. In
+ * the product the overlay root inherits the host page's body font the same way.
+ */
+test('every popup sets the framework font rather than inheriting the page\'s', async ({ page }) => {
+  await open(page, { extra: '&selects=1&managers=1' });
+  const font = (selector: string) =>
+    page.locator(selector).first().evaluate((el) => getComputedStyle(el).fontFamily.split(',')[0]!.trim());
+
+  expect(await font('[data-testid="inline-overlays"]'), 'the fixture ground already uses Inter, so this proves nothing').not.toMatch(/Inter/);
+  const seen: Record<string, string> = {};
+  await inline(page, 'menu-trigger').click();
+  seen.menu = await font('.mullion-menu');
+  await page.keyboard.press('Escape');
+  await inline(page, 'popover-trigger').click();
+  seen.popover = await font('.mullion-popover');
+  await page.keyboard.press('Escape');
+  await inline(page, 'select-trigger').click();
+  seen.listbox = await font('.mullion-select-popup');
+  await page.keyboard.press('Escape');
+  await inline(page, 'modal-trigger').click();
+  seen.modal = await font('.mullion-modal');
+  await page.keyboard.press('Escape');
+  await page.locator('[data-testid="notify-plain"]').click();
+  seen.toast = await font('.mullion-toast');
+  expect(seen).toEqual({ menu: 'Inter', popover: 'Inter', listbox: 'Inter', modal: 'Inter', toast: 'Inter' });
+});
+
+// ---------------------------------------------------------------------------
 // What a modal hides
 // ---------------------------------------------------------------------------
 

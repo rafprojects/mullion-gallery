@@ -85,6 +85,20 @@ describe('the portal container', () => {
   });
 });
 
+describe('popup typography (P80-G)', () => {
+  it('every popup root sets the framework font beside its own ground', () => {
+    // A popup in the overlay root inherits from document.body otherwise, which is the host theme's font.
+    const sheet = uiStylesText();
+    for (const root of ['overlay-popup', 'menu', 'popover', 'tooltip', 'toast', 'select-popup']) {
+      const rule = sheet.split('}').find((b) => new RegExp(`\\.mullion-${root}\\s*\\{`).test(b));
+      expect(rule, `.mullion-${root} has no rule`).toBeDefined();
+      expect(rule, `.mullion-${root} inherits its font from wherever it was portalled`).toContain(
+        'font-family: var(--mullion-font-family)',
+      );
+    }
+  });
+});
+
 describe('the modal stack inside a shadow root (P80-F)', () => {
   // Base UI's aria-hidden walk starts at body and cannot enter a shadow root, so
   // a modal in the overlay root hid nothing beside it. `registerModal` finishes that walk.

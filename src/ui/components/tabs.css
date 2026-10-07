@@ -10,12 +10,13 @@
  * a `font-weight` declaration, which is the same defect avoided the same way in
  * `chrome-portable.scss` after it was reintroduced there in P80-A.
  *
- * The segmented indicator carries a BORDER and not just a ground, and that is a
- * measurement rather than a preference: `surfaceRaised` is identical to
- * `surface2` on **21 of the 23 bundled themes** (deltaE00 0.00, ratio 1.00), so
- * an indicator that relied on stepping up the elevation ladder would have been
- * invisible on nearly all of them. `border-strong` on `surface2` clears 3:1 on
- * all 23 by construction, because the engine audits that pair.
+ * The segmented control sits on the elevation ladder (P80-G): the track is
+ * `surface` and the indicator `surfaceRaised`, a real rung on every dark theme
+ * since the engine stopped resolving it to `surface2`. By rule 13 a dark theme
+ * shows the step by lightness alone and a light theme by a `border-strong`
+ * hairline, which is what `raised-bd` carries. Until P80-G the indicator
+ * needed that hairline on every theme, because `surfaceRaised` was identical
+ * to `surface2` on 21 of the 23.
  */
 @layer mullion.components {
   /* ── Tabs ────────────────────────────────────────────────────────────── */
@@ -155,7 +156,7 @@
     gap: 0;
     padding: 2px;
     border-radius: var(--mullion-radius, var(--mullion-radius-sm));
-    background-color: var(--mullion-color-surface2);
+    background-color: var(--mullion-color-surface);
     block-size: var(--mullion-control-height-sm);
   }
 
@@ -186,8 +187,9 @@
 
   /*
    * The moving indicator, positioned from the two custom properties
-   * `tabs.tsx` publishes after reading the checked segment's box. The border is
-   * what makes it visible: see the measurement in this file's header.
+   * `tabs.tsx` publishes after reading the checked segment's box. Its border
+   * is the rule-13 hairline: transparent on a dark theme, `border-strong` on a
+   * light one (see this file's header).
    */
   .mullion-segmented-indicator {
     position: absolute;
@@ -197,7 +199,7 @@
     inset-inline-start: 0;
     inline-size: var(--mullion-segment-width, 0);
     translate: var(--mullion-segment-left, 0) 0;
-    border: 1px solid var(--mullion-color-border-strong);
+    border: 1px solid var(--mullion-raised-bd);
     border-radius: calc(var(--mullion-radius, var(--mullion-radius-sm)) - 1px);
     background-color: var(--mullion-color-surface-raised);
     pointer-events: none;

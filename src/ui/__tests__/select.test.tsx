@@ -383,8 +383,13 @@ describe('the sheet', () => {
     expect(selected, 'a selected row must not take a ground').not.toMatch(/background/);
   });
 
-  it('does not pin a popup width', () => {
+  it('sizes the popup to its field at least, its longest label at most, under a cap', () => {
+    // P80-G, the designer's §6: grow to fit, then wrap; never cut an option with an ellipsis.
     const popup = blocks().find((b) => /\.mullion-select-popup\s*\{/.test(b));
-    expect(popup).toMatch(/inline-size:\s*var\(--mullion-select-popup-width, var\(--anchor-width\)\)/);
+    expect(popup).toMatch(/[^-]inline-size:\s*var\(--mullion-select-popup-width, max-content\)/);
+    expect(popup).toMatch(/min-inline-size:\s*max\(8rem, var\(--anchor-width, 0px\)\)/);
+    expect(popup).toMatch(/max-inline-size:\s*min\(24rem, calc\(100vw - 16px\)\)/);
+    const text = blocks().find((b) => /\.mullion-select-item-text\s*\{/.test(b));
+    expect(text, 'an option label must wrap, not truncate').not.toMatch(/text-overflow|nowrap/);
   });
 });
