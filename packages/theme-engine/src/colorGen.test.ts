@@ -20,7 +20,7 @@ import {
   selectUiContrastIndex,
   PRIMARY_SHADE_CONTRAST_MIN,
   UI_CONTRAST_MIN,
-  resolveSurfaceRaised,
+  resolveElevation,
   deriveBorderFloor,
   borderGrounds,
   RAISED_STEP_MIN,
@@ -246,35 +246,48 @@ describe('resolveColors', () => {
     expect(resolved.primaryShade).toEqual(derivePrimaryShade(rig));
   });
 
-  // P80-G: the designer's invariants of 2026-10-06. The old fallback was `surface2` itself.
-  describe('surfaceRaised when a theme does not author it', () => {
-    it('keeps an authored value', () => {
-      expect(resolveSurfaceRaised({ ...baseColors, surfaceRaised: '#123456' }, 'dark')).toBe('#123456');
+  // P80-G as revised 2026-10-07: keep a dark theme's own rung, and lift only where it has none.
+  describe('the elevation ladder when a theme does not author surfaceRaised', () => {
+    it('keeps an authored value, and the authored intermediates with it', () => {
+      const e = resolveElevation({ ...baseColors, surfaceRaised: '#5b6b85' }, 'dark');
+      expect(e).toEqual({ surfaceRaised: '#5b6b85', surface2: baseColors.surface2, surface3: baseColors.surface3 });
     });
 
     it('takes surface on a light theme, and so is never darker than it', () => {
       const light = { ...baseColors, surface: '#fdf6e3', surface2: '#eee8d5', surface3: '#e4ddc8' };
-      expect(resolveSurfaceRaised(light, 'light')).toBe('#fdf6e3');
+      expect(resolveElevation(light, 'light').surfaceRaised).toBe('#fdf6e3');
     });
 
-    it('takes surface3 on a dark theme when it is a real rung that carries role text', () => {
-      expect(resolveSurfaceRaised(baseColors, 'dark')).toBe(baseColors.surface3);
+    it('keeps a dark theme\'s own rung and re-derives the intermediates below it', () => {
+      // The homage ports authored surface2 as the rung itself; that, not the ladder, was the collision.
+      const e = resolveElevation(baseColors, 'dark');
+      expect(e.surfaceRaised).toBe(baseColors.surface2);
+      const lab = (c: string) => chroma(c).get('lab.l');
+      expect(lab(e.surface2)).toBeGreaterThan(lab(baseColors.surface));
+      expect(lab(e.surface3)).toBeGreaterThan(lab(e.surface2));
+      expect(lab(e.surfaceRaised)).toBeGreaterThan(lab(e.surface3));
     });
 
-    it('derives a rung at least ΔE00 2.0 above surface2 when the theme authors none', () => {
-      const { surface3: _s3, ...noRung } = baseColors;
-      const raised = resolveSurfaceRaised(noRung, 'dark');
-      expect(chroma.deltaE(raised, baseColors.surface2!)).toBeGreaterThanOrEqual(RAISED_STEP_MIN);
-      expect(chroma(raised).get('lab.l')).toBeGreaterThan(chroma(baseColors.surface2!).get('lab.l'));
+    it('lifts only when the theme has no rung ΔE00 2.0 above surface', () => {
+      const flat = { ...baseColors, surface2: '#212c3e' };
+      expect(chroma.deltaE(flat.surface2, flat.surface)).toBeLessThan(RAISED_STEP_MIN);
+      const e = resolveElevation(flat, 'dark');
+      expect(e.surfaceRaised).toBe(baseColors.surface3);
+      expect(e.surface2).toBe('#212c3e');
     });
 
-    it('stops short of a surface3 too light to carry role-coloured text', () => {
-      const pale = { ...baseColors, surface3: '#8a96aa' };
-      const raised = resolveSurfaceRaised(pale, 'dark');
+    it('stops a lift short of a surface3 too light to carry role-coloured text', () => {
+      const pale = { ...baseColors, surface2: '#212c3e', surface3: '#8a96aa' };
+      const raised = resolveElevation(pale, 'dark').surfaceRaised;
       expect(raised).not.toBe('#8a96aa');
-      expect(chroma.deltaE(raised, baseColors.surface2!)).toBeGreaterThanOrEqual(RAISED_STEP_MIN);
-      const ceiling = generateColorScale(baseColors.error, 'dark')[0]!;
-      expect(chroma.contrast(ceiling, raised)).toBeGreaterThanOrEqual(4.5);
+      expect(chroma.deltaE(raised, '#212c3e')).toBeGreaterThanOrEqual(RAISED_STEP_MIN);
+      expect(chroma.contrast(generateColorScale(baseColors.error, 'dark')[0]!, raised)).toBeGreaterThanOrEqual(4.5);
+    });
+
+    it('derives a rung when the theme authors none at all', () => {
+      const { surface2: _s2, surface3: _s3, ...bare } = baseColors;
+      const e = resolveElevation(bare, 'dark');
+      expect(chroma.deltaE(e.surfaceRaised, e.surface2)).toBeGreaterThanOrEqual(RAISED_STEP_MIN);
     });
   });
 
@@ -308,7 +321,8 @@ describe('resolveColors', () => {
 
     it('has a raised ground that reads as raised', () => {
       if (def.colorScheme === 'dark') {
-        expect(chroma.deltaE(rc.surfaceRaised, rc.surface2)).toBeGreaterThanOrEqual(RAISED_STEP_MIN);
+        // A real step above surface, and rule 13: strictly above surface2.
+        expect(chroma.deltaE(rc.surfaceRaised, rc.surface)).toBeGreaterThanOrEqual(RAISED_STEP_MIN);
         expect(chroma(rc.surfaceRaised).get('lab.l')).toBeGreaterThan(chroma(rc.surface2).get('lab.l'));
       } else {
         // Rule 13 as revised 2026-10-06: never darker than surface, and strictly above surface2.

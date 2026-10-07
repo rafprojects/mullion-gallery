@@ -12,7 +12,7 @@
  *
  * The segmented control sits on the elevation ladder (P80-G): the track is
  * `surface` and the indicator `surfaceRaised`, a real rung on every dark theme
- * since the engine stopped resolving it to `surface2`. By rule 13 a dark theme
+ * since P80-G re-derived `surface2` below it rather than equal to it. By rule 13 a dark theme
  * shows the step by lightness alone and a light theme by a `border-strong`
  * hairline, which is what `raised-bd` carries. Until P80-G the indicator
  * needed that hairline on every theme, because `surfaceRaised` was identical

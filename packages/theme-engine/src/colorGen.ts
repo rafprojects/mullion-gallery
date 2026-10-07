@@ -188,37 +188,74 @@ export function deriveBorderStrong(
   return best;
 }
 
-/** The least a raised ground sits above `surface2` on a dark theme: the side-by-side visibility floor. */
+/** The least step a raised ground makes on a dark theme, ΔE00: the side-by-side visibility floor. */
 export const RAISED_STEP_MIN = 2.0;
 
 /** The least a decorative `border` sits from any ground it is drawn on (designer, 2026-10-06). */
 export const BORDER_FLOOR_MIN = 3.5;
 
-/**
- * Resolve `surfaceRaised` when a theme does not author it (P80-G).
- *
- * The designer's invariants, 2026-10-06. An authored value always wins. A
- * light theme takes `surface`: rule 13 puts light elevation in the hairline and
- * the shadow, and a step toward white would synthesise a colour the palette
- * never published. A dark theme takes the next authored rung above `surface2`,
- * `surface3`, which must be lighter than `surface2` by at least ΔE00 2.0.
- *
- * One limit the invariants did not foresee, measured on the bundled themes: on
- * four dark homages `surface3` is a mid-tone, too light to carry role-coloured
- * text at 4.5:1 or, on two, the authored `borderStrong` at 3:1. There the
- * ground stops at the highest point from `surface2` toward `surface3` that keeps
- * both, still at least ΔE00 2.0 up. A theme with no usable authored rung gets
- * one derived by stepping lightness up from its highest rung.
- */
-export function resolveSurfaceRaised(colors: ThemeColors, colorScheme: 'light' | 'dark'): string {
-  if (colors.surfaceRaised) return colors.surfaceRaised;
-  if (colorScheme === 'light') return colors.surface;
+/** A theme's raised ground and the two intermediates that sit between it and `surface`. */
+export interface Elevation {
+  surfaceRaised: string;
+  surface2: string;
+  surface3: string;
+}
 
-  const s2Of = (raised: string) => colors.surface2 ?? labStops(colors.surface, raised, 4)[1]!;
-  const raisedEnough = (raised: string) => {
-    const s2 = s2Of(raised);
-    return chroma(raised).get('lab.l') > chroma(s2).get('lab.l') && chroma.deltaE(raised, s2) >= RAISED_STEP_MIN;
+/** Strictly lighter than `base`, by at least the visibility floor. */
+function stepsAbove(color: string, base: string): boolean {
+  return chroma(color).get('lab.l') > chroma(base).get('lab.l') && chroma.deltaE(color, base) >= RAISED_STEP_MIN;
+}
+
+/**
+ * Resolve the elevation ladder above `surface` (P80-G, revised 2026-10-07).
+ *
+ * An authored `surfaceRaised` always wins, and a light theme that does not
+ * author one takes `surface`. A dark theme that does not author one keeps the
+ * rung it already ships: the value the old fallback gave it, its own
+ * `surface2`, when that is at least ΔE00 2.0 above `surface`. Its `surface2`
+ * and `surface3` are then re-derived as the intermediates rule 13 says they are,
+ * because the homage ports authored `surface2` as the rung itself, which is
+ * what made the menu the colour of the panel under it. Only neutral fills move.
+ *
+ * The first version of P80-G lifted the raised ground to `surface3` instead,
+ * and the before-and-after table showed the cost: the accent re-selected on ten
+ * dark homages and role text on twelve, by up to ΔE00 11. The designer reversed
+ * it on 2026-10-07. That lift survives as the fallback for a theme with no rung
+ * of its own, which no bundled theme needs.
+ */
+export function resolveElevation(colors: ThemeColors, colorScheme: 'light' | 'dark'): Elevation {
+  const between = (raised: string): Elevation => {
+    const stops = labStops(colors.surface, raised, 4);
+    return { surfaceRaised: raised, surface2: stops[1]!, surface3: stops[2]! };
   };
+  const keepingAuthored = (raised: string): Elevation => {
+    const derived = between(raised);
+    return {
+      surfaceRaised: raised,
+      surface2: colors.surface2 ?? derived.surface2,
+      surface3: colors.surface3 ?? derived.surface3,
+    };
+  };
+
+  if (colors.surfaceRaised) return keepingAuthored(colors.surfaceRaised);
+  if (colorScheme === 'light') return keepingAuthored(colors.surface);
+  if (colors.surface2 && stepsAbove(colors.surface2, colors.surface)) return between(colors.surface2);
+  return keepingAuthored(liftRaised(colors));
+}
+
+/**
+ * A raised ground for a dark theme whose palette has no rung above `surface`.
+ *
+ * The next authored rung, `surface3`, when it sits ΔE00 2.0 above `surface2`.
+ * Where that rung is too light to carry role-coloured text at 4.5:1, or an
+ * authored `borderStrong` at 3:1, the ground stops at the highest point from
+ * `surface2` toward it that keeps both. With no usable rung at all, one is
+ * derived by stepping lightness up. Moving the ground this way re-selects every
+ * chromatic token against it, so it is the last resort, not the default.
+ */
+function liftRaised(colors: ThemeColors): string {
+  const s2Of = (raised: string) => colors.surface2 ?? labStops(colors.surface, raised, 4)[1]!;
+  const raisedEnough = (raised: string) => stepsAbove(raised, s2Of(raised));
   // The lightest text rung each role can take; if it cannot read on a ground, no rung can.
   // The fallbacks are `resolveColors`'s own, so the check sees the roles that will render.
   const primary = primaryBase(colors);
@@ -514,12 +551,8 @@ export function resolveColors(
     ? colors.dark
     : deriveDarkTuple(colors.text, colors.surface, colors.background);
 
-  // P80-G: a real raised rung (see `resolveSurfaceRaised`); surface2/3 fill
-  // the schema between surface and it when a theme does not author them.
-  const surfaceRaised = resolveSurfaceRaised(colors, colorScheme);
-  const elev = labStops(colors.surface, surfaceRaised, 4);
-  const surface2 = colors.surface2 ?? elev[1]!;
-  const surface3 = colors.surface3 ?? elev[2]!;
+  // P80-G: the raised rung and the intermediates below it (see `resolveElevation`).
+  const { surfaceRaised, surface2, surface3 } = resolveElevation(colors, colorScheme);
 
   const textMuted2 = colors.textMuted2
     ?? chroma.mix(colors.text, colors.textMuted, 0.65, 'lab').hex();
