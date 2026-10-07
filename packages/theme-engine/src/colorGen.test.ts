@@ -20,6 +20,11 @@ import {
   selectUiContrastIndex,
   PRIMARY_SHADE_CONTRAST_MIN,
   UI_CONTRAST_MIN,
+  resolveSurfaceRaised,
+  deriveBorderFloor,
+  borderGrounds,
+  RAISED_STEP_MIN,
+  BORDER_FLOOR_MIN,
 } from './colorGen';
 import { bundledThemeDefinitions } from './bundledThemes';
 import type { ThemeColors } from './types';
@@ -191,7 +196,6 @@ describe('resolveColors', () => {
     expect(resolved.background).toBe('#0f172a');
     expect(resolved.surface).toBe('#1e293b');
     expect(resolved.text).toBe('#ffffff');
-    expect(resolved.border).toBe('#334155');
     expect(resolved.success).toBe('#22c55e');
   });
 
@@ -242,9 +246,85 @@ describe('resolveColors', () => {
     expect(resolved.primaryShade).toEqual(derivePrimaryShade(rig));
   });
 
-  it('falls surfaceRaised back to surface2 when unset', () => {
-    const resolved = resolveColors(baseColors, 'dark');
-    expect(resolved.surfaceRaised).toBe(baseColors.surface2);
+  // P80-G: the designer's invariants of 2026-10-06. The old fallback was `surface2` itself.
+  describe('surfaceRaised when a theme does not author it', () => {
+    it('keeps an authored value', () => {
+      expect(resolveSurfaceRaised({ ...baseColors, surfaceRaised: '#123456' }, 'dark')).toBe('#123456');
+    });
+
+    it('takes surface on a light theme, and so is never darker than it', () => {
+      const light = { ...baseColors, surface: '#fdf6e3', surface2: '#eee8d5', surface3: '#e4ddc8' };
+      expect(resolveSurfaceRaised(light, 'light')).toBe('#fdf6e3');
+    });
+
+    it('takes surface3 on a dark theme when it is a real rung that carries role text', () => {
+      expect(resolveSurfaceRaised(baseColors, 'dark')).toBe(baseColors.surface3);
+    });
+
+    it('derives a rung at least ΔE00 2.0 above surface2 when the theme authors none', () => {
+      const { surface3: _s3, ...noRung } = baseColors;
+      const raised = resolveSurfaceRaised(noRung, 'dark');
+      expect(chroma.deltaE(raised, baseColors.surface2!)).toBeGreaterThanOrEqual(RAISED_STEP_MIN);
+      expect(chroma(raised).get('lab.l')).toBeGreaterThan(chroma(baseColors.surface2!).get('lab.l'));
+    });
+
+    it('stops short of a surface3 too light to carry role-coloured text', () => {
+      const pale = { ...baseColors, surface3: '#8a96aa' };
+      const raised = resolveSurfaceRaised(pale, 'dark');
+      expect(raised).not.toBe('#8a96aa');
+      expect(chroma.deltaE(raised, baseColors.surface2!)).toBeGreaterThanOrEqual(RAISED_STEP_MIN);
+      const ceiling = generateColorScale(baseColors.error, 'dark')[0]!;
+      expect(chroma.contrast(ceiling, raised)).toBeGreaterThanOrEqual(4.5);
+    });
+  });
+
+  describe('the border floor', () => {
+    const grounds = ['#0f172a', '#1e293b', '#334155', '#475569'];
+
+    it('leaves a border that already clears every ground alone', () => {
+      expect(deriveBorderFloor('#5b6b85', grounds, '#94a3b8', 'dark')).toBe('#5b6b85');
+    });
+
+    it('steps a colliding border lighter on a dark theme, holding its hue, until it clears', () => {
+      const moved = deriveBorderFloor('#334155', grounds, '#94a3b8', 'dark');
+      for (const g of grounds) expect(chroma.deltaE(moved, g)).toBeGreaterThanOrEqual(BORDER_FLOOR_MIN);
+      expect(Math.abs(chroma(moved).get('lch.h') - chroma('#334155').get('lch.h'))).toBeLessThan(2);
+      expect(chroma.deltaE(moved, '#94a3b8')).toBeGreaterThanOrEqual(BORDER_FLOOR_MIN);
+    });
+
+    it('steps darker on a light theme', () => {
+      const moved = deriveBorderFloor('#eee8d5', ['#fdf6e3', '#eee8d5'], '#93a1a1', 'light');
+      expect(chroma(moved).get('lab.l')).toBeLessThan(chroma('#eee8d5').get('lab.l'));
+    });
+
+    it('returns the authored value when there is no room before borderStrong', () => {
+      expect(deriveBorderFloor('#334155', grounds, '#3d4b60', 'dark')).toBe('#334155');
+    });
+  });
+
+  // The CI form of both rules: a bundled theme that breaks either fails here, by name.
+  describe.each(bundledThemeDefinitions.map((d) => [d.id, d] as const))('%s', (_id, def) => {
+    const rc = resolveColors(def.colors as ThemeColors, def.colorScheme);
+
+    it('has a raised ground that reads as raised', () => {
+      if (def.colorScheme === 'dark') {
+        expect(chroma.deltaE(rc.surfaceRaised, rc.surface2)).toBeGreaterThanOrEqual(RAISED_STEP_MIN);
+        expect(chroma(rc.surfaceRaised).get('lab.l')).toBeGreaterThan(chroma(rc.surface2).get('lab.l'));
+      } else {
+        // Rule 13 as revised 2026-10-06: never darker than surface, and strictly above surface2.
+        expect(chroma(rc.surfaceRaised).get('lab.l')).toBeGreaterThanOrEqual(chroma(rc.surface).get('lab.l') - 0.01);
+        expect(chroma(rc.surfaceRaised).get('lab.l')).toBeGreaterThan(chroma(rc.surface2).get('lab.l'));
+      }
+    });
+
+    it('draws border at least ΔE00 3.5 from every ground, and apart from borderStrong', () => {
+      for (const g of borderGrounds(rc)) {
+        expect(chroma.deltaE(rc.border, g), `${def.id}: border ${rc.border} on ${g}`).toBeGreaterThanOrEqual(
+          BORDER_FLOOR_MIN,
+        );
+      }
+      expect(chroma.deltaE(rc.border, rc.borderStrong)).toBeGreaterThanOrEqual(BORDER_FLOOR_MIN);
+    });
   });
 
   it('derives borderStrong instead of aliasing to border when unset', () => {

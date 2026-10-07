@@ -63,6 +63,12 @@ export const COMPONENT_TOKEN_DERIVATIONS = {
   'menu-bg': (rc) => rc.surfaceRaised,
   'menu-bd': (rc) => rc.border,
 
+  // [P80-G] The hairline a raised element carries, by rule 13 of the
+  // standing rules: a dark theme shows elevation by lightness and needs none,
+  // a light theme shows it by this hairline and the shadow. Transparent rather
+  // than absent, so an element keeps the same border box on either scheme.
+  'raised-bd': (rc) => (chroma(rc.background).luminance() < 0.5 ? 'transparent' : rc.borderStrong),
+
   // [P80-A] Tooltip. Lifted from `Tooltip.styles.tooltip` in the adapter,
   // which paints the raised surface with the ordinary text colour and a
   // border rather than the inverted chip most libraries default to. The

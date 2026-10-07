@@ -142,6 +142,16 @@ describe('framework constants', () => {
     }
   });
 
+  it('gives a raised element the rule-13 hairline on light themes and none on dark', () => {
+    // P80-G: dark themes show elevation by lightness, light ones by a border-strong hairline.
+    for (const ext of bundledThemeDefinitions) {
+      const def = fullDefinition(ext);
+      const rc = resolveColors(def.colors as ThemeColors, def.colorScheme);
+      const expected = def.colorScheme === 'dark' ? 'transparent' : rc.borderStrong;
+      expect(deriveComponentTokens(rc)['raised-bd'], def.id).toBe(expected);
+    }
+  });
+
   it('selects a text rung that clears 4.5:1 on every ground, for every bundled theme', () => {
     // [P79-C] The framework paints text in a role colour (`Text tone="danger"`,
     // a `light` button's label, an `outline` badge). `primaryStroke` is
