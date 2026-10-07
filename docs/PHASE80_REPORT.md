@@ -1,8 +1,8 @@
 # Phase 80 - Behavioural components
 
-**Status:** In progress (P80-A to P80-D and P80-F complete; P80-G and P80-E remain: the designer's answers and the screen-reader pass)
+**Status:** In progress (P80-A to P80-D and P80-F complete; P80-G is three-fifths done and waits on the designer for the elevation ladder; P80-E, the screen-reader pass, remains)
 **Created:** 2026-09-10
-**Last updated:** 2026-10-02 (P80-F landed, including a live double-action fix in `main.tsx`; earlier the same day Key Decision C was redefined, Key Decision E corrected, four tracks added, every follow-on given an owner, and `COLOR-SPEC.md` gained the standing rules)
+**Last updated:** 2026-10-03 (P80-G's unblocked half landed: the rail under focus, the glyph on `filled`, the capture). 2026-10-02 (P80-F landed, including a live double-action fix in `main.tsx`; earlier the same day Key Decision C was redefined, Key Decision E corrected, four tracks added, every follow-on given an owner, and `COLOR-SPEC.md` gained the standing rules)
 
 ### Tracks
 
@@ -14,7 +14,7 @@
 | P80-D | The keyboard gate, automated: a browser suite asserting every component's keyboard contract on the shipped configuration, and §6B of the manual audit extended to every component family | **Done** (2026-10-02); found six defects, filed in P80-F | Medium |
 | P80-E | The keyboard gate, manual: one recorded screen-reader pass over every component family | Planned (human) | Small |
 | P80-F | Framework defects and decisions that must land before Phase 81 builds on them | **Done** (2026-10-02); also found the overlay-root axe gates had never scanned anything, and a live double-action defect on two-gallery pages | Medium |
-| P80-G | The designer's 2026-10-02 answers: the elevation ladder's resolution, the rail under focus, the glyph on `filled` controls, the selected row's geometry | Planned | Medium |
+| P80-G | The designer's 2026-10-02 answers: the elevation ladder's resolution, the rail under focus, the glyph on `filled` controls, the selected row's geometry | **In progress** (2026-10-03): items 3 to 5 done; items 1 and 2 wait on the designer's two elevation decisions | Medium |
 
 ---
 
@@ -253,6 +253,7 @@ Their diagnosis of the *cause* does not hold, and they asked for it to be checke
 3. **Suppress the menu rail under `:focus-visible`.** One selector, with the existing rail guard extended so a mutation that re-enables it under focus fails. Apply it to the plain `Select` as well, whose options take real focus and carry the inset ring, measured 2026-10-02. Not to the searchable `Select`, `MultiSelect` or `TagsInput`: they keep focus in the text field and name the option with `aria-activedescendant`, so the rail is their only keyboard mark and must stay.
 4. **Default the role glyph on `filled` status controls**, in `Alert`, `Button` and `Badge`, and confirm that every framework component rendering a filled status button where the label already names the role declines it explicitly, as `confirm()` does.
 5. **Send the designer a capture** of a highlighted-and-selected row in the select family and in the menu, at true size, on one light and one dark theme. If the check sits on the rail, move it to the row's normal padding.
+6. **The popup's width** (found by the capture, 2026-10-03). A select popup takes its field's width and truncates a longer label with an ellipsis, so a sighted user cannot read the full option. Asked of the designer in `selected-row-capture-2026-10-03.md`, recommending the popup grow to its longest label up to a maximum. Build whichever they choose.
 
 ### Acceptance criteria
 
@@ -348,6 +349,18 @@ Three rows below say "FUTURE_TASKS" and were **never actually filed there**: the
 | Dropping `@mantine/hooks` | Seven hooks, about 150 lines. Cheap, and it can wait for Phase 81's removal track. |
 
 ## Implementation Notes
+
+### P80-G, the half that did not wait on the designer (2026-10-03)
+
+**Status: items 3, 4 and 5 done; items 1 and 2 open.** The elevation fix and the segmented indicator built on it wait on the two decisions sent in `elevation-followup-2026-10-02.md`: which ground a raised element takes on a light theme, and the rule for a `border` that collides with the rung it is drawn on. Doing the dark half of item 1 alone was considered and not done. It would create the cyberpunk and nord `border` collisions with no rule to resolve them, which is exactly what Decision 2 asks for.
+
+**Item 3: the rail steps aside for the keyboard.** One selector in each sheet: the rail paints on `[data-highlighted]:not(:focus-visible, [data-focus-visible])`. So a pointer highlight gets the rail and a keyboard highlight gets the inset ring alone, on menu rows and on plain `Select` options, which take real focus. No special case was needed for the searchable `Select`, `MultiSelect` and `TagsInput`. Their options never take focus, so they never match, and the rail stays as their only keyboard mark, as the designer's answer and the 2026-10-02 correction required. Five browser tests state the contract both ways. The two keyboard tests fail on the old sheet. The three that expect a rail (pointer on a menu row, pointer on a `Select` option, keyboard on a searchable option) pass on both, so they guard against suppressing too much. The two jsdom guards that read the rail rule now also require the exclusion.
+
+**Item 4: the glyph on `filled` controls had been on since P80-A.** The question sent to the designer said the glyph defaulted on `light` controls and asked whether to widen it to `filled`. It did not: `resolveRoleGlyph` never looked at the variant, so a `filled` status `Alert`, `Badge` or `Button` has carried its glyph from the start, and `feedback.css` already styles that case. The designer's "yes" therefore matches what shipped, and the correction went to them in the capture note. What this item adds is a test that pins it: every status tone, all three components, `filled`, with and without the opt-out. Seeding the regression it exists for, a `Button` narrowed to `light` only, fails all four tones. The glyph's ink on a fill is the label's, `onColor(fill)`, black or white by whichever contrasts more, and that never falls below 4.5:1 for any colour. So it clears the 3:1 non-text floor on every theme by construction. The only framework component that renders a toned button with a role word in its label is `confirm()`, and both its buttons decline the glyph explicitly.
+
+**Item 5: the capture.** Ten PNGs at true size on default-light and default-dark, in `docs/design/correspondences/selected-row-capture-2026-10-03/` and the designer's folder, with the note `selected-row-capture-2026-10-03.md`. They cover a plain `Select` row that is selected and highlighted, by pointer and by keyboard; a searchable row by keyboard; and a menu row each way for comparison. Menus have no selected state. **The check does not sit on the rail.** The rail is 3px, the row's padding is 12px, and the check starts 13.9px in, about 11px clear on both themes, so nothing moved. The captures also showed something nobody had asked about: the popup takes its field's width, and "Administrator" truncates to "Administra…" in the narrow showcase field. That is now a question to the designer, with a recommendation to let the popup grow to its longest label.
+
+**Validation.** `npx tsc --noEmit`, `npm run lint` and the allow-list (178) clean. `npx vitest run` **4,412 of 4,412** across 277 files, and `npm run build` clean. The browser suite, now 202 tests, ran twice from a cold Vite cache: **202 of 202** on the second run, and 201 on the first. The one failure was P80-F's stacked-modal test, and it held two races of the test's own, not of the stack. First, the stack hides the lower dialog the moment the new one mounts, a frame before Base UI moves focus into it. The test pressed Escape inside that frame, so the Escape closed the lower dialog and left the stacked one open, which is exactly what it reported. Second, its name-reading helper threw when a dialog detached mid-exit, and `expect.poll` does not retry a thrown callback. The test now waits for focus to arrive and skips detached dialogs, and its block of three tests passed 120 of 120 repetitions.
 
 ### P80-F, framework defects and decisions (2026-10-02)
 
