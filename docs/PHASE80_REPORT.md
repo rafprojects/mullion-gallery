@@ -1,8 +1,8 @@
 # Phase 80 - Behavioural components
 
-**Status:** In progress (P80-A to P80-D and P80-F complete; P80-G is three-fifths done and waits on the designer for the elevation ladder; P80-E, the screen-reader pass, remains)
+**Status:** In progress (P80-A to P80-D, P80-F and P80-G complete; P80-E, the screen-reader pass, remains)
 **Created:** 2026-09-10
-**Last updated:** 2026-10-03 (P80-G's unblocked half landed: the rail under focus, the glyph on `filled`, the capture). 2026-10-02 (P80-F landed, including a live double-action fix in `main.tsx`; earlier the same day Key Decision C was redefined, Key Decision E corrected, four tracks added, every follow-on given an owner, and `COLOR-SPEC.md` gained the standing rules)
+**Last updated:** 2026-10-07 (P80-G landed: the elevation ladder, the `border` floor, the popup typeface and width, rules 13 and 14 in `COLOR-SPEC.md`). 2026-10-03 (P80-G's unblocked half landed: the rail under focus, the glyph on `filled`, the capture). 2026-10-02 (P80-F landed, including a live double-action fix in `main.tsx`; earlier the same day Key Decision C was redefined, Key Decision E corrected, four tracks added, every follow-on given an owner, and `COLOR-SPEC.md` gained the standing rules)
 
 ### Tracks
 
@@ -14,7 +14,7 @@
 | P80-D | The keyboard gate, automated: a browser suite asserting every component's keyboard contract on the shipped configuration, and §6B of the manual audit extended to every component family | **Done** (2026-10-02); found six defects, filed in P80-F | Medium |
 | P80-E | The keyboard gate, manual: one recorded screen-reader pass over every component family | Planned (human) | Small |
 | P80-F | Framework defects and decisions that must land before Phase 81 builds on them | **Done** (2026-10-02); also found the overlay-root axe gates had never scanned anything, and a live double-action defect on two-gallery pages | Medium |
-| P80-G | The designer's 2026-10-02 answers: the elevation ladder's resolution, the rail under focus, the glyph on `filled` controls, the selected row's geometry | **In progress** (2026-10-03): items 3 to 5 done; items 1 and 2 wait on the designer's two elevation decisions | Medium |
+| P80-G | The designer's 2026-10-02 answers: the elevation ladder's resolution, the rail under focus, the glyph on `filled` controls, the selected row's geometry | **Done** (2026-10-07). The designer has three exceptions to rule on, listed in the note | Medium |
 
 ---
 
@@ -349,6 +349,26 @@ Three rows below say "FUTURE_TASKS" and were **never actually filed there**: the
 | Dropping `@mantine/hooks` | Seven hooks, about 150 lines. Cheap, and it can wait for Phase 81's removal track. |
 
 ## Implementation Notes
+
+### P80-G, the elevation ladder and the rest (2026-10-07)
+
+**Status: landed.** The designer answered both elevation decisions on 2026-10-06 (`designer-answers-elevation-and-capture-2026-10-06.md`), and the rest of the track followed. The note sent back is `elevation-built-2026-10-07.md`. The full before-and-after table is `elevation-token-table-2026-10-07.md`, both in `docs/design/correspondences/`.
+
+**Item 1: a real raised rung.** `resolveSurfaceRaised()` in `colorGen.ts` implements the designer's invariants. An authored value wins. A light theme takes `surface`. A dark theme takes `surface3` when it is at least ΔE00 2.0 above `surface2`. When a theme has no such rung, one is derived by stepping lightness up. **One departure, measured, and with the designer to rule on:** on catppuccin-mocha, tokyo-night and gruvbox-dark, `surface3` is a mid-tone, and every role's lightest text rung falls under 4.5:1 on it (3.79 to 4.37). There the ground stops at the highest point from `surface2` toward `surface3` that keeps role text at 4.5:1 and an authored `borderStrong` at 3:1. That is ΔE00 4.11 to 4.46 above `surface2`, well clear of the 2.0 floor. Ten of the thirteen dark homages take `surface3` exactly. One knock-on in the engine: `deriveBorderStrong` could not reach 3:1 against the new menu ground on tokyo-night and crimson-canvas within its 50-unit search, so the search continues past that only when nothing cleared, and every other theme's value is identical.
+
+**Item 2: the `border` floor and the segmented control.** `deriveBorderFloor()` steps an authored `border` that sits under ΔE00 3.5 from any ground it is drawn on (`background`, `surface`, `surface2` for striped table rows, and `surfaceRaised`). It steps lighter on dark themes and darker on light ones, holding hue, and stops short of `borderStrong`; when there is no room it keeps the authored value, and the per-theme test fails CI by name. It moved eight dark themes, not the four the designer expected, because the floor also catches tokyo-night and midnight-rose today. The designer's rule 13 hairline became a component token, `raised-bd`: `borderStrong` on a light theme and transparent on a dark one. The segmented control now sits on the ladder, with the track on `surface` and the indicator on `surfaceRaised` carrying `raised-bd`.
+
+**What moved, measured on all 23 themes before and after.** The resolved set changed in five keys only: `surfaceRaised` on 21 themes (every theme that does not author it), `border` on 8, `primaryStroke` on 10, `borderStrong` on the dark homages, and `focusHalo` on 3. Nothing the designer authored moved, `surface2` and `surface3` included. In the component tier, the role text rungs moved on 12 dark themes: they are selected against every ground, the new menu ground included, so each took a lighter rung of its own hue. The designer had predicted that no signed-off colour would move, and this is the one place it did. Every `primaryStroke` clears 3:1 on its new menu ground; the thinnest are darcula 3.00, nord 3.01, crimson-canvas 3.06 and synthwave 3.07. Since the rail is the only keyboard mark on the searchable select family, those four are flagged to the designer.
+
+**`theme-qa`, reviewed by pixel diff, as the acceptance criteria required.** Its tolerance (`maxDiffPixelRatio` 0.1) is what makes an explicit diff necessary, and the diff found something older than this track. Every snapshot of the open Settings drawer had already drifted about 41,000 pixels from its 2026-09-09 baseline before P80-G changed anything: the whole drawer content had shifted sideways by a few pixels. Rendering with P80-F's `main.tsx` reverted produced the identical image, so that change did not cause it. The drift came in somewhere between P77-C and now, and it is filed in P81-B as a lead on the Settings panel clip the user reported on 2026-09-14. P80-G's own changes were then isolated against a render of the previous commit: zero pixels on the two default themes, 1,500 to 13,000 on the dark homages' drawers, and a sliver of each gallery's top bar. Read side by side on tokyo-night, they are the `border` and `borderStrong` steps and nothing else. The baselines were regenerated and committed.
+
+**Item 6: the popup's width.** As the designer specified: at least the field's width, as wide as the longest label, capped at `min(24rem, 100vw - 16px)`. Past the cap a label wraps, with the check centred on its first line by a `1lh` indicator. The closed field keeps its ellipsis. Both browser tests failed on the old sheet.
+
+**The typeface (the designer's §5).** Their production concern held and their diagnosis was one step out. The select popups have been in their trigger's root since P80-F, and the captures' serif was the test page's bare ground, which the gallery's own labels shared. But a modal, drawer, confirm or toast lives in the overlay root, which inherits from the host page's `body`. Every popup root now sets `font-family: var(--mullion-font-family)` beside its own ground. A browser test on a page whose body font is a system stack failed on the old sheet with every popup reporting `-apple-system`, and passes with all five reporting Inter.
+
+**`COLOR-SPEC.md`.** Archived as `archive/2026-10-07-pre-rule-13-revision/` in the repo and the designer's folder, then changed. Rule 13's second sentence was replaced with the designer's text verbatim. The `border` floor was added as rule 14, in wording assembled from the designer's §2, which they have been asked to check. The engineering note under rule 13 now records how the engine meets both rules, including the three-theme stop. The designer's folder copy matches the repo.
+
+**Validation.** `npx tsc --noEmit`, `npm run lint`, the allow-list (178) and `npm run themes:catalog:check` clean. `npx vitest run` **4,468 of 4,468** across 277 files, including a per-theme test of both rules on all 23 bundled themes. `npx playwright test` **205 of 205, twice consecutively, each from a cold Vite cache**, and `npm run build` clean. Each new browser test was shown failing on the code before its fix.
 
 ### P80-G, the half that did not wait on the designer (2026-10-03)
 

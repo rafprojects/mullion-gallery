@@ -20,6 +20,12 @@ correspondence that ended 2026-09-14, plus the elevation rule from their 2026-10
 The copy before this change is archived in
 [`archive/2026-10-02-pre-standing-rules/`](archive/2026-10-02-pre-standing-rules/).
 
+**2026-10-07: rule 13 revised, rule 14 added.** Rule 13's second sentence is replaced with the
+designer's corrected text, and rule 14, the `border` floor, is the designer's decision of
+2026-10-06. The engineering note under rule 13 now records how the engine meets both. The copy
+before this change is archived in
+[`archive/2026-10-07-pre-rule-13-revision/`](archive/2026-10-07-pre-rule-13-revision/).
+
 ## 1. Theme tokens — what the plugin consumes
 
 Shipped as theme **`default-dark`** ("Mullion") in
@@ -278,18 +284,26 @@ held every time either of us ignored it since.)*
 **13.** **Elevation is carried by ground lightness on dark themes and by border and shadow on light
 themes.** Dark themes have three rungs — `background`, `surface`, `surfaceRaised` — and a raised
 element needs no border to be read as raised. Light themes have two, and a raised element carries
-a 1px `borderStrong` hairline and its shadow. `surfaceRaised` must be strictly above `surface2`
-on every theme; `surface2` and `surface3` sit between `surface` and `surfaceRaised` and are
-never one side of an elevation pair on their own. *(2026-10-02.)*
+a 1px `borderStrong` hairline and its shadow. `surfaceRaised` must be strictly above `surface2` on
+every theme. **On dark themes** `surface2` and `surface3` sit between `surface` and
+`surfaceRaised`. **On light themes** they may instead recess below `surface`, as input fills;
+`surfaceRaised` must never be darker than `surface`. Neither is one side of an elevation pair on
+its own. *(2026-10-02; second sentence revised 2026-10-06.)*
 
-> **Engineering note, 2026-10-02: the bundled themes do not satisfy rule 13 yet.** None of the
-> 21 non-default themes authors `surfaceRaised`, and `resolveColors()` falls back to
-> `surfaceRaised ?? surface2` (P74-N), so on all 21 the raised ground resolves to the same value
-> as `surface2`. On the 13 dark ones `surface3` is the lighter rung above it; on the 8 light ones
-> `surface2` and `surface3` step *darker* than `surface`, so the fallback currently makes a raised
-> menu darker than the surface it sits on. Phase 80 track P80-G changes the resolution and
-> measures every token it moves; how the light homage themes should satisfy this rule is open
-> with the designer.
+> **Engineering note, 2026-10-07: the bundled themes satisfy rules 13 and 14 (P80-G).** When a
+> theme does not author `surfaceRaised`, the engine now resolves it to `surface` on a light theme
+> and to `surface3` on a dark one, provided `surface3` is at least ΔE00 2.0 lighter than `surface2`.
+> Where `surface3` is too light to carry role-coloured text at 4.5:1, or an authored `borderStrong`
+> at 3:1, the ground stops at the highest point from `surface2` toward `surface3` that keeps both.
+> That happens on three dark homages: catppuccin-mocha, tokyo-night and gruvbox-dark. Every bundled
+> theme is tested against both rules by name.
+
+**14.** **`border` must sit at least ΔE00 3.5 from every ground it can be drawn on, and the engine
+steps it when an authored value does not.** The floor is just under the tightest pair the default
+themes ship (default-dark, 3.84 on `surfaceRaised`). The step moves `border`'s lightness away from
+the grounds, lighter on dark themes and darker on light, holding hue, and stops before it reaches
+`borderStrong`. If there is no room, CI fails and names the theme. Move `border`, never the
+ladder. *(2026-10-06.)*
 
 ---
 
