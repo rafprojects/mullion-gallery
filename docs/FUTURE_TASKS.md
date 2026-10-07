@@ -332,6 +332,22 @@ The **manual** assistive-tech audit ([guides/ACCESSIBILITY_MANUAL_AUDIT.md](guid
 
 ---
 
+### Two-Tone Highlight Rail, for a Dark Theme Whose Raised Ground Has to Be Lifted
+
+**Origin:** [PHASE80_REPORT.md](PHASE80_REPORT.md) track **P80-G**, deferred 2026-10-07. The idea is the designer's, in [`designer-reversal-elevation-2026-10-07.md`](design/correspondences/designer-reversal-elevation-2026-10-07.md) §3.
+
+**Context:** The leading rail that marks a highlighted row in a menu or select popup is a single tone, `primaryStroke`. On the searchable `Select`, `MultiSelect` and `TagsInput` it is the only keyboard mark, so it must clear WCAG 1.4.11's 3:1 alone against the popup's ground, `surfaceRaised`. When that ground moves lighter, the engine re-selects `primaryStroke` to keep 3:1, and `primaryStroke` is also the focus ring's core, so the theme's accent changes everywhere. P80-G's first resolution did exactly that on ten dark homages, by up to ΔE00 9 (gruvbox's orange became a peach), and was reversed. The focus ring never had this problem, because it is two-tone: a halo carries it where the core alone would not, and the designer checked that seven of those ten would have kept the old core as a ring pair. A rail with a halo would let the accent stay put when the ground moves.
+
+**When it matters:** only for a dark theme whose palette has no rung at least ΔE00 2.0 above `surface`, which is the lift branch (`liftRaised` in `packages/theme-engine/src/colorGen.ts`). **No bundled theme takes that branch**: all thirteen dark homages keep their own rung (the tightest, darcula, at 3.39). So today it can only affect a user-authored theme.
+
+**What to implement:** A rail drawn as core and halo, like the inset ring, so the core can keep the theme's `primaryStroke` while the pair clears 3:1 against a lifted ground. Then let the lift branch stop re-selecting `primaryStroke` against the lifted ground when the rail pair clears.
+
+**Before building it:** validate against a user-authored theme that actually needs a lift. Write or find one whose `surface2` sits under ΔE00 2.0 above `surface`, resolve it, and measure what moves with and without the two-tone rail. If no realistic theme needs a lift, this is not worth building. The rail's geometry also has to stay clear of the inset ring's halo band, which is why P80-G gives the keyboard the ring and the pointer the rail.
+
+**Effort:** Small to Medium (one rail rule, the engine change, and a designer pass on the rail's look) | **Impact:** Low today (no bundled theme), Medium for theme authors: it keeps their accent when their palette has no raised rung.
+
+---
+
 ### ~~Two-Tone ("Halo") Focus Ring~~ — ⬆ PROMOTED to Phase 77 (P77-F)
 
 *Promoted 2026-09-01 to [PHASE77_REPORT.md](PHASE77_REPORT.md) track **P77-F**, which absorbs
