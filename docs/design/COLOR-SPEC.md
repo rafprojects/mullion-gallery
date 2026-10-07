@@ -26,6 +26,11 @@ designer's corrected text, and rule 14, the `border` floor, is the designer's de
 before this change is archived in
 [`archive/2026-10-07-pre-rule-13-revision/`](archive/2026-10-07-pre-rule-13-revision/).
 
+**2026-10-07, later: the engineering note under rule 13 rewritten.** The designer reversed the dark
+half of P80-G's elevation resolution the same day, and the note now describes the reversed one. No
+rule's text changed. The copy before this change is archived in
+[`archive/2026-10-07-pre-elevation-reversal/`](archive/2026-10-07-pre-elevation-reversal/).
+
 ## 1. Theme tokens — what the plugin consumes
 
 Shipped as theme **`default-dark`** ("Mullion") in
@@ -290,13 +295,15 @@ every theme. **On dark themes** `surface2` and `surface3` sit between `surface` 
 `surfaceRaised` must never be darker than `surface`. Neither is one side of an elevation pair on
 its own. *(2026-10-02; second sentence revised 2026-10-06.)*
 
-> **Engineering note, 2026-10-07: the bundled themes satisfy rules 13 and 14 (P80-G).** When a
-> theme does not author `surfaceRaised`, the engine now resolves it to `surface` on a light theme
-> and to `surface3` on a dark one, provided `surface3` is at least ΔE00 2.0 lighter than `surface2`.
-> Where `surface3` is too light to carry role-coloured text at 4.5:1, or an authored `borderStrong`
-> at 3:1, the ground stops at the highest point from `surface2` toward `surface3` that keeps both.
-> That happens on three dark homages: catppuccin-mocha, tokyo-night and gruvbox-dark. Every bundled
-> theme is tested against both rules by name.
+> **Engineering note, 2026-10-07: the bundled themes satisfy rules 13 and 14 (P80-G).** On the
+> bundled dark homages the step from `surface` to `surfaceRaised` is already ≥ ΔE00 2.0 on all thirteen; the
+> collision was `surface2`, not the ladder. The ports authored `surface2` as the rung itself, so when
+> a dark theme does not author `surfaceRaised`, the engine keeps that value as the raised ground and
+> re-derives `surface2` and `surface3` as the intermediates between it and `surface`. Only neutral
+> fills move; no accent, role text or ring colour does. A dark theme with no rung that far above
+> `surface` is lifted instead, toward `surface3`, stopping where role text would fall under 4.5:1;
+> no bundled theme needs that. A light theme that does not author `surfaceRaised` takes `surface`.
+> Every bundled theme is tested against both rules by name.
 
 **14.** **`border` must sit at least ΔE00 3.5 from every ground it can be drawn on, and the engine
 steps it when an authored value does not.** The floor is just under the tightest pair the default

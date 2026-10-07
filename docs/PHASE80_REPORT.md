@@ -2,7 +2,7 @@
 
 **Status:** In progress (P80-A to P80-D, P80-F and P80-G complete; P80-E, the screen-reader pass, remains)
 **Created:** 2026-09-10
-**Last updated:** 2026-10-07 (P80-G landed: the elevation ladder, the `border` floor, the popup typeface and width, rules 13 and 14 in `COLOR-SPEC.md`). 2026-10-03 (P80-G's unblocked half landed: the rail under focus, the glyph on `filled`, the capture). 2026-10-02 (P80-F landed, including a live double-action fix in `main.tsx`; earlier the same day Key Decision C was redefined, Key Decision E corrected, four tracks added, every follow-on given an owner, and `COLOR-SPEC.md` gained the standing rules)
+**Last updated:** 2026-10-07 (P80-G's dark-theme elevation reversed at the designer's request, after the before-and-after table showed it repainting accents; the two-tone rail filed in FUTURE_TASKS). Earlier the same day (P80-G landed: the elevation ladder, the `border` floor, the popup typeface and width, rules 13 and 14 in `COLOR-SPEC.md`). 2026-10-03 (P80-G's unblocked half landed: the rail under focus, the glyph on `filled`, the capture). 2026-10-02 (P80-F landed, including a live double-action fix in `main.tsx`; earlier the same day Key Decision C was redefined, Key Decision E corrected, four tracks added, every follow-on given an owner, and `COLOR-SPEC.md` gained the standing rules)
 
 ### Tracks
 
@@ -14,7 +14,7 @@
 | P80-D | The keyboard gate, automated: a browser suite asserting every component's keyboard contract on the shipped configuration, and §6B of the manual audit extended to every component family | **Done** (2026-10-02); found six defects, filed in P80-F | Medium |
 | P80-E | The keyboard gate, manual: one recorded screen-reader pass over every component family | Planned (human) | Small |
 | P80-F | Framework defects and decisions that must land before Phase 81 builds on them | **Done** (2026-10-02); also found the overlay-root axe gates had never scanned anything, and a live double-action defect on two-gallery pages | Medium |
-| P80-G | The designer's 2026-10-02 answers: the elevation ladder's resolution, the rail under focus, the glyph on `filled` controls, the selected row's geometry | **Done** (2026-10-07). The designer has three exceptions to rule on, listed in the note | Medium |
+| P80-G | The designer's 2026-10-02 answers: the elevation ladder's resolution, the rail under focus, the glyph on `filled` controls, the selected row's geometry | **Done** (2026-10-07), with the dark-theme half of the elevation fix reversed the same day at the designer's request | Medium |
 
 ---
 
@@ -349,6 +349,24 @@ Three rows below say "FUTURE_TASKS" and were **never actually filed there**: the
 | Dropping `@mantine/hooks` | Seven hooks, about 150 lines. Cheap, and it can wait for Phase 81's removal track. |
 
 ## Implementation Notes
+
+### P80-G, the dark half of the elevation fix reversed (2026-10-07)
+
+**Status: landed.** The note below this one describes P80-G's first resolution for a dark theme that does not author `surfaceRaised`: lift it to `surface3`, stopping short where role text would fail. The before-and-after table did what it was sent for, and the designer reversed that half the same day (`designer-reversal-elevation-2026-10-07.md`). Everything else in that note stands: the light half, the `border` floor, rule 14, the popup typeface and width, and the segmented control.
+
+**Why it was reversed.** The lift moved the ground every chromatic token is selected against, so the accent was re-selected on ten dark homages and the role text on twelve, by up to ΔE00 9.04 on gruvbox's orange and 11.05 on crimson-canvas's success text. That is the magnitude of September's option A, which the designer rejected because it moved homage themes off the palettes they are named after. The lift was also unnecessary. On gruvbox, `surface` to the old raised ground was already ΔE00 6.07, a real rung. The 0.00 collision was `surface2` sitting on that rung, because the ports authored `surface2` as the rung itself. Every figure in the designer's note reproduces exactly from the engine and the theme JSON.
+
+**What the engine does now.** `resolveElevation()` replaces `resolveSurfaceRaised()`. For a dark theme that does not author `surfaceRaised`, it keeps the value the old fallback gave, its own `surface2`, when that is at least ΔE00 2.0 above `surface`. It then re-derives `surface2` and `surface3` as the LAB intermediates between `surface` and that rung, which is what rule 13 says they are. P80-G's lift, stop included, moved into `liftRaised()` and runs only for a dark theme with no such rung. **No bundled theme takes it**: `surface` to `surface2` is at least ΔE00 3.39 on all thirteen dark homages (darcula, the tightest), and the 1.31 at the bottom of the 2026-10-02 range was solarized-light.
+
+**Measured on all 23 themes, against what shipped before P80-G.** Four resolved tokens moved: `surfaceRaised` on the 8 light homages (to `surface`, the kept light half), `surface2` and `surface3` on the 13 dark homages (re-derived, neutral), and `border` on exactly the four the designer named (catppuccin-mocha, gruvbox-dark, tokyo-night and midnight-rose). `primaryStroke`, `borderStrong`, `focusHalo` and every role text rung are unchanged on every theme, and darcula's and nord's rail ratios are back at 3.67 and 3.52. Every audit passes; the tightest `border` pair is 3.51. `surface2` paints more than the input fill and table stripe the designer named (chips, keyboard keys, skeletons, the subtle hover, Mantine's switch track), all neutral, and the note back says so. The table is `elevation-token-table-reversed-2026-10-07.md`.
+
+**`theme-qa`, pixel-reviewed again against both earlier renders.** The default themes do not move. The dark homages' drawers and gallery bars change where `surface2` fills an input, a search field or a chip, a step darker, and nothing chromatic moves. One snapshot turned out to be non-deterministic rather than changed: `theme selector dropdown — default-dark` renders one of two layouts 3px apart, and two runs of identical code differed by the same 53,589 pixels. Its committed baseline was kept as it was, and the flake is filed in P81-B beside the Settings drawer drift.
+
+**`COLOR-SPEC.md`.** Archived again, as `archive/2026-10-07-pre-elevation-reversal/`, in the repo and the designer's folder. Then the engineering note under rule 13 was rewritten to describe the reversed resolution, opening with the sentence the designer asked for, so the next person to see a 0.00 suspects `surface2` rather than the ladder. No rule's text changed.
+
+**The two-tone rail.** The designer suggested it as the thing to reach for before moving an accent, for any theme that does take the lift. It is filed in [FUTURE_TASKS.md](FUTURE_TASKS.md) under Accessibility, to be validated on a user-authored theme that needs a lift before anyone builds it, because no bundled theme does.
+
+**Validation.** `npx tsc --noEmit`, `npm run lint`, the allow-list (178) and `npm run themes:catalog:check` clean. `npx vitest run` **4,469 of 4,469**, with the per-theme tests of rules 13 and 14 now asserting a real step above `surface` and a raised ground strictly above `surface2`. `npx playwright test` **205 of 205, twice consecutively, each from a cold Vite cache**, and `npm run build` clean.
 
 ### P80-G, the elevation ladder and the rest (2026-10-07)
 
