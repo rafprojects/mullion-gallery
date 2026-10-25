@@ -2,7 +2,7 @@
 
 **Status:** Planned, no code yet
 **Created:** 2026-09-10
-**Last updated:** 2026-10-02 (P80-F settled the manager hosts and the tooltip rule, and placed the 22 tooltips that break it into B; earlier the same day Phase 80's follow-ons were placed into B and D, including `useBroadcastStaleness` and the notification and confirm migration; the Settings panel clipping defect added to B on 2026-09-14)
+**Last updated:** 2026-10-25 (P81-E added from Phase 80's audit). 2026-10-02 (P80-F settled the manager hosts and the tooltip rule, and placed the 22 tooltips that break it into B; earlier the same day Phase 80's follow-ons were placed into B and D, including `useBroadcastStaleness` and the notification and confirm migration; the Settings panel clipping defect added to B on 2026-09-14)
 
 ### Tracks
 
@@ -12,6 +12,7 @@
 | P81-B | Migrate the consumers, theming-critical surfaces first | Planned | Large |
 | P81-C | Test, story and e2e harness migration | Planned | Medium |
 | P81-D | Remove Mantine and delete the workarounds it required | Planned | Small-Medium |
+| P81-E | Small defects found during Phase 80's audit: an escaped ampersand in every interface string, a flickering admin menu at 320px, alt text lost on export, a broken CLI, and three layout faults | Planned | Small-Medium |
 
 ---
 
@@ -197,6 +198,43 @@ Retarget rather than delete the guards that still describe something true: the s
 ### Validation
 
 - Full suites twice, `npm run build`, `npm run size-check`, and a rebuilt plugin checked on the dev site.
+
+---
+
+## Track P81-E - Small defects found during Phase 80's audit
+
+### Problem
+
+The user's partial pass of `ACCESSIBILITY_MANUAL_AUDIT.md` on 2026-10-25, and the work of seeding a site for it, turned up defects in today's product. Each is small. None is a framework defect, so none belonged in Phase 80.
+
+| Defect | What is known |
+|---|---|
+| **`&` arrives as `&#038;` in interface strings** ("Open Mode &#038; Sizing" in the Settings panel) | Cause found. `class-mullion-embed.php` prints the `window.__MULLION_I18N__` script inline in the shortcode's output, and on a block theme the shortcode block runs before WordPress's `the_content` filters, so `convert_chars` rewrites every bare `&` in it. Confirmed on wordpress.lan's home page. It probably reaches every string with an ampersand, in every locale, and any `&` in the config payload. |
+| **The admin menu flickers indefinitely at 320px** | Reported in Brave on Windows with the menu open. Not reproduced in headless Chromium, logged in, menu open or closed: zero DOM mutations over three seconds. The user's screenshot shows a classic vertical scrollbar, which headless Chromium does not draw, so the leading hypothesis is a loop: the open popup toggles the scrollbar, the viewport width changes, the popup repositions, and so on. |
+| **NVDA reads list items twice** in the Admin Panel's and the Settings panel's category lists | Observed in NVDA's Speech viewer as two entries per item, the first cut off after its first word. It may be NVDA's own behaviour or our markup; inspect the accessibility tree of both lists first. |
+| **Alt text is lost on campaign export and import** | The gallery's alt text is each media item's `caption`, and neither the JSON nor the ZIP export writes it, nor does `Mullion_Campaign_IO::import_entry` read it. A round trip silently drops every image's alt text. |
+| **The gallery ignores WordPress's attachment alt text** | Alt is `caption`, falling back to `title`. Alt text set in the Media Library never reaches the gallery. Decide whether an upload's caption defaults from the attachment's alt, or alt becomes its own field. |
+| **Most `wp mullion` subcommands are unreachable** | `@subcommand campaign list` and its siblings contain a space, which WP-CLI does not support, so each group collapses to its last registered command. `campaign list`, `archive`, `restore`, `duplicate`, `export` and `media list` cannot be run, and the documented `wp mullion campaign import file.zip` reads the word `import` as the file name. |
+| **Three layout faults in the Settings and Admin panels** | The `px` unit slot spills out of its number field (Campaign Viewer, Fullscreen Content Max Width); a wrapped label ("Desktop Image Gallery Adapter") pushes its select out of line with its neighbour in Per-Type Breakpoint Adapters; and `Add Media` is filled and flush, already in P81-B's carried table. |
+
+### Fix
+
+- **The ampersand:** encode the inline payloads with `JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT`, so they contain nothing a content filter rewrites and no `</script>`. A PHP test renders the shortcode through `the_content` and asserts the string survives.
+- **The flicker:** reproduce with classic scrollbars, in Brave or Chrome on Windows, or by forcing them, before changing anything. Then stop the loop, likely with `scrollbar-gutter: stable` or by keeping the popup from changing the document's overflow.
+- **The doubled list items:** compare the accessibility tree of both category lists with NVDA's output, and fix our markup if it is the cause; otherwise record it as an NVDA behaviour.
+- **Alt text on export and import:** carry `caption` both ways, with a round-trip test.
+- **The attachment alt:** a decision for the user, then the change.
+- **The CLI:** register each group's commands as real subcommands (a `Mullion_CLI_Campaign` class per group, or the `campaign` command dispatching on its first argument), with a test that runs each documented example.
+- **The layout faults:** fix with the P81-B surfaces they sit on, if that batch lands first; otherwise here.
+
+### Acceptance criteria
+
+- Every defect in the table is fixed, or decided and recorded, with a test where one can prove it.
+- `wp help mullion campaign` lists every campaign command, and each documented example runs.
+
+### Validation
+
+- The new PHP and browser tests, the full suites, and a re-check of the ampersand and the flicker on wordpress.lan.
 
 ---
 

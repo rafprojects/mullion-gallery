@@ -140,16 +140,26 @@ segmented controls, radios) · `Home`/`End` first/last.
 
 | # | Check (WCAG) | How | Pass looks like | Result |
 |---|---|---|---|---|
-| G1 | **Focus visible** (2.4.7) | `Tab` through the whole surface | Every focusable control shows a clear, high-contrast focus ring; focus never "disappears" | |
-| G2 | **No keyboard trap** (2.1.2) | `Tab` forward through everything, then `Shift+Tab` back out | Focus can always move on and escape any widget/modal (via Tab or Esc) | |
-| G3 | **Focus order** (2.4.3) | `Tab` slowly, watch the order | Order follows the visual/reading order; no wild jumps | |
-| G4 | **Zoom 200%** (1.4.4) | `Ctrl/⌘ +` to 200% | No clipped text, no overlap, all controls usable | |
+| G1 | **Focus visible** (2.4.7) | `Tab` through the whole surface | Every focusable control shows a clear, high-contrast focus ring; focus never "disappears" | Yes |
+| G2 | **No keyboard trap** (2.1.2) | `Tab` forward through everything, then `Shift+Tab` back out | Focus can always move on and escape any widget/modal (via Tab or Esc) | yes |
+| G3 | **Focus order** (2.4.3) | `Tab` slowly, watch the order | Order follows the visual/reading order; no wild jumps | yes |
+| G4 | **Zoom 200%** (1.4.4) | `Ctrl/⌘ +` to 200% | No clipped text, no overlap, all controls usable | good |
 | G5 | **Reflow 320px** (1.4.10) | DevTools width 320px | No horizontal scroll for content; nothing lost or unusable | |
-| G6 | **Reduced motion** (2.3.3) | Enable *reduce motion*, reload | Carousel autoplay, entrance/scroll-reveal, tilt/glow, and builder transitions are stilled or greatly reduced | |
-| G7 | **Non-text contrast** (1.4.11) | Eyeball focus rings, icons, input borders | Focus indicators and meaningful icons/borders have ≥3:1 against their background | |
-| G8 | **`outline:none` audit** | Cross-check the 8 `outline:none` spots (see [ACCESSIBILITY.md](ACCESSIBILITY.md) §2) | Each has a visible `:focus-visible` replacement — none removes focus indication outright | |
+| G6 | **Reduced motion** (2.3.3) | Enable *reduce motion*, reload | Carousel autoplay, entrance/scroll-reveal, tilt/glow, and builder transitions are stilled or greatly reduced | yeah looks like it |
+| G7 | **Non-text contrast** (1.4.11) | Eyeball focus rings, icons, input borders | Focus indicators and meaningful icons/borders have ≥3:1 against their background | looks like it |
+| G8 | **`outline:none` audit** | Cross-check the 8 `outline:none` spots (see [ACCESSIBILITY.md](ACCESSIBILITY.md) §2) | Each has a visible `:focus-visible` replacement — none removes focus indication outright | the document doesn't list what they are, and it's not clear what we're checking here. Can't this part be automated anyway? |
+
+NOTE: With the NVDA piece, list items spoken would be doubled, confirmed in the speech viewer as 2 entries for the same list item.  It comes out as the first word repeated and the rest of the list sentence spoken normally (as if the first speaking of it were cut off by the repetition), at least with NVDA.  Not sure if this is an issue of our setup, or a behavior flaw of NVDA.
 
 ---
+
+> **2026-10-25: the audit stops here until the product is essentially complete.** Section 3 was
+> run on 2026-10-25 (results above). Phases 81 and 82 change most of what sections 4 to 6B test,
+> so the rest, including the §6B.3 screen-reader pass, moves to Phase 83's track P83-G. That
+> track first automates nearly every remaining check and rewrites this doc to say which test
+> covers each, leaving only the speech checks for a person. Test content for the pass:
+> `scripts/seed-a11y-fixtures.php` (usage in its header). The findings so far are in Phase 81's
+> track P81-E.
 
 ## 4. Public surfaces
 
@@ -157,7 +167,7 @@ segmented controls, radios) · `Home`/`End` first/last.
 
 | # | Check | Steps | Pass | Result |
 |---|---|---|---|---|
-| P-L1 | Keyboard reach | `Tab` from page top | Every card / control is reachable and activatable with keyboard | |
+| P-L1 | Keyboard reach | `Tab` from page top | Every card / control is reachable and activatable with keyboard | yes |
 | P-L2 | Card semantics (1.3.1, 4.1.2) | Screen-reader through a card | Card announces a meaningful name (campaign title); it's a link/button, not a bare div | |
 | P-L3 | Images (1.1.1) | SR over thumbnails | Decorative images are silent; meaningful images have alt text | |
 | P-L4 | Headings (1.3.1, 2.4.6) | NVDA `H` / VO rotor | A sensible heading structure exists (no skipped levels for the visible hierarchy) | |

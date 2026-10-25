@@ -1,8 +1,8 @@
 # Phase 80 - Behavioural components
 
-**Status:** In progress (P80-A to P80-D, P80-F and P80-G complete; P80-E, the screen-reader pass, remains)
+**Status:** Complete (2026-10-25). P80-E, the screen-reader pass, moved to Phase 83's P83-G by user decision
 **Created:** 2026-09-10
-**Last updated:** 2026-10-07 (P80-G's dark-theme elevation reversed at the designer's request, after the before-and-after table showed it repainting accents; the two-tone rail filed in FUTURE_TASKS). Earlier the same day (P80-G landed: the elevation ladder, the `border` floor, the popup typeface and width, rules 13 and 14 in `COLOR-SPEC.md`). 2026-10-03 (P80-G's unblocked half landed: the rail under focus, the glyph on `filled`, the capture). 2026-10-02 (P80-F landed, including a live double-action fix in `main.tsx`; earlier the same day Key Decision C was redefined, Key Decision E corrected, four tracks added, every follow-on given an owner, and `COLOR-SPEC.md` gained the standing rules)
+**Last updated:** 2026-10-25 (closed; P80-E moved to P83-G, the audit's findings to P81-E). 2026-10-07 (P80-G's dark-theme elevation reversed at the designer's request, after the before-and-after table showed it repainting accents; the two-tone rail filed in FUTURE_TASKS). Earlier the same day (P80-G landed: the elevation ladder, the `border` floor, the popup typeface and width, rules 13 and 14 in `COLOR-SPEC.md`). 2026-10-03 (P80-G's unblocked half landed: the rail under focus, the glyph on `filled`, the capture). 2026-10-02 (P80-F landed, including a live double-action fix in `main.tsx`; earlier the same day Key Decision C was redefined, Key Decision E corrected, four tracks added, every follow-on given an owner, and `COLOR-SPEC.md` gained the standing rules)
 
 ### Tracks
 
@@ -12,7 +12,7 @@
 | P80-B | Selection, navigation and choice controls: the select family, tabs, accordion, checkbox, switch, chip, segmented control, slider | **Done** (2026-09-14), including the pagination and colour-picker gaps | Large |
 | P80-C | Imperative managers: notifications and confirmations | **Done** (2026-09-14) | Small-Medium |
 | P80-D | The keyboard gate, automated: a browser suite asserting every component's keyboard contract on the shipped configuration, and §6B of the manual audit extended to every component family | **Done** (2026-10-02); found six defects, filed in P80-F | Medium |
-| P80-E | The keyboard gate, manual: one recorded screen-reader pass over every component family | Planned (human) | Small |
+| P80-E | The keyboard gate, manual: one recorded screen-reader pass over every component family | **Moved to P83-G** (2026-10-25), with the rest of the manual audit, to run once on the finished product | Small |
 | P80-F | Framework defects and decisions that must land before Phase 81 builds on them | **Done** (2026-10-02); also found the overlay-root axe gates had never scanned anything, and a live double-action defect on two-gallery pages | Medium |
 | P80-G | The designer's 2026-10-02 answers: the elevation ladder's resolution, the rail under focus, the glyph on `filled` controls, the selected row's geometry | **Done** (2026-10-07), with the dark-theme half of the elevation fix reversed the same day at the designer's request | Medium |
 
@@ -857,11 +857,11 @@ The one real decision is that **the range keeps a constant width as the current 
 
 ## Outcome
 
-_Updated 2026-10-25. All tracks but P80-E have landed. P80-E, the screen-reader pass, is the user's, and this section is finished from its results at close-out._
+_Closed 2026-10-25. Every track landed except P80-E, which moved to P83-G with the rest of the manual audit (below)._
 
 **What Phase 80 built.** Every `@mullion/ui` component that handles a keypress, plus the two imperative stores that raise chrome without one. Nothing was migrated onto them: Key Decision B holds, and Phase 81 owns the move. The one exception is a two-line mount fix in `main.tsx` for a live defect, recorded under P80-F.
 
-**The four gates of Key Decision C, phase-wide.** The axe structural gate, the P77-F ring walk and the P79-B static sheet rules are met and mutation-checked for every component. The fourth, the keyboard gate, was redefined on 2026-10-02 as an automated contract suite plus one recorded screen-reader pass. The automated half is P80-D: 64 browser tests on both mounts, every family mutation-checked, and every defect it found fixed in P80-F with no expected-failure marks left. The screen-reader half is P80-E: *pending, see §6B.4 of `ACCESSIBILITY_MANUAL_AUDIT.md`.*
+**The four gates of Key Decision C, phase-wide.** The axe structural gate, the P77-F ring walk and the P79-B static sheet rules are met and mutation-checked for every component. The fourth, the keyboard gate, was redefined on 2026-10-02 as an automated contract suite plus one recorded screen-reader pass. The automated half is P80-D: 64 browser tests on both mounts, every family mutation-checked, and every defect it found fixed in P80-F with no expected-failure marks left. The screen-reader half, P80-E, moved to Phase 83. The user ran section 3 of the manual audit on 2026-10-25 and stopped there, because Phases 81 and 82 change most of the surfaces the rest tests. P83-G now owns it, together with an automated product accessibility suite that will take over nearly every check that remains, and the seed script `scripts/seed-a11y-fixtures.php` that gives it data. The pass's findings (an escaped ampersand in every interface string, a flickering admin menu at 320px, doubled NVDA list items, alt text lost on export, an unreachable CLI, three layout faults) are P81-E. So the keyboard gate closes three and a half of four here: its automated half is complete, and its speech half is scheduled.
 
 **What D, F and G changed.**
 

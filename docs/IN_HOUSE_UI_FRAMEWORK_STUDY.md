@@ -310,7 +310,7 @@ counts, not estimated in days.
 | 1 Primitive bake-off | Five components on two candidates against the fixed tests in the evaluation's section 9 | Small-Medium | 0 | 78 B |
 | 2 Engine extension | Component token tier, framework constants, `defineTheme` with audits at save | Medium | none | 78 C |
 | 3 Framework core | `MullionProvider` (scope, portal, mode, persistence), delivery, token sheet, layout and typography primitives, focus rule | Medium-Large | 1, 2 | [79](PHASE79_REPORT.md) A, B, C |
-| 4 Behavioural components, wave one | Input family, `Modal`, `Drawer`, `Popover`, `Tooltip`, `Menu` (the adapter's hardest cases) | Large | 3 | [80](PHASE80_REPORT.md) A |
+| 4 Behavioural components, wave one | Input family, `Modal`, `Drawer`, `Popover`, `Tooltip`, `Menu` (the adapter's hardest cases) | Large | 3 | [80](archive/phases/PHASE80_REPORT.md) A |
 | 5 Behavioural components, wave two | `Select` family, `Tabs`, `SegmentedControl`, `Checkbox`, `Switch`, `Chip`, `Slider`, `NumberInput`, `ColorInput`, `Accordion`, `ScrollArea`, `Pagination`, toast and confirm managers | Large | 4 | 80 B, C |
 | 6 Theme manager merge | Registry, catalogue, `ThemeSelector`, persistence, scoping, lock and follow, the editor | Medium | 3 | 79 D |
 | 7 Consumer migration | 142 files; 1,535 style props; about 1,500 size and variant literals; 117 test files onto the new wrapper; 16 stories; 3 e2e selectors; `--mantine-*` references in 58 files | Large, incremental behind the facade | 4, 5, 6 | [81](PHASE81_REPORT.md) A, B, C |
