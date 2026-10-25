@@ -265,7 +265,7 @@ describe('the dialog shell', () => {
     const v = vars(screen.getByRole('dialog'));
     expect(v['--mullion-modal-size']).toBe('var(--mullion-spacing-lg)');
     expect(v['--mullion-pad']).toBe('var(--mullion-spacing-sm)');
-    expect(v['--mullion-radius']).toBe('4px');
+    expect(v['--mullion-radius']).toBe('calc(0.25rem * var(--mullion-scale, 1))');
   });
 
   it('takes its z-index from the layer scale, never a literal', () => {
@@ -297,7 +297,7 @@ describe('the dialog shell', () => {
     const popup = screen.getByRole('dialog');
     expect(popup.getAttribute('data-position')).toBe('left');
     expect(popup.className).toContain('mullion-drawer');
-    expect(vars(popup)['--mullion-drawer-size']).toBe('320px');
+    expect(vars(popup)['--mullion-drawer-size']).toBe('calc(20rem * var(--mullion-scale, 1))');
   });
 
   it('a modal is centred by default and full-screen on request', () => {
@@ -555,7 +555,7 @@ describe('the popover', () => {
       </Popover>,
     );
     const popup = document.querySelector('.mullion-popover')!;
-    expect(vars(popup)['--mullion-popover-width']).toBe('240px');
+    expect(vars(popup)['--mullion-popover-width']).toBe('calc(15rem * var(--mullion-scale, 1))');
     expect(vars(popup)['--mullion-pad']).toBe('var(--mullion-spacing-md)');
     const positioner = document.querySelector('.mullion-overlay-positioner')!;
     expect(vars(positioner)['--mullion-overlay-layer']).toBe('var(--mullion-layer-popover)');

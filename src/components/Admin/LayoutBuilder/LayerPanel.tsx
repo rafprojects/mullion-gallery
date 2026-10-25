@@ -6,6 +6,7 @@ import { buildLayerList, getLayerName, type GroupLayerItem } from '@/utils/layer
 import { LayerRow } from './LayerRow';
 import type { LayoutTemplate } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -280,7 +281,7 @@ export function LayerPanel({
       <Text
         size="xs"
         fw={600}
-        style={{ paddingInline: '0.375rem', paddingBlock: '0.25rem',
+        style={{ paddingInline: uiRem(0.375), paddingBlock: uiRem(0.25),
           borderBottom: '1px solid var(--mullion-builder-border)',
           letterSpacing: '0.05em',
           textTransform: 'uppercase',
@@ -294,7 +295,7 @@ export function LayerPanel({
         scrollbarSize={4}
         onKeyDown={handleKeyDown}
         tabIndex={0}
-        style={{ maxHeight: '28.75rem', outline: 'none' }}
+        style={{ maxHeight: uiRem(28.75), outline: 'none' }}
       >
         <Stack gap={0} py={4}>
           {displayedLayers.map((item) => {

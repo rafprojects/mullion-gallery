@@ -38,6 +38,7 @@ import {
 } from '@tabler/icons-react';
 import type { LayoutSlot, LayoutTemplate, MediaItem } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -278,7 +279,7 @@ export function MediaPickerSidebar({
               const mediaItem = media.find((m) => m.id === slot.mediaId);
               return (
                 <Group key={slot.id} gap={4} wrap="nowrap">
-                  <Badge size="xs" variant="light" style={{ width: '3.125rem', flexShrink: 0 }}>
+                  <Badge size="xs" variant="light" style={{ width: uiRem(3.125), flexShrink: 0 }}>
                     {t('lb_mps_slot_n', 'Slot {{n}}', { n: idx + 1 })}
                   </Badge>
                   <Text size="xs" truncate style={{ flex: 1 }}>

@@ -3,6 +3,7 @@ import { IconChevronLeft, IconChevronRight, IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 interface MediaLightboxModalProps {
   opened: boolean;
@@ -47,7 +48,7 @@ export function MediaLightboxModal({
           <ActionIcon
             variant="filled"
             color="dark"
-            style={{ position: 'absolute', top: '0.625rem', right: '0.625rem' }}
+            style={{ position: 'absolute', top: uiRem(0.625), right: uiRem(0.625) }}
             onClick={onClose}
             aria-label={t('admin_media_lb_close', 'Close lightbox')}
           >
@@ -58,7 +59,7 @@ export function MediaLightboxModal({
               <ActionIcon
                 variant="filled"
                 color="dark"
-                style={{ position: 'absolute', left: '0.625rem', top: '50%', transform: 'translateY(-50%)' }}
+                style={{ position: 'absolute', left: uiRem(0.625), top: '50%', transform: 'translateY(-50%)' }}
                 onClick={onPrev}
                 aria-label={t('admin_media_lb_prev', 'Previous image')}
               >
@@ -67,7 +68,7 @@ export function MediaLightboxModal({
               <ActionIcon
                 variant="filled"
                 color="dark"
-                style={{ position: 'absolute', right: '0.625rem', top: '50%', transform: 'translateY(-50%)' }}
+                style={{ position: 'absolute', right: uiRem(0.625), top: '50%', transform: 'translateY(-50%)' }}
                 onClick={onNext}
                 aria-label={t('admin_media_lb_next', 'Next image')}
               >

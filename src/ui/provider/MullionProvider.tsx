@@ -55,6 +55,7 @@ import {
 import { readStoredThemeId, storageKeyFor, writeStoredThemeId } from './persistence';
 import { PORTAL_ATTR, SCOPE_ATTR, createScopeId, isShadowRoot, scopeSelector } from './scope';
 import { attachSheet, buildTokenSheet, sheetRootOf, type SheetHandle, type SheetRoot } from './tokenSheet';
+import { useRootScale } from '../styles/rootScale';
 import { adoptUiStyles } from '../styles/uiStyles';
 
 export type MullionScope = HTMLElement | ShadowRoot | 'document';
@@ -250,6 +251,7 @@ export function MullionProvider({
   // The component sheet (P79-B) is one list shared by every root on the page;
   // the token sheet is built per scope. Both go wherever the scope and the
   // portal container live, so nothing the provider paints is left unstyled.
+  const scale = useRootScale();
   const handlesRef = useRef<SheetHandle[]>([]);
   const adoptedRef = useRef<Map<SheetRoot, () => void>>(new Map());
   // [P79-0] Written as a function the two effects below share. The layout
@@ -286,7 +288,7 @@ export function MullionProvider({
     const cssFor = (sel: string) => {
       let css = cssBySelector.get(sel);
       if (css === undefined) {
-        css = buildTokenSheet(entry, sel);
+        css = buildTokenSheet(entry, sel, scale);
         cssBySelector.set(sel, css);
       }
       return css;
@@ -307,7 +309,7 @@ export function MullionProvider({
     }
     handlesRef.current = next;
     return complete;
-  }, [scope, selector, container, entry, scopeId]);
+  }, [scope, selector, container, entry, scopeId, scale]);
 
   const deferredRef = useRef(false);
   useLayoutEffect(() => {

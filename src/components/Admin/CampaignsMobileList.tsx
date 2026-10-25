@@ -12,6 +12,7 @@ import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 // Returns an i18next key + English default so the caller can translate in render.
 function scheduleLabel(publishAt?: string, unpublishAt?: string): { key: string; text: string; color: string } | null {
@@ -124,7 +125,7 @@ export function CampaignsMobileList({
             </Group>
 
             {/* Actions */}
-            <Group gap="xs" wrap="wrap" style={{ marginTop: '0.125rem' }}>
+            <Group gap="xs" wrap="wrap" style={{ marginTop: uiRem(0.125) }}>
               <Button size="xs" variant="outline" leftSection={<IconEdit size={12} />} onClick={() => handleEdit(c)}>
                 {t('admin_edit', 'Edit')}
               </Button>

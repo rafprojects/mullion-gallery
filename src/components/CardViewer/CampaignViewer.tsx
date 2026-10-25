@@ -27,6 +27,7 @@ import {
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { UnifiedGallerySection } from './UnifiedGallerySection';
 import { PerTypeGallerySection } from './PerTypeGallerySection';
+import { uiRem } from '@/ui';
 
 const LazyGalleryConfigEditorModal = lazy(() =>
   import('@/components/Common/GalleryConfigEditorModal').then((module) => ({
@@ -109,7 +110,7 @@ function CampaignViewerCoverHeader({
 
       {settings.showCampaignCompanyName !== false && (
         <Badge
-          style={{ position: 'absolute', top: '1rem', left: '1rem', backgroundColor: displayedCampaign.company.brandColor }}
+          style={{ position: 'absolute', top: uiRem(1), left: uiRem(1), backgroundColor: displayedCampaign.company.brandColor }}
           size="lg"
         >
           <Group gap={8}>
@@ -191,7 +192,7 @@ function CampaignViewerGalleryContent({
       }}
     >
       <Suspense fallback={
-        <Center py="xl" style={{ minHeight: '12.5rem' }}>
+        <Center py="xl" style={{ minHeight: uiRem(12.5) }}>
           <Stack align="center" gap="xs">
             <Loader size="md" />
             <Text size="sm" c="dimmed">{t('cv_loading', 'Loading gallery…')}</Text>

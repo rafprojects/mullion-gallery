@@ -1,6 +1,7 @@
 import { Modal, Table, Text, Kbd, Group, Stack } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 interface BuilderKeyboardShortcutsModalProps {
   opened: boolean;
@@ -107,7 +108,7 @@ export function BuilderKeyboardShortcutsModal({
                           <span key={i}>
                             <Kbd>{k}</Kbd>
                             {i < row.keys.length - 1 && (
-                              <Text span size="xs" c="dimmed" style={{ paddingInline: '0.125rem' }}>
+                              <Text span size="xs" c="dimmed" style={{ paddingInline: uiRem(0.125) }}>
                                 +
                               </Text>
                             )}

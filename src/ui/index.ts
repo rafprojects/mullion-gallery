@@ -179,6 +179,11 @@ export {
 // form the host offset can reach. See src/ui/styles/layers.ts.
 export { uiLayer, type UiLayer } from './styles/layers';
 
+// ── Framework: the size basis (P81-F) ──────────────────────────────────────
+// One rem is a design rem on every host, whatever the host sets its root to.
+// `uiRem` writes an inline length in that basis. See src/ui/styles/rootScale.ts.
+export { measureRootScale, uiRem, useRootScale } from './styles/rootScale';
+
 // The presentational components (P79-C) live in `./components` and are
 // deliberately not re-exported here yet: this list is the migration ledger,
 // and moving `Text` onto the framework here would move all 92 files that

@@ -15,6 +15,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { SpaceAssetLibrary } from './SpaceAssetLibrary';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import type { FontLibraryEntry } from '@mullion/shared-utils';
+import { uiRem } from '@/ui';
 
 interface SpaceGrant {
   userId: number;
@@ -511,7 +512,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                 value={grantRole}
                 onChange={(v) => setGrantRole(v ?? 'viewer')}
                 size="sm"
-                style={{ width: '7.5rem' }}
+                style={{ width: uiRem(7.5) }}
                 allowDeselect={false}
               />
               <Button
@@ -535,7 +536,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
           <Text c="dimmed" size="sm">{t('admin_space_library_empty', 'Select a space from the Spaces tab to manage its shared library.')}</Text>
         ) : !isDelegated ? (
           <Alert icon={<IconInfoCircle size={16} />} color="blue" variant="light">
-            <Text size="sm" fw={500} style={{ marginBottom: '0.125rem' }}>{t('admin_space_open_title', '{{name}} is an open space.', { name: selectedSpace.name })}</Text>
+            <Text size="sm" fw={500} style={{ marginBottom: uiRem(0.125) }}>{t('admin_space_open_title', '{{name}} is an open space.', { name: selectedSpace.name })}</Text>
             <Text size="sm">
               {t('admin_space_open_desc', 'Open spaces can use every asset in the library — per-space selection only applies to delegated spaces. Switch this space to delegated isolation mode to restrict its assets.')}
             </Text>

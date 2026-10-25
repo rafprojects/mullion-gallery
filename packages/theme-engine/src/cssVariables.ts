@@ -32,6 +32,14 @@ const SIZE_STEPS = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
 /** The six heading levels `HeadingsConfig.sizes` carries. */
 const HEADING_LEVELS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as const;
 
+/** Rewrite each rem length in one declaration as rem times `<prefix>-scale` (P81-F). */
+export function scaleRem(declaration: string, prefix: string = DEFAULT_CSS_VAR_PREFIX): string {
+  const colon = declaration.indexOf(':');
+  const name = declaration.slice(0, colon + 1);
+  const value = declaration.slice(colon + 1);
+  return name + value.replace(/(-?\d*\.?\d+)rem\b/g, `calc($1rem * var(${prefix}-scale, 1))`);
+}
+
 // ---------------------------------------------------------------------------
 // Generator
 // ---------------------------------------------------------------------------
@@ -159,8 +167,11 @@ export function generateCssVariables(
     vars.push(`${PREFIX}-${name}: ${value};`);
   }
 
+  // [P81-F] Every rem is multiplied by the scope's scale, so one step is the
+  // same physical size whatever the host sets its root to. The provider
+  // declares the scale; anywhere it does not, the fallback leaves plain rem.
   const indent = '  ';
-  const body = vars.map((v) => `${indent}${v}`).join('\n');
+  const body = vars.map((v) => `${indent}${scaleRem(v, PREFIX)}`).join('\n');
 
   return `${selector} {\n${body}\n}`;
 }

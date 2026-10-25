@@ -67,6 +67,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useBuilderDeepLink } from '@mullion/shared-utils';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
+import { uiRem } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -675,7 +676,7 @@ function TemplateGridCard({ template, onEdit, onDuplicate, onDelete, onExport }:
           bottom-right so it sits beside the title on the card background, as it did
           pre-P72-G: over the dark preview canvas a `subtle` ActionIcon has almost no
           contrast in light mode. */}
-      <Box style={{ position: 'absolute', bottom: '0.5rem', right: '0.5rem' }}>
+      <Box style={{ position: 'absolute', bottom: uiRem(0.5), right: uiRem(0.5) }}>
         <Menu position="bottom-end" withArrow>
           <Menu.Target>
             <ActionIcon

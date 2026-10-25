@@ -23,6 +23,7 @@ import {
 } from '@tabler/icons-react';
 import type { DockviewApi } from 'dockview';
 import type { LayoutScope } from '@/hooks/useBuilderWorkspacePrefs';
+import { uiRem } from '@/ui';
 
 // The four panel ids used in the default layout.
 const SIDE_PANELS = ['layers', 'media', 'properties'] as const;
@@ -308,7 +309,7 @@ export function LayoutBuilderMenuBar({
         />
       </MenuButton>
 
-      <Divider orientation="vertical" style={{ marginInline: '0.25rem' }} />
+      <Divider orientation="vertical" style={{ marginInline: uiRem(0.25) }} />
     </Group>
   );
 }

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import type { AuditEntry, AuditFilters } from '@/services/adminQuery';
 import { AuditEventRow } from './AuditEventRow';
+import { uiRem } from '@/ui';
 
 type GlobalFilters = AuditFilters & { campaignId?: string };
 
@@ -54,7 +55,7 @@ export function GlobalAuditTab({ entries, loading, filters, onFiltersChange, onE
 
   return (
     <>
-      <Text size="sm" fw={600} id="global-audit-heading" style={{ marginBottom: '0.125rem' }}>
+      <Text size="sm" fw={600} id="global-audit-heading" style={{ marginBottom: uiRem(0.125) }}>
         {t('admin_gaudit_heading', 'System Audit')}
       </Text>
       <Text size="xs" c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('admin_gaudit_subtitle', 'Cross-campaign and plugin-wide admin events.')}</Text>
@@ -111,12 +112,12 @@ export function GlobalAuditTab({ entries, loading, filters, onFiltersChange, onE
           <Table verticalSpacing="sm" aria-label={t('admin_gaudit_loading_aria', 'Loading system audit entries')}>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th style={{ minWidth: '8.75rem' }}>{t('admin_audit_th_when', 'When')}</Table.Th>
-                <Table.Th style={{ minWidth: '12.5rem' }}>{t('admin_audit_th_summary', 'Summary')}</Table.Th>
-                <Table.Th style={{ minWidth: '4.375rem' }}>{t('admin_audit_th_severity', 'Severity')}</Table.Th>
-                <Table.Th style={{ minWidth: '6.25rem' }}>{t('admin_gaudit_th_campaign', 'Campaign')}</Table.Th>
-                <Table.Th style={{ minWidth: '5rem' }}>{t('admin_audit_th_actor', 'Actor')}</Table.Th>
-                <Table.Th style={{ minWidth: '10rem' }}>{t('admin_audit_th_details', 'Details')}</Table.Th>
+                <Table.Th style={{ minWidth: uiRem(8.75) }}>{t('admin_audit_th_when', 'When')}</Table.Th>
+                <Table.Th style={{ minWidth: uiRem(12.5) }}>{t('admin_audit_th_summary', 'Summary')}</Table.Th>
+                <Table.Th style={{ minWidth: uiRem(4.375) }}>{t('admin_audit_th_severity', 'Severity')}</Table.Th>
+                <Table.Th style={{ minWidth: uiRem(6.25) }}>{t('admin_gaudit_th_campaign', 'Campaign')}</Table.Th>
+                <Table.Th style={{ minWidth: uiRem(5) }}>{t('admin_audit_th_actor', 'Actor')}</Table.Th>
+                <Table.Th style={{ minWidth: uiRem(10) }}>{t('admin_audit_th_details', 'Details')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody><AuditSkeletonRows /></Table.Tbody>
@@ -125,17 +126,17 @@ export function GlobalAuditTab({ entries, loading, filters, onFiltersChange, onE
       ) : entries.length === 0 ? (
         <Text c="dimmed" role="status" aria-live="polite">{t('admin_gaudit_none', 'No audit entries found.')}</Text>
       ) : (
-        <ScrollArea offsetScrollbars type="always" scrollbars="y" className="mullion-scrollarea" style={{ height: '25rem' }}>
+        <ScrollArea offsetScrollbars type="always" scrollbars="y" className="mullion-scrollarea" style={{ height: uiRem(25) }}>
           <Table.ScrollContainer minWidth={750}>
             <Table verticalSpacing="sm" highlightOnHover aria-label={t('admin_gaudit_entries_aria', 'System audit entries')}>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th style={{ minWidth: '8.75rem' }}>{t('admin_audit_th_when', 'When')}</Table.Th>
-                  <Table.Th style={{ minWidth: '12.5rem' }}>{t('admin_audit_th_summary', 'Summary')}</Table.Th>
-                  <Table.Th style={{ minWidth: '4.375rem' }}>{t('admin_audit_th_severity', 'Severity')}</Table.Th>
-                  <Table.Th style={{ minWidth: '6.25rem' }}>{t('admin_gaudit_th_campaign', 'Campaign')}</Table.Th>
-                  <Table.Th style={{ minWidth: '5rem' }}>{t('admin_audit_th_actor', 'Actor')}</Table.Th>
-                  <Table.Th style={{ minWidth: '10rem' }}>{t('admin_audit_th_details', 'Details')}</Table.Th>
+                  <Table.Th style={{ minWidth: uiRem(8.75) }}>{t('admin_audit_th_when', 'When')}</Table.Th>
+                  <Table.Th style={{ minWidth: uiRem(12.5) }}>{t('admin_audit_th_summary', 'Summary')}</Table.Th>
+                  <Table.Th style={{ minWidth: uiRem(4.375) }}>{t('admin_audit_th_severity', 'Severity')}</Table.Th>
+                  <Table.Th style={{ minWidth: uiRem(6.25) }}>{t('admin_gaudit_th_campaign', 'Campaign')}</Table.Th>
+                  <Table.Th style={{ minWidth: uiRem(5) }}>{t('admin_audit_th_actor', 'Actor')}</Table.Th>
+                  <Table.Th style={{ minWidth: uiRem(10) }}>{t('admin_audit_th_details', 'Details')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>{rows}</Table.Tbody>

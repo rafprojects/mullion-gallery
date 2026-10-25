@@ -30,6 +30,7 @@ import {
   setCampaignBreakpointScopeAdapterOverride,
   syncCampaignGalleryOverrideMode,
 } from '@/utils/campaignGalleryOverrides';
+import { uiRem } from '@/ui';
 
 
 const LazyGalleryConfigEditorModal = lazy(() =>
@@ -140,7 +141,7 @@ const UnifiedCampaignModalTabList: NamedComponent<UnifiedCampaignModalTabListPro
       <Tabs.Tab value="details">{t('admin_camp_tab_details', 'Details')}</Tabs.Tab>
       {isEdit && (
         <Tabs.Tab value="media">
-          {t('admin_camp_tab_media', 'Media')} {mediaCount > 0 && <Badge size="sm" style={{ marginLeft: '0.25rem' }}>{mediaCount}</Badge>}
+          {t('admin_camp_tab_media', 'Media')} {mediaCount > 0 && <Badge size="sm" style={{ marginLeft: uiRem(0.25) }}>{mediaCount}</Badge>}
         </Tabs.Tab>
       )}
       <Tabs.Tab value="settings">{t('admin_camp_tab_settings', 'Settings')}</Tabs.Tab>
@@ -382,11 +383,11 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
             />
             {effectiveCampaignGalleryMode === 'unified' ? (
               <Box>
-                <Text size="sm" fw={500} style={{ marginBottom: '0.25rem' }}>{t('admin_camp_unified_bp', 'Unified Breakpoint Adapters')}</Text>
-                <Text size="xs" c="dimmed" style={{ marginBottom: '0.5rem' }}>
+                <Text size="sm" fw={500} style={{ marginBottom: uiRem(0.25) }}>{t('admin_camp_unified_bp', 'Unified Breakpoint Adapters')}</Text>
+                <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.5) }}>
                   {t('admin_camp_unified_bp_hint', 'Clear a cell to inherit the global unified adapter for that breakpoint.')}
                 </Text>
-                <SimpleGrid cols={2} spacing="xs" style={{ marginBottom: '0.25rem' }}>
+                <SimpleGrid cols={2} spacing="xs" style={{ marginBottom: uiRem(0.25) }}>
                   <Text size="xs" fw={600} ta="center" c="dimmed"> </Text>
                   <Text size="xs" fw={600} ta="center">{t('admin_gallery_mode_unified', 'Unified')}</Text>
                 </SimpleGrid>
@@ -409,11 +410,11 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
               </Box>
             ) : (
               <Box>
-                <Text size="sm" fw={500} style={{ marginBottom: '0.25rem' }}>{t('admin_camp_pertype_bp', 'Per-Type Breakpoint Adapters')}</Text>
-                <Text size="xs" c="dimmed" style={{ marginBottom: '0.5rem' }}>
+                <Text size="sm" fw={500} style={{ marginBottom: uiRem(0.25) }}>{t('admin_camp_pertype_bp', 'Per-Type Breakpoint Adapters')}</Text>
+                <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.5) }}>
                   {t('admin_camp_pertype_bp_hint', "Clear any cell to inherit that breakpoint's global adapter selection.")}
                 </Text>
-                <SimpleGrid cols={3} spacing="xs" style={{ marginBottom: '0.25rem' }}>
+                <SimpleGrid cols={3} spacing="xs" style={{ marginBottom: uiRem(0.25) }}>
                   <Text size="xs" fw={600} ta="center" c="dimmed"> </Text>
                   <Text size="xs" fw={600} ta="center">{t('admin_camp_col_image', 'Image')}</Text>
                   <Text size="xs" fw={600} ta="center">{t('admin_camp_col_video', 'Video')}</Text>
@@ -447,7 +448,7 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
             )}
           </Stack>
           <Group justify="space-between" align="flex-start" gap="md">
-            <Text size="sm" c="dimmed" style={{ maxWidth: '35rem' }}>
+            <Text size="sm" c="dimmed" style={{ maxWidth: uiRem(35) }}>
               {t('admin_camp_quick_overrides_hint', 'Quick per-breakpoint overrides stay inline here. Use the shared responsive editor for mode changes, shared responsive settings, and adapter-specific fields.')}
             </Text>
             <Button variant="light" onClick={onOpenResponsiveConfig}>
@@ -519,7 +520,7 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
             </Group>
           )}
           {usesLayoutBuilder && !formState.layoutTemplateId && (
-            <Text size="xs" c="orange" style={{ marginTop: layoutTemplates.length > 0 ? '0.25rem' : 0 }}>
+            <Text size="xs" c="orange" style={{ marginTop: layoutTemplates.length > 0 ? uiRem(0.25) : 0 }}>
               {layoutTemplates.length > 0
                 ? t('admin_camp_lb_no_template', 'Layout Builder is selected as a gallery adapter, but no template is assigned — pick one above, or the gallery falls back to the default adapter.')
                 : t('admin_camp_lb_no_templates', 'Layout Builder is selected as a gallery adapter, but no layout templates exist yet. Create one in the Layout Builder first.')}
@@ -835,7 +836,7 @@ function MediaTabContent({
                   </ActionIcon>
                 </Tooltip>
               </Group>
-              {media.caption && <Text size="xs" c="dimmed" lineClamp={1} style={{ marginTop: '0.25rem' }}>{media.caption}</Text>}
+              {media.caption && <Text size="xs" c="dimmed" lineClamp={1} style={{ marginTop: uiRem(0.25) }}>{media.caption}</Text>}
             </Card>
           ))}
         </SimpleGrid>

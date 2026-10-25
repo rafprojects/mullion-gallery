@@ -10,6 +10,7 @@ import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { CompanyCombobox } from '@/components/Common/CompanyCombobox';
 import type { ApiClient } from '@/services/apiClient';
+import { uiRem } from '@/ui';
 
 function toSlug(name: string): string {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -78,7 +79,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
 
       return (
         <Table.Tr key={c.id} data-selected={isSelected || undefined}>
-          <Table.Td style={{ width: '2.25rem' }}>
+          <Table.Td style={{ width: uiRem(2.25) }}>
             <Checkbox
               checked={isSelected}
               onChange={() => handleToggleCampaignSelect(cid)}

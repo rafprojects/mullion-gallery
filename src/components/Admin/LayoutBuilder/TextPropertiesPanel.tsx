@@ -12,6 +12,7 @@ import {
 import type { LayoutTextLayer, LayoutTextSemanticTag, LayoutTextAlign, TypographyOverride } from '@/types';
 import { TypographyEditor } from '@/components/Common/TypographyEditor';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 export interface TextPropertiesPanelProps {
   text: LayoutTextLayer;
@@ -98,7 +99,7 @@ export function TextPropertiesPanel({
         comboboxProps={{ withinPortal: false }}
       />
       <div>
-        <Text size="xs" c="dimmed" style={{ marginBottom: '0.25rem' }}>{t('lb_text_alignment', 'Alignment')}</Text>
+        <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.25) }}>{t('lb_text_alignment', 'Alignment')}</Text>
         <SegmentedControl
           size="xs"
           fullWidth

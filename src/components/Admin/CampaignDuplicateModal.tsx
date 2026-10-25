@@ -13,6 +13,7 @@ import { IconCopy } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { AdminCampaign } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 export interface CampaignDuplicateModalProps {
   /** Source campaign to duplicate; null when modal is closed. */
@@ -51,7 +52,7 @@ function CampaignDuplicateModalOptions({
   return (
     <Stack {...getMullionDebugProps('CampaignDuplicateModal', 'stack')} gap="md">
       <div>
-        <Text size="sm" c="dimmed" style={{ marginBottom: '0.25rem' }}>
+        <Text size="sm" c="dimmed" style={{ marginBottom: uiRem(0.25) }}>
           {t('admin_dup_source_label', 'Source:')}
         </Text>
         <Text fw={600}>{source?.title}</Text>

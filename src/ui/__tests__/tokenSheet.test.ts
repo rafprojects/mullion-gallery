@@ -19,7 +19,18 @@ describe('buildTokenSheet', () => {
     expect(css).toContain(`--mullion-color-primary-stroke: ${entry.resolved.primaryStroke};`);
     expect(css).toContain('--mullion-focus-ring-width: 2px;');
     expect(css).toContain('--mullion-color-scheme: light;');
-    expect(css).toMatch(/\[data-mullion-scope="x"\] \{\n {2}color-scheme: light;\n\}\n@media/);
+    expect(css).toMatch(/\[data-mullion-scope="x"\] \{\n {2}--mullion-scale: 1;\n {2}color-scheme: light;\n\}\n@media/);
+  });
+
+  // P81-F: the scope declares the page's size basis beside the tokens that
+  // read it, and every rem token is multiplied by it.
+  it('declares the scale on the scope and multiplies every rem token by it', () => {
+    const css = buildTokenSheet(getThemeEntry('default-dark'), ':host', 1.6);
+    expect(css).toContain('--mullion-scale: 1.6;');
+    expect(css).toContain('--mullion-spacing-xs: calc(0.625rem * var(--mullion-scale, 1));');
+    expect(css).toContain('--mullion-control-height-sm: calc(2.25rem * var(--mullion-scale, 1));');
+    expect(css).not.toMatch(/:\s*-?[\d.]+rem;/);
+    expect(css).toContain('--mullion-focus-ring-width: 2px;');
   });
 
   it('keys on :host for a shadow root and on :root for the document', () => {

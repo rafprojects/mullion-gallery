@@ -10,6 +10,7 @@ import { MaskPropertiesPanel } from './MaskPropertiesPanel';
 import { BackgroundPropertiesPanel } from './BackgroundPropertiesPanel';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
+import { uiRem } from '@/ui';
 
 // P62-G: gate the Pro text editor behind the build flag so the free WP.org build
 // dead-code-eliminates TextPropertiesPanel (and its heavyweight TypographyEditor).
@@ -180,7 +181,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
         </Box>
         <Divider />
         <Box>
-          <Text size="xs" c="dimmed" style={{ marginBottom: '0.25rem' }}>{t('lb_props_aspect_ratio', 'Aspect ratio')}</Text>
+          <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.25) }}>{t('lb_props_aspect_ratio', 'Aspect ratio')}</Text>
           <SegmentedControl
             size="xs"
             value={String(builder.template.canvasAspectRatio)}
@@ -190,7 +191,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
           />
         </Box>
         <Box>
-          <Text size="xs" c="dimmed" style={{ marginBottom: '0.25rem' }}>{t('lb_props_height_mode', 'Height mode')}</Text>
+          <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.25) }}>{t('lb_props_height_mode', 'Height mode')}</Text>
           <Group gap={6} wrap="nowrap">
             <SegmentedControl
               size="xs"
@@ -210,7 +211,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
                 max={100}
                 step={5}
                 size="xs"
-                style={{ width: '4.5rem' }}
+                style={{ width: uiRem(4.5) }}
                 suffix="vh"
                 aria-label={t('lb_props_height_vh_aria', 'Canvas height in viewport units')}
               />

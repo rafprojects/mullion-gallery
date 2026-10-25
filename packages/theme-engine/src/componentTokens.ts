@@ -172,8 +172,9 @@ export type ComponentTokenName = keyof typeof COMPONENT_TOKEN_DERIVATIONS;
 /**
  * Control heights. Measured from the installed `@mantine/core` stylesheet
  * rather than recalled: `--input-height-*` and `--button-height-*` agree
- * exactly on all five rungs. Mantine's `var(--mantine-scale)` multiplier is
- * dropped because the framework has no such global.
+ * exactly on all five rungs. Mantine's `var(--mantine-scale)` multiplier
+ * becomes the framework's own `--mullion-scale`, which the generator applies
+ * to every rem it emits (P81-F).
  *
  * These sit with the component tokens rather than the constants because a
  * theme may legitimately want a denser or looser control scale, but they are

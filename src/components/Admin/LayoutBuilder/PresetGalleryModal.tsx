@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { IconLayoutDashboard } from '@tabler/icons-react';
 import { LAYOUT_PRESETS, type LayoutPreset } from '@/data/layoutPresets';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -119,7 +120,7 @@ export function PresetGalleryModal({
             <Text size="xs" c="dimmed" ta="center" lineClamp={2}>
               {preset.description}
             </Text>
-            <Group gap={4} style={{ marginTop: '0.25rem' }} justify="center">
+            <Group gap={4} style={{ marginTop: uiRem(0.25) }} justify="center">
               <Badge size="xs" variant="light">
                 {t('lb_preset_n_slots', '{{count}} slots', { count: preset.slots.length })}
               </Badge>

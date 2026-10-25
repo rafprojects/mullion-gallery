@@ -18,6 +18,7 @@ import { safeLocalStorage, fitRectsIntoBand } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
+import { uiRem } from '@/ui';
 
 // ── P30-C: Device preview presets ────────────────────────────────────────────
 
@@ -519,7 +520,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                   max={3840}
                   step={10}
                   size="xs"
-                  style={{ width: '5rem' }}
+                  style={{ width: uiRem(5) }}
                   suffix="px"
                   aria-label={tr('lb_canvas_max_width_aria', 'Canvas max width')}
                 />
@@ -561,7 +562,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                       max={30}
                       step={1}
                       size="xs"
-                      style={{ width: '5rem' }}
+                      style={{ width: uiRem(5) }}
                       label={(v) => `${v}px`}
                       aria-label={tr('lb_canvas_snap_sens', 'Snap sensitivity')}
                     />
@@ -587,7 +588,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                     max={200}
                     step={4}
                     size="xs"
-                    style={{ width: '4.25rem' }}
+                    style={{ width: uiRem(4.25) }}
                     suffix="px"
                     aria-label={tr('lb_canvas_grid_size_aria', 'Grid cell size')}
                   />
@@ -762,7 +763,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                   max={3840}
                   step={10}
                   size="xs"
-                  style={{ width: '5.625rem' }}
+                  style={{ width: uiRem(5.625) }}
                   suffix="px"
                   aria-label={tr('lb_canvas_custom_width_aria', 'Custom preview width')}
                   data-testid="custom-preview-width-input"

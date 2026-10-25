@@ -36,6 +36,7 @@ import {
   shouldLoopCarousel,
   shouldUseSyntheticCarouselLoop,
 } from './carouselBehavior';
+import { uiRem } from '@/ui';
 
 type GalleryRuntimeCommonSettings = ReturnType<typeof resolveGalleryComponentCommonSettings>;
 
@@ -47,9 +48,9 @@ const VIDEO_ASPECT_RATIO = '16 / 9';
 const VIDEO_ASPECT_RATIO_MULTIPLIER = 16 / 9;
 
 const VIEWPORT_HEIGHT_OFFSETS: Record<Breakpoint, string> = {
-  desktop: '16rem',
-  tablet: '10rem',
-  mobile: '6rem',
+  desktop: uiRem(16),
+  tablet: uiRem(10),
+  mobile: uiRem(6),
 };
 const VIEWPORT_MAX_WIDTHS: Record<Breakpoint, string> = {
   desktop: '72vw',
@@ -675,7 +676,7 @@ export function MediaCarouselInner({ media, settings, commonSettings, breakpoint
             size="lg"
             variant="light"
             aria-label={t('carousel_open_lightbox', 'Open lightbox')}
-            style={{ position: 'absolute', bottom: '0.75rem', right: '0.75rem', zIndex: 3 }}
+            style={{ position: 'absolute', bottom: uiRem(0.75), right: uiRem(0.75), zIndex: 3 }}
           >
             <IconZoomIn size={20} />
           </ActionIcon>

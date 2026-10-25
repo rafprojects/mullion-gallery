@@ -5,6 +5,7 @@ import { IconMail, IconCheck, IconAlertCircle } from '@tabler/icons-react';
 import { Trans, useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 interface RequestAccessFormProps {
   campaignId: string;
@@ -52,7 +53,7 @@ export function RequestAccessForm({ campaignId, campaignTitle, apiClient }: Requ
         onClick={(e) => e.stopPropagation()}
       >
         <IconCheck size={24} color="var(--mantine-color-green-4)" />
-        <Text size="sm" style={{ marginTop: '0.375rem' }} c="dimmed">
+        <Text size="sm" style={{ marginTop: uiRem(0.375) }} c="dimmed">
           {/* P64-C: no confirmation email is sent on submit anymore (that was a
               mail-bombing vector on this public endpoint); the requester hears
               back only once an admin resolves the request. */}

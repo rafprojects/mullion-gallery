@@ -164,8 +164,8 @@ describe('VideoCarousel', () => {
 
     expect(screen.getByTestId('video-player-frame')).toHaveStyle({
       height: 'auto',
-      maxHeight: 'min(calc(100dvh - 16rem), 68dvh)',
-      maxWidth: 'min(calc(min(calc(100dvh - 16rem), 68dvh) * 1.7777777777777777), 72vw)',
+      maxHeight: 'min(calc(100dvh - calc(16rem * var(--mullion-scale, 1))), 68dvh)',
+      maxWidth: 'min(calc(min(calc(100dvh - calc(16rem * var(--mullion-scale, 1))), 68dvh) * 1.7777777777777777), 72vw)',
       aspectRatio: '16 / 9',
     });
   });
@@ -180,7 +180,7 @@ describe('VideoCarousel', () => {
     );
 
     expect(screen.getByTestId('video-player-frame')).toHaveStyle({
-      maxWidth: 'min(900px, calc(min(calc(100dvh - 16rem), 68dvh) * 1.7777777777777777), 72vw)',
+      maxWidth: 'min(900px, calc(min(calc(100dvh - calc(16rem * var(--mullion-scale, 1))), 68dvh) * 1.7777777777777777), 72vw)',
     });
   });
 });

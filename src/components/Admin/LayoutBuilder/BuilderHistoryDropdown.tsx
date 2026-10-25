@@ -19,6 +19,7 @@ import {
 } from '@mantine/core';
 import { IconClockHour4, IconTrash } from '@tabler/icons-react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -95,7 +96,7 @@ export function BuilderHistoryDropdown({
 
       <Popover.Dropdown style={{ padding: '0' }}>
         {/* Header */}
-        <Box px="sm" style={{ paddingTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))', paddingBottom: '0.25rem', borderBottom: '1px solid var(--mantine-color-default-border)' }}>
+        <Box px="sm" style={{ paddingTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))', paddingBottom: uiRem(0.25), borderBottom: '1px solid var(--mantine-color-default-border)' }}>
           <Text size="xs" fw={600} c="dimmed" tt="uppercase">
             {t('lb_hist_title', 'History ({{count}})', { count })}
           </Text>

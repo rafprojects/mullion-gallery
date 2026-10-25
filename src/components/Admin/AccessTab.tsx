@@ -27,6 +27,7 @@ import { PendingRequestsPanel } from './PendingRequestsPanel';
 import type { ApiClient } from '@/services/apiClient';
 import type { AdminAccessState } from '@/hooks/useAdminAccessState';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 type AccessViewMode = 'campaign' | 'company' | 'all';
 
@@ -131,7 +132,7 @@ export function AccessTab({
             {/* P53-A: Company / All are system-admin only; editors see campaign access only. */}
             {isSystemAdmin && (
               <Box>
-                <Text size="sm" fw={500} style={{ marginBottom: '0.25rem' }}>{t('admin_access_view_by', 'View By')}</Text>
+                <Text size="sm" fw={500} style={{ marginBottom: uiRem(0.25) }}>{t('admin_access_view_by', 'View By')}</Text>
                 <SegmentedControl
                   value={accessViewMode}
                   onChange={(v) => onAccessViewModeChange(v as AccessViewMode)}
@@ -180,7 +181,7 @@ export function AccessTab({
                     <Text size="xs">{t('admin_access_archived_inactive', 'Archived campaign - grants inactive')}</Text>
                   </Alert>
                 )}
-                <Group gap="xs" style={{ marginTop: '0.125rem' }}>
+                <Group gap="xs" style={{ marginTop: uiRem(0.125) }}>
                   <Text size="xs" c="dimmed">{t('admin_access_total_users', 'Total users:')}</Text>
                   <Badge variant="light" color="blue">{t('admin_access_badge_count', 'Access {{count}}', { count: accessEntriesCount })}</Badge>
                 </Group>
@@ -200,12 +201,12 @@ export function AccessTab({
                     size="xs"
                     leftSection={<IconArchive size={14} />}
                     onClick={() => onArchiveCompanyClick(selectedCompany)}
-                    style={{ marginTop: '0.25rem' }}
+                    style={{ marginTop: uiRem(0.25) }}
                   >
                     {t('admin_access_archive_all', 'Archive All Campaigns')}
                   </Button>
                 )}
-                <Group gap="xs" style={{ marginTop: '0.125rem' }}>
+                <Group gap="xs" style={{ marginTop: uiRem(0.125) }}>
                   <Text size="xs" c="dimmed">{t('admin_access_total_users', 'Total users:')}</Text>
                   <Badge variant="light" color="blue">{t('admin_access_badge_count', 'Access {{count}}', { count: accessEntriesCount })}</Badge>
                 </Group>
@@ -257,14 +258,14 @@ export function AccessTab({
                       <Table.Th>{t('admin_access_th_type', 'Access Type')}</Table.Th>
                       <Table.Th>{t('admin_access_th_role', 'Role')}</Table.Th>
                       <Table.Th>{t('admin_access_th_granted', 'Granted / Expires')}</Table.Th>
-                      <Table.Th style={{ width: '5rem' }}>{t('admin_access_th_revoke', 'Revoke')}</Table.Th>
+                      <Table.Th style={{ width: uiRem(5) }}>{t('admin_access_th_revoke', 'Revoke')}</Table.Th>
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
                     {Array.from({ length: 3 }).map((_, i) => (
                       <Table.Tr key={i}>
                         <Table.Td>
-                          <Skeleton height={14} width="50%" style={{ marginBottom: '0.25rem' }} />
+                          <Skeleton height={14} width="50%" style={{ marginBottom: uiRem(0.25) }} />
                           <Skeleton height={10} width="70%" />
                         </Table.Td>
                         <Table.Td><Skeleton height={22} width={80} radius="xl" /></Table.Td>
@@ -298,7 +299,7 @@ export function AccessTab({
                         <Table.Th>{t('admin_access_th_type', 'Access Type')}</Table.Th>
                         <Table.Th>{t('admin_access_th_role', 'Role')}</Table.Th>
                         <Table.Th>{t('admin_access_th_granted', 'Granted / Expires')}</Table.Th>
-                        <Table.Th style={{ width: '5rem' }}>{t('admin_access_th_revoke', 'Revoke')}</Table.Th>
+                        <Table.Th style={{ width: uiRem(5) }}>{t('admin_access_th_revoke', 'Revoke')}</Table.Th>
                       </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>{accessRows}</Table.Tbody>

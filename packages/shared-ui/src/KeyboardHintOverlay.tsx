@@ -82,7 +82,7 @@ export function KeyboardHintOverlay({ visible }: KeyboardHintOverlayProps) {
       {(transitionStyles) => (
         <Box
           aria-hidden="true"
-          style={{ position: 'absolute', bottom: '3.75rem', left: '50%',
+          style={{ position: 'absolute', bottom: 'calc(3.75rem * var(--mullion-scale, 1))', left: '50%',
             ...transitionStyles,
             transform: 'translateX(-50%)',
             zIndex: 10,
@@ -94,7 +94,7 @@ export function KeyboardHintOverlay({ visible }: KeyboardHintOverlayProps) {
               <kbd style={KBD_STYLE}>{t('kb_arrow_left', '←')}</kbd>
               <kbd style={KBD_STYLE}>{t('kb_arrow_right', '→')}</kbd>
               <Text size="sm" style={TEXT_STYLE}>{t('kb_hint_navigate', 'navigate')}</Text>
-              <Text size="sm" style={{ marginInline: '0.25rem', ...TEXT_STYLE }}>{t('kb_hint_separator', '·')}</Text>
+              <Text size="sm" style={{ marginInline: 'calc(0.25rem * var(--mullion-scale, 1))', ...TEXT_STYLE }}>{t('kb_hint_separator', '·')}</Text>
               <kbd style={KBD_STYLE}>{t('kb_escape', 'Esc')}</kbd>
               <Text size="sm" style={TEXT_STYLE}>{t('kb_hint_close', 'close')}</Text>
             </Group>

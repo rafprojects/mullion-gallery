@@ -9,6 +9,7 @@ import { MediaUsageBadge } from './MediaUsageBadge';
 import { FALLBACK_IMAGE_SRC } from '@/utils/fallback';
 import type { ApiClient } from '@/services/apiClient';
 import type { MediaItem } from '@/types';
+import { uiRem } from '@/ui';
 
 export type SharedSortableProps = {
   item: MediaItem;
@@ -84,7 +85,7 @@ export function SortableListRow({
       </Table.Td>
       <Table.Td>
         <Text size="sm" lineClamp={1}>{item.caption || '—'}</Text>
-        <Group gap={4} style={{ marginTop: '0.25rem' }}>
+        <Group gap={4} style={{ marginTop: uiRem(0.25) }}>
           <Badge size="xs" variant="filled" color={mediaTypeColor}>{mediaTypeLabel}</Badge>
           <Badge size="xs" variant="light" color={sourceColor}>{sourceLabel}</Badge>
         </Group>

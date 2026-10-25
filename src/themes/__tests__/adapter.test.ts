@@ -69,21 +69,21 @@ describe('adaptTheme', () => {
   it('sets all heading sizes', () => {
     const def = makeThemeDef();
     const result = adaptTheme(def);
-    expect(result.headings?.sizes?.h1?.fontSize).toBe('2rem');
-    expect(result.headings?.sizes?.h6?.fontSize).toBe('0.875rem');
+    expect(result.headings?.sizes?.h1?.fontSize).toBe('calc(2rem * var(--mantine-scale))');
+    expect(result.headings?.sizes?.h6?.fontSize).toBe('calc(0.875rem * var(--mantine-scale))');
   });
 
   it('sets spacing scale from definition', () => {
     const def = makeThemeDef();
     const result = adaptTheme(def);
-    expect(result.spacing?.xs).toBe('0.625rem');
-    expect(result.spacing?.xl).toBe('2rem');
+    expect(result.spacing?.xs).toBe('calc(0.625rem * var(--mantine-scale))');
+    expect(result.spacing?.xl).toBe('calc(2rem * var(--mantine-scale))');
   });
 
   it('sets radius scale from definition', () => {
     const def = makeThemeDef();
     const result = adaptTheme(def);
-    expect(result.radius?.md).toBe('0.5rem');
+    expect(result.radius?.md).toBe('calc(0.5rem * var(--mantine-scale))');
   });
 
   it('generates component overrides', () => {

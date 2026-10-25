@@ -1,6 +1,7 @@
 import { Select } from '@mantine/core';
 import type { CSSProperties } from 'react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 export type SpaceSelectItem = { value: string; label: string };
 
@@ -31,7 +32,7 @@ export function SpaceSelector({
       value={value}
       onChange={(v) => onChange(v ?? 'all')}
       size={size}
-      style={{ ...(w !== undefined && { width: `${w / 16}rem` }), ...style }}
+      style={{ ...(w !== undefined && { width: uiRem(w / 16) }), ...style }}
       aria-label={ariaLabel}
       disabled={disabled ?? false}
       allowDeselect={false}

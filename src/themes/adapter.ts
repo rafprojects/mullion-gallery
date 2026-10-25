@@ -226,7 +226,7 @@ function generateComponentOverrides(
           color: rc.textMuted,
           fontWeight: FONT_WEIGHT_SEMIBOLD,
           textTransform: 'uppercase' as const,
-          fontSize: '0.75rem',
+          fontSize: scaled('0.75rem'),
           letterSpacing: '0.03em',
         },
         tr: {
@@ -286,7 +286,7 @@ function generateComponentOverrides(
           backgroundColor: rc.surfaceRaised,
           color: rc.text,
           border: `1px solid ${rc.border}`,
-          fontSize: '0.8125rem',
+          fontSize: scaled('0.8125rem'),
         },
       }),
     },
@@ -439,6 +439,15 @@ function generateComponentOverrides(
 // ---------------------------------------------------------------------------
 
 /**
+ * [P81-F] A theme length in Mantine's basis. Mantine multiplies its own rem
+ * lengths by `--mantine-scale`; the theme's are passed through raw, so they
+ * take the same multiplier here, and `main.tsx` sets the scale from the host.
+ */
+function scaled(value: string): string {
+  return value.replace(/(-?\d*\.?\d+)rem\b/g, 'calc($1rem * var(--mantine-scale))');
+}
+
+/**
  * Convert a fully validated ThemeDefinition into a MantineThemeOverride.
  *
  * Pipeline:
@@ -475,57 +484,57 @@ export function adaptTheme(def: ThemeDefinition): MantineThemeOverride {
     fontFamilyMonospace: def.typography.fontFamilyMono,
 
     fontSizes: {
-      xs: def.typography.fontSizes.xs,
-      sm: def.typography.fontSizes.sm,
-      md: def.typography.fontSizes.md,
-      lg: def.typography.fontSizes.lg,
-      xl: def.typography.fontSizes.xl,
+      xs: scaled(def.typography.fontSizes.xs),
+      sm: scaled(def.typography.fontSizes.sm),
+      md: scaled(def.typography.fontSizes.md),
+      lg: scaled(def.typography.fontSizes.lg),
+      xl: scaled(def.typography.fontSizes.xl),
     },
 
     headings: {
       fontFamily: def.typography.headings.fontFamily,
       sizes: {
         h1: {
-          fontSize: def.typography.headings.sizes.h1.fontSize,
+          fontSize: scaled(def.typography.headings.sizes.h1.fontSize),
           lineHeight: def.typography.headings.sizes.h1.lineHeight,
         },
         h2: {
-          fontSize: def.typography.headings.sizes.h2.fontSize,
+          fontSize: scaled(def.typography.headings.sizes.h2.fontSize),
           lineHeight: def.typography.headings.sizes.h2.lineHeight,
         },
         h3: {
-          fontSize: def.typography.headings.sizes.h3.fontSize,
+          fontSize: scaled(def.typography.headings.sizes.h3.fontSize),
           lineHeight: def.typography.headings.sizes.h3.lineHeight,
         },
         h4: {
-          fontSize: def.typography.headings.sizes.h4.fontSize,
+          fontSize: scaled(def.typography.headings.sizes.h4.fontSize),
           lineHeight: def.typography.headings.sizes.h4.lineHeight,
         },
         h5: {
-          fontSize: def.typography.headings.sizes.h5.fontSize,
+          fontSize: scaled(def.typography.headings.sizes.h5.fontSize),
           lineHeight: def.typography.headings.sizes.h5.lineHeight,
         },
         h6: {
-          fontSize: def.typography.headings.sizes.h6.fontSize,
+          fontSize: scaled(def.typography.headings.sizes.h6.fontSize),
           lineHeight: def.typography.headings.sizes.h6.lineHeight,
         },
       },
     },
 
     spacing: {
-      xs: def.spacing.xs,
-      sm: def.spacing.sm,
-      md: def.spacing.md,
-      lg: def.spacing.lg,
-      xl: def.spacing.xl,
+      xs: scaled(def.spacing.xs),
+      sm: scaled(def.spacing.sm),
+      md: scaled(def.spacing.md),
+      lg: scaled(def.spacing.lg),
+      xl: scaled(def.spacing.xl),
     },
 
     radius: {
-      xs: def.radius.xs,
-      sm: def.radius.sm,
-      md: def.radius.md,
-      lg: def.radius.lg,
-      xl: def.radius.xl,
+      xs: scaled(def.radius.xs),
+      sm: scaled(def.radius.sm),
+      md: scaled(def.radius.md),
+      lg: scaled(def.radius.lg),
+      xl: scaled(def.radius.xl),
     },
 
     shadows: {

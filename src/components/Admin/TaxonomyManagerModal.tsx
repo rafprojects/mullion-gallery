@@ -23,6 +23,7 @@ import {
   useMediaTags,
 } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 interface TaxonomyManagerModalProps {
   opened: boolean;
@@ -78,7 +79,7 @@ function CategoryRow({ cat, depth, parentName, apiClient, onNotify, onMutate }: 
 
   if (editing) {
     return (
-      <Group gap="xs" align="center" style={{ paddingLeft: `${depth}rem` }}>
+      <Group gap="xs" align="center" style={{ paddingLeft: uiRem(depth) }}>
         <TextInput
           value={value}
           onChange={(e) => setValue(e.currentTarget.value)}
@@ -99,7 +100,7 @@ function CategoryRow({ cat, depth, parentName, apiClient, onNotify, onMutate }: 
   }
 
   return (
-    <Group gap="xs" justify="space-between" style={{ paddingLeft: `${depth}rem` }}>
+    <Group gap="xs" justify="space-between" style={{ paddingLeft: uiRem(depth) }}>
       <Group gap="xs">
         {/* eslint-disable-next-line i18next/no-literal-string -- tree-indent glyph, not translatable text */}
         {depth > 0 && <Text size="xs" c="dimmed">↳</Text>}

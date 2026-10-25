@@ -172,8 +172,8 @@ describe('ImageCarousel', () => {
 
     expect(screen.getByTestId('image-viewer-frame')).toHaveStyle({
       height: 'auto',
-      maxHeight: 'min(calc(100dvh - 16rem), 68dvh)',
-      maxWidth: 'min(calc(min(calc(100dvh - 16rem), 68dvh) * 1.5), 72vw)',
+      maxHeight: 'min(calc(100dvh - calc(16rem * var(--mullion-scale, 1))), 68dvh)',
+      maxWidth: 'min(calc(min(calc(100dvh - calc(16rem * var(--mullion-scale, 1))), 68dvh) * 1.5), 72vw)',
       aspectRatio: '3 / 2',
     });
   });
@@ -188,8 +188,8 @@ describe('ImageCarousel', () => {
     );
 
     expect(screen.getByTestId('image-viewer-frame')).toHaveStyle({
-      maxHeight: 'min(calc(100dvh - 6rem), 65dvh)',
-      maxWidth: 'min(calc(min(calc(100dvh - 6rem), 65dvh) * 1.5), 94vw)',
+      maxHeight: 'min(calc(100dvh - calc(6rem * var(--mullion-scale, 1))), 65dvh)',
+      maxWidth: 'min(calc(min(calc(100dvh - calc(6rem * var(--mullion-scale, 1))), 65dvh) * 1.5), 94vw)',
     });
   });
 
@@ -206,8 +206,8 @@ describe('ImageCarousel', () => {
     );
 
     expect(screen.getByTestId('image-viewer-frame')).toHaveStyle({
-      maxHeight: 'min(calc(100dvh - 10rem), 85dvh)',
-      maxWidth: 'min(calc(min(calc(100dvh - 10rem), 85dvh) * 1.5), 88vw)',
+      maxHeight: 'min(calc(100dvh - calc(10rem * var(--mullion-scale, 1))), 85dvh)',
+      maxWidth: 'min(calc(min(calc(100dvh - calc(10rem * var(--mullion-scale, 1))), 85dvh) * 1.5), 88vw)',
     });
   });
 

@@ -176,7 +176,7 @@ export function Lightbox({ isOpen, media, currentIndex, onPrev, onNext, onClose,
             size="lg"
             variant="light"
             aria-label={t('lightbox_close', 'Close lightbox')}
-            style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 1 }}
+            style={{ position: 'absolute', top: 'calc(1rem * var(--mullion-scale, 1))', right: 'calc(1rem * var(--mullion-scale, 1))', zIndex: 1 }}
             onClick={(e) => {
               e.stopPropagation();
               onClose();
@@ -253,7 +253,7 @@ export function Lightbox({ isOpen, media, currentIndex, onPrev, onNext, onClose,
                 size="xl"
                 variant="light"
                 aria-label={t('lightbox_prev', 'Previous image (lightbox)')}
-                style={{ position: 'absolute', top: '50%', left: '1rem', transform: 'translateY(-50%)' }}
+                style={{ position: 'absolute', top: '50%', left: 'calc(1rem * var(--mullion-scale, 1))', transform: 'translateY(-50%)' }}
                 onClick={(e) => {
                   e.stopPropagation();
                   onPrev();
@@ -265,7 +265,7 @@ export function Lightbox({ isOpen, media, currentIndex, onPrev, onNext, onClose,
                 size="xl"
                 variant="light"
                 aria-label={t('lightbox_next', 'Next image (lightbox)')}
-                style={{ position: 'absolute', top: '50%', right: '1rem', transform: 'translateY(-50%)' }}
+                style={{ position: 'absolute', top: '50%', right: 'calc(1rem * var(--mullion-scale, 1))', transform: 'translateY(-50%)' }}
                 onClick={(e) => {
                   e.stopPropagation();
                   onNext();

@@ -52,6 +52,7 @@ import { useMediaExternal } from '@/hooks/useMediaExternal';
 import { useMediaCrud } from '@/hooks/useMediaCrud';
 import { useMediaDisplay } from '@/hooks/useMediaDisplay';
 import styles from './MediaTab.module.scss';
+import { uiRem } from '@/ui';
 
 // Position the DragOverlay so its top-center sits just below the cursor.
 // The overlay is 140 px wide; placing the cursor at (width/2, 12) gives a natural
@@ -391,12 +392,12 @@ export default function MediaTab({ campaignId, apiClient, onCampaignsUpdated }: 
                 <Table verticalSpacing="xs" highlightOnHover>
                   <Table.Thead>
                     <Table.Tr>
-                      <Table.Th style={{ width: '3.75rem' }}>{t('admin_media_col_thumb', 'Thumb')}</Table.Th>
+                      <Table.Th style={{ width: uiRem(3.75) }}>{t('admin_media_col_thumb', 'Thumb')}</Table.Th>
                       <Table.Th>{t('admin_media_col_caption', 'Caption')}</Table.Th>
                       <Table.Th>{t('admin_media_col_type', 'Type')}</Table.Th>
                       <Table.Th>{t('admin_media_col_source', 'Source')}</Table.Th>
-                      <Table.Th style={{ width: '6.25rem' }}>{t('admin_media_col_usage', 'Usage')}</Table.Th>
-                      <Table.Th style={{ width: '11.25rem' }}>{t('admin_col_actions', 'Actions')}</Table.Th>
+                      <Table.Th style={{ width: uiRem(6.25) }}>{t('admin_media_col_usage', 'Usage')}</Table.Th>
+                      <Table.Th style={{ width: uiRem(11.25) }}>{t('admin_col_actions', 'Actions')}</Table.Th>
                     </Table.Tr>
                   </Table.Thead>
                 </Table>

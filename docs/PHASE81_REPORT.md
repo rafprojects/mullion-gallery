@@ -13,7 +13,7 @@
 | P81-C | Test, story and e2e harness migration | Planned | Medium |
 | P81-D | Remove Mantine and delete the workarounds it required | Planned | Small-Medium |
 | P81-E | Small defects found during Phase 80's audit: an escaped ampersand in every interface string, a flickering admin menu at 320px, alt text lost on export, a broken CLI, and three layout faults | Planned | Small-Medium |
-| P81-F | The size basis: one token step is the same physical size on every host, whatever the host's root font size | Planned | Small-Medium |
+| P81-F | The size basis: one token step is the same physical size on every host, whatever the host's root font size | Done | Small-Medium |
 
 ---
 
@@ -235,6 +235,29 @@ Found while answering P81-A's question about numbers. The designer's reply (`doc
 
 The provider measures the document's root font size at mount and sets a scale on its scope that brings one step back to design size, and the token sheet multiplies every rem token by it, as Mantine's `rem() * var(--mantine-scale)` does. Until P81-D removes Mantine, the same value goes to `--mantine-scale`, so both libraries keep agreeing (P81-A's pass 1 relies on that). Open points to settle in the track: whether to re-measure when the root changes after mount, and whether the wp-admin apps, which have no provider until P81-B, need it at all; that depends on wp-admin's root font size, which has not been measured.
 
+### Implementation (2026-10-25)
+
+**Priority.** The designer called this a shipping defect rather than a sequencing item (`designer-answers-scale-data-2026-10-25.md`, section 1): every install on a theme that sets its root to 62.5% shows the gallery at 62.5% of its design size today. It also cannot move a colour, so it shipped ahead of the rest of the phase.
+
+**The scale is the user's default font size over the root's, not 16 over the root's.** `measureRootScale()` reads a probe at `font-size: medium !important`, which resolves to the browser's default whatever the host's stylesheets say, against `<html>`'s computed size. On a host that leaves the root alone the result is exactly 1, so nothing moves, and a reader who raised their browser's default keeps that preference; only the host's override is cancelled. One measurement per page, shared by every provider through `useRootScale()`, repeated on `resize` (a root that follows a media query) and on `load` (a late stylesheet).
+
+**One multiplier, four routes.** Rem lengths live in four places, and each needed its own route to the same variable:
+
+| Where | Count | Route |
+|---|---|---|
+| Theme tokens (spacing, radius, type and heading scales, control heights) | every rem the engine emits | `scaleRem` at the end of `generateCssVariables`, so a theme or `defineTheme` override is covered without a list to maintain |
+| Stylesheets under `src/` and dockview's | 66 framework, 90 app, 11 dockview | a PostCSS step in `vite.config.ts`; Mantine's sheet is excluded because it already multiplies by `--mantine-scale` |
+| Inline styles | 165 literals in 45 files, 4 template strings | `uiRem(n)` from `@/ui`; `packages/shared-ui` cannot import `@/ui`, so its 7 carry the `calc()` literally until batch zero dissolves the package |
+| Mantine | its 650 `var(--mantine-scale)` uses, plus the theme's own rems | `theme.scale` in `main.tsx`, and the adapter multiplies the rems it hands Mantine by `--mantine-scale` |
+
+`--mullion-scale` is declared on each scope beside the tokens that read it, in the token sheet. Outside a provider every route falls back to 1, so the wp-admin apps read plain rem, as before, until P81-B gives them a provider; their root size was not measured, and does not need to be until then.
+
+**`scale.ts` now reads numbers as sixteenths of a design rem, and rem strings in the basis.** That was P81-A's open discrepancy, settled by the designer as "read numbers the way Mantine does, because that is the way the tokens are read". A rem inside a string prop (`paddingInline="1rem"`) takes the scale too, so a caller cannot opt a value out of the basis by spelling it.
+
+**How it was verified.** `e2e/size-basis.spec.ts` serves the dev page with `html { font-size: 62.5% }` injected into `<head>`, where a theme's stylesheet puts it, asserts the root really measures 10px, and compares bounding rectangles against a 16px root: the framework showcase in shadow and light mounts (stack and group gaps, button, action icon and chip heights) and the product gallery (Mantine group and stack gaps, button and chip heights). Before the fix it failed on every box, a 36px button measuring 22.5. The first draft of the spec passed before any fix, because an init script sets the font size on a document element the parser then replaces; the root-size assertion is what keeps that from recurring. The chip's height comes from rem literals in `control.css`, and with the PostCSS step removed the two showcase cases fail on it, so the build-time route is proved, not assumed. At a 16px root, two exact `theme-qa` captures against the original "before" set: one matched on all 16, the other differed by 28 pixels at the corners of the open popup in `theme-selector-open-default-dark`, the snapshot already known to flip. Lint, typecheck, the allow-list check, `npm run build`, vitest (278 files) and the full Playwright suite pass. The tests that changed pinned raw rem text and now pin the scaled form: the engine's type-scale tests, the adapter's size tests, the layout and overlay number readings, two `select.css` sheet assertions, the carousel viewport strings, and the showcase's token-to-pixel check, which now reads the rem out of the `calc()`.
+
+**Left for later.** Lengths a user types into the settings in rem (the unit pickers in the Settings panel offer `rem` for radii, heights, spacing and offsets, emitted raw by `toCss()` in `shared-utils`) are content, not tokens, and still resolve against the host's root. Whether they should follow the basis is a question for the designer, filed under Follow-On Candidates.
+
 ### Acceptance criteria
 
 - On a page with `html { font-size: 62.5% }`, a token gap, a field's height and the focus ring's reach measure the same as on a 16px root, in both shadow and light mounts.
@@ -290,6 +313,7 @@ The user's partial pass of `ACCESSIBILITY_MANUAL_AUDIT.md` on 2026-10-25, and th
 |-----------|--------------------|
 | Publishing `@mullion/ui` | A product decision, and it converts an internal API into a public commitment. Worth deciding after the framework has shipped in the product, not before. |
 | Dropping `@mantine/dates` | Listed in Phase 80's follow-ons; confirm it is genuinely unused before removing. |
+| User-entered rem lengths and the size basis | P81-F put every rem the product owns on one basis, but a value a user picks in rem in the Settings panel goes out through `toCss()` in `shared-utils` as plain rem and still shrinks with a host's 62.5% root. Whether a user's `1rem` means a design rem is the designer's call; if it does, `toCss()` emits it through the same multiplier. |
 | ~~Row-selection keyboard support in `Table`~~ | **Moved into P81-B 2026-10-02.** The gap is `SpaceManagementView`'s `<tr onClick>`, and migrating that screen while keeping it would fail this phase's own per-batch keyboard pass. Only the keyboard fix moved; the screen's wider UX pass stays in FUTURE_TASKS. |
 
 ## Implementation Notes

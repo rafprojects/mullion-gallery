@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { CampaignSelector, type CampaignSelectItem } from '@/components/Common/CampaignSelector';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import type { AuditFilters } from '@/services/adminQuery';
+import { uiRem } from '@/ui';
 
 function mergeFilter(base: AuditFilters, key: keyof AuditFilters, value: string): AuditFilters {
   const next = { ...base };
@@ -69,7 +70,7 @@ export function AuditTab({
   const { t } = useTranslation('mullion');
   return (
     <>
-      <Text size="sm" fw={600} id="audit-heading" style={{ marginBottom: '0.125rem' }}>
+      <Text size="sm" fw={600} id="audit-heading" style={{ marginBottom: uiRem(0.125) }}>
         {t('admin_audit_heading', 'Campaign Activity')}
       </Text>
       <Text size="xs" c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('admin_audit_subtitle', 'All activity recorded for the selected campaign.')}</Text>
@@ -125,11 +126,11 @@ export function AuditTab({
           <Table verticalSpacing="sm" aria-label={t('admin_audit_loading_aria', 'Loading audit entries')}>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th style={{ minWidth: '8.75rem' }}>{t('admin_audit_th_when', 'When')}</Table.Th>
-                <Table.Th style={{ minWidth: '12.5rem' }}>{t('admin_audit_th_summary', 'Summary')}</Table.Th>
-                <Table.Th style={{ minWidth: '4.375rem' }}>{t('admin_audit_th_severity', 'Severity')}</Table.Th>
-                <Table.Th style={{ minWidth: '5rem' }}>{t('admin_audit_th_actor', 'Actor')}</Table.Th>
-                <Table.Th style={{ minWidth: '10rem' }}>{t('admin_audit_th_details', 'Details')}</Table.Th>
+                <Table.Th style={{ minWidth: uiRem(8.75) }}>{t('admin_audit_th_when', 'When')}</Table.Th>
+                <Table.Th style={{ minWidth: uiRem(12.5) }}>{t('admin_audit_th_summary', 'Summary')}</Table.Th>
+                <Table.Th style={{ minWidth: uiRem(4.375) }}>{t('admin_audit_th_severity', 'Severity')}</Table.Th>
+                <Table.Th style={{ minWidth: uiRem(5) }}>{t('admin_audit_th_actor', 'Actor')}</Table.Th>
+                <Table.Th style={{ minWidth: uiRem(10) }}>{t('admin_audit_th_details', 'Details')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody><AuditSkeletonRows /></Table.Tbody>
@@ -145,17 +146,17 @@ export function AuditTab({
           type="always"
           scrollbars="y"
           className="mullion-scrollarea"
-          style={{ height: '22.5rem' }}
+          style={{ height: uiRem(22.5) }}
         >
           <Table.ScrollContainer minWidth={680}>
             <Table verticalSpacing="sm" highlightOnHover aria-label={t('admin_audit_entries_aria', 'Audit entries')}>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th style={{ minWidth: '8.75rem' }}>{t('admin_audit_th_when', 'When')}</Table.Th>
-                  <Table.Th style={{ minWidth: '12.5rem' }}>{t('admin_audit_th_summary', 'Summary')}</Table.Th>
-                  <Table.Th style={{ minWidth: '4.375rem' }}>{t('admin_audit_th_severity', 'Severity')}</Table.Th>
-                  <Table.Th style={{ minWidth: '5rem' }}>{t('admin_audit_th_actor', 'Actor')}</Table.Th>
-                  <Table.Th style={{ minWidth: '10rem' }}>{t('admin_audit_th_details', 'Details')}</Table.Th>
+                  <Table.Th style={{ minWidth: uiRem(8.75) }}>{t('admin_audit_th_when', 'When')}</Table.Th>
+                  <Table.Th style={{ minWidth: uiRem(12.5) }}>{t('admin_audit_th_summary', 'Summary')}</Table.Th>
+                  <Table.Th style={{ minWidth: uiRem(4.375) }}>{t('admin_audit_th_severity', 'Severity')}</Table.Th>
+                  <Table.Th style={{ minWidth: uiRem(5) }}>{t('admin_audit_th_actor', 'Actor')}</Table.Th>
+                  <Table.Th style={{ minWidth: uiRem(10) }}>{t('admin_audit_th_details', 'Details')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>{auditRows}</Table.Tbody>

@@ -16,6 +16,7 @@ import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { MediaUploadController, GENERAL_LIBRARY_TARGET } from '../MediaUploadController';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useRootId } from '@mullion/shared-ui';
+import { uiRem } from '@/ui';
 
 export function LayoutBuilderMediaPanel(_props: IDockviewPanelProps) {
   const { t } = useTranslation('mullion');
@@ -103,7 +104,7 @@ export function LayoutBuilderMediaPanel(_props: IDockviewPanelProps) {
         <Accordion.Item value="asset-library">
           <Accordion.Control>{t('lb_mp_asset_library', 'Asset Library')}</Accordion.Control>
           <Accordion.Panel>
-            <Group justify="space-between" align="center" style={{ marginBottom: '0.375rem' }}>
+            <Group justify="space-between" align="center" style={{ marginBottom: uiRem(0.375) }}>
               <Text size="xs" c="dimmed">
                 {t('lb_mp_asset_desc', 'Decorative assets, shared across campaigns. Drag onto the canvas to place.')}
               </Text>
@@ -115,7 +116,7 @@ export function LayoutBuilderMediaPanel(_props: IDockviewPanelProps) {
               onSetTags={handleSetAssetTags}
               maxHeight={200}
             />
-            <Box style={{ marginTop: '0.5rem' }}>
+            <Box style={{ marginTop: uiRem(0.5) }}>
               <Button
                 size="xs"
                 variant="light"

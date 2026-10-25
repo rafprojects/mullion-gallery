@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { generateCssVariables } from './cssVariables';
+import { generateCssVariables, scaleRem } from './cssVariables';
 import { resolveColors } from './colorGen';
 import type { ThemeDefinition, ThemeColors } from './types';
 import baseDefaults from './definitions/_base.json';
@@ -150,11 +150,11 @@ describe('generateCssVariables', () => {
     const rc = makeResolvedColors();
     const def = makeThemeDef();
     const result = generateCssVariables(rc, def);
-    expect(result).toContain('--mullion-font-size-xs: 0.75rem;');
-    expect(result).toContain('--mullion-font-size-sm: 0.875rem;');
-    expect(result).toContain('--mullion-font-size-md: 1rem;');
-    expect(result).toContain('--mullion-font-size-lg: 1.125rem;');
-    expect(result).toContain('--mullion-font-size-xl: 1.25rem;');
+    expect(result).toContain('--mullion-font-size-xs: calc(0.75rem * var(--mullion-scale, 1));');
+    expect(result).toContain('--mullion-font-size-sm: calc(0.875rem * var(--mullion-scale, 1));');
+    expect(result).toContain('--mullion-font-size-md: calc(1rem * var(--mullion-scale, 1));');
+    expect(result).toContain('--mullion-font-size-lg: calc(1.125rem * var(--mullion-scale, 1));');
+    expect(result).toContain('--mullion-font-size-xl: calc(1.25rem * var(--mullion-scale, 1));');
   });
 
   it('emits the heading scale, size and line height per level', () => {
@@ -162,9 +162,9 @@ describe('generateCssVariables', () => {
     const def = makeThemeDef();
     const result = generateCssVariables(rc, def);
     expect(result).toContain('--mullion-heading-font-family:');
-    expect(result).toContain('--mullion-heading-size-h1: 2rem;');
+    expect(result).toContain('--mullion-heading-size-h1: calc(2rem * var(--mullion-scale, 1));');
     expect(result).toContain('--mullion-heading-line-height-h1: 1.3;');
-    expect(result).toContain('--mullion-heading-size-h6: 0.875rem;');
+    expect(result).toContain('--mullion-heading-size-h6: calc(0.875rem * var(--mullion-scale, 1));');
     expect(result).toContain('--mullion-heading-line-height-h6: 1.5;');
   });
 
@@ -173,7 +173,7 @@ describe('generateCssVariables', () => {
     const def = makeThemeDef();
     const typography = def.typography as unknown as Record<string, unknown>;
     typography.fontSizes = { ...(typography.fontSizes as object), md: '1.5rem' };
-    expect(generateCssVariables(rc, def)).toContain('--mullion-font-size-md: 1.5rem;');
+    expect(generateCssVariables(rc, def)).toContain('--mullion-font-size-md: calc(1.5rem * var(--mullion-scale, 1));');
   });
 
   it('falls back to "none" / "inherit" / "monospace" when shadow/typography values are undefined (lines 89-97)', () => {
@@ -195,3 +195,21 @@ describe('generateCssVariables', () => {
     expect(result).toContain('--mullion-heading-line-height-h1: normal');
   });
 });
+
+// P81-F: one token step is the same physical size on every host.
+describe('scaleRem', () => {
+  it('multiplies each rem length in a declaration by the prefix scale', () => {
+    expect(scaleRem('--x-spacing-xs: 0.625rem;', '--x')).toBe('--x-spacing-xs: calc(0.625rem * var(--x-scale, 1));');
+    expect(scaleRem('--x-pad: 0.5rem 1rem;', '--x')).toBe(
+      '--x-pad: calc(0.5rem * var(--x-scale, 1)) calc(1rem * var(--x-scale, 1));',
+    );
+    expect(scaleRem('--x-neg: -2rem;', '--x')).toBe('--x-neg: calc(-2rem * var(--x-scale, 1));');
+  });
+
+  it('leaves px, em, colours and the property name alone', () => {
+    for (const decl of ['--x-ring: 2px;', '--x-bp: 36em;', '--x-color-rem: #fff;', '--x-ms: 200ms;']) {
+      expect(scaleRem(decl, '--x')).toBe(decl);
+    }
+  });
+});
+

@@ -17,6 +17,7 @@
 import { frameworkConstants, generateCssVariables } from '@mullion/theme-engine';
 import type { MullionThemeEntry } from './registry';
 import { attachSheet as attachAny, type SheetHandle, type SheetRoot } from '../styles/sheets';
+import { SCALE_VAR } from '../styles/rootScale';
 
 export { sheetRootOf, type SheetHandle, type SheetRoot } from '../styles/sheets';
 
@@ -26,12 +27,17 @@ export const TOKEN_SHEET_ATTR = 'data-mullion-tokens';
 const PREFIX = '--mullion';
 const DURATION_TOKENS = Object.keys(frameworkConstants(PREFIX)).filter((name) => name.startsWith('duration-'));
 
-export function buildTokenSheet(entry: MullionThemeEntry, selector: string): string {
+/**
+ * `scale` is the page's size basis (P81-F, `../styles/rootScale.ts`): every
+ * rem token the engine emits is multiplied by it, so it is declared on the
+ * same scope as the tokens that read it.
+ */
+export function buildTokenSheet(entry: MullionThemeEntry, selector: string, scale = 1): string {
   const vars = generateCssVariables(entry.resolved, entry.definition, selector);
   const zeroed = DURATION_TOKENS.map((name) => `    ${PREFIX}-${name}: 0ms;`).join('\n');
   return [
     vars,
-    `${selector} {\n  color-scheme: ${entry.colorScheme};\n}`,
+    `${selector} {\n  ${SCALE_VAR}: ${scale};\n  color-scheme: ${entry.colorScheme};\n}`,
     `@media (prefers-reduced-motion: reduce) {\n  ${selector} {\n${zeroed}\n  }\n}`,
   ].join('\n');
 }

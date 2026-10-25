@@ -12,6 +12,7 @@ import { IconArrowsExchange, IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { AdminCampaign, SpaceInfo } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 export interface CampaignMoveSpaceModalProps {
   /** Campaign to move; null when modal is closed. */
@@ -72,9 +73,9 @@ export function CampaignMoveSpaceModal({
     >
       <Stack {...getMullionDebugProps('CampaignMoveSpaceModal', 'stack')} gap="md">
         <div>
-          <Text size="sm" c="dimmed" style={{ marginBottom: '0.25rem' }}>{t('admin_move_campaign_label', 'Campaign:')}</Text>
+          <Text size="sm" c="dimmed" style={{ marginBottom: uiRem(0.25) }}>{t('admin_move_campaign_label', 'Campaign:')}</Text>
           <Text fw={600}>{source?.title}</Text>
-          <Text size="sm" c="dimmed" style={{ marginTop: '0.25rem' }}>
+          <Text size="sm" c="dimmed" style={{ marginTop: uiRem(0.25) }}>
             {t('admin_move_from_space', 'From space:')} <Text component="span" fw={600} c="inherit">{sourceSpace?.name ?? '—'}</Text>
           </Text>
         </div>

@@ -25,6 +25,7 @@ import { DEFAULT_MASK_LAYER } from '@/types';
 import type { AssetLibraryItem } from './BuilderDockContext';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -46,7 +47,7 @@ function PropRow({ label, children, tooltip }: { label: string; children: React.
       <Group gap={2} align="center" wrap="nowrap" style={{ width: 70, flexShrink: 0 }}>
         <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
         {tooltip && (
-          <Tooltip label={tooltip} multiline style={{ width: '15rem' }} position="left" withArrow>
+          <Tooltip label={tooltip} multiline style={{ width: uiRem(15) }} position="left" withArrow>
             <ActionIcon size={14} variant="transparent" c="dimmed" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })}>
               <IconInfoCircle size={12} />
             </ActionIcon>
@@ -63,9 +64,9 @@ setMullionDebugDisplayName(PropRow, 'LayoutBuilder:MaskPropertiesPanel:PropRow')
 function SectionHeader({ label }: { label: string }) {
   return (
     <Box
-      style={{ marginTop: '0.375rem', marginBottom: '0.125rem', paddingBottom: '0.1875rem', borderBottom: '1px solid var(--mantine-color-default-border)' }}
+      style={{ marginTop: uiRem(0.375), marginBottom: uiRem(0.125), paddingBottom: uiRem(0.1875), borderBottom: '1px solid var(--mantine-color-default-border)' }}
     >
-      <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: '0.05rem' }}>
+      <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>
         {label}
       </Text>
     </Box>
@@ -318,7 +319,7 @@ export function MaskPropertiesPanel({
         variant="subtle"
         color="red"
         fullWidth
-        style={{ marginTop: '0.25rem' }}
+        style={{ marginTop: uiRem(0.25) }}
         onClick={() =>
           onUpdate({ maskLayer: undefined, maskUrl: undefined, maskMode: undefined })
         }

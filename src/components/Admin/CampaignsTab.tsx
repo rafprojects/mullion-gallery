@@ -3,6 +3,7 @@ import { IconPlus } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 /** P13-C: Skeleton rows displayed while campaign list loads. */
 function CampaignSkeletonRows({ withCheckbox }: { withCheckbox: boolean }) {
@@ -10,9 +11,9 @@ function CampaignSkeletonRows({ withCheckbox }: { withCheckbox: boolean }) {
     <>
       {Array.from({ length: 5 }).map((_, i) => (
         <Table.Tr key={i}>
-          {withCheckbox && <Table.Td style={{ width: '2.25rem' }}><Skeleton height={16} width={16} /></Table.Td>}
+          {withCheckbox && <Table.Td style={{ width: uiRem(2.25) }}><Skeleton height={16} width={16} /></Table.Td>}
           <Table.Td>
-            <Skeleton height={14} width="60%" style={{ marginBottom: '0.375rem' }} />
+            <Skeleton height={14} width="60%" style={{ marginBottom: uiRem(0.375) }} />
             <Skeleton height={10} width="80%" />
           </Table.Td>
           <Table.Td><Skeleton height={22} width={60} radius="xl" /></Table.Td>
@@ -92,7 +93,7 @@ export function CampaignsTab({
         <Table verticalSpacing="sm" highlightOnHover aria-label={t('admin_campaign_list_aria', 'Campaign list')}>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th style={{ width: '2.25rem' }} aria-label={t('admin_select_all', 'Select all')}>
+              <Table.Th style={{ width: uiRem(2.25) }} aria-label={t('admin_select_all', 'Select all')}>
                 <Checkbox
                   checked={allSelected}
                   indeterminate={someSelected}

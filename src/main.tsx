@@ -25,7 +25,7 @@ import { createAppQueryClient } from './services/queryClient'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { resolveWpThemeIds } from './services/wpThemeId'
 import { useTheme } from './hooks/useTheme'
-import { MullionProvider, usePageHost } from './ui'
+import { MullionProvider, usePageHost, useRootScale } from './ui'
 import { RootIdProvider } from '@mullion/shared-ui'
 import { parseProps, parseNodeConfig, type MountProps, type NodeConfig } from './mountConfig'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -160,17 +160,21 @@ function MantineBridge({
   // P60-D: give every Mantine close button (modals, drawers) an accessible name.
   // Mantine leaves CloseButton unlabeled by default, which trips axe `button-name`
   // across the app's ~36 modals; components that pass their own aria-label still win.
+  // P81-F: the same size basis the framework's token sheet uses, so a host
+  // that shrinks its root does not shrink Mantine's lengths either.
+  const rootScale = useRootScale()
   const themeWithA11y = useMemo(
     () =>
       withPortalTarget(
         mergeThemeOverrides(mantineTheme, {
+          scale: rootScale,
           components: {
             CloseButton: { defaultProps: { 'aria-label': i18n.t('common_close', 'Close') } },
           },
         }),
         portal,
       ),
-    [mantineTheme, portal],
+    [mantineTheme, portal, rootScale],
   )
 
   return (

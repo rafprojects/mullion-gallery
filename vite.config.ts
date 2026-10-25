@@ -6,6 +6,26 @@ import { createHash } from 'node:crypto'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
+import type { Plugin } from 'postcss'
+
+/**
+ * P81-F: every rem in a stylesheet we own becomes rem times `--mullion-scale`,
+ * so one step is the same physical size whatever the host sets its root to.
+ * Mantine's sheet already multiplies by its own `--mantine-scale` and is left
+ * alone; dockview's is ours to correct because the Layout Builder paints it.
+ */
+const REM = /(-?\d*\.?\d+)rem\b/g
+function remScale(): Plugin {
+  return {
+    postcssPlugin: 'mullion-rem-scale',
+    Declaration(decl) {
+      const file = decl.source?.input.file ?? ''
+      if (file.includes('/node_modules/') && !file.includes('/node_modules/dockview/')) return
+      if (!/\drem\b/.test(decl.value) || decl.value.includes('--mullion-scale')) return
+      decl.value = decl.value.replace(REM, 'calc($1rem * var(--mullion-scale, 1))')
+    },
+  }
+}
 
 function resolveVendorChunk(id: string): string | undefined {
   if (!id.includes('/node_modules/')) {
@@ -109,6 +129,9 @@ export default defineConfig({
       },
     },
   ],
+  css: {
+    postcss: { plugins: [remScale()] },
+  },
   resolve: {
     alias: {
       '@': new URL('./src', import.meta.url).pathname,

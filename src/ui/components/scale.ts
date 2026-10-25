@@ -1,9 +1,9 @@
 /**
  * Prop values to token references (P79-C).
  *
- * A scale name resolves to the theme's token, a number to pixels, and any
- * other string passes through untouched, which is the same reading Mantine
- * gives `gap`, `p` and `radius` today. Keeping that reading is what makes
+ * A scale name resolves to the theme's token, a number to sixteenths of a
+ * design rem, and any other string passes through with its rem lengths in the
+ * same basis, which is the reading Mantine gives `gap`, `p` and `radius`. Keeping that reading is what makes
  * Phase 81's codemod mechanical: `gap="md"` and `gap={4}` both mean here what
  * they mean now, so a migrated call site does not have to be re-measured.
  *
@@ -11,6 +11,8 @@
  * declarations, so they travel with it into any tree (study 3.4). No colour
  * is ever a value here: colour is a token read by the sheet, never a prop.
  */
+
+import { uiRem } from '../styles/rootScale';
 
 /** The five rungs every scale in a theme definition carries. */
 export type UiScaleStep = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -23,12 +25,19 @@ export type UiFontSize = UiScaleStep | number | string;
 
 function scaled(group: string, value: UiSpacing | undefined): string | undefined {
   if (value === undefined) return undefined;
-  if (typeof value === 'number') return `${value}px`;
+  // [P81-F] A number is read as Mantine reads it, in sixteenths of a rem, and
+  // in the tokens' basis, so a number and a token scale together on any host.
+  if (typeof value === 'number') return uiRem(value / 16);
   if (STEPS.includes(value)) return `var(--mullion-${group}-${value})`;
-  return value;
+  return scaledLength(value);
 }
 
-/** `"md"` becomes the spacing token, `4` becomes `4px`, `"1rem"` stays itself. */
+/** Any rem length in a raw value takes the scale too, so `"1rem"` is a design rem; px and em are untouched. */
+export function scaledLength(value: string): string {
+  return value.replace(/(-?\d*\.?\d+)rem\b/g, (_, n: string) => uiRem(Number(n)));
+}
+
+/** `"md"` becomes the spacing token, `4` a quarter of a design rem, `"1rem"` one design rem. */
 export const spacingValue = (value: UiSpacing | undefined): string | undefined =>
   scaled('spacing', value);
 

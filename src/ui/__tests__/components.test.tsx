@@ -60,7 +60,7 @@ function vars(el: Element): Record<string, string> {
 }
 
 describe('layout primitives', () => {
-  it('render a scale step as a token and a number as pixels', () => {
+  it('render a scale step as a token and a number as sixteenths of a design rem (P81-F)', () => {
     const { container } = render(
       <>
         <Stack gap="md" data-testid="scale" />
@@ -70,7 +70,7 @@ describe('layout primitives', () => {
     );
     const [scale, pixels, raw] = Array.from(container.querySelectorAll('.mullion-stack'));
     expect(vars(scale!)['--mullion-gap']).toBe('var(--mullion-spacing-md)');
-    expect(vars(pixels!)['--mullion-gap']).toBe('4px');
+    expect(vars(pixels!)['--mullion-gap']).toBe('calc(0.25rem * var(--mullion-scale, 1))');
     expect(vars(raw!)['--mullion-gap']).toBe('0.5em');
   });
 
@@ -89,8 +89,8 @@ describe('layout primitives', () => {
     const { container } = render(<Center padding="sm" paddingBlock={12} paddingInline="1rem" />);
     expect(vars(container.querySelector('.mullion-center')!)).toEqual({
       '--mullion-pad': 'var(--mullion-spacing-sm)',
-      '--mullion-pad-block': '12px',
-      '--mullion-pad-inline': '1rem',
+      '--mullion-pad-block': 'calc(0.75rem * var(--mullion-scale, 1))',
+      '--mullion-pad-inline': 'calc(1rem * var(--mullion-scale, 1))',
     });
   });
 
@@ -115,7 +115,7 @@ describe('layout primitives', () => {
       </>,
     );
     const [step, px, fluid] = Array.from(container.querySelectorAll('.mullion-container'));
-    expect(vars(step!)['--mullion-container-size']).toBe('48rem');
+    expect(vars(step!)['--mullion-container-size']).toBe('calc(48rem * var(--mullion-scale, 1))');
     expect(vars(px!)['--mullion-container-size']).toBe('800px');
     expect(fluid!.hasAttribute('data-fluid')).toBe(true);
   });

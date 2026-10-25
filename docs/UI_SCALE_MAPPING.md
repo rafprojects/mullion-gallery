@@ -37,7 +37,7 @@ The resolvers reproduce Mantine's (`node_modules/@mantine/core/esm/core/Box/styl
 |---|---|---|
 | A scale step, `"sm"` | `var(--mullion-spacing-sm, var(--mantine-spacing-sm))` | Both sets are generated from the same theme definition. The fallback serves the wp-admin apps, which run under a bare `MantineProvider` with no `--mullion-*` tokens until P81-B gives them a provider. P81-D strips the fallbacks. |
 | A negative step, `"-sm"` | `calc(<the token above> * -1)` | Mantine's reading. |
-| A number, `4` | `'0.25rem'` | Mantine's `rem()` divides by 16. Pixels would match only where the host's root font size is 16px. |
+| A number, `4` | `uiRem(0.25)` | Mantine's `rem()` divides by 16 and multiplies by its scale. Pass 1 first wrote `'0.25rem'`; P81-F converted every such literal to `uiRem`, which multiplies by the same page scale. |
 | `0` | `'0'` | |
 | A pixel string, `"10px"` | `'0.625rem'` | Mantine converts these too. |
 | Any other string, `"100%"`, `"auto"`, `"80dvh"` | unchanged | |
@@ -95,9 +95,9 @@ The rule for every colour prop, `c`, `bg` or `color`: **a Mantine palette name o
 
 ### Numbers and the size basis
 
-**Settled: numbers share the tokens' basis.** A number in a spacing or size prop is read as rem times the framework's scale, as Mantine reads it, so a number and a token always shrink or grow together. `src/ui/components/scale.ts` reads numbers as pixels today and is corrected in pass 2. Pass 1 already emits rem.
+**Settled and built: numbers share the tokens' basis.** A number in a spacing or size prop is read as rem times the framework's scale, as Mantine reads it, so a number and a token always shrink or grow together. P81-F corrected `src/ui/components/scale.ts`, which had read numbers as pixels.
 
-**Ahead of that: the basis itself is unprotected.** Measured 2026-10-25 with `html { font-size: 62.5% }` on the dev page: `lg` 20px becomes 12.5, `md` 16 becomes 10, `xs` 10 becomes 6.25. Every token shrinks with the host's root, because nothing sets a scale. The designer's invariant, filed as its own Phase 81 track: one token step is the same physical size on every host, with the framework measuring the root at mount and setting its scale to compensate.
+**The basis itself was unprotected, and P81-F fixed it.** Measured 2026-10-25 with `html { font-size: 62.5% }` on the dev page: `lg` 20px became 12.5, `md` 16 became 10, `xs` 10 became 6.25. The designer's invariant, now held by `e2e/size-basis.spec.ts`: one token step is the same physical size on every host. How it is built is in `src/ui/README.md`, under The size basis.
 
 **Off-scale numbers fold onto tokens.** Of 409 `gap` values, 136 are numbers:
 

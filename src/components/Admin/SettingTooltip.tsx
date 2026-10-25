@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Tooltip, ActionIcon, Group } from '@mantine/core';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 interface SettingTooltipProps {
   label: ReactNode;
@@ -14,7 +15,7 @@ export function SettingTooltip({ label, tooltip, enabled }: SettingTooltipProps)
   return (
     <Group gap={4} component="span" wrap="nowrap" style={{ display: 'inline-flex' }}>
       {label}
-      <Tooltip label={tooltip} multiline style={{ width: '17.5rem' }} withArrow position="top">
+      <Tooltip label={tooltip} multiline style={{ width: uiRem(17.5) }} withArrow position="top">
         <ActionIcon variant="transparent" size="xs" aria-label={tooltip} tabIndex={0}>
           <IconInfoCircle size={14} />
         </ActionIcon>

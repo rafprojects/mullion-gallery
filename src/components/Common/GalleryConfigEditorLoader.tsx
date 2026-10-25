@@ -1,5 +1,6 @@
 import { Center, Loader, Stack, Text } from '@mantine/core';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 interface GalleryConfigEditorLoaderProps {
   minHeight?: number;
@@ -11,7 +12,7 @@ export function GalleryConfigEditorLoader({
   message = 'Loading gallery config editor...',
 }: GalleryConfigEditorLoaderProps) {
   return (
-    <Center py="xl" style={{ minHeight: `${minHeight / 16}rem` }}>
+    <Center py="xl" style={{ minHeight: uiRem(minHeight / 16) }}>
       <Stack align="center" gap="xs">
         <Loader size="sm" />
         <Text size="sm" c="dimmed">

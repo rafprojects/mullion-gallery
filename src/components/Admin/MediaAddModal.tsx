@@ -19,6 +19,7 @@ import { IconUpload, IconX, IconFile, IconVideo } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { OEmbedResponse } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 interface MediaAddModalProps {
   opened: boolean;
@@ -257,10 +258,10 @@ export function MediaAddModal({
                             <IconX size={10} />
                           </ActionIcon>
                         )}
-                        <Text size="xs" lineClamp={1} title={file.name} style={{ marginTop: '0.125rem' }}>{file.name}</Text>
+                        <Text size="xs" lineClamp={1} title={file.name} style={{ marginTop: uiRem(0.125) }}>{file.name}</Text>
                         {error && <Text size="xs" c="red" lineClamp={2}>{error}</Text>}
                         {progress !== null && (
-                          <Progress value={progress} size="xs" color={error ? 'red' : 'blue'} style={{ marginTop: '0.125rem' }} striped animated={uploading && progress < 100} />
+                          <Progress value={progress} size="xs" color={error ? 'red' : 'blue'} style={{ marginTop: uiRem(0.125) }} striped animated={uploading && progress < 100} />
                         )}
                       </div>
                     );

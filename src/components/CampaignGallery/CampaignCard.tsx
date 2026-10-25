@@ -11,6 +11,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { RequestAccessForm } from './RequestAccessForm';
 import { CompanyLogo } from '@/components/Common/CompanyLogo';
 import styles from './CampaignCard.module.scss';
+import { uiRem } from '@/ui';
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -163,7 +164,7 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
             {/* Access indicator badge */}
             {hasAccess && settings?.showCardAccessBadge !== false && (
               <Badge
-                style={{ position: 'absolute', top: `${badgeOffsetY / 16}rem`, right: '0.75rem' }}
+                style={{ position: 'absolute', top: uiRem(badgeOffsetY / 16), right: uiRem(0.75) }}
                 color="green"
                 leftSection={<IconEye size={accessIconSize} />}
               >
@@ -174,7 +175,7 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
             {/* Company badge */}
             {settings?.showCardCompanyName !== false && (
               <Badge
-                style={{ position: 'absolute', top: `${badgeOffsetY / 16}rem`, left: '0.75rem', maxWidth: `${companyBadgeMaxWidth / 16}rem`, backgroundColor: campaign.company.brandColor, overflow: 'hidden', textOverflow: 'ellipsis' }}
+                style={{ position: 'absolute', top: uiRem(badgeOffsetY / 16), left: uiRem(0.75), maxWidth: uiRem(companyBadgeMaxWidth / 16), backgroundColor: campaign.company.brandColor, overflow: 'hidden', textOverflow: 'ellipsis' }}
               >
                 <Group gap={6}>
                   <CompanyLogo logo={campaign.company.logo} companyName={campaign.company.name} />

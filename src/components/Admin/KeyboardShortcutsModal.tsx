@@ -4,6 +4,7 @@ import { IconEdit, IconCheck, IconX, IconRotateClockwise } from '@tabler/icons-r
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { ACTION_IDS, ACTION_DEFAULTS, type ShortcutActionId, type ShortcutConfigHandle } from '@/hooks/useShortcutConfig';
+import { uiRem } from '@/ui';
 
 // ── Key display helpers ───────────────────────────────────────────────────────
 
@@ -54,7 +55,7 @@ function Keys({ keys }: { keys: string[] }) {
             {k}
           </kbd>
           {i < keys.length - 1 && (
-            <Text span size="xs" c="dimmed" style={{ marginInline: '0.125rem' }}>
+            <Text span size="xs" c="dimmed" style={{ marginInline: uiRem(0.125) }}>
               +
             </Text>
           )}
@@ -112,7 +113,7 @@ function EditRow({ id, currentKey, defaultKey, config }: EditRowProps) {
 
   return (
     <Table.Tr>
-      <Table.Td style={{ width: '11.25rem' }}>
+      <Table.Td style={{ width: uiRem(11.25) }}>
         {recording ? (
           <Stack gap={4}>
             <TextInput
@@ -158,7 +159,7 @@ function EditRow({ id, currentKey, defaultKey, config }: EditRowProps) {
       <Table.Td>
         <Text size="sm">{ACTION_DEFAULTS[id].label}</Text>
       </Table.Td>
-      <Table.Td style={{ width: '5rem' }}>
+      <Table.Td style={{ width: uiRem(5) }}>
         <Group gap={4} wrap="nowrap">
           {!recording && (
             <Tooltip label={t('admin_ksc_remap', 'Remap')} withArrow>
@@ -237,15 +238,15 @@ export function KeyboardShortcutsModal({ opened, onClose, config }: KeyboardShor
           <Table striped withTableBorder style={{ fontSize: 'var(--mullion-font-size-sm, var(--mantine-font-size-sm))' }}>
             <Table.Tbody>
               <Table.Tr>
-                <Table.Td style={{ width: '11.25rem' }}><Keys keys={['?']} /></Table.Td>
+                <Table.Td style={{ width: uiRem(11.25) }}><Keys keys={['?']} /></Table.Td>
                 <Table.Td><Text size="sm">{t('admin_ksc_open_help', 'Open keyboard shortcuts help (this modal)')}</Text></Table.Td>
-                {editMode && <Table.Td style={{ width: '5rem' }} />}
+                {editMode && <Table.Td style={{ width: uiRem(5) }} />}
               </Table.Tr>
               {STATIC_ITEMS.map((item) => (
                 <Table.Tr key={item.description}>
-                  <Table.Td style={{ width: '11.25rem' }}><Keys keys={item.keys} /></Table.Td>
+                  <Table.Td style={{ width: uiRem(11.25) }}><Keys keys={item.keys} /></Table.Td>
                   <Table.Td><Text size="sm">{t(item.descKey, item.description)}</Text></Table.Td>
-                  {editMode && <Table.Td style={{ width: '5rem' }} />}
+                  {editMode && <Table.Td style={{ width: uiRem(5) }} />}
                 </Table.Tr>
               ))}
             </Table.Tbody>
@@ -281,7 +282,7 @@ export function KeyboardShortcutsModal({ opened, onClose, config }: KeyboardShor
                   const key = config ? config.effectiveMap[id] : ACTION_DEFAULTS[id].defaultKey;
                   return (
                     <Table.Tr key={id}>
-                      <Table.Td style={{ width: '11.25rem' }}><Keys keys={formatKeyParts(key)} /></Table.Td>
+                      <Table.Td style={{ width: uiRem(11.25) }}><Keys keys={formatKeyParts(key)} /></Table.Td>
                       <Table.Td><Text size="sm">{ACTION_DEFAULTS[id].label}</Text></Table.Td>
                     </Table.Tr>
                   );

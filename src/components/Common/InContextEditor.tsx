@@ -3,6 +3,7 @@ import { ActionIcon, Popover, ScrollArea, Box } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 interface InContextEditorProps {
   /** Position relative to the nearest positioned parent. */
@@ -56,7 +57,7 @@ interface InContextEditorContentProps {
 function InContextEditorContent({ children }: InContextEditorContentProps) {
   return (
     <Popover.Dropdown {...getMullionDebugProps('InContextEditor', 'dropdown')}>
-      <ScrollArea.Autosize {...getMullionDebugProps('InContextEditor', 'content')} style={{ maxHeight: '25rem' }}>
+      <ScrollArea.Autosize {...getMullionDebugProps('InContextEditor', 'content')} style={{ maxHeight: uiRem(25) }}>
         {children}
       </ScrollArea.Autosize>
     </Popover.Dropdown>

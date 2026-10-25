@@ -17,6 +17,7 @@ import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderD
 import { CHECKERED_BG } from '@/utils/checkeredBg';
 import { getAssetFileType } from '@/utils/assetFileType';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
+import { uiRem } from '@/ui';
 
 export interface SpaceAssetLibraryProps {
   assets: AssetLibraryItem[];
@@ -177,7 +178,7 @@ export function SpaceAssetLibrary({
                   {fileType}
                 </Badge>
 
-                <Text size="10px" truncate style={{ paddingInline: '0.25rem', paddingBlock: '0.125rem' }} title={asset.name}>{asset.name}</Text>
+                <Text size="10px" truncate style={{ paddingInline: uiRem(0.25), paddingBlock: uiRem(0.125) }} title={asset.name}>{asset.name}</Text>
               </Box>
             );
           })}

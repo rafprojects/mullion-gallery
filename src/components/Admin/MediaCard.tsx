@@ -6,6 +6,7 @@ import type { MediaItem } from '@/types';
 import { FALLBACK_IMAGE_SRC } from '@/utils/fallback';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import styles from './MediaCard.module.scss';
+import { uiRem } from '@/ui';
 
 interface MediaCardProps {
   item: MediaItem;
@@ -150,7 +151,7 @@ export const MediaCard = forwardRef<HTMLDivElement, MediaCardProps>(
               </Group>
             </Group>
           ) : (
-            <Group justify="center" style={{ marginTop: '0.25rem' }} gap={4}>
+            <Group justify="center" style={{ marginTop: uiRem(0.25) }} gap={4}>
               {dragHandleProps !== undefined && (
                 <ActionIcon
                   size="sm"

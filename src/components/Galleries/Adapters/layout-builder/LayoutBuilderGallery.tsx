@@ -50,6 +50,7 @@ import { useViewportHeight } from '@mullion/shared-utils';
 import { sanitizeCssUrl, toCssOrNumber } from '@mullion/shared-utils';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { resolveAdapterShellStyle, resolveGalleryComponentCommonSettings, resolveGalleryHeading } from '../_shared/runtimeCommon';
+import { uiRem } from '@/ui';
 
 // ── TiltWrapper: applies mouse-reactive 3D tilt to children ──────────────────
 
@@ -478,7 +479,7 @@ export function LayoutBuilderGallery({
 
   if (isLoading) {
     return (
-      <Center py="xl" style={{ minHeight: '12.5rem' }}>
+      <Center py="xl" style={{ minHeight: uiRem(12.5) }}>
         <Stack align="center" gap="xs">
           <Loader size="md" aria-label={t('layout_loading_aria', 'Loading layout template')} />
           <Text size="sm" c="dimmed">{t('layout_loading_text', 'Loading gallery…')}</Text>
@@ -746,7 +747,7 @@ function LayoutBuilderGalleryInner({
             borderRadius: 6,
             background: 'var(--mantine-color-yellow-light)',
             color: 'var(--mantine-color-yellow-9)',
-            fontSize: '0.8125rem',
+            fontSize: uiRem(0.8125),
           }}
           role="alert"
         >
@@ -768,7 +769,7 @@ function LayoutBuilderGalleryInner({
             borderRadius: 6,
             background: 'var(--mantine-color-blue-light)',
             color: 'var(--mantine-color-blue-9)',
-            fontSize: '0.8125rem',
+            fontSize: uiRem(0.8125),
             lineHeight: 1.5,
           }}
         >

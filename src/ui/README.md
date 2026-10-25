@@ -69,6 +69,30 @@ Hooks: `useMullionTheme()` (switching API, always the root's),
 one that fails the contrast audits. A static test forbids any
 `[data-*-color-scheme]` ancestor selector under `src/ui`.
 
+## The size basis
+
+One token step is the same physical size on every host (P81-F). Every length
+the framework owns is rem, and `rem` resolves against `<html>` however deep the
+shadow root is, so a host theme that sets `html { font-size: 62.5% }` used to
+shrink the whole product to 62.5% of its design size. Now every rem is
+multiplied by `--mullion-scale`, which the provider declares on each scope it
+paints from one page-wide measurement (`styles/rootScale.ts`): the user's
+default font size over the root's. On a host that leaves the root alone that is
+exactly 1, and a user who raised their browser default keeps the preference.
+
+The multiplier reaches every rem by one of four routes:
+
+| Where the rem is written | How it is scaled |
+|---|---|
+| Theme tokens | the engine's generator wraps every rem it emits (`scaleRem`) |
+| Stylesheets under `src/` and dockview's | a PostCSS step in `vite.config.ts` |
+| Inline styles in components | `uiRem(0.25)` from `@/ui` |
+| Mantine | `theme.scale` in `main.tsx` sets `--mantine-scale`; the adapter multiplies the theme's own rems by it |
+
+Outside a provider the fallback is 1, so the wp-admin apps read plain rem until
+P81-B gives them one. `e2e/size-basis.spec.ts` mounts at a 16px and a 10px root
+and compares bounding rectangles.
+
 ## Style delivery
 
 `styles/uiStyles.ts` is the one registration list. `registerUiStyles(id, css)`
@@ -128,8 +152,9 @@ Four rules govern every one of them:
 2. **Per-instance geometry is an inline custom property.** `gap="md"` becomes
    `--mullion-gap: var(--mullion-spacing-md)` on the element, so the value
    travels with it into any tree. A scale step resolves to a token, a number
-   to pixels, any other string passes through, which is the reading Mantine
-   gives the same props today.
+   to sixteenths of a design rem, and any other string passes through with its
+   rem lengths in the same basis, which is the reading Mantine gives the same
+   props (P81-F).
 3. **Variants and sizes are data attributes.** `[data-variant='light']` and
    `[data-size='xs']` rather than a class per combination.
 4. **The focus ring is one rule.** Every focusable renders through

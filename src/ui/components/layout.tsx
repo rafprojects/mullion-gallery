@@ -15,10 +15,12 @@ import { renderElement, cx, type UiElementProps } from './element';
 import {
   customProperties,
   splitPadding,
+  scaledLength,
   spacingValue,
   type UiPaddingProps,
   type UiSpacing,
 } from './scale';
+import { uiRem } from '../styles/rootScale';
 
 type Align = 'stretch' | 'center' | 'flex-start' | 'flex-end' | 'baseline';
 type Justify =
@@ -164,11 +166,11 @@ export interface ContainerProps extends UiElementProps, UiPaddingProps {
 
 /** Container sizes are layout, not spacing, so they have their own scale rather than reusing the spacing tokens. */
 const CONTAINER_SIZES: Record<string, string> = {
-  xs: '40rem',
-  sm: '48rem',
-  md: '64rem',
-  lg: '75rem',
-  xl: '90rem',
+  xs: uiRem(40),
+  sm: uiRem(48),
+  md: uiRem(64),
+  lg: uiRem(75),
+  xl: uiRem(90),
 };
 
 export function Container({
@@ -186,7 +188,7 @@ export function Container({
       ? undefined
       : typeof size === 'number'
         ? `${size}px`
-        : (CONTAINER_SIZES[size] ?? size);
+        : (CONTAINER_SIZES[size] ?? scaledLength(size));
   return renderElement(
     'div',
     {

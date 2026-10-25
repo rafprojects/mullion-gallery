@@ -196,7 +196,9 @@ test.describe('components read tokens rather than fallbacks', () => {
         // The type scale is new in P79-C: the engine emitted no font-size
         // token before this track, so `Text size="sm"` had nothing to read.
         expect(r.fontSizeToken, 'the type scale did not reach the element').not.toBe('');
-        expect(parseFloat(r.fontSize)).toBeCloseTo(parseFloat(r.fontSizeToken) * 16, 1);
+        // P81-F: the token is a rem times the page's scale, which is 1 on this 16px root.
+        const tokenRem = parseFloat(r.fontSizeToken.replace(/^calc\(/, ''));
+        expect(parseFloat(r.fontSize)).toBeCloseTo(tokenRem * 16, 1);
         expect(r.gapToken).not.toBe('');
       });
     }
