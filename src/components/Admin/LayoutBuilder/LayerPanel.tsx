@@ -280,9 +280,7 @@ export function LayerPanel({
       <Text
         size="xs"
         fw={600}
-        px={6}
-        py={4}
-        style={{
+        style={{ paddingInline: '0.375rem', paddingBlock: '0.25rem',
           borderBottom: '1px solid var(--mullion-builder-border)',
           letterSpacing: '0.05em',
           textTransform: 'uppercase',
@@ -293,11 +291,10 @@ export function LayerPanel({
       </Text>
 
       <ScrollArea.Autosize
-        mah={460}
         scrollbarSize={4}
         onKeyDown={handleKeyDown}
         tabIndex={0}
-        style={{ outline: 'none' }}
+        style={{ maxHeight: '28.75rem', outline: 'none' }}
       >
         <Stack gap={0} py={4}>
           {displayedLayers.map((item) => {

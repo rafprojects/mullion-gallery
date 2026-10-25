@@ -386,7 +386,7 @@ export function TypographyEditor({ value, onChange, customFonts }: TypographyEdi
       </Group>
 
       {/* ── Advanced Effects ── */}
-      <Accordion variant="separated" chevronPosition="left" mt="xs" styles={{ content: { padding: '8px 12px' } }}>
+      <Accordion variant="separated" chevronPosition="left" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} styles={{ content: { padding: '8px 12px' } }}>
         {/* Stroke */}
         <Accordion.Item value="stroke">
           <Accordion.Control>

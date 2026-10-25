@@ -14,7 +14,7 @@ export function SettingTooltip({ label, tooltip, enabled }: SettingTooltipProps)
   return (
     <Group gap={4} component="span" wrap="nowrap" style={{ display: 'inline-flex' }}>
       {label}
-      <Tooltip label={tooltip} multiline w={280} withArrow position="top">
+      <Tooltip label={tooltip} multiline style={{ width: '17.5rem' }} withArrow position="top">
         <ActionIcon variant="transparent" size="xs" aria-label={tooltip} tabIndex={0}>
           <IconInfoCircle size={14} />
         </ActionIcon>

@@ -98,7 +98,7 @@ export function TextPropertiesPanel({
         comboboxProps={{ withinPortal: false }}
       />
       <div>
-        <Text size="xs" c="dimmed" mb={4}>{t('lb_text_alignment', 'Alignment')}</Text>
+        <Text size="xs" c="dimmed" style={{ marginBottom: '0.25rem' }}>{t('lb_text_alignment', 'Alignment')}</Text>
         <SegmentedControl
           size="xs"
           fullWidth
@@ -156,8 +156,8 @@ export function TextPropertiesPanel({
         <Stack gap={4}>
           <Text size="xs" c="dimmed">{t('lb_text_remove_confirm', 'Remove this text layer?')}</Text>
           <Group gap={4}>
-            <Button size="xs" variant="subtle" onClick={closeConfirm} flex={1}>{t('lb_gl_cancel', 'Cancel')}</Button>
-            <Button size="xs" color="red" onClick={() => { closeConfirm(); onRemove(text.id); }} leftSection={<IconTrash size={12} />} flex={1} aria-label={t('lb_gl_confirm_remove', 'Confirm remove')}>{t('lb_gl_remove', 'Remove')}</Button>
+            <Button size="xs" variant="subtle" onClick={closeConfirm} style={{ flex: 1 }}>{t('lb_gl_cancel', 'Cancel')}</Button>
+            <Button size="xs" color="red" onClick={() => { closeConfirm(); onRemove(text.id); }} leftSection={<IconTrash size={12} />} style={{ flex: 1 }} aria-label={t('lb_gl_confirm_remove', 'Confirm remove')}>{t('lb_gl_remove', 'Remove')}</Button>
           </Group>
         </Stack>
       ) : (

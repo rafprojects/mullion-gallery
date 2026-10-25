@@ -35,7 +35,7 @@ export const SettingsCardsTab = memo(function SettingsCardsTab({
   return (
     <Stack gap="md">
       <Box>
-        <Text size="sm" c="dimmed" mb="xs">
+        <Text size="sm" c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
           {t('set_cards_tab_intro', 'Desktop edits the base card settings. Tablet and mobile can override selected layout and appearance fields without changing the desktop baseline.')}
         </Text>
         <SegmentedControl

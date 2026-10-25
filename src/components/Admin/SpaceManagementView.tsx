@@ -298,7 +298,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
         <Tabs.Tab value="library" disabled={!selectedSpaceId}>{t('admin_space_tab_library', 'Library')}</Tabs.Tab>
       </Tabs.List>
 
-      <Tabs.Panel value="spaces" pt="md">
+      <Tabs.Panel value="spaces" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         <Stack gap="md">
           {spacesLoading ? (
             <Center py="md"><Loader size="sm" /></Center>
@@ -404,7 +404,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
         </Stack>
       </Tabs.Panel>
 
-      <Tabs.Panel value="settings" pt="md">
+      <Tabs.Panel value="settings" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         {selectedSpace ? (
           <Stack gap="sm">
             <Text size="sm" c="dimmed">
@@ -424,7 +424,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
         )}
       </Tabs.Panel>
 
-      <Tabs.Panel value="access" pt="md">
+      <Tabs.Panel value="access" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         {selectedSpace ? (
           <Stack gap="md">
             <Text size="sm" fw={500}>{t('admin_space_grants_for', 'Access grants for {{name}}', { name: selectedSpace.name })}</Text>
@@ -511,7 +511,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                 value={grantRole}
                 onChange={(v) => setGrantRole(v ?? 'viewer')}
                 size="sm"
-                w={120}
+                style={{ width: '7.5rem' }}
                 allowDeselect={false}
               />
               <Button
@@ -530,12 +530,12 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
         )}
       </Tabs.Panel>
 
-      <Tabs.Panel value="library" pt="md">
+      <Tabs.Panel value="library" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         {!selectedSpace ? (
           <Text c="dimmed" size="sm">{t('admin_space_library_empty', 'Select a space from the Spaces tab to manage its shared library.')}</Text>
         ) : !isDelegated ? (
           <Alert icon={<IconInfoCircle size={16} />} color="blue" variant="light">
-            <Text size="sm" fw={500} mb={2}>{t('admin_space_open_title', '{{name}} is an open space.', { name: selectedSpace.name })}</Text>
+            <Text size="sm" fw={500} style={{ marginBottom: '0.125rem' }}>{t('admin_space_open_title', '{{name}} is an open space.', { name: selectedSpace.name })}</Text>
             <Text size="sm">
               {t('admin_space_open_desc', 'Open spaces can use every asset in the library — per-space selection only applies to delegated spaces. Switch this space to delegated isolation mode to restrict its assets.')}
             </Text>

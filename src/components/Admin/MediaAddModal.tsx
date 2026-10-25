@@ -257,10 +257,10 @@ export function MediaAddModal({
                             <IconX size={10} />
                           </ActionIcon>
                         )}
-                        <Text size="xs" lineClamp={1} title={file.name} mt={2}>{file.name}</Text>
+                        <Text size="xs" lineClamp={1} title={file.name} style={{ marginTop: '0.125rem' }}>{file.name}</Text>
                         {error && <Text size="xs" c="red" lineClamp={2}>{error}</Text>}
                         {progress !== null && (
-                          <Progress value={progress} size="xs" color={error ? 'red' : 'blue'} mt={2} striped animated={uploading && progress < 100} />
+                          <Progress value={progress} size="xs" color={error ? 'red' : 'blue'} style={{ marginTop: '0.125rem' }} striped animated={uploading && progress < 100} />
                         )}
                       </div>
                     );
@@ -342,7 +342,7 @@ export function MediaAddModal({
         </Stack>
 
         {externalPreview && (
-          <Card mt="sm">
+          <Card style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
             <Stack>
               {externalPreview.html ? (
                 <div

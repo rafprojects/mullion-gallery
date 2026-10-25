@@ -71,7 +71,7 @@ function CampaignViewerCoverHeader({
 }: CampaignViewerCoverHeaderProps) {
   const { t } = useTranslation('mullion');
   return (
-    <Box pos="relative" h={coverHeights} component="div">
+    <Box style={{ position: 'relative' }} h={coverHeights} component="div">
       <InContextEditor
         visible={isAdmin && settings.showInContextEditors}
         position="top-left"
@@ -80,7 +80,7 @@ function CampaignViewerCoverHeader({
           <Text fw={600} size="xs">{t('cv_hdr', 'Campaign Header')}</Text>
           <Switch label={t('cv_show_company', 'Show Company Name')} checked={settings.showCampaignCompanyName !== false} onChange={(e) => inContextSave('showCampaignCompanyName', e.currentTarget.checked)} size="xs" />
           <Switch label={t('cv_show_date', 'Show Date')} checked={settings.showCampaignDate !== false} onChange={(e) => inContextSave('showCampaignDate', e.currentTarget.checked)} size="xs" />
-          <Text fw={500} size="xs" mt="xs">{t('cv_title_typo', 'Title Typography')}</Text>
+          <Text fw={500} size="xs" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('cv_title_typo', 'Title Typography')}</Text>
           <TypographyEditor
             value={settings.typographyOverrides.campaignTitle ?? {}}
             onChange={(value) => {
@@ -101,9 +101,7 @@ function CampaignViewerCoverHeader({
       />
 
       <Box
-        pos="absolute"
-        inset={0}
-        style={{
+        style={{ position: 'absolute', inset: '0',
           background: 'linear-gradient(to top, var(--mullion-color-surface) 0%, color-mix(in srgb, var(--mullion-color-surface) 60%, transparent) 45%, transparent 80%)',
           pointerEvents: 'none',
         }}
@@ -111,10 +109,7 @@ function CampaignViewerCoverHeader({
 
       {settings.showCampaignCompanyName !== false && (
         <Badge
-          pos="absolute"
-          top={16}
-          left={16}
-          style={{ backgroundColor: displayedCampaign.company.brandColor }}
+          style={{ position: 'absolute', top: '1rem', left: '1rem', backgroundColor: displayedCampaign.company.brandColor }}
           size="lg"
         >
           <Group gap={8}>
@@ -124,8 +119,8 @@ function CampaignViewerCoverHeader({
         </Badge>
       )}
 
-      <Box pos="absolute" bottom={0} left={0} right={0} p={{ base: 'md', md: 'lg' }}>
-        <Title order={2} size="h3" mb="sm" style={campaignTitleStyle}>
+      <Box style={{ position: 'absolute', bottom: '0', left: '0', right: '0' }} p={{ base: 'md', md: 'lg' }}>
+        <Title order={2} size="h3" style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))', ...campaignTitleStyle }}>
           {displayedCampaign.title}
         </Title>
         {settings.showCampaignDate !== false && (
@@ -196,7 +191,7 @@ function CampaignViewerGalleryContent({
       }}
     >
       <Suspense fallback={
-        <Center py="xl" mih={200}>
+        <Center py="xl" style={{ minHeight: '12.5rem' }}>
           <Stack align="center" gap="xs">
             <Loader size="md" />
             <Text size="sm" c="dimmed">{t('cv_loading', 'Loading gallery…')}</Text>
@@ -234,7 +229,7 @@ function CampaignViewerStatsSection({
 }: CampaignViewerStatsSectionProps) {
   const { t } = useTranslation('mullion');
   return (
-    <Box component="section" role="region" aria-labelledby="campaign-stats-heading" pos="relative">
+    <Box component="section" role="region" aria-labelledby="campaign-stats-heading" style={{ position: 'relative' }}>
       <InContextEditor
         visible={isAdmin && settings.showInContextEditors}
         position="top-right"
@@ -245,21 +240,21 @@ function CampaignViewerStatsSection({
           <Switch label={t('cv_admin_only', 'Admin Only')} checked={!!settings.campaignStatsAdminOnly} onChange={(e) => inContextSave('campaignStatsAdminOnly', e.currentTarget.checked)} size="xs" />
         </Stack>
       </InContextEditor>
-      <Title order={3} size="h6" mb="sm" id="campaign-stats-heading" className="mullion-sr-only">{t('cv_stats_heading', 'Campaign Statistics')}</Title>
+      <Title order={3} size="h6" style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }} id="campaign-stats-heading" className="mullion-sr-only">{t('cv_stats_heading', 'Campaign Statistics')}</Title>
       <SimpleGrid cols={{ base: 2, sm: 4 }} spacing={{ base: 'sm', md: 'md' }} py="sm" style={{ borderTopWidth: 1, borderTopColor: 'var(--mullion-color-border)' }}>
-        <Paper p="md" radius="md" withBorder ta="center">
+        <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
           <Text size="xl" fw={700} style={campaignStatsValueStyle}>{displayedCampaign.videos.length}</Text>
           <Text size="sm" c="dimmed" style={campaignStatsLabelStyle}>{t('cv_videos', 'Videos')}</Text>
         </Paper>
-        <Paper p="md" radius="md" withBorder ta="center">
+        <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
           <Text size="xl" fw={700} style={campaignStatsValueStyle}>{displayedCampaign.images.length}</Text>
           <Text size="sm" c="dimmed" style={campaignStatsLabelStyle}>{t('cv_images', 'Images')}</Text>
         </Paper>
-        <Paper p="md" radius="md" withBorder ta="center">
+        <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
           <Text size="xl" fw={700} style={campaignStatsValueStyle}>{displayedCampaign.tags.length}</Text>
           <Text size="sm" c="dimmed" style={campaignStatsLabelStyle}>{t('cv_tags', 'Tags')}</Text>
         </Paper>
-        <Paper p="md" radius="md" withBorder ta="center">
+        <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
           <Text size="xl" fw={700} style={campaignStatsValueStyle}>
             {displayedCampaign.visibility === 'public' ? '🌐' : '🔒'}
           </Text>
@@ -517,7 +512,7 @@ export function CampaignViewer({
         <Stack gap="lg" style={{ width: '100%' }}>
           {/* Description — hidden in galleries-only mode */}
           {!galleriesOnly && s.showCampaignAbout !== false && (
-            <Box pos="relative">
+            <Box style={{ position: 'relative' }}>
               <InContextEditor
                 visible={isAdmin && s.showInContextEditors}
                 position="top-right"
@@ -526,7 +521,7 @@ export function CampaignViewer({
                   <Text fw={600} size="xs">{t('cv_about_section', 'About Section')}</Text>
                   <Switch label={t('cv_show_about', 'Show About')} checked={Boolean(s.showCampaignAbout)} onChange={(e) => inContextSave('showCampaignAbout', e.currentTarget.checked)} size="xs" />
                   <Switch label={t('cv_show_description', 'Show Description')} checked={Boolean(s.showCampaignDescription)} onChange={(e) => inContextSave('showCampaignDescription', e.currentTarget.checked)} size="xs" />
-                  <Text fw={500} size="xs" mt="xs">{t('cv_heading_typo', 'Heading Typography')}</Text>
+                  <Text fw={500} size="xs" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('cv_heading_typo', 'Heading Typography')}</Text>
                   <TypographyEditor
                     value={s.typographyOverrides['campaignAboutHeading'] ?? {}}
                     onChange={(v) => {
@@ -538,9 +533,9 @@ export function CampaignViewer({
                   />
                 </Stack>
               </InContextEditor>
-              <Title order={2} size="h4" mb="sm" style={campaignAboutHeadingStyle}>{s.campaignAboutHeadingText || t('cv_about_fallback', 'About this Campaign')}</Title>
+              <Title order={2} size="h4" style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))', ...campaignAboutHeadingStyle }}>{s.campaignAboutHeadingText || t('cv_about_fallback', 'About this Campaign')}</Title>
               {s.showCampaignDescription !== false && (
-                <Text c="dimmed" lh={1.6} style={campaignDescriptionStyle}>
+                <Text c="dimmed" style={{ lineHeight: 1.6, ...campaignDescriptionStyle }}>
                   {displayedCampaign.description}
                 </Text>
               )}
@@ -567,7 +562,7 @@ export function CampaignViewer({
           />
 
           {hasAccess && displayedCampaign.videos.length === 0 && displayedCampaign.images.length === 0 && (
-            <Text c="dimmed" ta="center" py="xl">{t('cv_no_media', 'No media available for this campaign.')}</Text>
+            <Text c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-xl, var(--mantine-spacing-xl))' }}>{t('cv_no_media', 'No media available for this campaign.')}</Text>
           )}
 
           {/* Campaign Stats — conditional */}

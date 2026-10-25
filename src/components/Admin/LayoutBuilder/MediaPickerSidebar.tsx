@@ -181,7 +181,7 @@ export function MediaPickerSidebar({
   );
 
   return (
-    <Stack gap="sm" h="100%">
+    <Stack gap="sm" style={{ height: '100%' }}>
       <Group justify="space-between" wrap="nowrap">
         <Text size="sm" fw={600}>
           {t('lb_mps_media_count', 'Media ({{count}})', { count: media.length })}
@@ -269,7 +269,7 @@ export function MediaPickerSidebar({
       {/* Assigned media per slot — quick overview */}
       {template.slots.some((s) => s.mediaId) && (
         <>
-          <Text size="xs" fw={500} mt="xs">
+          <Text size="xs" fw={500} style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
             {t('lb_mps_assignments', 'Assignments')}
           </Text>
           <Stack gap={2}>
@@ -278,7 +278,7 @@ export function MediaPickerSidebar({
               const mediaItem = media.find((m) => m.id === slot.mediaId);
               return (
                 <Group key={slot.id} gap={4} wrap="nowrap">
-                  <Badge size="xs" variant="light" w={50} style={{ flexShrink: 0 }}>
+                  <Badge size="xs" variant="light" style={{ width: '3.125rem', flexShrink: 0 }}>
                     {t('lb_mps_slot_n', 'Slot {{n}}', { n: idx + 1 })}
                   </Badge>
                   <Text size="xs" truncate style={{ flex: 1 }}>
@@ -356,7 +356,7 @@ export function MediaPickerSidebar({
             })}
 
             {filteredMedia.length === 0 && (
-              <Text size="xs" c="dimmed" ta="center" py="lg">
+              <Text size="xs" c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-lg, var(--mantine-spacing-lg))' }}>
                 {searchQuery ? t('lb_mps_no_results', 'No results.') : t('lb_mps_no_media', 'No media items available.')}
               </Text>
             )}
@@ -428,7 +428,7 @@ export function MediaPickerSidebar({
             })}
 
             {filteredMedia.length === 0 && (
-              <Text size="xs" c="dimmed" ta="center" py="lg" style={{ gridColumn: '1 / -1' }}>
+              <Text size="xs" c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-lg, var(--mantine-spacing-lg))', gridColumn: '1 / -1' }}>
                 {searchQuery ? t('lb_mps_no_results', 'No results.') : t('lb_mps_no_media', 'No media items available.')}
               </Text>
             )}

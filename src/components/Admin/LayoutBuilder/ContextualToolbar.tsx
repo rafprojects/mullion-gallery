@@ -157,7 +157,7 @@ export function ContextualToolbar({
             defaultValue={defaultName}
             placeholder={t('lb_ctb_group_name_ph', 'Group name')}
             data-autofocus
-            mb="sm"
+            style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}
           />
           <Group justify="flex-end" gap="xs">
             <Button variant="subtle" size="xs" onClick={() => modals.closeAll()}>

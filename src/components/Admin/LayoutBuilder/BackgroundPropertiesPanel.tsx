@@ -43,8 +43,8 @@ setMullionDebugDisplayName(GRow, 'LayoutBuilder:GRow');
 
 function SectionHeader({ label }: { label: string }) {
   return (
-    <Box mt={6} mb={2} pb={3} style={{ borderBottom: '1px solid var(--mantine-color-default-border)' }}>
-      <Text size="xs" fw={700} tt="uppercase" c="dimmed" lts={0.8}>{label}</Text>
+    <Box style={{ marginTop: '0.375rem', marginBottom: '0.125rem', paddingBottom: '0.1875rem', borderBottom: '1px solid var(--mantine-color-default-border)' }}>
+      <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: '0.05rem' }}>{label}</Text>
     </Box>
   );
 }
@@ -141,7 +141,7 @@ function BackgroundModeControls({
   );
 
   if (mode === 'none') {
-    return <Text size="xs" c="dimmed" mt={4}>{t('lb_bg_transparent', 'Transparent background — no fill applied.')}</Text>;
+    return <Text size="xs" c="dimmed" style={{ marginTop: '0.25rem' }}>{t('lb_bg_transparent', 'Transparent background — no fill applied.')}</Text>;
   }
 
   if (mode === 'color') {
@@ -313,7 +313,7 @@ function BackgroundModeControls({
           <div style={{ background: 'var(--mantine-color-default)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4, overflow: 'hidden', marginBottom: 4 }}>
             <img src={builder.template.backgroundImage} alt={t('lb_bg_preview_alt', 'Background preview')} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
           </div>
-          <Button size="xs" color="red" variant="light" fullWidth leftSection={<IconTrash size={12} />} onClick={() => builder.setBackgroundImage('')} mb={2}>
+          <Button size="xs" color="red" variant="light" fullWidth leftSection={<IconTrash size={12} />} onClick={() => builder.setBackgroundImage('')} style={{ marginBottom: '0.125rem' }}>
             {t('lb_bg_remove_image', 'Remove image')}
           </Button>
         </Box>

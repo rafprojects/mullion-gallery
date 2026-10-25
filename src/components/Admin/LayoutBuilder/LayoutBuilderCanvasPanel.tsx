@@ -519,7 +519,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                   max={3840}
                   step={10}
                   size="xs"
-                  w={80}
+                  style={{ width: '5rem' }}
                   suffix="px"
                   aria-label={tr('lb_canvas_max_width_aria', 'Canvas max width')}
                 />
@@ -561,7 +561,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                       max={30}
                       step={1}
                       size="xs"
-                      w={80}
+                      style={{ width: '5rem' }}
                       label={(v) => `${v}px`}
                       aria-label={tr('lb_canvas_snap_sens', 'Snap sensitivity')}
                     />
@@ -587,7 +587,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                     max={200}
                     step={4}
                     size="xs"
-                    w={68}
+                    style={{ width: '4.25rem' }}
                     suffix="px"
                     aria-label={tr('lb_canvas_grid_size_aria', 'Grid cell size')}
                   />
@@ -762,7 +762,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                   max={3840}
                   step={10}
                   size="xs"
-                  w={90}
+                  style={{ width: '5.625rem' }}
                   suffix="px"
                   aria-label={tr('lb_canvas_custom_width_aria', 'Custom preview width')}
                   data-testid="custom-preview-width-input"

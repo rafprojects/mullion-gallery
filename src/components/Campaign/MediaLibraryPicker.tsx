@@ -52,7 +52,7 @@ export function MediaLibraryPicker({
         {libraryLoading ? (
           <Center py="md"><Loader size="sm" /></Center>
         ) : libraryMedia.length === 0 ? (
-          <Text size="sm" c="dimmed" ta="center" py="md">
+          <Text size="sm" c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
             {t('medialib_empty', 'Click "Load Library" to browse existing media')}
           </Text>
         ) : (

@@ -51,7 +51,7 @@ function CampaignDuplicateModalOptions({
   return (
     <Stack {...getMullionDebugProps('CampaignDuplicateModal', 'stack')} gap="md">
       <div>
-        <Text size="sm" c="dimmed" mb={4}>
+        <Text size="sm" c="dimmed" style={{ marginBottom: '0.25rem' }}>
           {t('admin_dup_source_label', 'Source:')}
         </Text>
         <Text fw={600}>{source?.title}</Text>
@@ -97,7 +97,7 @@ function CampaignDuplicateModalOptions({
         )}
       </Stack>
 
-      <Group {...getMullionDebugProps('CampaignDuplicateModal', 'actions')} justify="flex-end" mt="xs">
+      <Group {...getMullionDebugProps('CampaignDuplicateModal', 'actions')} justify="flex-end" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
         <Button variant="subtle" onClick={onClose} disabled={isSaving}>
           {t('admin_cancel', 'Cancel')}
         </Button>

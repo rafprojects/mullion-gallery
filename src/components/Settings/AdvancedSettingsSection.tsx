@@ -40,7 +40,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
 
   return (
     <>
-      <Text size="sm" c="dimmed" mb="md">
+      <Text size="sm" c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         {t('set_adv_intro', 'Fine-grained controls for power users. These settings override internal defaults across all gallery components. Change with care.')}
       </Text>
       <Accordion variant="separated" onChange={onChange}>

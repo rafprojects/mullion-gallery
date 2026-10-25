@@ -126,7 +126,7 @@ export function GlobalAssetManager({ apiClient, onNotify }: GlobalAssetManagerPr
 
   return (
     <>
-      <Group justify="space-between" align="center" mb="md">
+      <Group justify="space-between" align="center" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         <Title order={5}>{t('admin_asset_library_title', 'Asset Library')}</Title>
         <AssetUploader
           onFileSelect={handleFileSelect}

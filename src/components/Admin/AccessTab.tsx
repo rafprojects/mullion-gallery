@@ -125,13 +125,13 @@ export function AccessTab({
   return (
     <>
       {/* View Mode Toggle */}
-      <Card shadow="sm" withBorder mb="md" p={{ base: 'sm', md: 'md' }}>
+      <Card shadow="sm" withBorder style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} p={{ base: 'sm', md: 'md' }}>
         <Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
           <Group align="flex-end" gap="md" wrap="wrap">
             {/* P53-A: Company / All are system-admin only; editors see campaign access only. */}
             {isSystemAdmin && (
               <Box>
-                <Text size="sm" fw={500} mb={4}>{t('admin_access_view_by', 'View By')}</Text>
+                <Text size="sm" fw={500} style={{ marginBottom: '0.25rem' }}>{t('admin_access_view_by', 'View By')}</Text>
                 <SegmentedControl
                   value={accessViewMode}
                   onChange={(v) => onAccessViewModeChange(v as AccessViewMode)}
@@ -180,7 +180,7 @@ export function AccessTab({
                     <Text size="xs">{t('admin_access_archived_inactive', 'Archived campaign - grants inactive')}</Text>
                   </Alert>
                 )}
-                <Group gap="xs" mt={2}>
+                <Group gap="xs" style={{ marginTop: '0.125rem' }}>
                   <Text size="xs" c="dimmed">{t('admin_access_total_users', 'Total users:')}</Text>
                   <Badge variant="light" color="blue">{t('admin_access_badge_count', 'Access {{count}}', { count: accessEntriesCount })}</Badge>
                 </Group>
@@ -200,12 +200,12 @@ export function AccessTab({
                     size="xs"
                     leftSection={<IconArchive size={14} />}
                     onClick={() => onArchiveCompanyClick(selectedCompany)}
-                    mt={4}
+                    style={{ marginTop: '0.25rem' }}
                   >
                     {t('admin_access_archive_all', 'Archive All Campaigns')}
                   </Button>
                 )}
-                <Group gap="xs" mt={2}>
+                <Group gap="xs" style={{ marginTop: '0.125rem' }}>
                   <Text size="xs" c="dimmed">{t('admin_access_total_users', 'Total users:')}</Text>
                   <Badge variant="light" color="blue">{t('admin_access_badge_count', 'Access {{count}}', { count: accessEntriesCount })}</Badge>
                 </Group>
@@ -230,8 +230,8 @@ export function AccessTab({
       ) : (
         <>
           {/* Current Access - Show this first and prominently */}
-          <Card shadow="sm" withBorder mb="md" p={{ base: 'sm', md: 'md' }}>
-            <Group justify="space-between" mb="sm" wrap="wrap" gap="sm">
+          <Card shadow="sm" withBorder style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} p={{ base: 'sm', md: 'md' }}>
+            <Group justify="space-between" style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }} wrap="wrap" gap="sm">
               <Text fw={600} size="lg">
                 {accessViewMode === 'campaign' ? t('admin_access_current', 'Current Access') :
                  accessViewMode === 'company' ? t('admin_access_company_wide', 'Company-Wide Access') :
@@ -257,14 +257,14 @@ export function AccessTab({
                       <Table.Th>{t('admin_access_th_type', 'Access Type')}</Table.Th>
                       <Table.Th>{t('admin_access_th_role', 'Role')}</Table.Th>
                       <Table.Th>{t('admin_access_th_granted', 'Granted / Expires')}</Table.Th>
-                      <Table.Th w={80}>{t('admin_access_th_revoke', 'Revoke')}</Table.Th>
+                      <Table.Th style={{ width: '5rem' }}>{t('admin_access_th_revoke', 'Revoke')}</Table.Th>
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
                     {Array.from({ length: 3 }).map((_, i) => (
                       <Table.Tr key={i}>
                         <Table.Td>
-                          <Skeleton height={14} width="50%" mb={4} />
+                          <Skeleton height={14} width="50%" style={{ marginBottom: '0.25rem' }} />
                           <Skeleton height={10} width="70%" />
                         </Table.Td>
                         <Table.Td><Skeleton height={22} width={80} radius="xl" /></Table.Td>
@@ -277,7 +277,7 @@ export function AccessTab({
                 </Table>
               </Table.ScrollContainer>
             ) : accessEntriesCount === 0 ? (
-              <Text c="dimmed" ta="center" py="md">
+              <Text c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
                 {accessViewMode === 'campaign'
                   ? t('admin_access_none_campaign', 'No users have access to this campaign yet. Add users below.')
                   : accessViewMode === 'company'
@@ -298,7 +298,7 @@ export function AccessTab({
                         <Table.Th>{t('admin_access_th_type', 'Access Type')}</Table.Th>
                         <Table.Th>{t('admin_access_th_role', 'Role')}</Table.Th>
                         <Table.Th>{t('admin_access_th_granted', 'Granted / Expires')}</Table.Th>
-                        <Table.Th w={80}>{t('admin_access_th_revoke', 'Revoke')}</Table.Th>
+                        <Table.Th style={{ width: '5rem' }}>{t('admin_access_th_revoke', 'Revoke')}</Table.Th>
                       </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>{accessRows}</Table.Tbody>
@@ -310,7 +310,7 @@ export function AccessTab({
 
           {/* P18-I: Access Request Workflow */}
           {accessViewMode === 'campaign' && accessCampaignId && apiClient && (
-            <Card shadow="sm" withBorder mb="md" p={{ base: 'sm', md: 'md' }}>
+            <Card shadow="sm" withBorder style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} p={{ base: 'sm', md: 'md' }}>
               <PendingRequestsPanel
                 campaignId={accessCampaignId}
                 apiClient={apiClient}
@@ -320,7 +320,7 @@ export function AccessTab({
 
           {/* Grant Access Form - Unified and compact */}
           <Card shadow="sm" withBorder p={{ base: 'sm', md: 'md' }}>
-            <Text fw={600} size="lg" mb="sm">
+            <Text fw={600} size="lg" style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
               {accessViewMode === 'campaign' ? t('admin_access_grant_new', 'Grant New Access') : t('admin_access_grant_company', 'Grant Company-Wide Access')}
             </Text>
 
@@ -453,12 +453,12 @@ export function AccessTab({
             </Group>
 
             {accessViewMode === 'campaign' && accessSource === 'company' && (
-              <Text size="xs" c="dimmed" mt="xs">
+              <Text size="xs" c="dimmed" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
                 {t('admin_access_note_company_level', 'Company-level grants give access to all campaigns under the same company.')}
               </Text>
             )}
             {(accessViewMode === 'company' || accessViewMode === 'all') && (
-              <Text size="xs" c="dimmed" mt="xs">
+              <Text size="xs" c="dimmed" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
                 {t('admin_access_note_company_future', 'Grants apply to all current and future campaigns for this company.')}
               </Text>
             )}

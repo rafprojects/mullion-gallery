@@ -68,7 +68,7 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
 
   if (!campaignId) {
     return (
-      <Text size="sm" c="dimmed" ta="center" py="md">
+      <Text size="sm" c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         {t('admin_req_select_campaign', 'Select a campaign to see access requests.')}
       </Text>
     );
@@ -94,11 +94,11 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
       )}
 
       {isLoading ? (
-        <Box ta="center" py="md">
+        <Box style={{ textAlign: 'center' }} py="md">
           <Loader size="sm" />
         </Box>
       ) : pendingRequests.length === 0 && resolvedRequests.length === 0 ? (
-        <Text size="sm" c="dimmed" ta="center" py="md">
+        <Text size="sm" c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           {t('admin_req_none', 'No access requests for this campaign.')}
         </Text>
       ) : (
@@ -164,7 +164,7 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
 
           {resolvedRequests.length > 0 && (
             <>
-              <Text size="xs" tt="uppercase" fw={600} c="dimmed" mt="xs">
+              <Text size="xs" tt="uppercase" fw={600} c="dimmed" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
                 {t('admin_req_resolved', 'Resolved')}
               </Text>
               <Table withTableBorder withColumnBorders>

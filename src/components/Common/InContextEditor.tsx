@@ -56,7 +56,7 @@ interface InContextEditorContentProps {
 function InContextEditorContent({ children }: InContextEditorContentProps) {
   return (
     <Popover.Dropdown {...getMullionDebugProps('InContextEditor', 'dropdown')}>
-      <ScrollArea.Autosize {...getMullionDebugProps('InContextEditor', 'content')} mah={400}>
+      <ScrollArea.Autosize {...getMullionDebugProps('InContextEditor', 'content')} style={{ maxHeight: '25rem' }}>
         {children}
       </ScrollArea.Autosize>
     </Popover.Dropdown>

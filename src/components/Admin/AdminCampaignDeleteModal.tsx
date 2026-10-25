@@ -65,7 +65,7 @@ export function AdminCampaignDeleteModal({
           onChange={(e) => setPurgeAnalytics(e.currentTarget.checked)}
           label={t('admin_delete_purge_analytics', 'Also purge analytics events for this campaign')}
         />
-        <Group justify="flex-end" mt="sm">
+        <Group justify="flex-end" style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           <Button variant="default" onClick={onClose} disabled={loading}>{t('admin_cancel', 'Cancel')}</Button>
           <Button
             color="red"

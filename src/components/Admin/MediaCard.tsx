@@ -124,7 +124,7 @@ export const MediaCard = forwardRef<HTMLDivElement, MediaCardProps>(
 
           {/* Show controls based on size */}
           {!compact ? (
-            <Group justify="space-between" mt="sm">
+            <Group justify="space-between" style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
               <Box style={{ flex: 1, minWidth: 0 }}>
                 <Text size="sm" lineClamp={1}>{item.caption || '—'}</Text>
                 {showUrl && item.url && (
@@ -150,7 +150,7 @@ export const MediaCard = forwardRef<HTMLDivElement, MediaCardProps>(
               </Group>
             </Group>
           ) : (
-            <Group justify="center" mt={4} gap={4}>
+            <Group justify="center" style={{ marginTop: '0.25rem' }} gap={4}>
               {dragHandleProps !== undefined && (
                 <ActionIcon
                   size="sm"

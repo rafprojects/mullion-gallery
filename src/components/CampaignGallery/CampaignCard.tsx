@@ -99,9 +99,8 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
         >
           {/* Thumbnail Section */}
           <Card.Section
-            pos="relative"
             h={showInfo ? { base: toCssOrNumber(Math.round(scaledThumbHeight * 0.8), thumbHeightUnit), sm: toCssOrNumber(scaledThumbHeight, thumbHeightUnit) } : undefined}
-            style={!showInfo ? { flex: 1, overflow: 'hidden' } : undefined}
+            style={{ position: 'relative', ...(!showInfo ? { flex: 1, overflow: 'hidden' } : undefined) }}
             component="div"
           >
             <Image
@@ -120,9 +119,7 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
             {/* Overlay gradient */}
             {settings?.showCardThumbnailFade !== false && (
               <Box
-                pos="absolute"
-                inset={0}
-                style={{
+                style={{ position: 'absolute', inset: '0',
                   background: thumbnailFade,
                   pointerEvents: 'none'
                 }}
@@ -132,9 +129,7 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
             {/* Lock overlay for inaccessible cards */}
             {!hasAccess && (
               <Box
-                pos="absolute"
-                inset={0}
-                style={{
+                style={{ position: 'absolute', inset: '0',
                   background: 'color-mix(in srgb, var(--mullion-color-background) 60%, transparent)',
                   display: 'flex',
                   alignItems: 'center',
@@ -168,9 +163,7 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
             {/* Access indicator badge */}
             {hasAccess && settings?.showCardAccessBadge !== false && (
               <Badge
-                pos="absolute"
-                top={badgeOffsetY}
-                right={12}
+                style={{ position: 'absolute', top: `${badgeOffsetY / 16}rem`, right: '0.75rem' }}
                 color="green"
                 leftSection={<IconEye size={accessIconSize} />}
               >
@@ -181,11 +174,7 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
             {/* Company badge */}
             {settings?.showCardCompanyName !== false && (
               <Badge
-                pos="absolute"
-                top={badgeOffsetY}
-                left={12}
-                maw={companyBadgeMaxWidth}
-                style={{ backgroundColor: campaign.company.brandColor, overflow: 'hidden', textOverflow: 'ellipsis' }}
+                style={{ position: 'absolute', top: `${badgeOffsetY / 16}rem`, left: '0.75rem', maxWidth: `${companyBadgeMaxWidth / 16}rem`, backgroundColor: campaign.company.brandColor, overflow: 'hidden', textOverflow: 'ellipsis' }}
               >
                 <Group gap={6}>
                   <CompanyLogo logo={campaign.company.logo} companyName={campaign.company.name} />
@@ -228,7 +217,7 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
             */}
 
                 {settings?.showCardMediaCounts !== false && (
-                  <Group gap="xs" mt="auto" {...(styles.mediaStats ? { className: styles.mediaStats } : {})}>
+                  <Group gap="xs" style={{ marginTop: 'auto' }} {...(styles.mediaStats ? { className: styles.mediaStats } : {})}>
                     <span className={styles.mediaStat}>{t('campcard_videos', '🎬 {{count}} videos', { count: campaign.videos.length })}</span>
                     <span className={styles.mediaStat}>{t('campcard_images', '🖼️ {{count}} images', { count: campaign.images.length })}</span>
                   </Group>

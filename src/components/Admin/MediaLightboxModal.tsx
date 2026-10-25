@@ -37,19 +37,17 @@ export function MediaLightboxModal({
       aria-label={ariaLabel}
     >
       {imageItems.length > 0 && currentItem && (
-        <Box pos="relative">
+        <Box style={{ position: 'relative' }}>
           <Image
             src={currentItem.url}
             alt={currentItem.caption || t('admin_media_lb_alt', 'Media preview')}
             fit="contain"
-            mah="80dvh"
+            style={{ maxHeight: '80dvh' }}
           />
           <ActionIcon
             variant="filled"
             color="dark"
-            pos="absolute"
-            top={10}
-            right={10}
+            style={{ position: 'absolute', top: '0.625rem', right: '0.625rem' }}
             onClick={onClose}
             aria-label={t('admin_media_lb_close', 'Close lightbox')}
           >
@@ -60,10 +58,7 @@ export function MediaLightboxModal({
               <ActionIcon
                 variant="filled"
                 color="dark"
-                pos="absolute"
-                left={10}
-                top="50%"
-                style={{ transform: 'translateY(-50%)' }}
+                style={{ position: 'absolute', left: '0.625rem', top: '50%', transform: 'translateY(-50%)' }}
                 onClick={onPrev}
                 aria-label={t('admin_media_lb_prev', 'Previous image')}
               >
@@ -72,10 +67,7 @@ export function MediaLightboxModal({
               <ActionIcon
                 variant="filled"
                 color="dark"
-                pos="absolute"
-                right={10}
-                top="50%"
-                style={{ transform: 'translateY(-50%)' }}
+                style={{ position: 'absolute', right: '0.625rem', top: '50%', transform: 'translateY(-50%)' }}
                 onClick={onNext}
                 aria-label={t('admin_media_lb_next', 'Next image')}
               >
@@ -84,12 +76,8 @@ export function MediaLightboxModal({
             </>
           )}
           <Box
-            pos="absolute"
-            bottom={0}
-            left={0}
-            right={0}
             p="md"
-            style={{ background: 'linear-gradient(transparent, color-mix(in srgb, var(--mullion-color-background) 80%, transparent))' }}
+            style={{ position: 'absolute', bottom: '0', left: '0', right: '0', background: 'linear-gradient(transparent, color-mix(in srgb, var(--mullion-color-background) 80%, transparent))' }}
           >
             <Text c="white" size="sm">{currentItem.caption || t('admin_untitled', 'Untitled')}</Text>
             <Text c="dimmed" size="xs">{lightboxIndex + 1} / {imageItems.length}</Text>

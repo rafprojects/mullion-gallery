@@ -173,13 +173,10 @@ export function Lightbox({ isOpen, media, currentIndex, onPrev, onNext, onClose,
           {/* Close button */}
           <ActionIcon
             ref={closeButtonRef}
-            pos="absolute"
-            top={16}
-            right={16}
             size="lg"
             variant="light"
             aria-label={t('lightbox_close', 'Close lightbox')}
-            style={{ zIndex: 1 }}
+            style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 1 }}
             onClick={(e) => {
               e.stopPropagation();
               onClose();
@@ -253,13 +250,10 @@ export function Lightbox({ isOpen, media, currentIndex, onPrev, onNext, onClose,
           {media.length > 1 && (
             <>
               <ActionIcon
-                pos="absolute"
-                top="50%"
-                left={16}
                 size="xl"
                 variant="light"
                 aria-label={t('lightbox_prev', 'Previous image (lightbox)')}
-                style={{ transform: 'translateY(-50%)' }}
+                style={{ position: 'absolute', top: '50%', left: '1rem', transform: 'translateY(-50%)' }}
                 onClick={(e) => {
                   e.stopPropagation();
                   onPrev();
@@ -268,13 +262,10 @@ export function Lightbox({ isOpen, media, currentIndex, onPrev, onNext, onClose,
                 <IconChevronLeft size={32} />
               </ActionIcon>
               <ActionIcon
-                pos="absolute"
-                top="50%"
-                right={16}
                 size="xl"
                 variant="light"
                 aria-label={t('lightbox_next', 'Next image (lightbox)')}
-                style={{ transform: 'translateY(-50%)' }}
+                style={{ position: 'absolute', top: '50%', right: '1rem', transform: 'translateY(-50%)' }}
                 onClick={(e) => {
                   e.stopPropagation();
                   onNext();
@@ -287,12 +278,8 @@ export function Lightbox({ isOpen, media, currentIndex, onPrev, onNext, onClose,
 
           {/* Caption & counter */}
           <Box
-            pos="absolute"
-            bottom={0}
-            left={0}
-            right={0}
             p="lg"
-            style={{ pointerEvents: 'none', paddingBottom: 'calc(var(--mantine-spacing-lg) + env(safe-area-inset-bottom, 0px))' }}
+            style={{ position: 'absolute', bottom: '0', left: '0', right: '0', pointerEvents: 'none', paddingBottom: 'calc(var(--mantine-spacing-lg) + env(safe-area-inset-bottom, 0px))' }}
           >
             <Stack gap="xs">
               {current.caption && (

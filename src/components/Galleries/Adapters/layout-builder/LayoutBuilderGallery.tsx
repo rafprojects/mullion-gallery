@@ -478,7 +478,7 @@ export function LayoutBuilderGallery({
 
   if (isLoading) {
     return (
-      <Center py="xl" mih={200}>
+      <Center py="xl" style={{ minHeight: '12.5rem' }}>
         <Stack align="center" gap="xs">
           <Loader size="md" aria-label={t('layout_loading_aria', 'Loading layout template')} />
           <Text size="sm" c="dimmed">{t('layout_loading_text', 'Loading gallery…')}</Text>

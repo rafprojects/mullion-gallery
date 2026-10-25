@@ -46,7 +46,7 @@ function PropRow({ label, children, tooltip }: { label: string; children: React.
       <Group gap={2} align="center" wrap="nowrap" style={{ width: 70, flexShrink: 0 }}>
         <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
         {tooltip && (
-          <Tooltip label={tooltip} multiline w={240} position="left" withArrow>
+          <Tooltip label={tooltip} multiline style={{ width: '15rem' }} position="left" withArrow>
             <ActionIcon size={14} variant="transparent" c="dimmed" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })}>
               <IconInfoCircle size={12} />
             </ActionIcon>
@@ -63,12 +63,9 @@ setMullionDebugDisplayName(PropRow, 'LayoutBuilder:MaskPropertiesPanel:PropRow')
 function SectionHeader({ label }: { label: string }) {
   return (
     <Box
-      mt={6}
-      mb={2}
-      pb={3}
-      style={{ borderBottom: '1px solid var(--mantine-color-default-border)' }}
+      style={{ marginTop: '0.375rem', marginBottom: '0.125rem', paddingBottom: '0.1875rem', borderBottom: '1px solid var(--mantine-color-default-border)' }}
     >
-      <Text size="xs" fw={700} tt="uppercase" c="dimmed" lts={0.8}>
+      <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: '0.05rem' }}>
         {label}
       </Text>
     </Box>
@@ -321,7 +318,7 @@ export function MaskPropertiesPanel({
         variant="subtle"
         color="red"
         fullWidth
-        mt={4}
+        style={{ marginTop: '0.25rem' }}
         onClick={() =>
           onUpdate({ maskLayer: undefined, maskUrl: undefined, maskMode: undefined })
         }

@@ -54,7 +54,7 @@ function Keys({ keys }: { keys: string[] }) {
             {k}
           </kbd>
           {i < keys.length - 1 && (
-            <Text span size="xs" c="dimmed" mx={2}>
+            <Text span size="xs" c="dimmed" style={{ marginInline: '0.125rem' }}>
               +
             </Text>
           )}
@@ -112,7 +112,7 @@ function EditRow({ id, currentKey, defaultKey, config }: EditRowProps) {
 
   return (
     <Table.Tr>
-      <Table.Td w={180}>
+      <Table.Td style={{ width: '11.25rem' }}>
         {recording ? (
           <Stack gap={4}>
             <TextInput
@@ -158,7 +158,7 @@ function EditRow({ id, currentKey, defaultKey, config }: EditRowProps) {
       <Table.Td>
         <Text size="sm">{ACTION_DEFAULTS[id].label}</Text>
       </Table.Td>
-      <Table.Td w={80}>
+      <Table.Td style={{ width: '5rem' }}>
         <Group gap={4} wrap="nowrap">
           {!recording && (
             <Tooltip label={t('admin_ksc_remap', 'Remap')} withArrow>
@@ -234,18 +234,18 @@ export function KeyboardShortcutsModal({ opened, onClose, config }: KeyboardShor
           <Group gap="xs" align="center">
             <Badge variant="light" size="sm">{t('admin_ksc_navigation', 'Navigation')}</Badge>
           </Group>
-          <Table striped withTableBorder fz="sm">
+          <Table striped withTableBorder style={{ fontSize: 'var(--mullion-font-size-sm, var(--mantine-font-size-sm))' }}>
             <Table.Tbody>
               <Table.Tr>
-                <Table.Td w={180}><Keys keys={['?']} /></Table.Td>
+                <Table.Td style={{ width: '11.25rem' }}><Keys keys={['?']} /></Table.Td>
                 <Table.Td><Text size="sm">{t('admin_ksc_open_help', 'Open keyboard shortcuts help (this modal)')}</Text></Table.Td>
-                {editMode && <Table.Td w={80} />}
+                {editMode && <Table.Td style={{ width: '5rem' }} />}
               </Table.Tr>
               {STATIC_ITEMS.map((item) => (
                 <Table.Tr key={item.description}>
-                  <Table.Td w={180}><Keys keys={item.keys} /></Table.Td>
+                  <Table.Td style={{ width: '11.25rem' }}><Keys keys={item.keys} /></Table.Td>
                   <Table.Td><Text size="sm">{t(item.descKey, item.description)}</Text></Table.Td>
-                  {editMode && <Table.Td w={80} />}
+                  {editMode && <Table.Td style={{ width: '5rem' }} />}
                 </Table.Tr>
               ))}
             </Table.Tbody>
@@ -261,7 +261,7 @@ export function KeyboardShortcutsModal({ opened, onClose, config }: KeyboardShor
             )}
           </Group>
           {editMode && config ? (
-            <Table striped withTableBorder fz="sm">
+            <Table striped withTableBorder style={{ fontSize: 'var(--mullion-font-size-sm, var(--mantine-font-size-sm))' }}>
               <Table.Tbody>
                 {CONFIGURABLE_IDS.filter((id) => id !== 'openHelp').map((id) => (
                   <EditRow
@@ -275,13 +275,13 @@ export function KeyboardShortcutsModal({ opened, onClose, config }: KeyboardShor
               </Table.Tbody>
             </Table>
           ) : (
-            <Table striped withTableBorder fz="sm">
+            <Table striped withTableBorder style={{ fontSize: 'var(--mullion-font-size-sm, var(--mantine-font-size-sm))' }}>
               <Table.Tbody>
                 {CONFIGURABLE_IDS.filter((id) => id !== 'openHelp').map((id) => {
                   const key = config ? config.effectiveMap[id] : ACTION_DEFAULTS[id].defaultKey;
                   return (
                     <Table.Tr key={id}>
-                      <Table.Td w={180}><Keys keys={formatKeyParts(key)} /></Table.Td>
+                      <Table.Td style={{ width: '11.25rem' }}><Keys keys={formatKeyParts(key)} /></Table.Td>
                       <Table.Td><Text size="sm">{ACTION_DEFAULTS[id].label}</Text></Table.Td>
                     </Table.Tr>
                   );

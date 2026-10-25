@@ -93,9 +93,9 @@ export function BuilderHistoryDropdown({
         </Tooltip>
       </Popover.Target>
 
-      <Popover.Dropdown p={0}>
+      <Popover.Dropdown style={{ padding: '0' }}>
         {/* Header */}
-        <Box px="sm" pt="xs" pb={4} style={{ borderBottom: '1px solid var(--mantine-color-default-border)' }}>
+        <Box px="sm" style={{ paddingTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))', paddingBottom: '0.25rem', borderBottom: '1px solid var(--mantine-color-default-border)' }}>
           <Text size="xs" fw={600} c="dimmed" tt="uppercase">
             {t('lb_hist_title', 'History ({{count}})', { count })}
           </Text>
@@ -103,7 +103,7 @@ export function BuilderHistoryDropdown({
 
         {count === 0 ? (
           /* Empty state */
-          <Box p="md" ta="center">
+          <Box p="md" style={{ textAlign: 'center' }}>
             <IconClockHour4 size={24} style={{ opacity: 0.4, marginBottom: 6 }} />
             <Text size="sm" c="dimmed">
               {t('lb_hist_none', 'No history yet.')}

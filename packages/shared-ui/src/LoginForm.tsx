@@ -96,9 +96,7 @@ export function LoginForm({ onSubmit, compact = false, minPasswordLength = 6 }: 
       withBorder
       component="form"
       onSubmit={handleSubmit}
-      maw={26 * 16}
-      mx="auto"
-      my="xl"
+      style={{ maxWidth: '26rem', marginInline: 'auto', marginBlock: 'var(--mullion-spacing-xl, var(--mantine-spacing-xl))' }}
     >
       {content}
     </Paper>

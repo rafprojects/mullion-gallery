@@ -86,7 +86,7 @@ export function PresetGalleryModal({
       size="xl"
       centered
     >
-      <Text size="sm" c="dimmed" mb="md">
+      <Text size="sm" c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         {t('lb_preset_desc', 'Choose a preset layout as your starting point. You can customize slots, shapes, and properties after creation.')}
       </Text>
 
@@ -113,13 +113,13 @@ export function PresetGalleryModal({
             }}
           >
             <PresetPreview preset={preset} />
-            <Text size="sm" fw={600} mt="xs" ta="center">
+            <Text size="sm" fw={600} style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} ta="center">
               {preset.name}
             </Text>
             <Text size="xs" c="dimmed" ta="center" lineClamp={2}>
               {preset.description}
             </Text>
-            <Group gap={4} mt={4} justify="center">
+            <Group gap={4} style={{ marginTop: '0.25rem' }} justify="center">
               <Badge size="xs" variant="light">
                 {t('lb_preset_n_slots', '{{count}} slots', { count: preset.slots.length })}
               </Badge>

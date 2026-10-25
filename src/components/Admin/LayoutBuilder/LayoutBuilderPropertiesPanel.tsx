@@ -62,7 +62,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
   if (isBackgroundSelected) {
     return (
       <Box p="sm" style={panelStyle}>
-        <Text size="xs" fw={600} c="dimmed" mb="xs">{t('lb_props_hdr_background', 'BACKGROUND')}</Text>
+        <Text size="xs" fw={600} c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_background', 'BACKGROUND')}</Text>
         <BackgroundPropertiesPanel />
       </Box>
     );
@@ -72,7 +72,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
   if (selectedMaskSlotId && selectedSlot) {
     return (
       <Box p="sm" style={panelStyle}>
-        <Text size="xs" fw={600} c="dimmed" mb="xs">{t('lb_props_hdr_mask', 'MASK PROPERTIES')}</Text>
+        <Text size="xs" fw={600} c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_mask', 'MASK PROPERTIES')}</Text>
         <MaskPropertiesPanel
           slot={selectedSlot}
           onUpdate={(updates) => builder.updateSlot(selectedSlot.id, updates)}
@@ -86,7 +86,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
   if (selectedSlot) {
     return (
       <Box p="sm" style={panelStyle}>
-        <Text size="xs" fw={600} c="dimmed" mb="xs">{t('lb_props_hdr_slot', 'SLOT PROPERTIES')}</Text>
+        <Text size="xs" fw={600} c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_slot', 'SLOT PROPERTIES')}</Text>
         <SlotPropertiesPanel
           slot={selectedSlot}
           onUpdate={(updates) => builder.updateSlot(selectedSlot.id, updates)}
@@ -103,7 +103,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
   if (selectedOverlay) {
     return (
       <Box style={panelStyle}>
-        <Text size="xs" fw={600} c="dimmed" p="sm" pb={0}>{t('lb_props_hdr_graphic', 'GRAPHIC LAYER')}</Text>
+        <Text size="xs" fw={600} c="dimmed" style={{ padding: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))', paddingBottom: '0' }}>{t('lb_props_hdr_graphic', 'GRAPHIC LAYER')}</Text>
         <GraphicLayerPropertiesPanel
           key={selectedOverlay.id}
           overlay={selectedOverlay}
@@ -127,7 +127,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
     const textIndex = (builder.template.texts ?? []).findIndex((txt) => txt.id === selectedText.id);
     return (
       <Box style={panelStyle}>
-        <Text size="xs" fw={600} c="dimmed" p="sm" pb={0}>{t('lb_props_hdr_text', 'TEXT LAYER')}</Text>
+        <Text size="xs" fw={600} c="dimmed" style={{ padding: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))', paddingBottom: '0' }}>{t('lb_props_hdr_text', 'TEXT LAYER')}</Text>
         {__MULLION_PREMIUM__ && TextPropertiesPanel && isPro ? (
           <Suspense fallback={null}>
             <TextPropertiesPanel
@@ -153,7 +153,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
           //  • premium build, unlicensed runtime (!isPro) — we must NOT show a live
           //    editor: the server freezes `texts` on save (enforce_license_gates),
           //    so an editable panel would silently discard the user's edits (P62-A).
-          <Text size="sm" c="dimmed" p="sm">
+          <Text size="sm" c="dimmed" style={{ padding: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
             {t('upsell_text_layers', 'Text layers are a Pro feature. Upgrade to add and edit text in your layouts.')}
           </Text>
         )}
@@ -168,7 +168,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
 
   return (
     <Box p="sm" style={panelStyle}>
-      <Text size="xs" fw={600} c="dimmed" mb="xs">{t('lb_props_hdr_canvas', 'CANVAS')}</Text>
+      <Text size="xs" fw={600} c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_canvas', 'CANVAS')}</Text>
       <Stack gap="xs">
         <Box>
           <Text size="xs" c="dimmed">{t('lb_props_slots', 'Slots')}</Text>
@@ -180,7 +180,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
         </Box>
         <Divider />
         <Box>
-          <Text size="xs" c="dimmed" mb={4}>{t('lb_props_aspect_ratio', 'Aspect ratio')}</Text>
+          <Text size="xs" c="dimmed" style={{ marginBottom: '0.25rem' }}>{t('lb_props_aspect_ratio', 'Aspect ratio')}</Text>
           <SegmentedControl
             size="xs"
             value={String(builder.template.canvasAspectRatio)}
@@ -190,7 +190,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
           />
         </Box>
         <Box>
-          <Text size="xs" c="dimmed" mb={4}>{t('lb_props_height_mode', 'Height mode')}</Text>
+          <Text size="xs" c="dimmed" style={{ marginBottom: '0.25rem' }}>{t('lb_props_height_mode', 'Height mode')}</Text>
           <Group gap={6} wrap="nowrap">
             <SegmentedControl
               size="xs"
@@ -210,7 +210,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
                 max={100}
                 step={5}
                 size="xs"
-                w={72}
+                style={{ width: '4.5rem' }}
                 suffix="vh"
                 aria-label={t('lb_props_height_vh_aria', 'Canvas height in viewport units')}
               />

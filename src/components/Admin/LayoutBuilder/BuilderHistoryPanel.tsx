@@ -50,7 +50,7 @@ export function BuilderHistoryPanel(_props: IDockviewPanelProps) {
   return (
     <Box style={{ height: '100%', display: 'flex', flexDirection: 'column' }} p="xs">
       {/* Header */}
-      <Group justify="space-between" mb="xs" px={4}>
+      <Group justify="space-between" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} px={4}>
         <Text size="xs" fw={600} c="dimmed" tt="uppercase">
           {t('lb_hist_title', 'History ({{count}})', { count: historyEntries.length })}
         </Text>

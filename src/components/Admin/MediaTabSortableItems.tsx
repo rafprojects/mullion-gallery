@@ -84,7 +84,7 @@ export function SortableListRow({
       </Table.Td>
       <Table.Td>
         <Text size="sm" lineClamp={1}>{item.caption || '—'}</Text>
-        <Group gap={4} mt={4}>
+        <Group gap={4} style={{ marginTop: '0.25rem' }}>
           <Badge size="xs" variant="filled" color={mediaTypeColor}>{mediaTypeLabel}</Badge>
           <Badge size="xs" variant="light" color={sourceColor}>{sourceLabel}</Badge>
         </Group>

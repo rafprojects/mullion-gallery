@@ -11,7 +11,7 @@ export function GalleryConfigEditorLoader({
   message = 'Loading gallery config editor...',
 }: GalleryConfigEditorLoaderProps) {
   return (
-    <Center py="xl" mih={minHeight}>
+    <Center py="xl" style={{ minHeight: `${minHeight / 16}rem` }}>
       <Stack align="center" gap="xs">
         <Loader size="sm" />
         <Text size="sm" c="dimmed">

@@ -61,7 +61,7 @@ export function AutoGridDialog({ opened, onClose, onGenerate, hasExistingSlots =
 
         {/* Live preview — same geometry as generation */}
         <div>
-          <Text size="xs" c="dimmed" mb={4}>
+          <Text size="xs" c="dimmed" style={{ marginBottom: '0.25rem' }}>
             {t('lb_grid_preview', 'Preview ({{count}} slot)', { count: cells.length })}
           </Text>
           <div
@@ -92,13 +92,13 @@ export function AutoGridDialog({ opened, onClose, onGenerate, hasExistingSlots =
             ))}
           </div>
           {!canGenerate && (
-            <Text size="xs" c="red" mt={4}>
+            <Text size="xs" c="red" style={{ marginTop: '0.25rem' }}>
               {t('lb_grid_no_room', 'These settings leave no room for cells — reduce the gap or margin.')}
             </Text>
           )}
         </div>
 
-        <Group justify="flex-end" mt="xs">
+        <Group justify="flex-end" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
           <Button variant="default" onClick={onClose}>{t('lb_grid_cancel', 'Cancel')}</Button>
           <Button onClick={handleGenerate} disabled={!canGenerate}>{t('lb_grid_generate', 'Generate')}</Button>
         </Group>

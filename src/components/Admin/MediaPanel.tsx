@@ -72,7 +72,7 @@ export function MediaPanel({
 
   return (
     <>
-      <Group mb="md" justify="space-between" wrap="wrap" gap="sm">
+      <Group style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} justify="space-between" wrap="wrap" gap="sm">
         <CampaignSelector data={campaignSelectData} value={mediaCampaignId} onChange={setMediaCampaignId} style={{ minWidth: 200, flex: '1 1 200px' }} />
         {/* P53-A: library-wide media tools (binary export/import, cross-space rescan) are system-admin only. */}
         {isSystemAdmin && (

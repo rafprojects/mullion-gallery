@@ -90,7 +90,7 @@ export function BuilderKeyboardShortcutsModal({
       <Stack gap="lg">
         {SECTIONS.map((section) => (
           <div key={section.heading}>
-            <Text fw={600} mb="xs" size="sm" c="dimmed" tt="uppercase">
+            <Text fw={600} style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} size="sm" c="dimmed" tt="uppercase">
               {t(section.hkey, section.heading)}
             </Text>
             <Table
@@ -107,7 +107,7 @@ export function BuilderKeyboardShortcutsModal({
                           <span key={i}>
                             <Kbd>{k}</Kbd>
                             {i < row.keys.length - 1 && (
-                              <Text span size="xs" c="dimmed" px={2}>
+                              <Text span size="xs" c="dimmed" style={{ paddingInline: '0.125rem' }}>
                                 +
                               </Text>
                             )}

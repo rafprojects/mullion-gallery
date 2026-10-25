@@ -558,10 +558,7 @@ export function MediaCarouselInner({ media, settings, commonSettings, breakpoint
                 fit="contain"
               />
               <ActionIcon
-                pos="absolute"
-                top="50%"
-                left="50%"
-                style={{ transform: 'translate(-50%, -50%)' }}
+                style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                 size="xl"
                 radius="xl"
                 onClick={(e) => {
@@ -624,13 +621,12 @@ export function MediaCarouselInner({ media, settings, commonSettings, breakpoint
       {/* Frame container */}
       <Box
         {...getMullionDebugProps('MediaCarouselAdapter', 'frame')}
-        pos="relative"
         data-testid={testId}
         role="region"
         tabIndex={0}
         aria-label={ariaLabel}
         aria-roledescription="carousel"
-        style={{
+        style={{ position: 'relative',
           width: '100%',
           maxWidth: frameMaxWidth,
           marginLeft: 'auto',
@@ -675,14 +671,11 @@ export function MediaCarouselInner({ media, settings, commonSettings, breakpoint
         {/* Zoom button — images only, single-slide mode */}
         {!isCurrentVideo && visibleCards <= 1 && (
           <ActionIcon
-            pos="absolute"
-            bottom={12}
-            right={12}
             onClick={openLightbox}
             size="lg"
             variant="light"
             aria-label={t('carousel_open_lightbox', 'Open lightbox')}
-            style={{ zIndex: 3 }}
+            style={{ position: 'absolute', bottom: '0.75rem', right: '0.75rem', zIndex: 3 }}
           >
             <IconZoomIn size={20} />
           </ActionIcon>
@@ -861,7 +854,7 @@ function CampaignListingCarousel({ items, renderItem, settings }: CampaignListin
 
       {/* Dot navigator below the carousel */}
       {items.length > 1 && settings.cardPageDotNav && (
-        <Stack align="center" gap={4} mt="sm">
+        <Stack align="center" gap={4} style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           <DotNavigator
             total={items.length}
             currentIndex={selectedIndex}

@@ -308,7 +308,7 @@ export function LayoutBuilderMenuBar({
         />
       </MenuButton>
 
-      <Divider orientation="vertical" mx={4} />
+      <Divider orientation="vertical" style={{ marginInline: '0.25rem' }} />
     </Group>
   );
 }

@@ -72,9 +72,9 @@ export function CampaignMoveSpaceModal({
     >
       <Stack {...getMullionDebugProps('CampaignMoveSpaceModal', 'stack')} gap="md">
         <div>
-          <Text size="sm" c="dimmed" mb={4}>{t('admin_move_campaign_label', 'Campaign:')}</Text>
+          <Text size="sm" c="dimmed" style={{ marginBottom: '0.25rem' }}>{t('admin_move_campaign_label', 'Campaign:')}</Text>
           <Text fw={600}>{source?.title}</Text>
-          <Text size="sm" c="dimmed" mt={4}>
+          <Text size="sm" c="dimmed" style={{ marginTop: '0.25rem' }}>
             {t('admin_move_from_space', 'From space:')} <Text component="span" fw={600} c="inherit">{sourceSpace?.name ?? '—'}</Text>
           </Text>
         </div>
@@ -94,7 +94,7 @@ export function CampaignMoveSpaceModal({
           {t('admin_move_info', 'All analytics, audit history, media references, and access requests move with the campaign. The source space will no longer list it.')}
         </Alert>
 
-        <Group {...getMullionDebugProps('CampaignMoveSpaceModal', 'actions')} justify="flex-end" mt="xs">
+        <Group {...getMullionDebugProps('CampaignMoveSpaceModal', 'actions')} justify="flex-end" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
           <Button variant="subtle" onClick={onClose} disabled={isSaving}>
             {t('admin_cancel', 'Cancel')}
           </Button>

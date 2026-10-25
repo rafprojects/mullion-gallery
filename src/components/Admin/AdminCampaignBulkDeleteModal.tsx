@@ -42,7 +42,7 @@ export function AdminCampaignBulkDeleteModal({
           onChange={(e) => setPurgeAnalytics(e.currentTarget.checked)}
           label={t('admin_bulk_delete_purge', 'Also purge all analytics data for these campaigns')}
         />
-        <Group justify="flex-end" mt="sm">
+        <Group justify="flex-end" style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           <Button variant="default" onClick={onClose} disabled={loading}>
             {t('admin_cancel', 'Cancel')}
           </Button>

@@ -78,7 +78,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
 
       return (
         <Table.Tr key={c.id} data-selected={isSelected || undefined}>
-          <Table.Td w={36}>
+          <Table.Td style={{ width: '2.25rem' }}>
             <Checkbox
               checked={isSelected}
               onChange={() => handleToggleCampaignSelect(cid)}

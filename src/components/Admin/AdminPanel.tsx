@@ -241,7 +241,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
 
   return (
     <Card {...getMullionDebugProps('AdminPanel')} shadow="sm" radius="md" withBorder tabIndex={-1} onKeyDown={campaignActions.hotkeyHandler} style={{ outline: 'none' }}>
-      <Group {...getMullionDebugProps('AdminPanel', 'header')} justify="space-between" wrap="wrap" gap="sm" mb="md">
+      <Group {...getMullionDebugProps('AdminPanel', 'header')} justify="space-between" wrap="wrap" gap="sm" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         <Group>
           <ActionIcon variant="light" size="lg" onClick={onClose} aria-label={t('admin_back_to_gallery', 'Back to gallery')}>
             <IconArrowLeft />
@@ -333,7 +333,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
               ...(isSystemAdmin ? [{ value: 'globalAudit', label: t('admin_tab_global_audit', 'System Audit') }] : []),
               { value: 'analytics', label: t('admin_tab_analytics', 'Analytics') },
             ]}
-            mb="sm"
+            style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}
             aria-label={t('admin_select_tab', 'Select admin panel tab')}
           />
         ) : (
@@ -350,14 +350,14 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
           </Tabs.List>
         )}
 
-        <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'campaigns-panel')} value="campaigns" pt="md">
-          <Group justify="space-between" align="flex-start" mb="sm" wrap="wrap" gap="sm">
+        <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'campaigns-panel')} value="campaigns" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
+          <Group justify="space-between" align="flex-start" style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }} wrap="wrap" gap="sm">
             <Box style={{ flex: '1 1 auto' }}>
               {isMobile && (
                 <Button
                   variant="subtle"
                   size="xs"
-                  mb="xs"
+                  style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}
                   leftSection={<IconAdjustments size={14} />}
                   rightSection={activeFilterCount > 0 ? <Badge size="xs" circle color="blue">{activeFilterCount}</Badge> : null}
                   onClick={() => setFiltersOpen((o) => !o)}
@@ -480,7 +480,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
           tagItems={campaignTags}
         />
 
-        <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'media-panel')} value="media" pt="md">
+        <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'media-panel')} value="media" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           {/* P72-E: media tab-selection (+ rescan loading) lives in MediaPanel now;
               key={selectedSpaceId} resets it on space change. `addMediaCampaign`
               stays in AdminPanel — it's a Campaigns-tab row action, not media-local. */}
@@ -496,22 +496,22 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
           />
         </Tabs.Panel>
 
-        <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'layouts-panel')} value="layouts" pt="md">
+        <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'layouts-panel')} value="layouts" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           <LayoutTemplateList apiClient={apiClient} onNotify={onNotify} initialTemplateId={pendingEditLayoutId ?? undefined} spaceId={selectedSpaceId} />
         </Tabs.Panel>
 
-        <Tabs.Panel value="templates" pt="md">
+        <Tabs.Panel value="templates" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           <TemplatesTab apiClient={apiClient} campaigns={allCampaigns} onNotify={onNotify} />
         </Tabs.Panel>
 
         {/* P52-B: global asset library management. */}
-        <Tabs.Panel value="assets" pt="md">
+        <Tabs.Panel value="assets" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           <Suspense fallback={<Center py="xl"><Loader size="sm" /></Center>}>
             <GlobalAssetTab apiClient={apiClient} onNotify={onNotify} />
           </Suspense>
         </Tabs.Panel>
 
-        <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'access-panel')} value="access" pt="md">
+        <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'access-panel')} value="access" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           {/* P72-E: access tab-selection state + its two modals live in AccessPanel now;
               key={selectedSpaceId} resets that state when the space changes. */}
           <AccessPanel
@@ -529,7 +529,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
           />
         </Tabs.Panel>
 
-        <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'audit-panel')} value="audit" pt="md" component="section">
+        <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'audit-panel')} value="audit" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} component="section">
           {/* P72-E: audit tab-selection + filter state lives in AuditPanel now;
               key={selectedSpaceId} resets that state when the space changes. */}
           <AuditPanel
@@ -541,7 +541,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
           />
         </Tabs.Panel>
 
-        <Tabs.Panel value="globalAudit" pt="md" component="section">
+        <Tabs.Panel value="globalAudit" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} component="section">
           {isSystemAdmin && <GlobalAuditTab
             entries={globalAuditEntries}
             loading={globalAuditLoading}
@@ -560,7 +560,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
           />}
         </Tabs.Panel>
 
-        <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'analytics-panel')} value="analytics" pt="md">
+        <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'analytics-panel')} value="analytics" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           <ErrorBoundary isAdmin={true}>
             <Suspense fallback={<Center py="xl"><Loader size="sm" /></Center>}>
               <AnalyticsDashboard apiClient={apiClient} campaigns={campaignSelectData} isSystemAdmin={isSystemAdmin} />

@@ -140,7 +140,7 @@ const UnifiedCampaignModalTabList: NamedComponent<UnifiedCampaignModalTabListPro
       <Tabs.Tab value="details">{t('admin_camp_tab_details', 'Details')}</Tabs.Tab>
       {isEdit && (
         <Tabs.Tab value="media">
-          {t('admin_camp_tab_media', 'Media')} {mediaCount > 0 && <Badge size="sm" ml={4}>{mediaCount}</Badge>}
+          {t('admin_camp_tab_media', 'Media')} {mediaCount > 0 && <Badge size="sm" style={{ marginLeft: '0.25rem' }}>{mediaCount}</Badge>}
         </Tabs.Tab>
       )}
       <Tabs.Tab value="settings">{t('admin_camp_tab_settings', 'Settings')}</Tabs.Tab>
@@ -175,7 +175,7 @@ const UnifiedCampaignDetailsPanel: NamedComponent<UnifiedCampaignDetailsPanelPro
 }) => {
   const { t } = useTranslation('mullion');
   return (
-  <Tabs.Panel value="details" pt="md">
+  <Tabs.Panel value="details" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
     <Stack gap="md">
       <TextInput
         label={t('admin_camp_title_label', 'Title')}
@@ -291,7 +291,7 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
   const { t } = useTranslation('mullion');
   const usesLayoutBuilder = campaignUsesLayoutBuilder(formState.galleryOverrides);
   return (
-  <Tabs.Panel value="settings" pt="md">
+  <Tabs.Panel value="settings" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
     <Stack gap="md">
       <Group grow wrap="wrap" gap="sm">
         <Select
@@ -382,16 +382,16 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
             />
             {effectiveCampaignGalleryMode === 'unified' ? (
               <Box>
-                <Text size="sm" fw={500} mb={4}>{t('admin_camp_unified_bp', 'Unified Breakpoint Adapters')}</Text>
-                <Text size="xs" c="dimmed" mb={8}>
+                <Text size="sm" fw={500} style={{ marginBottom: '0.25rem' }}>{t('admin_camp_unified_bp', 'Unified Breakpoint Adapters')}</Text>
+                <Text size="xs" c="dimmed" style={{ marginBottom: '0.5rem' }}>
                   {t('admin_camp_unified_bp_hint', 'Clear a cell to inherit the global unified adapter for that breakpoint.')}
                 </Text>
-                <SimpleGrid cols={2} spacing="xs" mb={4}>
+                <SimpleGrid cols={2} spacing="xs" style={{ marginBottom: '0.25rem' }}>
                   <Text size="xs" fw={600} ta="center" c="dimmed"> </Text>
                   <Text size="xs" fw={600} ta="center">{t('admin_gallery_mode_unified', 'Unified')}</Text>
                 </SimpleGrid>
                 {CAMPAIGN_BREAKPOINTS.map((breakpoint) => (
-                  <SimpleGrid cols={2} spacing="xs" mb="xs" key={breakpoint}>
+                  <SimpleGrid cols={2} spacing="xs" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} key={breakpoint}>
                     <Text size="sm" fw={500} style={{ display: 'flex', alignItems: 'center' }}>
                       {t(`admin_bp_${breakpoint}`, BREAKPOINT_LABELS[breakpoint])}
                     </Text>
@@ -409,17 +409,17 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
               </Box>
             ) : (
               <Box>
-                <Text size="sm" fw={500} mb={4}>{t('admin_camp_pertype_bp', 'Per-Type Breakpoint Adapters')}</Text>
-                <Text size="xs" c="dimmed" mb={8}>
+                <Text size="sm" fw={500} style={{ marginBottom: '0.25rem' }}>{t('admin_camp_pertype_bp', 'Per-Type Breakpoint Adapters')}</Text>
+                <Text size="xs" c="dimmed" style={{ marginBottom: '0.5rem' }}>
                   {t('admin_camp_pertype_bp_hint', "Clear any cell to inherit that breakpoint's global adapter selection.")}
                 </Text>
-                <SimpleGrid cols={3} spacing="xs" mb={4}>
+                <SimpleGrid cols={3} spacing="xs" style={{ marginBottom: '0.25rem' }}>
                   <Text size="xs" fw={600} ta="center" c="dimmed"> </Text>
                   <Text size="xs" fw={600} ta="center">{t('admin_camp_col_image', 'Image')}</Text>
                   <Text size="xs" fw={600} ta="center">{t('admin_camp_col_video', 'Video')}</Text>
                 </SimpleGrid>
                 {CAMPAIGN_BREAKPOINTS.map((breakpoint) => (
-                  <SimpleGrid cols={3} spacing="xs" mb="xs" key={breakpoint}>
+                  <SimpleGrid cols={3} spacing="xs" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} key={breakpoint}>
                     <Text size="sm" fw={500} style={{ display: 'flex', alignItems: 'center' }}>
                       {t(`admin_bp_${breakpoint}`, BREAKPOINT_LABELS[breakpoint])}
                     </Text>
@@ -447,7 +447,7 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
             )}
           </Stack>
           <Group justify="space-between" align="flex-start" gap="md">
-            <Text size="sm" c="dimmed" maw={560}>
+            <Text size="sm" c="dimmed" style={{ maxWidth: '35rem' }}>
               {t('admin_camp_quick_overrides_hint', 'Quick per-breakpoint overrides stay inline here. Use the shared responsive editor for mode changes, shared responsive settings, and adapter-specific fields.')}
             </Text>
             <Button variant="light" onClick={onOpenResponsiveConfig}>
@@ -519,7 +519,7 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
             </Group>
           )}
           {usesLayoutBuilder && !formState.layoutTemplateId && (
-            <Text size="xs" c="orange" mt={layoutTemplates.length > 0 ? 4 : 0}>
+            <Text size="xs" c="orange" style={{ marginTop: layoutTemplates.length > 0 ? '0.25rem' : 0 }}>
               {layoutTemplates.length > 0
                 ? t('admin_camp_lb_no_template', 'Layout Builder is selected as a gallery adapter, but no template is assigned — pick one above, or the gallery falls back to the default adapter.')
                 : t('admin_camp_lb_no_templates', 'Layout Builder is selected as a gallery adapter, but no layout templates exist yet. Create one in the Layout Builder first.')}
@@ -635,7 +635,7 @@ export function UnifiedCampaignModal({
         onClose={guardedClose}
         withinPortal={false}
         title={
-          <Group w="100%" justify="space-between" wrap="nowrap" gap="sm">
+          <Group style={{ width: '100%' }} justify="space-between" wrap="nowrap" gap="sm">
             <span>{isEdit ? t('admin_camp_edit_title', 'Edit Campaign') : t('admin_camp_new_title', 'New Campaign')}</span>
             <Group gap="xs" wrap="nowrap">
               <Button variant="default" size="sm" onClick={guardedClose}>{t('admin_cancel', 'Cancel')}</Button>
@@ -666,7 +666,7 @@ export function UnifiedCampaignModal({
 
           {/* ── Media Tab (edit only) ──────────────────────────────── */}
           {isEdit && (
-            <Tabs.Panel value="media" pt="md">
+            <Tabs.Panel value="media" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
               {mediaLoading ? (
                 <Center py="xl"><Loader /></Center>
               ) : (
@@ -819,7 +819,7 @@ function MediaTabContent({
     <Stack gap="lg">
       {/* Media grid */}
       {mediaItems.length === 0 ? (
-        <Text c="dimmed" ta="center" py="xl">{t('admin_camp_no_media', 'No media attached to this campaign.')}</Text>
+        <Text c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-xl, var(--mantine-spacing-xl))' }}>{t('admin_camp_no_media', 'No media attached to this campaign.')}</Text>
       ) : (
         <SimpleGrid cols={{ base: 2, sm: 3, md: 4 }} spacing="sm">
           {mediaItems.map((media) => (
@@ -827,7 +827,7 @@ function MediaTabContent({
               <Card.Section>
                 <Image src={media.thumbnail || media.url} height={100} alt={media.caption || t('admin_camp_media_alt', 'Media')} fallbackSrc={FALLBACK_IMAGE_SRC} />
               </Card.Section>
-              <Group justify="space-between" mt="xs">
+              <Group justify="space-between" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
                 <Badge size="xs" variant="light">{media.type}</Badge>
                 <Tooltip label={t('admin_camp_remove_media', 'Remove from campaign')}>
                   <ActionIcon color="red" variant="light" size="sm" onClick={() => void onRemoveMedia(media)} aria-label={t('admin_camp_remove_media', 'Remove from campaign')}>
@@ -835,7 +835,7 @@ function MediaTabContent({
                   </ActionIcon>
                 </Tooltip>
               </Group>
-              {media.caption && <Text size="xs" c="dimmed" lineClamp={1} mt={4}>{media.caption}</Text>}
+              {media.caption && <Text size="xs" c="dimmed" lineClamp={1} style={{ marginTop: '0.25rem' }}>{media.caption}</Text>}
             </Card>
           ))}
         </SimpleGrid>

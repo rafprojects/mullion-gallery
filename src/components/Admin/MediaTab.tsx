@@ -308,7 +308,7 @@ export default function MediaTab({ campaignId, apiClient, onCampaignsUpdated }: 
 
   return (
     <div ref={scrollContainerRef} style={{ overflowY: 'auto', maxHeight: '70vh' }}>
-      <Group justify="space-between" mb="md" wrap="wrap" gap="sm">
+      <Group justify="space-between" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} wrap="wrap" gap="sm">
         <Group gap="md" wrap="wrap">
           <Text fw={700}>{t('admin_media_heading', 'Media')}</Text>
           <Text size="sm" c="dimmed">({displayedMedia.length}{orphanFilter ? ` / ${media.length}` : ''} {t('admin_media_items', 'items')})</Text>
@@ -391,12 +391,12 @@ export default function MediaTab({ campaignId, apiClient, onCampaignsUpdated }: 
                 <Table verticalSpacing="xs" highlightOnHover>
                   <Table.Thead>
                     <Table.Tr>
-                      <Table.Th w={60}>{t('admin_media_col_thumb', 'Thumb')}</Table.Th>
+                      <Table.Th style={{ width: '3.75rem' }}>{t('admin_media_col_thumb', 'Thumb')}</Table.Th>
                       <Table.Th>{t('admin_media_col_caption', 'Caption')}</Table.Th>
                       <Table.Th>{t('admin_media_col_type', 'Type')}</Table.Th>
                       <Table.Th>{t('admin_media_col_source', 'Source')}</Table.Th>
-                      <Table.Th w={100}>{t('admin_media_col_usage', 'Usage')}</Table.Th>
-                      <Table.Th w={180}>{t('admin_col_actions', 'Actions')}</Table.Th>
+                      <Table.Th style={{ width: '6.25rem' }}>{t('admin_media_col_usage', 'Usage')}</Table.Th>
+                      <Table.Th style={{ width: '11.25rem' }}>{t('admin_col_actions', 'Actions')}</Table.Th>
                     </Table.Tr>
                   </Table.Thead>
                 </Table>
@@ -415,7 +415,7 @@ export default function MediaTab({ campaignId, apiClient, onCampaignsUpdated }: 
               </Table.ScrollContainer>
 
               {listTotalPages > 1 && (
-                <Group justify="flex-end" mt="sm">
+                <Group justify="flex-end" style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
                   <Pagination
                     value={listPage}
                     onChange={setListPage}

@@ -132,7 +132,7 @@ function PropRow({ label, children, tooltip }: { label: string; children: React.
       <Group gap={2} align="center" wrap="nowrap" style={{ width: 70, flexShrink: 0 }}>
         <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
         {tooltip && (
-          <Tooltip label={tooltip} multiline w={240} position="left" withArrow>
+          <Tooltip label={tooltip} multiline style={{ width: '15rem' }} position="left" withArrow>
             <ActionIcon size={14} variant="transparent" c="dimmed" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })}>
               <IconInfoCircle size={12} />
             </ActionIcon>
@@ -149,14 +149,11 @@ setMullionDebugDisplayName(PropRow, 'LayoutBuilder:SlotPropertiesPanel:PropRow')
 function SectionHeader({ label }: { label: string }) {
   return (
     <Box
-      mt={6}
-      mb={2}
-      pb={3}
-      style={{
+      style={{ marginTop: '0.375rem', marginBottom: '0.125rem', paddingBottom: '0.1875rem',
         borderBottom: '1px solid var(--mantine-color-default-border)',
       }}
     >
-      <Text size="xs" fw={700} tt="uppercase" c="dimmed" lts={0.8}>
+      <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: '0.05rem' }}>
         {label}
       </Text>
     </Box>
@@ -405,7 +402,7 @@ function EntranceSection({ slot, onUpdate }: EffectSectionProps) {
               aria-label={t('lb_slot_ent_delay_aria', 'Entrance delay')}
             />
           </PropRow>
-          <Group gap={8} align="center" mt={2}>
+          <Group gap={8} align="center" style={{ marginTop: '0.125rem' }}>
             <Box
               style={{
                 width: 64, height: 40, position: 'relative', overflow: 'hidden',
@@ -467,8 +464,7 @@ export function SlotPropertiesPanel({
     <>
       {listingMode && (
         <Box
-          mb={6}
-          style={{
+          style={{ marginBottom: '0.375rem',
             display: 'flex',
             gap: 8,
             padding: '8px 10px',
@@ -500,7 +496,7 @@ export function SlotPropertiesPanel({
       {/* ── Layout ─────────────────────────────────────────── */}
       <Accordion.Item value="layout">
         <Accordion.Control>
-          <Text size="xs" fw={600} tt="uppercase" c="dimmed" lts={0.8}>{t('lb_slot_acc_layout', 'Layout')}</Text>
+          <Text size="xs" fw={600} tt="uppercase" c="dimmed" style={{ letterSpacing: '0.05rem' }}>{t('lb_slot_acc_layout', 'Layout')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap={4}>
@@ -601,7 +597,7 @@ export function SlotPropertiesPanel({
               onPointerUp={() => { rotScrubRef.current = null; }}
               onPointerCancel={() => { rotScrubRef.current = null; }}
             >
-              <Text size="xs" fw={700} tt="uppercase" c="dimmed" lts={0.8}>{t('lb_slot_rotation', 'Rotation')}</Text>
+              <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: '0.05rem' }}>{t('lb_slot_rotation', 'Rotation')}</Text>
             </div>
             <Group gap={6} align="center" wrap="nowrap">
               <NumberInput
@@ -680,7 +676,7 @@ export function SlotPropertiesPanel({
       ) : (
       <Accordion.Item value="image">
         <Accordion.Control>
-          <Text size="xs" fw={600} tt="uppercase" c="dimmed" lts={0.8}>{t('lb_slot_acc_image', 'Image')}</Text>
+          <Text size="xs" fw={600} tt="uppercase" c="dimmed" style={{ letterSpacing: '0.05rem' }}>{t('lb_slot_acc_image', 'Image')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap={4}>
@@ -798,7 +794,7 @@ export function SlotPropertiesPanel({
       {/* ── Effects ────────────────────────────────────────── */}
       <Accordion.Item value="effects">
         <Accordion.Control>
-          <Text size="xs" fw={600} tt="uppercase" c="dimmed" lts={0.8}>{t('lb_slot_acc_effects', 'Effects')}</Text>
+          <Text size="xs" fw={600} tt="uppercase" c="dimmed" style={{ letterSpacing: '0.05rem' }}>{t('lb_slot_acc_effects', 'Effects')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap={4}>
@@ -833,7 +829,7 @@ export function SlotPropertiesPanel({
       {/* ── Stacking & Interaction ─────────────────────────── */}
       <Accordion.Item value="stacking">
         <Accordion.Control>
-          <Text size="xs" fw={600} tt="uppercase" c="dimmed" lts={0.8}>{t('lb_slot_acc_stacking', 'Stacking & Interaction')}</Text>
+          <Text size="xs" fw={600} tt="uppercase" c="dimmed" style={{ letterSpacing: '0.05rem' }}>{t('lb_slot_acc_stacking', 'Stacking & Interaction')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap={4}>

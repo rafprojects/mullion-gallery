@@ -59,7 +59,7 @@ export function ArchiveCompanyModal({
     >
       {campaignsToArchive.length > 0 && (
         <Box {...getMullionDebugProps('ArchiveCompanyModal', 'campaign-list')}>
-          <Text size="sm" fw={500} mb="xs">{t('admin_archco_list_heading', 'Campaigns to be archived:')}</Text>
+          <Text size="sm" fw={500} style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('admin_archco_list_heading', 'Campaigns to be archived:')}</Text>
           <ScrollArea {...getMullionDebugProps('ArchiveCompanyModal', 'campaign-scroll')} style={{ maxHeight: 150 }}>
             <Stack gap={4}>
               {campaignsToArchive.map((c) => (

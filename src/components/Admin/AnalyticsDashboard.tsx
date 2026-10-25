@@ -90,7 +90,7 @@ function StatCard({
 }) {
   return (
     <Paper withBorder p="md" radius="md">
-      <Stack gap={4} mb="xs">
+      <Stack gap={4} style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
         {icon}
         <Text size="sm" c="dimmed" fw={500}>
           {label}
@@ -378,7 +378,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
               )}
               {!mediaLoading && mediaItems.length > 0 && (
                 <ScrollArea>
-                  <Table striped highlightOnHover withTableBorder withColumnBorders fz="sm">
+                  <Table striped highlightOnHover withTableBorder withColumnBorders style={{ fontSize: 'var(--mullion-font-size-sm, var(--mantine-font-size-sm))' }}>
                     <Table.Thead>
                       <Table.Tr>
                         <Table.Th>{t('admin_analytics_th_media_id', 'Media ID')}</Table.Th>
@@ -415,7 +415,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
                   <IconChartLine size={16} />
                   {t('admin_analytics_top_campaigns', 'Top Campaigns by Views')}
                 </Title>
-                <Table striped highlightOnHover withTableBorder withColumnBorders fz="sm">
+                <Table striped highlightOnHover withTableBorder withColumnBorders style={{ fontSize: 'var(--mullion-font-size-sm, var(--mantine-font-size-sm))' }}>
                   <Table.Thead>
                     <Table.Tr>
                       <Table.Th>#</Table.Th>

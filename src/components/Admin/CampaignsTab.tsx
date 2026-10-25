@@ -10,9 +10,9 @@ function CampaignSkeletonRows({ withCheckbox }: { withCheckbox: boolean }) {
     <>
       {Array.from({ length: 5 }).map((_, i) => (
         <Table.Tr key={i}>
-          {withCheckbox && <Table.Td w={36}><Skeleton height={16} width={16} /></Table.Td>}
+          {withCheckbox && <Table.Td style={{ width: '2.25rem' }}><Skeleton height={16} width={16} /></Table.Td>}
           <Table.Td>
-            <Skeleton height={14} width="60%" mb={6} />
+            <Skeleton height={14} width="60%" style={{ marginBottom: '0.375rem' }} />
             <Skeleton height={10} width="80%" />
           </Table.Td>
           <Table.Td><Skeleton height={22} width={60} radius="xl" /></Table.Td>
@@ -82,7 +82,7 @@ export function CampaignsTab({
   return (
     <>
       {onAddCampaign && (
-        <Group justify="flex-end" mb="xs">
+        <Group justify="flex-end" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
           <Button size="sm" leftSection={<IconPlus size={14} />} onClick={onAddCampaign}>
             {t('admin_add_campaign', 'Add Campaign')}
           </Button>
@@ -92,7 +92,7 @@ export function CampaignsTab({
         <Table verticalSpacing="sm" highlightOnHover aria-label={t('admin_campaign_list_aria', 'Campaign list')}>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th w={36} aria-label={t('admin_select_all', 'Select all')}>
+              <Table.Th style={{ width: '2.25rem' }} aria-label={t('admin_select_all', 'Select all')}>
                 <Checkbox
                   checked={allSelected}
                   indeterminate={someSelected}
@@ -117,7 +117,7 @@ export function CampaignsTab({
       </Table.ScrollContainer>
 
       {totalPages > 1 && (
-        <Group justify="space-between" mt="md">
+        <Group justify="space-between" style={{ marginTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           <Text size="sm" c="dimmed">{t('admin_campaign_count', '{{count}} campaigns', { count: total })}</Text>
           <Pagination value={page} onChange={onPageChange} total={totalPages} size="sm" />
         </Group>

@@ -205,7 +205,7 @@ const GalleryConfigBreakpointAdaptersSection: NamedComponent<GalleryConfigBreakp
           {GALLERY_BREAKPOINTS.map((breakpoint) => {
             if (resolvedDraft.mode === 'unified') {
               return (
-                <Tabs.Panel key={breakpoint} value={breakpoint} pt="md">
+                <Tabs.Panel key={breakpoint} value={breakpoint} style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
                   <Stack gap="md">
                     <Text size="sm" c="dimmed">
                       {i18n.t('set_ad_gce_bp_editing_unified', 'Editing breakpoint-specific unified settings for the {{bp}} layout.', { bp: tBreakpointLabel(breakpoint), ns: 'mullion' })}
@@ -236,7 +236,7 @@ const GalleryConfigBreakpointAdaptersSection: NamedComponent<GalleryConfigBreakp
             });
 
             return (
-              <Tabs.Panel key={breakpoint} value={breakpoint} pt="md">
+              <Tabs.Panel key={breakpoint} value={breakpoint} style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
                 <Stack gap="md">
                   <Select
                     label={i18n.t('set_ad_gce_image_adapter_label', 'Image Adapter', { ns: 'mullion' })}
@@ -357,7 +357,7 @@ export function GalleryConfigEditorModal({
       withinPortal={withinPortal}
       {...drawerProps}
       title={
-        <Group w="100%" justify="space-between" wrap="nowrap" gap="sm">
+        <Group style={{ width: '100%' }} justify="space-between" wrap="nowrap" gap="sm">
           <Text fw={600} size="sm" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</Text>
           <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
             <Menu shadow="md" position="bottom-end">

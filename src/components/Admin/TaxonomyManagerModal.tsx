@@ -78,7 +78,7 @@ function CategoryRow({ cat, depth, parentName, apiClient, onNotify, onMutate }: 
 
   if (editing) {
     return (
-      <Group gap="xs" align="center" pl={depth * 16}>
+      <Group gap="xs" align="center" style={{ paddingLeft: `${depth}rem` }}>
         <TextInput
           value={value}
           onChange={(e) => setValue(e.currentTarget.value)}
@@ -99,7 +99,7 @@ function CategoryRow({ cat, depth, parentName, apiClient, onNotify, onMutate }: 
   }
 
   return (
-    <Group gap="xs" justify="space-between" pl={depth * 16}>
+    <Group gap="xs" justify="space-between" style={{ paddingLeft: `${depth}rem` }}>
       <Group gap="xs">
         {/* eslint-disable-next-line i18next/no-literal-string -- tree-indent glyph, not translatable text */}
         {depth > 0 && <Text size="xs" c="dimmed">↳</Text>}
@@ -281,7 +281,7 @@ export function TaxonomyManagerModal({ opened, apiClient, onClose, onNotify }: T
           <Tabs.Tab value="media-tags">{t('admin_tax_tab_media_tags', 'Media Tags')}</Tabs.Tab>
         </Tabs.List>
 
-        <Tabs.Panel value="categories" pt="sm">
+        <Tabs.Panel value="categories" style={{ paddingTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           <Stack gap="xs">
             {campaignCategories.length === 0 && (
               <Text size="sm" c="dimmed">{t('admin_tax_no_categories', 'No categories yet.')}</Text>
@@ -322,7 +322,7 @@ export function TaxonomyManagerModal({ opened, apiClient, onClose, onNotify }: T
           </Stack>
         </Tabs.Panel>
 
-        <Tabs.Panel value="campaign-tags" pt="sm">
+        <Tabs.Panel value="campaign-tags" style={{ paddingTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           <Stack gap="xs">
             {campaignTags.length === 0 && (
               <Text size="sm" c="dimmed">{t('admin_tax_no_campaign_tags', 'No campaign tags yet.')}</Text>
@@ -339,7 +339,7 @@ export function TaxonomyManagerModal({ opened, apiClient, onClose, onNotify }: T
           </Stack>
         </Tabs.Panel>
 
-        <Tabs.Panel value="media-tags" pt="sm">
+        <Tabs.Panel value="media-tags" style={{ paddingTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           <Stack gap="xs">
             {mediaTags.length === 0 && (
               <Text size="sm" c="dimmed">{t('admin_tax_no_media_tags', 'No media tags yet.')}</Text>

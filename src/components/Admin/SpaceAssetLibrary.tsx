@@ -75,7 +75,7 @@ export function SpaceAssetLibrary({
 
   return (
     <Box>
-      <Group gap="xs" mb="xs" wrap="wrap">
+      <Group gap="xs" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} wrap="wrap">
         <TextInput
           size="xs"
           placeholder={t('admin_sal_search_ph', 'Search assets…')}
@@ -106,7 +106,7 @@ export function SpaceAssetLibrary({
 
       {allTags.length > 0 && (
         <Chip.Group multiple value={activeTags} onChange={setActiveTags}>
-          <Group gap={4} mb="xs" wrap="wrap">
+          <Group gap={4} style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} wrap="wrap">
             {allTags.map((tag) => (
               <Chip key={tag} value={tag} size="xs" variant="outline">{tag}</Chip>
             ))}
@@ -115,7 +115,7 @@ export function SpaceAssetLibrary({
       )}
 
       {filtered.length === 0 ? (
-        <Text size="xs" c="dimmed" py="sm">{t('admin_sal_no_match', 'No assets match the current filter.')}</Text>
+        <Text size="xs" c="dimmed" style={{ paddingBlock: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>{t('admin_sal_no_match', 'No assets match the current filter.')}</Text>
       ) : (
         <div
           style={{
@@ -177,7 +177,7 @@ export function SpaceAssetLibrary({
                   {fileType}
                 </Badge>
 
-                <Text size="10px" truncate px={4} py={2} title={asset.name}>{asset.name}</Text>
+                <Text size="10px" truncate style={{ paddingInline: '0.25rem', paddingBlock: '0.125rem' }} title={asset.name}>{asset.name}</Text>
               </Box>
             );
           })}

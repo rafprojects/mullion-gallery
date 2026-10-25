@@ -203,7 +203,7 @@ export function CardGalleryHostPagination({
 
       {/* Dot navigator + page indicator for paginated mode */}
       {displayMode === 'paginated' && totalPages > 1 && (
-        <Stack align="center" gap={4} mt="sm">
+        <Stack align="center" gap={4} style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           {settings.cardPageDotNav && (
             <DotNavigator
               total={totalPages}
@@ -220,7 +220,7 @@ export function CardGalleryHostPagination({
 
       {/* Load more button */}
       {hasMore && (
-        <Center mt="xl">
+        <Center style={{ marginTop: 'var(--mullion-spacing-xl, var(--mantine-spacing-xl))' }}>
           <Button
             variant="light"
             size="md"

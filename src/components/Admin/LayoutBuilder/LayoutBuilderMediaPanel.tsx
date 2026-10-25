@@ -51,7 +51,7 @@ export function LayoutBuilderMediaPanel(_props: IDockviewPanelProps) {
     >
       <Select
         size="xs"
-        mb="sm"
+        style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}
         placeholder={t('lb_mp_choose_campaign', 'Choose a campaign…')}
         value={selectedCampaignId}
         onChange={setSelectedCampaignId}
@@ -71,7 +71,7 @@ export function LayoutBuilderMediaPanel(_props: IDockviewPanelProps) {
         leftSection={<IconUpload size={14} />}
         onClick={() => setUploadOpen(true)}
         fullWidth
-        mb="sm"
+        style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}
       >
         {t('lb_mp_add_media', 'Add media')}
       </Button>
@@ -98,13 +98,12 @@ export function LayoutBuilderMediaPanel(_props: IDockviewPanelProps) {
             localStorage.setItem(`mullion_builder_${rootId}_design_assets_open`, String(next));
           } catch { /* ignore */ }
         }}
-        mt="sm"
-        style={{ flexShrink: 0 }}
+        style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))', flexShrink: 0 }}
       >
         <Accordion.Item value="asset-library">
           <Accordion.Control>{t('lb_mp_asset_library', 'Asset Library')}</Accordion.Control>
           <Accordion.Panel>
-            <Group justify="space-between" align="center" mb={6}>
+            <Group justify="space-between" align="center" style={{ marginBottom: '0.375rem' }}>
               <Text size="xs" c="dimmed">
                 {t('lb_mp_asset_desc', 'Decorative assets, shared across campaigns. Drag onto the canvas to place.')}
               </Text>
@@ -116,7 +115,7 @@ export function LayoutBuilderMediaPanel(_props: IDockviewPanelProps) {
               onSetTags={handleSetAssetTags}
               maxHeight={200}
             />
-            <Box mt={8}>
+            <Box style={{ marginTop: '0.5rem' }}>
               <Button
                 size="xs"
                 variant="light"

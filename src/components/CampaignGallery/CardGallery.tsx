@@ -315,7 +315,7 @@ export function CardGallery({
                 size="xs"
               />
             )}
-            <Text fw={500} size="xs" mt="xs">{t('cardgal_title_typo', 'Title Typography')}</Text>
+            <Text fw={500} size="xs" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('cardgal_title_typo', 'Title Typography')}</Text>
             <TypographyEditor
               value={galleryBehaviorSettings.typographyOverrides['viewerTitle'] ?? {}}
               onChange={(v) => {

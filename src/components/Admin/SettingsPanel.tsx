@@ -275,11 +275,11 @@ const SettingsPanelTabsContent: NamedComponent<SettingsPanelTabsContentProps> = 
         )}
       </Tabs.List>
 
-      <Tabs.Panel value="appearance" pt="md">
+      <Tabs.Panel value="appearance" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         <SettingsAppearanceTab settings={settings} updateSetting={updateSetting} isSystemAdmin={isSystemAdmin} />
       </Tabs.Panel>
 
-      <Tabs.Panel value="cards" pt="md">
+      <Tabs.Panel value="cards" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         <SettingsCardsTab
           settings={settings}
           updateSetting={updateGallerySetting}
@@ -289,7 +289,7 @@ const SettingsPanelTabsContent: NamedComponent<SettingsPanelTabsContentProps> = 
         />
       </Tabs.Panel>
 
-      <Tabs.Panel value="gallery-layout" pt="md">
+      <Tabs.Panel value="gallery-layout" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         <SettingsGalleryLayoutTab
           settings={settings}
           updateSetting={updateGallerySetting}
@@ -297,19 +297,19 @@ const SettingsPanelTabsContent: NamedComponent<SettingsPanelTabsContentProps> = 
         />
       </Tabs.Panel>
 
-      <Tabs.Panel value="gallery-style" pt="md">
+      <Tabs.Panel value="gallery-style" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         <SettingsGalleryStyleTab settings={settings} updateSetting={updateSetting} tooltipLabel={tooltipLabel} />
       </Tabs.Panel>
 
-      <Tabs.Panel value="gallery-navigation" pt="md">
+      <Tabs.Panel value="gallery-navigation" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         <SettingsGalleryNavigationTab settings={settings} updateSetting={updateSetting} tooltipLabel={tooltipLabel} />
       </Tabs.Panel>
 
-      <Tabs.Panel value="viewer" pt="md">
+      <Tabs.Panel value="viewer" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         <SettingsViewerTab settings={settings} updateSetting={updateGallerySetting} />
       </Tabs.Panel>
 
-      <Tabs.Panel value="typography" pt="md">
+      <Tabs.Panel value="typography" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         <SettingsTypographyTab
           apiClient={apiClient}
           customFonts={customFonts}
@@ -322,13 +322,13 @@ const SettingsPanelTabsContent: NamedComponent<SettingsPanelTabsContentProps> = 
       </Tabs.Panel>
 
       {!isSpaceMode && isSystemAdmin && (
-        <Tabs.Panel value="integrations" pt="md">
+        <Tabs.Panel value="integrations" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           <SettingsIntegrationsTab apiClient={apiClient} />
         </Tabs.Panel>
       )}
 
       {isSystemAdmin && settings.advancedSettingsEnabled && (
-        <Tabs.Panel value="system-admin" pt="md">
+        <Tabs.Panel value="system-admin" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           <SettingsSystemAdminTab
             settings={settings}
             updateSetting={updateSetting}
@@ -612,7 +612,7 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
       classNames={adminChromeClassNames(applyThemeEverywhere)}
       attributes={adminChromeAttributes(applyThemeEverywhere, themeId)}
       title={
-        <Group w="100%" justify="space-between" wrap="nowrap" gap="sm">
+        <Group style={{ width: '100%' }} justify="space-between" wrap="nowrap" gap="sm">
           <Group gap="sm">
             <IconSettings size={22} />
             <Title order={3}>{t('set_panel_title', 'Settings')}</Title>

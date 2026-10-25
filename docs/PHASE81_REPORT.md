@@ -1,6 +1,6 @@
 # Phase 81 - Consumer migration and Mantine removal
 
-**Status:** Planned, no code yet
+**Status:** In progress (P81-A pass 1)
 **Created:** 2026-09-10
 **Last updated:** 2026-10-25 (P81-E added from Phase 80's audit). 2026-10-02 (P80-F settled the manager hosts and the tooltip rule, and placed the 22 tooltips that break it into B; earlier the same day Phase 80's follow-ons were placed into B and D, including `useBroadcastStaleness` and the notification and confirm migration; the Settings panel clipping defect added to B on 2026-09-14)
 
@@ -8,7 +8,7 @@
 
 | Track | Description | Status | Effort |
 |-------|-------------|--------|--------|
-| P81-A | Style props and the size and variant scales: the mechanical bulk of the migration | Planned | Large |
+| P81-A | Style props and the size and variant scales: the mechanical bulk of the migration | In progress: pass 1 landed, pass 2 rides each name flip | Large |
 | P81-B | Migrate the consumers, theming-critical surfaces first | Planned | Large |
 | P81-C | Test, story and e2e harness migration | Planned | Medium |
 | P81-D | Remove Mantine and delete the workarounds it required | Planned | Small-Medium |
@@ -72,6 +72,20 @@ A codemod for the direct mappings onto the framework's layout primitive props, w
 **Data point from P79-B (2026-09-12).** Responsive style props were partly inert until P79-B. React 19 inserts Mantine's hoisted `__mdi__` sheet as a root's first child, so a responsive prop setting the same property as the component's core rule (`Card` with `p={{ base: 'sm', md: 'md' }}`, four sites in `AccessTab`) lost to the core rule at the base breakpoint while Mantine's sheet was a `<style>` after it. P79-B registers Mantine's sheet in the `mullion.vendor` cascade layer, so the hoisted rule now wins and those cards take `sm` padding below `md`. The codemod should carry the responsive intent (the values as written), not what painted before P79-B.
 
 **Data point from P79-0 (2026-09-13).** The framework `Container` scale is `40rem` to `90rem` (`xs` to `xl`) where Mantine's is 540px to 1320px, so the names do not map one to one: the single `size="sm"` call site moves from 720px to 768px. The mapping document should list the container scale beside the spacing scale rather than carry the step names across unchanged. `Text` and `Title` carry no colour of their own and inherit, as Mantine's do, so `c="dimmed"` becomes `tone="muted"` and an unqualified `Text` needs nothing.
+
+### Pass 1 (2026-10-25)
+
+**The execution order above cannot work as written, so A runs in two passes.** Consumers render Mantine until their name flips in `src/ui/index.ts`, and Mantine ignores the framework's prop names: renaming `c="dimmed"` to `tone="muted"` ahead of the flip silently un-styles 236 `Text` sites. User decision, 2026-10-25: pass 1 moves now only the style props the framework drops entirely; pass 2 runs the renames per component name, in the commit that flips it. The mapping for both lives in [UI_SCALE_MAPPING.md](UI_SCALE_MAPPING.md).
+
+**Pass 1 writes inline styles, not utility classes.** Utility classes were the user's first choice and were rejected on measurement. Mantine renders a style prop as an inline style, which beats everything. Mantine's own sheet sets `margin: 0` on `Text`, `Title` and about 75 other rules, and `main.tsx` loads that sheet unlayered into the document, where it beats `@layer mullion.components`. A `mullion-mt-sm` class would therefore lose on light-mount galleries and in wp-admin. Moving the prop into `style` on the same element, ahead of anything the caller wrote (Mantine's `Box` merges `style` after the style props), renders the same declaration under either library.
+
+**Values keep Mantine's reading exactly.** A scale step becomes `var(--mullion-spacing-sm, var(--mantine-spacing-sm))`. The fallback serves the 72 `.tsx` files reachable from the wp-admin apps, which run under a bare `MantineProvider` with no `--mullion-*` tokens until P81-B. Mantine's default spacing and font-size scales equal `_base.json`'s, no theme overrides either, and `--mantine-scale` is never set, so the two variables are interchangeable wherever both exist. A number becomes rem (`4` is `0.25rem`) because Mantine's `rem()` divides by 16; pixels would match only on a host whose root font size is 16px. That exposed a discrepancy in `scale.ts`, which reads numbers as pixels while claiming to match Mantine. It is recorded as an open question in the mapping document, for pass 2.
+
+**What moved.** `scripts/ui-codemod-pass1.mjs` moved 330 props on 280 elements in 66 files. It refuses a site whose merge order it cannot prove (a spread that might carry `style`, a non-literal `style`, an expression under a non-identity resolver). `getMullionDebugProps()` spreads are allowed because they return only `data-*` attributes. 14 sites were done by hand from that list, each checked against its type (`useTypographyStyle` returns `CSSProperties`, `SpaceSelector`'s `style` is `CSSProperties`, the badge offsets are numbers). Two responsive `h` objects stay for pass 2, since the framework has no responsive prop form. 265 colour props (`c`, `bg`, `ff`) are pass 2's by design.
+
+**How it was verified.** `playwright.capture.config.ts` and `scripts/pixel-diff.mjs` give an exact before/after comparison with no tolerance. Two captures of the unchanged tree agreed on all 16 `theme-qa` screenshots to the pixel, so the noise floor is zero and any differing pixel after the codemod is a finding. After the codemod, three captures were taken. Two matched both "before" captures exactly on all 16. The first differed by 25 pixels at the four corners of the open popup in `theme-selector-open-default-light`, and a third capture of the same tree did not reproduce it. That snapshot is the light twin of the non-deterministic dark one filed under P81-B's Settings batch, and the light one flips too, about once in five captures. Typecheck, lint, the allow-list check, vitest (277 files, 4,469 tests) and the full Playwright suite (205 tests) all pass.
+
+**What the pixel diff does not cover.** `theme-qa` photographs the gallery shell and the Settings drawer. The Admin Panel, the Layout Builder, the modals and the wp-admin apps have no screenshots, so their neutrality rests on the construction argument above, which is the same for every site, and on the functional suites. Pass 2 cannot lean on that argument because it changes pixels on purpose, so each surface batch needs its own captures first.
 
 ### Acceptance criteria
 
@@ -181,6 +195,8 @@ Six pieces of this codebase exist only to make Mantine fit: `adapter.ts` (601 li
 ### Fix
 
 Delete them, drop `@mantine/core`, `@mantine/hooks`, `@mantine/modals`, `@mantine/notifications` and `@mantine/form` from `package.json`, and remove Mantine's stylesheet imports from `main.tsx` and `shadowStyles.ts`.
+
+Strip the `--mantine-*` fallbacks P81-A's pass 1 wrote into inline styles (`var(--mullion-spacing-sm, var(--mantine-spacing-sm))` becomes `var(--mullion-spacing-sm)`), once the wp-admin apps have a provider. A grep for `var(--mantine-` outside `src/themes/` finds them, along with 146 direct `--mantine-*` reads in `.tsx` files that predate this phase and need tokens chosen by hand.
 
 Retire `option-checked-bg` and `option-checked-color` from the component-token tier. The framework's select marks a selected option with a check and `primary-text` rather than a fill (P80-B, under standing rule 8), so the only readers left are the Mantine adapter and `chrome-portable.scss`, and both go in this track.
 

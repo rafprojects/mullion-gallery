@@ -56,7 +56,7 @@ export function SpaceSwitcher({ activeInstanceId, onSelect, pageSpaces = [] }: S
           return (
             <Menu.Item
               key={space.instanceId}
-              fw={isActive ? 600 : undefined}
+              style={{ fontWeight: isActive ? 600 : undefined }}
               leftSection={isActive ? <IconCheck size={12} /> : <span style={{ width: 12, display: 'inline-block' }} />}
               onClick={() => onSelect(space.instanceId)}
             >

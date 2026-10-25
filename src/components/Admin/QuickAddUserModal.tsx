@@ -67,7 +67,7 @@ function QuickAddUserSuccessState({ quickAddResult, onClose, onNotify }: QuickAd
       >
         <Text size="sm">{quickAddResult.message}</Text>
         {quickAddResult.resetUrl && (
-          <Box mt="sm">
+          <Box style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
             <Text size="sm" fw={500}>{t('admin_qau_reset_link_label', 'Password Reset Link:')}</Text>
             <TextInput
               label={t('admin_qau_reset_link_input', 'Password reset link')}
@@ -80,7 +80,7 @@ function QuickAddUserSuccessState({ quickAddResult, onClose, onNotify }: QuickAd
                 </Tooltip>
               )}
             />
-            <Group mt="xs" gap="xs">
+            <Group style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} gap="xs">
               <Button
                 size="xs"
                 variant="light"
@@ -102,7 +102,7 @@ function QuickAddUserSuccessState({ quickAddResult, onClose, onNotify }: QuickAd
                 {t('admin_qau_copy_link', 'Copy Link')}
               </Button>
             </Group>
-            <Text size="xs" c="dimmed" mt="xs">
+            <Text size="xs" c="dimmed" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
               {t('admin_qau_share_note', 'Share this link securely with the user. They can use it to set their own password.')}
             </Text>
           </Box>
@@ -204,7 +204,7 @@ function QuickAddUserFormState({
         description={t('admin_qau_test_mode_desc', 'Enable to test the password reset link UI without actually sending email')}
       />
 
-      <Group {...getMullionDebugProps('QuickAddUserModal', 'actions')} justify="flex-end" mt="md" wrap="wrap" gap="sm">
+      <Group {...getMullionDebugProps('QuickAddUserModal', 'actions')} justify="flex-end" style={{ marginTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} wrap="wrap" gap="sm">
         <Button variant="default" onClick={onClose}>{t('admin_qau_cancel', 'Cancel')}</Button>
         <Button
           onClick={onSubmit}

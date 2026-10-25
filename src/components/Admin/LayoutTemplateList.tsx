@@ -613,7 +613,7 @@ function TemplateGridCard({ template, onEdit, onDuplicate, onDelete, onExport }:
   const { t: tr } = useTranslation('mullion');
   const t = template;
   return (
-    <Card shadow="xs" radius="md" withBorder padding="sm" pos="relative">
+    <Card shadow="xs" radius="md" withBorder padding="sm" style={{ position: 'relative' }}>
       {/* P72-G: the primary "edit" action is a real button wrapping the preview +
           title, not a role="button" Card wrapping the menu button (which axe
           flagged as nested-interactive). The menu is a sibling, rendered after. */}
@@ -675,7 +675,7 @@ function TemplateGridCard({ template, onEdit, onDuplicate, onDelete, onExport }:
           bottom-right so it sits beside the title on the card background, as it did
           pre-P72-G: over the dark preview canvas a `subtle` ActionIcon has almost no
           contrast in light mode. */}
-      <Box pos="absolute" bottom={8} right={8}>
+      <Box style={{ position: 'absolute', bottom: '0.5rem', right: '0.5rem' }}>
         <Menu position="bottom-end" withArrow>
           <Menu.Target>
             <ActionIcon

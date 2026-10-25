@@ -562,7 +562,7 @@ export function GraphicLayerPropertiesPanel({
         <Stack gap={4}>
           <Text size="xs" c="dimmed">{t('lb_gl_remove_confirm', 'Remove this graphic layer?')}</Text>
           <Group gap={4}>
-            <Button size="xs" variant="subtle" onClick={closeConfirm} flex={1}>
+            <Button size="xs" variant="subtle" onClick={closeConfirm} style={{ flex: 1 }}>
               {t('lb_gl_cancel', 'Cancel')}
             </Button>
             <Button
@@ -570,7 +570,7 @@ export function GraphicLayerPropertiesPanel({
               color="red"
               onClick={() => { closeConfirm(); onRemove(overlay.id); }}
               leftSection={<IconTrash size={12} />}
-              flex={1}
+              style={{ flex: 1 }}
               aria-label={t('lb_gl_confirm_remove', 'Confirm remove')}
             >
               {t('lb_gl_remove', 'Remove')}

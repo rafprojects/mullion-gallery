@@ -124,7 +124,7 @@ export function CampaignsMobileList({
             </Group>
 
             {/* Actions */}
-            <Group gap="xs" wrap="wrap" mt={2}>
+            <Group gap="xs" wrap="wrap" style={{ marginTop: '0.125rem' }}>
               <Button size="xs" variant="outline" leftSection={<IconEdit size={12} />} onClick={() => handleEdit(c)}>
                 {t('admin_edit', 'Edit')}
               </Button>
@@ -192,7 +192,7 @@ export function CampaignsMobileList({
     <>
       <Stack gap="sm">{cards}</Stack>
       {totalPages > 1 && (
-        <Group justify="space-between" mt="md">
+        <Group justify="space-between" style={{ marginTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           <Text size="sm" c="dimmed">{t('admin_campaign_count', '{{count}} campaigns', { count: total })}</Text>
           <Pagination value={page} onChange={onPageChange} total={totalPages} size="sm" />
         </Group>

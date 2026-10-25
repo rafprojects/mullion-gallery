@@ -31,8 +31,7 @@ export function SpaceSelector({
       value={value}
       onChange={(v) => onChange(v ?? 'all')}
       size={size}
-      w={w}
-      style={style}
+      style={{ ...(w !== undefined && { width: `${w / 16}rem` }), ...style }}
       aria-label={ariaLabel}
       disabled={disabled ?? false}
       allowDeselect={false}
