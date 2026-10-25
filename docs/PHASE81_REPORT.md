@@ -13,6 +13,7 @@
 | P81-C | Test, story and e2e harness migration | Planned | Medium |
 | P81-D | Remove Mantine and delete the workarounds it required | Planned | Small-Medium |
 | P81-E | Small defects found during Phase 80's audit: an escaped ampersand in every interface string, a flickering admin menu at 320px, alt text lost on export, a broken CLI, and three layout faults | Planned | Small-Medium |
+| P81-F | The size basis: one token step is the same physical size on every host, whatever the host's root font size | Planned | Small-Medium |
 
 ---
 
@@ -55,6 +56,7 @@
 1. **P81-A** first. It is mechanical, it touches almost every file, and doing it before the component swap means each file is touched once for props and once for imports rather than churned twice in one diff.
 2. **P81-B** next, theming-critical surfaces first: the Settings panel, the Layout Builder chrome and the admin panel, because those are where Phase 76's defects lived and where a regression is most likely.
 3. **P81-C** alongside B, per batch. A migrated component with an unmigrated test harness is untested.
+1a. **P81-F** before P81-A's pass 2 reaches `Stack` and `Group`. Pass 2 reads numbers in the tokens' basis, so the basis has to be fixed first (designer, 2026-10-25).
 4. **P81-D** last, and only when the allow-list is empty or its residue is documented.
 
 ---
@@ -86,6 +88,10 @@ A codemod for the direct mappings onto the framework's layout primitive props, w
 **How it was verified.** `playwright.capture.config.ts` and `scripts/pixel-diff.mjs` give an exact before/after comparison with no tolerance. Two captures of the unchanged tree agreed on all 16 `theme-qa` screenshots to the pixel, so the noise floor is zero and any differing pixel after the codemod is a finding. After the codemod, three captures were taken. Two matched both "before" captures exactly on all 16. The first differed by 25 pixels at the four corners of the open popup in `theme-selector-open-default-light`, and a third capture of the same tree did not reproduce it. That snapshot is the light twin of the non-deterministic dark one filed under P81-B's Settings batch, and the light one flips too, about once in five captures. Typecheck, lint, the allow-list check, vitest (277 files, 4,469 tests) and the full Playwright suite (205 tests) all pass.
 
 **What the pixel diff does not cover.** `theme-qa` photographs the gallery shell and the Settings drawer. The Admin Panel, the Layout Builder, the modals and the wp-admin apps have no screenshots, so their neutrality rests on the construction argument above, which is the same for every site, and on the functional suites. Pass 2 cannot lean on that argument because it changes pixels on purpose, so each surface batch needs its own captures first.
+
+### Pass 2 mapping settled (2026-10-25)
+
+The designer answered every open row of the mapping (`designer-answers-ui-scale-mapping-2026-10-25.md`), and [UI_SCALE_MAPPING.md](UI_SCALE_MAPPING.md) now carries them as settled: colour names map to roles by what the component is, `Badge variant="dot"` becomes an outlined toned badge whose glyph replaces the dot, field `filled` is dropped, sub-token text floors to `xs`. Numbers are read as rem in the tokens' basis, which made the size basis itself the question: measured unprotected, and filed as P81-F. The data the designer asked for went back the same day (`ui-scale-mapping-data-2026-10-25.md`) with two questions still open: whether 6px (36 of the 136 numeric gaps) gets a step, and whether the builder's one inline-rename field earns a `bare` prop. The field-variant count in the first draft was wrong (28); it is 33, because `ColorInput` was missed.
 
 ### Acceptance criteria
 
@@ -214,6 +220,30 @@ Retarget rather than delete the guards that still describe something true: the s
 ### Validation
 
 - Full suites twice, `npm run build`, `npm run size-check`, and a rebuilt plugin checked on the dev site.
+
+---
+
+## Track P81-F - The size basis
+
+### Problem
+
+Every framework token is a rem value from `_base.json`, and so is every Mantine token, and `rem` resolves against `<html>` however deep the shadow root is. A WordPress theme that sets `html { font-size: 62.5% }` therefore shrinks the whole product to 62.5% of its design size: menus, inputs, the focus ring's reach, the badge glyphs. Measured on 2026-10-25 by mounting the dev page at both roots and reading bounding rectangles: a `Stack` at `lg` went from 20px to 12.5px, a `Group` at `md` from 16 to 10, at `xs` from 10 to 6.25. Nothing sets `--mantine-scale`, and the framework has no scale of its own.
+
+Found while answering P81-A's question about numbers. The designer's reply (`docs/design/correspondences/designer-answers-ui-scale-mapping-2026-10-25.md`, section 1) sets the invariant: one token step is the same physical size on every host, and numbers are read in the same basis as tokens.
+
+### Fix
+
+The provider measures the document's root font size at mount and sets a scale on its scope that brings one step back to design size, and the token sheet multiplies every rem token by it, as Mantine's `rem() * var(--mantine-scale)` does. Until P81-D removes Mantine, the same value goes to `--mantine-scale`, so both libraries keep agreeing (P81-A's pass 1 relies on that). Open points to settle in the track: whether to re-measure when the root changes after mount, and whether the wp-admin apps, which have no provider until P81-B, need it at all; that depends on wp-admin's root font size, which has not been measured.
+
+### Acceptance criteria
+
+- On a page with `html { font-size: 62.5% }`, a token gap, a field's height and the focus ring's reach measure the same as on a 16px root, in both shadow and light mounts.
+- A pass-1 inline style (`0.25rem`) and a token gap scale together, so P81-A's numbers stay in the tokens' basis.
+- An e2e test mounts at both roots and compares bounding rectangles.
+
+### Validation
+
+- The new e2e test, the full suites, and the exact `theme-qa` diff at a 16px root, which must not move.
 
 ---
 

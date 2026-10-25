@@ -51,9 +51,11 @@ Never moved by pass 1:
 - **Responsive objects** (`p={{ base: 'sm', md: 'md' }}`): the framework has no responsive prop form; these become classes by hand.
 - **Elements with a spread attribute**, or a `style` that is not an object literal: the merge order cannot be proved from the source, so a person does each one.
 
-## Pass 2: renames (draft, needs the designer)
+## Pass 2: renames
 
-Pass 2 runs per component name. The rows marked **open** need the designer's call before the codemod is written. The rest follow the framework's own props.
+Pass 2 runs per component name. The rows below were settled by the designer on 2026-10-25 (`docs/design/correspondences/designer-answers-ui-scale-mapping-2026-10-25.md`); the two marked **open** wait on questions sent back the same day (`ui-scale-mapping-data-2026-10-25.md`).
+
+### Props
 
 | Mantine | Framework | Notes |
 |---|---|---|
@@ -63,20 +65,44 @@ Pass 2 runs per component name. The rows marked **open** need the designer's cal
 | `Text tt="uppercase"` | `transform="uppercase"` | |
 | `Text fs="italic"` | `italic` | |
 | `Text ff="monospace"` | `font="mono"` | |
-| `Text fz` / `Text size` | `size` | `size="10px"` and `"9px"` pass through as lengths. |
+| `Text fz` / `Text size` | `size` | Any size below the smallest text token (`xs`, 0.75rem) floors to `xs` and is listed for review. Five sites today: three field affixes at 10px, an asset name at 10px, a thumbnail caption at 9px. |
 | `Title size="h3"` | `size={3}` | |
 | `Image w` `h` | `width` `height` | |
-| `c="dimmed"` | `tone="muted"` | 236 sites. P79-0 confirmed `Text` inherits when un-toned, as Mantine's does. |
-| `color` / `c`: `red` | `tone="danger"` | |
-| `green` | `tone="success"` | **open:** `teal` (5 sites) also success? |
-| `orange`, `yellow` | `tone="warning"` | |
-| `blue` | `tone="primary"`, or `tone="info"` on `Alert` | **open:** which, per component. |
-| `gray`, `dark` | no tone, or `tone="muted"` | **open:** 14 `ActionIcon color="gray"` sites read as the neutral control. |
-| `c="white"`, `"orange.4"`, `"inherit"`, `bg="gray.0"`, `bg="red.9"` | by hand | No tone carries a literal shade. |
 | `Button size="compact-xs"` | `size="xs" compact` | 8 sites. |
 | `ActionIcon size={14}` and other numbers | unchanged | The framework takes a number. |
-| `Badge variant="dot"` | **open** | The framework badge has `filled`, `light` and `outline`. 4 sites. |
-| `TextInput`/`NumberInput`/`Select variant="filled"` or `"unstyled"` | **open** | The framework fields have no variant prop. 28 sites. |
-| `Container size="sm"` | `size="sm"` | The step names do not map one to one: Mantine's `sm` is 720px, the framework's is 48rem (768px). The single call site moves 48px wider unless it is given `size={720}`. |
+| `Badge variant="dot"` | `variant="outline"` with the tone | The toned badge's role glyph replaces the dot, which removes four colour-only signals. 4 sites. |
+| Field `variant="filled"` | dropped | The framework field already sits on `surface2`, which is the filled input. If dropping it changes the reading, the default field is wrong. 31 sites, 29 of them in the Layout Builder's property panels. |
+| Field `variant="unstyled"` | **open** | 2 sites. `UnitScrubField`'s unit picker moves onto the framework number field's unit slot. The builder's title-bar rename needs a `bare` field or a small component of its own. |
+| `Container size="sm"` | `size="sm"` | Takes the framework's 48rem (768px), 48px wider than Mantine's 720px, and is reviewed on its surface. `size={720}` only if the layout was tuned to that width. One site. |
 
-**Numbers in pass 2: an open discrepancy.** `src/ui/components/scale.ts` reads a number as pixels and says that is "the same reading Mantine gives". Mantine reads it as rem (`rem(4)` is `0.25rem`). The two agree only where the host's root font size is 16px. On a WordPress theme that sets `html { font-size: 62.5% }`, a migrated `gap={4}` grows from 2.5px to 4px while every token-based gap shrinks with the root. Pass 1 emits rem so it stays neutral. Whether the framework should follow Mantine here is for the designer and the user, before pass 2 reaches `Stack` and `Group` (409 `gap` sites, 136 of them numbers).
+### Colour
+
+The rule for every colour prop, `c`, `bg` or `color`: **a Mantine palette name or shade maps to a role, never to a hex or a shade.** Where no role fits, the site goes on a list of gaps in the role set for the designer, not into a literal.
+
+| Mantine | Framework |
+|---|---|
+| `c="dimmed"`, `c="gray"` on text | `tone="muted"`. 236 `dimmed` sites. An un-toned `Text` inherits, as Mantine's does (P79-0). |
+| `c="dark"` on text | no tone; it inherits `text` |
+| `red` | `tone="danger"` |
+| `green` | `tone="success"` |
+| `teal` | `tone="primary"`, or `tone="success"` only where the element reports that something succeeded. 5 sites, each read. |
+| `orange`, `yellow` | `tone="warning"` |
+| `blue` on a control (`Button`, `ActionIcon`, `Anchor`, `Tabs`, anything operated) | `tone="primary"` |
+| `blue` on a status component (`Alert`, `Badge`, a toast, anything reporting a state) | `tone="info"`. Identical on the default themes; divergent on homage themes such as Nord. |
+| `gray`, `dark` on a control | no tone. The un-toned control is the quiet neutral one; if it does not read that way, that is one component defect, not fourteen props. |
+| A shade (`orange.4`, `red.9`, `gray.0`) | the role it stands for: `bg="red.9"` is a danger fill, `c="orange.4"` is warning text |
+| `c="white"` on a fill | the fill's on-colour, which a toned component already supplies |
+
+### Numbers and the size basis
+
+**Settled: numbers share the tokens' basis.** A number in a spacing or size prop is read as rem times the framework's scale, as Mantine reads it, so a number and a token always shrink or grow together. `src/ui/components/scale.ts` reads numbers as pixels today and is corrected in pass 2. Pass 1 already emits rem.
+
+**Ahead of that: the basis itself is unprotected.** Measured 2026-10-25 with `html { font-size: 62.5% }` on the dev page: `lg` 20px becomes 12.5, `md` 16 becomes 10, `xs` 10 becomes 6.25. Every token shrinks with the host's root, because nothing sets a scale. The designer's invariant, filed as its own Phase 81 track: one token step is the same physical size on every host, with the framework measuring the root at mount and setting its scale to compensate.
+
+**Off-scale numbers fold onto tokens.** Of 409 `gap` values, 136 are numbers:
+
+| Value | 0 | 2 | 3 | 4 | 6 | 8 |
+|---|---|---|---|---|---|---|
+| Sites | 9 | 16 | 2 | 69 | 36 | 4 |
+
+The designer proposed `3xs` (2px) and `2xs` (4px) below `xs` (10px), which takes 85 of them. **Open:** 6px has 36 sites and no step under that proposal; the question went back with the histogram. A literal survives pass 2 only where the value is deliberately off-scale, and it is emitted in the tokens' basis.
