@@ -96,6 +96,30 @@ export const focusable = { [FOCUS_ATTR]: '' } as const;
 export const focusableSibling = { [FOCUS_ATTR]: 'sibling' } as const;
 
 /**
+ * Spread onto a visible part whose focus target is a hidden input inside it,
+ * which is how a slider thumb works. Neither element matches `:focus-visible`
+ * with the ring on the right box, so the part rings when it contains focus.
+ */
+export const focusableWithin = { [FOCUS_ATTR]: 'within' } as const;
+
+/**
+ * Spread onto a focusable element that is flush with its container, so the
+ * ring is drawn inward instead of outward (P80-A).
+ *
+ * The outset ring reaches 6px outside the border box and is simply cut where
+ * an element has no clearance: a menu row loses 5px on each inline edge, the
+ * Admin Panel tab bar loses the whole band top and bottom. Use this wherever
+ * an element sits against its container's edge or inside `overflow: auto`.
+ *
+ * Not for a solid role fill. The inset ring's outer tone meets the element's
+ * OWN ground rather than the surface behind it, and on a filled control that
+ * pair falls under 3:1 on 33 of 138 theme-role pairs. A filled control keeps
+ * the outset ring and is given at least 6px of clearance; filled *and* flush
+ * is a layout defect rather than a ring variant.
+ */
+export const focusableInset = { [FOCUS_ATTR]: 'inset' } as const;
+
+/**
  * The tones a component may paint. Each is a data attribute read by the
  * component sheet, which resolves it to a token: colour never travels as a
  * prop value and never appears in a component's TSX (study principle 2).

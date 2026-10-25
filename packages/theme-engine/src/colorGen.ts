@@ -172,10 +172,13 @@ export function deriveBorderStrong(
   const towardMid = l < 50 ? 1 : -1;
   const grounds = [surface, ...alsoAgainst];
   let best = surface;
-  for (let i = 1; i <= 100; i++) {
+  // Past the first 50 lightness units only if nothing cleared: a mid-tone raised ground
+  // (P80-G) can need more, and a theme that cleared earlier keeps its exact value.
+  for (let i = 1; i <= 200; i++) {
     const t = i / 100;
     const L = l + towardMid * t * 50;
-    const C = c * (1 - 0.2 * t);
+    if (L < 0 || L > 100) break;
+    const C = c * Math.max(0, 1 - 0.2 * t);
     const hex = chroma.lch(L, Math.max(0, C), h).hex();
     best = hex;
     if (grounds.every((g) => chroma.contrast(hex, g) >= UI_CONTRAST_MIN)) {
@@ -183,6 +186,143 @@ export function deriveBorderStrong(
     }
   }
   return best;
+}
+
+/** The least step a raised ground makes on a dark theme, ΔE00: the side-by-side visibility floor. */
+export const RAISED_STEP_MIN = 2.0;
+
+/** The least a decorative `border` sits from any ground it is drawn on (designer, 2026-10-06). */
+export const BORDER_FLOOR_MIN = 3.5;
+
+/** A theme's raised ground and the two intermediates that sit between it and `surface`. */
+export interface Elevation {
+  surfaceRaised: string;
+  surface2: string;
+  surface3: string;
+}
+
+/** Strictly lighter than `base`, by at least the visibility floor. */
+function stepsAbove(color: string, base: string): boolean {
+  return chroma(color).get('lab.l') > chroma(base).get('lab.l') && chroma.deltaE(color, base) >= RAISED_STEP_MIN;
+}
+
+/**
+ * Resolve the elevation ladder above `surface` (P80-G, revised 2026-10-07).
+ *
+ * An authored `surfaceRaised` always wins, and a light theme that does not
+ * author one takes `surface`. A dark theme that does not author one keeps the
+ * rung it already ships: the value the old fallback gave it, its own
+ * `surface2`, when that is at least ΔE00 2.0 above `surface`. Its `surface2`
+ * and `surface3` are then re-derived as the intermediates rule 13 says they are,
+ * because the homage ports authored `surface2` as the rung itself, which is
+ * what made the menu the colour of the panel under it. Only neutral fills move.
+ *
+ * The first version of P80-G lifted the raised ground to `surface3` instead,
+ * and the before-and-after table showed the cost: the accent re-selected on ten
+ * dark homages and role text on twelve, by up to ΔE00 11. The designer reversed
+ * it on 2026-10-07. That lift survives as the fallback for a theme with no rung
+ * of its own, which no bundled theme needs.
+ */
+export function resolveElevation(colors: ThemeColors, colorScheme: 'light' | 'dark'): Elevation {
+  const between = (raised: string): Elevation => {
+    const stops = labStops(colors.surface, raised, 4);
+    return { surfaceRaised: raised, surface2: stops[1]!, surface3: stops[2]! };
+  };
+  const keepingAuthored = (raised: string): Elevation => {
+    const derived = between(raised);
+    return {
+      surfaceRaised: raised,
+      surface2: colors.surface2 ?? derived.surface2,
+      surface3: colors.surface3 ?? derived.surface3,
+    };
+  };
+
+  if (colors.surfaceRaised) return keepingAuthored(colors.surfaceRaised);
+  if (colorScheme === 'light') return keepingAuthored(colors.surface);
+  if (colors.surface2 && stepsAbove(colors.surface2, colors.surface)) return between(colors.surface2);
+  return keepingAuthored(liftRaised(colors));
+}
+
+/**
+ * A raised ground for a dark theme whose palette has no rung above `surface`.
+ *
+ * The next authored rung, `surface3`, when it sits ΔE00 2.0 above `surface2`.
+ * Where that rung is too light to carry role-coloured text at 4.5:1, or an
+ * authored `borderStrong` at 3:1, the ground stops at the highest point from
+ * `surface2` toward it that keeps both. With no usable rung at all, one is
+ * derived by stepping lightness up. Moving the ground this way re-selects every
+ * chromatic token against it, so it is the last resort, not the default.
+ */
+function liftRaised(colors: ThemeColors): string {
+  const s2Of = (raised: string) => colors.surface2 ?? labStops(colors.surface, raised, 4)[1]!;
+  const raisedEnough = (raised: string) => stepsAbove(raised, s2Of(raised));
+  // The lightest text rung each role can take; if it cannot read on a ground, no rung can.
+  // The fallbacks are `resolveColors`'s own, so the check sees the roles that will render.
+  const primary = primaryBase(colors);
+  const roleCeilings = [
+    primary, colors.success, colors.warning ?? '#f59e0b', colors.error ?? '#ef4444', colors.info ?? primary, colors.accent ?? primary,
+  ].map((base) => generateColorScale(base, 'dark')[0]!);
+  const carries = (raised: string) =>
+    roleCeilings.every((rung) => chroma.contrast(rung, raised) >= TEXT_FLOOR) &&
+    (!colors.borderStrong || chroma.contrast(colors.borderStrong, raised) >= UI_CONTRAST_MIN);
+
+  if (colors.surface3 && raisedEnough(colors.surface3)) {
+    if (carries(colors.surface3)) return colors.surface3;
+    if (colors.surface2) {
+      for (let i = 19; i >= 1; i--) {
+        const stop = chroma.mix(colors.surface2, colors.surface3, i / 20, 'lab').hex();
+        if (raisedEnough(stop) && carries(stop)) return stop;
+      }
+    }
+  }
+
+  const start = colors.surface3 ?? colors.surface2 ?? colors.surface;
+  const [l, c, h] = chroma(start).lch();
+  for (let i = 1; i <= 200; i++) {
+    const candidate = chroma.lch(Math.min(100, l + i * 0.5), c, h).hex();
+    if (raisedEnough(candidate)) return candidate;
+  }
+  return chroma.lch(Math.min(100, l + 100), c, h).hex();
+}
+
+/** The text floor a role-coloured label must clear on a raised ground (WCAG 1.4.3). */
+const TEXT_FLOOR = 4.5;
+
+/**
+ * Keep a decorative `border` visible on every ground it is drawn on (P80-G).
+ *
+ * The designer's rule, 2026-10-06: `border` sits at least ΔE00 3.5 from each
+ * ground, a floor set just under the tightest pair the default themes ship
+ * (default-dark, 3.84). An authored value that falls under it is stepped in
+ * lightness away from the grounds, lighter on a dark theme and darker on a
+ * light one, holding hue and chroma, until it clears them all. The ladder never
+ * moves, only `border`. It must stay distinguishable from `borderStrong`, which
+ * has a different job; if there is no room before that, the authored value is
+ * returned unchanged and `auditBorderFloor` fails the theme by name.
+ */
+export function deriveBorderFloor(
+  border: string,
+  grounds: readonly string[],
+  borderStrong: string,
+  colorScheme: 'light' | 'dark',
+): string {
+  const clearsAll = (hex: string) => grounds.every((g) => chroma.deltaE(hex, g) >= BORDER_FLOOR_MIN);
+  if (clearsAll(border)) return border;
+  const [l, c, h] = chroma(border).lch();
+  const direction = colorScheme === 'dark' ? 1 : -1;
+  for (let i = 1; i <= 200; i++) {
+    const L = l + direction * i * 0.25;
+    if (L < 0 || L > 100) break;
+    const candidate = chroma.lch(L, c, h).hex();
+    if (chroma.deltaE(candidate, borderStrong) < BORDER_FLOOR_MIN) break;
+    if (clearsAll(candidate)) return candidate;
+  }
+  return border;
+}
+
+/** The grounds a decorative `border` is drawn on: page, panel, striped row, and menu or tooltip. */
+export function borderGrounds(rc: Pick<ResolvedColors, 'background' | 'surface' | 'surface2' | 'surfaceRaised'>): string[] {
+  return [rc.background, rc.surface, rc.surface2, rc.surfaceRaised];
 }
 
 /**
@@ -411,12 +551,8 @@ export function resolveColors(
     ? colors.dark
     : deriveDarkTuple(colors.text, colors.surface, colors.background);
 
-  // surfaceRaised → surface2 when unset (flatter, safe). surface2/3 fill
-  // the 3-tier schema between surface and that raised anchor.
-  const surfaceRaised = colors.surfaceRaised ?? colors.surface2 ?? colors.surface;
-  const elev = labStops(colors.surface, surfaceRaised, 4);
-  const surface2 = colors.surface2 ?? elev[1]!;
-  const surface3 = colors.surface3 ?? elev[2]!;
+  // P80-G: the raised rung and the intermediates below it (see `resolveElevation`).
+  const { surfaceRaised, surface2, surface3 } = resolveElevation(colors, colorScheme);
 
   const textMuted2 = colors.textMuted2
     ?? chroma.mix(colors.text, colors.textMuted, 0.65, 'lab').hex();
@@ -445,6 +581,13 @@ export function resolveColors(
       : '#000000';
   const focusHalo = deriveFocusHalo(primaryStroke, colors.background, colorScheme);
 
+  const border = deriveBorderFloor(
+    colors.border,
+    borderGrounds({ background: colors.background, surface: colors.surface, surface2, surfaceRaised }),
+    borderStrong,
+    colorScheme,
+  );
+
   return {
     background: colors.background,
     surface: colors.surface,
@@ -456,7 +599,7 @@ export function resolveColors(
     textMuted: colors.textMuted,
     textMuted2,
 
-    border: colors.border,
+    border,
     borderStrong,
 
     primary: primaryArray,

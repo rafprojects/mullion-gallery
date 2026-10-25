@@ -2,7 +2,7 @@
 
 **Status:** Planned, no code yet
 **Created:** 2026-09-10
-**Last updated:** 2026-09-11 (P78-A measurements folded into B and D; Decision J gives B a batch zero; the Typography panel redesign is claimed by B's Settings batch)
+**Last updated:** 2026-10-25 (P81-E added from Phase 80's audit). 2026-10-02 (P80-F settled the manager hosts and the tooltip rule, and placed the 22 tooltips that break it into B; earlier the same day Phase 80's follow-ons were placed into B and D, including `useBroadcastStaleness` and the notification and confirm migration; the Settings panel clipping defect added to B on 2026-09-14)
 
 ### Tracks
 
@@ -12,6 +12,7 @@
 | P81-B | Migrate the consumers, theming-critical surfaces first | Planned | Large |
 | P81-C | Test, story and e2e harness migration | Planned | Medium |
 | P81-D | Remove Mantine and delete the workarounds it required | Planned | Small-Medium |
+| P81-E | Small defects found during Phase 80's audit: an escaped ampersand in every interface string, a flickering admin menu at 320px, alt text lost on export, a broken CLI, and three layout faults | Planned | Small-Medium |
 
 ---
 
@@ -50,6 +51,7 @@
 
 ## Execution Priority
 
+0. **Phase 80's P80-D, P80-E and P80-F land first.** P80-F settles two things that change what this phase migrates onto (whether `notify` and `confirm` are one store per page, and whether the overlays stay in the overlay root), and P80-D's keyboard suite is the regression net for every surface batch below.
 1. **P81-A** first. It is mechanical, it touches almost every file, and doing it before the component swap means each file is touched once for props and once for imports rather than churned twice in one diff.
 2. **P81-B** next, theming-critical surfaces first: the Settings panel, the Layout Builder chrome and the admin panel, because those are where Phase 76's defects lived and where a regression is most likely.
 3. **P81-C** alongside B, per batch. A migrated component with an unmigrated test harness is untested.
@@ -100,8 +102,43 @@ Then batch by surface, not by component. Settings panel, Layout Builder chrome, 
 
 The Settings batch carries one piece of design work with it: the **Typography panel redesign**, filed in [FUTURE_TASKS.md](FUTURE_TASKS.md) under Design & Brand from a user report on 2026-09-11. Its four problems all live in files this batch rewrites anyway (`TypographyEditor.tsx`, `CssValueInput.tsx`, `UnitScrubField.tsx`), and Decision B already permits the pixels to move here, so porting them forward and fixing them afterwards would be doing the same file twice. It depends on P80-A shipping a number field with a unit slot.
 
+**The Settings batch also carries a live clipping defect, reported by the user on 2026-09-14.** The Settings panel is cut off on its right-hand side by roughly 20px, obscuring the right edge of the fields, the column headings and the panel's own edge. Not yet diagnosed: a static read rules out `adminChromeStyles`, which contributes only custom properties and no width, so the cause is in the drawer's own box rather than in the shared chrome helper. The two candidates worth measuring first are the `body: { overflow: 'hidden' }` style in `SettingsPanel.tsx`, which clips anything wider than the drawer content rather than scrolling it, and the scroll `Box` inside it, whose `overflowY: 'auto'` makes `overflow-x` compute to `auto` as well and whose scrollbar eats inner width that fixed-width children do not give back. Diagnose it in a browser by comparing the content box, the inner box and the viewport; do not fix it from a source read. **A lead, from P80-G's pixel review on 2026-10-07:** every `theme-qa` snapshot of the open Settings drawer had drifted about 41,000 pixels from its 2026-09-09 baseline, and the diff is the whole drawer content shifted sideways by a few pixels. The 10% tolerance hid it; P80-F's `main.tsx` change was ruled out by rendering without it. The baselines were regenerated in P80-G, so the shift is now the baseline, and the drift came in somewhere between P77-C and P80. **A second finding in the same suite:** `theme selector dropdown — default-dark` is non-deterministic, rendering one of two layouts 3px apart; two runs of identical code differed by 53,589 pixels. The 10% tolerance lets it pass either way, which is also why it went unseen. Make it deterministic when this batch touches the drawer, because a snapshot that flips cannot catch a real change. It is filed here rather than as a Phase 80 track because the panel is a consumer surface and Key Decision B forbids Phase 80 touching one, and because this batch rewrites these exact files anyway.
+
+**The select family carries a live accessibility defect that this track fixes, and it is the reason the Settings batch cannot slip quietly.** Confirmed 2026-09-14: `use-combobox` resolves `const root = getRootElement(targetRef.current)` from the **trigger** and finds the active option with `findElementBySelector('#listId [data-combobox-active]', root)`. The shipped portal default puts the dropdown in the overlay root, a *different* shadow root, so the lookup returns null and arrow keys do nothing. `Select`, `Autocomplete`, `MultiSelect`, `TagsInput` and `TreeSelect` are all keyboard-inoperable today, across 26 files, which is a WCAG 2.1.1 failure on every dropdown in the product. Proved by `?portal=shadow`, which restores it; `?portal=document` does not, because `document.querySelector` does not pierce the overlay root either. The user chose on 2026-09-14 to fix it here rather than re-plumb Mantine portals this phase deletes.
+
+**The binding constraint that follows: a listbox must live in its trigger's root.** Base UI uses ID-referenced ARIA the same way Mantine does, so migrating onto the framework's own `Select` does **not** fix this by itself — it reproduces it unless the popup stays in the trigger's tree. Verify the keyboard contract on a shadow-mounted gallery before the batch is called done, not after.
+
+**The notification and confirmation call sites (filed 2026-10-02).** 42 `notifications.show` calls in 16 files become `notify.show`, and 6 `modals.openConfirmModal` sites become `confirm`, by renaming the callee (Phase 80 Key Decision E). Three things ride along:
+
+- **`useBroadcastStaleness` stops dismissing its own warning.** It passes `autoClose: 0`, which Mantine reads as a zero-length timer, so the "Template updated in another tab" warning, whose message tells the user to close and reopen the tab, disappears on the next tick. `notify` reads `0` as "keep it up", so the rename fixes it. The user chose on 2026-10-02 to let this phase fix it rather than patch Mantine first; it is named here so the fix is verified rather than assumed.
+- **`ContextualToolbar` stops using `modals.open` and `modals.closeAll`.** It raises a rename form imperatively, which `confirm()` does not cover and should not. Render it as a `<Modal>` with local state.
+- **The hosts: settled by P80-F on 2026-10-02.** Both framework hosts are page singletons: mount `<Notifications label={t(...)}>` and `<Confirmations />` in each gallery's tree if that is convenient, and only the first mounted renders, with the next taking over if it unmounts. P80-F also fixed today's Mantine hosts, which rendered every toast and opened every confirm once per gallery (confirming both ran the action twice, reproduced on a two-gallery page): `main.tsx` now renders them beside the app, in the first gallery only, behind `usePageHost('mantine-managers')`. When the sites move, replace those two lines with the framework hosts and delete that call. `e2e/ui-managers.spec.ts` asserts the two-gallery case for the framework hosts.
+
+**What each batch carries from Phase 80 (filed 2026-10-02).** Phase 80 found these while building the components; each lives on a surface a batch below rewrites anyway, so each is fixed in that batch rather than patched first and migrated second.
+
+| Batch | Item | Source |
+|-------|------|--------|
+| Settings | The panel is clipped about 20px on the right (above). | User report, 2026-09-14 |
+| Settings | `Show Title` and `Show Subtitle` in the Typography panel lose the focus ring's left edge. Same class as the menu row: a 6px outset ring inside a container that clips. Fix with the redesign the batch already carries. | P80 follow-on; held for this phase by user decision 2026-09-14 |
+| Layout Builder | `useLayoutBuilderKeyboardHandlers` handles ArrowUp and ArrowDown on `document` with no guard for an event from an `input`, `textarea` or `contenteditable`, so typing in any builder field moves the selected slots. | P80 follow-on |
+| Admin Panel | Three filled controls sit flush with their container, which standing rule 8 calls a layout defect: `Add Media` and `Rescan Types` (0px clearance) and the Media sort mode (3px). Give each 6px of clearance for the outset ring. | Designer, live Admin Panel, 2026-09-14 |
+| Gallery | Forward Tab moves backwards on screen: Typography icon, then Access Mode to its left, then the campaign filters further left. A WCAG 2.4.3 focus-order failure; fix the DOM order on the migrated surface rather than patching it twice. | P80-A manual pass, 2026-09-14 |
+| Any | `link-in-text-block`: P79-0's tone probe measures an `Anchor` inside muted `Text` at 1.11:1 against its surroundings with no underline. It may be fixture-only. Confirm on the first real surface that composes the two, and if it reproduces, fix it on `Anchor` rather than in the theme. | P79-0 |
+| wp-admin Spaces | `SpaceManagementView` selects a space with a bare `<tr onClick>`: no role, no tab stop, no key handling, so the primary control of the screen cannot be reached from the keyboard. Make it a real control with the ring. The rest of that screen's UX pass (master and detail, restoring archived spaces) stays in FUTURE_TASKS. | FUTURE_TASKS, Spaces UX pass item 3 |
+| Every batch | Two Phase 80 contracts differ from Mantine on purpose and must not be read as regressions: tabs activate manually (arrow moves focus, Enter selects; `activateOnFocus` restores the old behaviour per bar), and the accordion has no arrow-key navigation. Both are asserted by tests. | P80-B |
+| Every batch with a tooltip | **A tooltip is visual only** (P80-F item 10): the framework `Tooltip` gives assistive technology nothing, so no tooltip may carry information the control's own name or visible text does not. Of the 115 production tooltips, 90 already satisfy that. The classification put the other 25 in buckets that carry more; three of those are already conveyed by an `aria-label` (`LayoutBuilderCanvasPanel.tsx:719` and `:797`, `useCampaignsRows.tsx:93`), and the remaining 22 each need their own channel as their batch migrates, listed in the row below with two kinds of tooltip-only text found inside the 90. | P80-F, 2026-10-02 |
+| (the 22) | **No name at all:** `MediaTab.tsx:276-278`, the three view-mode segments, whose only content is an icon; give each segment an `aria-label`. **Explanation only in the tooltip, on a focusable control:** `SlotPropertiesPanel.tsx:135` and `MaskPropertiesPanel.tsx:49` (info buttons) and `DesignAssetsGrid.tsx:156` (the current tag list); make the first two a `Popover` and put the tags in the label. **Reason only in the tooltip, on a disabled control:** `AdminPanel.tsx:291` and `:297` ("Pick a space first"); show the reason as text, because a disabled button takes neither focus nor hover. **Extra detail on a visible-text control:** `CampaignsMobileList.tsx:167`, `useCampaignsRows.tsx:218` and `:249`, `LayoutBuilderCanvasPanel.tsx:666`, `MediaTab.tsx:345`; fold it into the name or the description. **On a non-focusable element:** `CampaignsMobileList.tsx:97` and `:120`, `QuickAddUserModal.tsx:78`, `SpaceManagementView.tsx:456`, `useAccessRows.tsx:109`, `:129` and `:144`, `useCampaignsRows.tsx:171` and `:175` (a bare count in a badge); mouse-only today, so the text moves into the element. **Shortcut hints** in the Layout Builder toolbar and `AdminPanel.tsx:308`: add `aria-keyshortcuts`. **Transient feedback** in `WebhookSettingsSection.tsx:79` ("Copied!"): announce it with `notify` or a live region. Line numbers are from the classification of 2026-10-02 and will drift. | P80-F, 2026-10-02 |
+| Every surface on a raised ground | Migrate onto the ladder Phase 80's P80-G corrects. `COLOR-SPEC.md` rule 13: on dark themes a raised element reads by lightness and needs no border; on light themes it carries a 1px `borderStrong` hairline and its shadow. Components that grew a border to stand in for a missing rung lose it on dark themes. | Designer, 2026-10-02 |
+
 ### Acceptance criteria
 
+- **Every migrated dropdown is operable by keyboard on a shadow mount**, verified in a browser rather than jsdom: arrow keys move the highlight, Enter selects, and a screen reader announces the active option.
+- **The Settings panel is not clipped on any axis**, measured in a browser at more than one viewport width rather than eyeballed, since the reported symptom is the panel's own right edge being cut off.
+- **`useBroadcastStaleness`'s stale-tab warning stays on screen until dismissed**, checked in a browser after the notification sites move.
+- No call site uses `modals.open`, `modals.closeAll` or `modals.openConfirmModal`.
+- **On a page with two galleries, one `notify.show` renders one toast and one `confirm()` opens one dialog**, checked in a browser on the product rather than only on the showcase.
+- **No tooltip carries information its control does not**: each of the 22 sites in the carried table has its own channel.
+- Every row of the "carried from Phase 80" table is closed, or re-filed with its reason.
 - The allow-list shrinks with every batch and never grows.
 - `packages/shared-ui` is gone, its eight modules rehomed, and the allow-list paths updated to match before the first surface batch.
 - Per batch: full suites green, axe gate green, and a keyboard pass on any surface whose interaction changed.
@@ -145,6 +182,8 @@ Six pieces of this codebase exist only to make Mantine fit: `adapter.ts` (601 li
 
 Delete them, drop `@mantine/core`, `@mantine/hooks`, `@mantine/modals`, `@mantine/notifications` and `@mantine/form` from `package.json`, and remove Mantine's stylesheet imports from `main.tsx` and `shadowStyles.ts`.
 
+Retire `option-checked-bg` and `option-checked-color` from the component-token tier. The framework's select marks a selected option with a check and `primary-text` rather than a fill (P80-B, under standing rule 8), so the only readers left are the Mantine adapter and `chrome-portable.scss`, and both go in this track.
+
 `@mantine/dates` goes too, and it can go at any time: P78-A found it has zero importers anywhere in `src/`, `packages/`, `e2e/` or the stories, so it is a dependency the tree already does not use. It is excluded from the P78-A lint rule for the same reason, a rule with no subject being noise.
 
 Retarget rather than delete the guards that still describe something true: the style-delivery tests, the P77-F ring walk and the 1.4.11 audit all continue to hold, against framework tokens instead of Mantine variables. Delete only the guards whose subject is gone, such as the `styles`-prop flatness tests, and say so in this document so their absence is not later read as a gap.
@@ -162,13 +201,50 @@ Retarget rather than delete the guards that still describe something true: the s
 
 ---
 
+## Track P81-E - Small defects found during Phase 80's audit
+
+### Problem
+
+The user's partial pass of `ACCESSIBILITY_MANUAL_AUDIT.md` on 2026-10-25, and the work of seeding a site for it, turned up defects in today's product. Each is small. None is a framework defect, so none belonged in Phase 80.
+
+| Defect | What is known |
+|---|---|
+| **`&` arrives as `&#038;` in interface strings** ("Open Mode &#038; Sizing" in the Settings panel) | Cause found. `class-mullion-embed.php` prints the `window.__MULLION_I18N__` script inline in the shortcode's output, and on a block theme the shortcode block runs before WordPress's `the_content` filters, so `convert_chars` rewrites every bare `&` in it. Confirmed on wordpress.lan's home page. It probably reaches every string with an ampersand, in every locale, and any `&` in the config payload. |
+| **The admin menu flickers indefinitely at 320px** | Reported in Brave on Windows with the menu open. Not reproduced in headless Chromium, logged in, menu open or closed: zero DOM mutations over three seconds. The user's screenshot shows a classic vertical scrollbar, which headless Chromium does not draw, so the leading hypothesis is a loop: the open popup toggles the scrollbar, the viewport width changes, the popup repositions, and so on. |
+| **NVDA reads list items twice** in the Admin Panel's and the Settings panel's category lists | Observed in NVDA's Speech viewer as two entries per item, the first cut off after its first word. It may be NVDA's own behaviour or our markup; inspect the accessibility tree of both lists first. |
+| **Alt text is lost on campaign export and import** | The gallery's alt text is each media item's `caption`, and neither the JSON nor the ZIP export writes it, nor does `Mullion_Campaign_IO::import_entry` read it. A round trip silently drops every image's alt text. |
+| **The gallery ignores WordPress's attachment alt text** | Alt is `caption`, falling back to `title`. Alt text set in the Media Library never reaches the gallery. Decide whether an upload's caption defaults from the attachment's alt, or alt becomes its own field. |
+| **Most `wp mullion` subcommands are unreachable** | `@subcommand campaign list` and its siblings contain a space, which WP-CLI does not support, so each group collapses to its last registered command. `campaign list`, `archive`, `restore`, `duplicate`, `export` and `media list` cannot be run, and the documented `wp mullion campaign import file.zip` reads the word `import` as the file name. |
+| **Three layout faults in the Settings and Admin panels** | The `px` unit slot spills out of its number field (Campaign Viewer, Fullscreen Content Max Width); a wrapped label ("Desktop Image Gallery Adapter") pushes its select out of line with its neighbour in Per-Type Breakpoint Adapters; and `Add Media` is filled and flush, already in P81-B's carried table. |
+
+### Fix
+
+- **The ampersand:** encode the inline payloads with `JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT`, so they contain nothing a content filter rewrites and no `</script>`. A PHP test renders the shortcode through `the_content` and asserts the string survives.
+- **The flicker:** reproduce with classic scrollbars, in Brave or Chrome on Windows, or by forcing them, before changing anything. Then stop the loop, likely with `scrollbar-gutter: stable` or by keeping the popup from changing the document's overflow.
+- **The doubled list items:** compare the accessibility tree of both category lists with NVDA's output, and fix our markup if it is the cause; otherwise record it as an NVDA behaviour.
+- **Alt text on export and import:** carry `caption` both ways, with a round-trip test.
+- **The attachment alt:** a decision for the user, then the change.
+- **The CLI:** register each group's commands as real subcommands (a `Mullion_CLI_Campaign` class per group, or the `campaign` command dispatching on its first argument), with a test that runs each documented example.
+- **The layout faults:** fix with the P81-B surfaces they sit on, if that batch lands first; otherwise here.
+
+### Acceptance criteria
+
+- Every defect in the table is fixed, or decided and recorded, with a test where one can prove it.
+- `wp help mullion campaign` lists every campaign command, and each documented example runs.
+
+### Validation
+
+- The new PHP and browser tests, the full suites, and a re-check of the ampersand and the flicker on wordpress.lan.
+
+---
+
 ## Follow-On Candidates
 
 | Candidate | Why it is deferred |
 |-----------|--------------------|
 | Publishing `@mullion/ui` | A product decision, and it converts an internal API into a public commitment. Worth deciding after the framework has shipped in the product, not before. |
 | Dropping `@mantine/dates` | Listed in Phase 80's follow-ons; confirm it is genuinely unused before removing. |
-| Row-selection keyboard support in `Table` | A real a11y gap with its own FUTURE_TASKS entry. Fix it as a feature, not inside a migration batch. |
+| ~~Row-selection keyboard support in `Table`~~ | **Moved into P81-B 2026-10-02.** The gap is `SpaceManagementView`'s `<tr onClick>`, and migrating that screen while keeping it would fail this phase's own per-batch keyboard pass. Only the keyboard fix moved; the screen's wider UX pass stays in FUTURE_TASKS. |
 
 ## Implementation Notes
 

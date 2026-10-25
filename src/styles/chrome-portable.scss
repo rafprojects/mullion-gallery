@@ -95,6 +95,43 @@
 
 .mullion-mantine-tabs-tab.mullion-mantine-tabs-tab[data-active] {
   color: var(--mullion-tabs-tab-active-color, inherit);
+  // [P80-A] The selection signal must not be colour alone. Mantine's base
+  // styles already draw the active underline (`--tab-border-bottom-color`),
+  // with inactive tabs holding a transparent 2px so nothing shifts, so weight
+  // is the part that was missing rather than the line. Set as the variable the
+  // adapter's inline `fontWeight` reads, because an inline style outranks this
+  // sheet and a plain `font-weight` here would never paint.
+  --mullion-tabs-tab-weight: 600;
+}
+
+// [P80-A] The underline had nothing to seat on: the tab list carries no rule
+// of its own, so the active tab's border floated. One rule under the whole bar
+// and the underline reads as sitting on it.
+.mullion-mantine-tabs-list.mullion-mantine-tabs-list {
+  border-bottom: 1px solid var(--mullion-color-border, transparent);
+}
+
+/*
+ * [P80-A] The inset focus ring for tabs.
+ *
+ * `Tabs.List` carries `overflow-x: auto`, and once one axis is not `visible`
+ * the other computes to `auto` as well, so the bar clips vertically too. A tab
+ * is the full height of the list with 0px of room above or below, and the
+ * outset ring reaches 6px, so the whole band was cut top and bottom: what
+ * shipped was a three-sided bracket, not a ring.
+ *
+ * Same two tones and the same three 2px bands, drawn inward. This mirrors
+ * `[data-mullion-focus="inset"]` in the framework's focus.css; the duplication
+ * is deliberate and temporary, because that rule only reaches components that
+ * stamp the framework's attribute and Mantine's tabs do not. Phase 81 deletes
+ * this file and the tabs land on the framework variant.
+ */
+.mullion-mantine-tabs-tab.mullion-mantine-tabs-tab:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 2px var(--mullion-color-focus-halo, transparent),
+    inset 0 0 0 4px var(--mullion-color-primary-stroke, currentColor),
+    inset 0 0 0 6px var(--mullion-color-focus-halo, transparent);
 }
 
 // SegmentedControl resting label colour, same shape. Mantine reads

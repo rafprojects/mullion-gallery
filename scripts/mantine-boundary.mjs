@@ -31,17 +31,28 @@ export const ALLOWLIST_PATH = path.join(
 );
 
 /**
- * The Mantine packages the boundary restricts. `@mantine/dates` is a declared
+ * The vendor UI packages the boundary restricts. `@mantine/dates` is a declared
  * dependency with zero importers and is deliberately left out. See the P78-A
- * rationale in docs/PHASE78_REPORT.md.
+ * rationale in docs/archive/phases/PHASE78_REPORT.md.
+ *
+ * [P80-A] `@base-ui/react` joins the list the moment it arrives. The boundary
+ * is not about Mantine: it is about the app never naming the vendor behind
+ * `@/ui`. Fencing the incoming primitive on its first day costs nothing,
+ * because no file outside `src/ui/` imports it yet, and it is the only moment
+ * at which that is true.
  */
-export const RESTRICTED_PACKAGES = [
+export const MANTINE_PACKAGES = [
   '@mantine/core',
   '@mantine/form',
   '@mantine/hooks',
   '@mantine/modals',
   '@mantine/notifications',
 ];
+
+/** The primitive the framework is built on (P78-B), restricted from P80-A. */
+export const PRIMITIVE_PACKAGES = ['@base-ui/react'];
+
+export const RESTRICTED_PACKAGES = [...MANTINE_PACKAGES, ...PRIMITIVE_PACKAGES];
 
 /** The one directory allowed to import Mantine directly. */
 export const BOUNDARY_DIR = 'src/ui';
@@ -70,23 +81,38 @@ const SPECIFIER_PATTERN = /(?:from|import|require)\s*\(?\s*['"]([^'"]+)['"]/g;
 const MOCK_PATTERN =
   /\b(?:vi|jest)\s*\.\s*(?:mock|doMock|unmock|importActual|importMock)\s*\(\s*['"]([^'"]+)['"]/g;
 
+const matchesAny = (specifier, packages) =>
+  packages.some((pkg) => specifier === pkg || specifier.startsWith(`${pkg}/`));
+
 /** True when a module specifier resolves to one of the restricted packages. */
 export function isRestrictedSpecifier(specifier) {
-  return RESTRICTED_PACKAGES.some(
-    (pkg) => specifier === pkg || specifier.startsWith(`${pkg}/`),
-  );
+  return matchesAny(specifier, RESTRICTED_PACKAGES);
 }
 
-/** True when `source` names a restricted Mantine package in an import or a mock. */
-export function hasRestrictedImport(source) {
+/**
+ * True when `source` names one of `packages` in an import or a `vi.mock`.
+ *
+ * The two boundaries this file serves are not the same shape, which is why
+ * the package set is a parameter. `@base-ui/react` may be imported by any
+ * framework module under `src/ui/`, because that is where the components are
+ * built. A Mantine package may only be named by the barrel, which is the
+ * migration ledger: a framework component that reached for Mantine would be
+ * building the new layer on the one being removed.
+ */
+export function hasImportFrom(source, packages) {
   for (const pattern of [SPECIFIER_PATTERN, MOCK_PATTERN]) {
     pattern.lastIndex = 0;
     let match;
     while ((match = pattern.exec(source)) !== null) {
-      if (isRestrictedSpecifier(match[1])) return true;
+      if (matchesAny(match[1], packages)) return true;
     }
   }
   return false;
+}
+
+/** True when `source` names any restricted package. Drives the allow-list. */
+export function hasRestrictedImport(source) {
+  return hasImportFrom(source, RESTRICTED_PACKAGES);
 }
 
 function* walk(dir) {

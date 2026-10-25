@@ -1,0 +1,142 @@
+/*
+ * The colour picker and the colour field (P80-B).
+ *
+ * Almost nothing here is a theme token, and that is the exception worth
+ * stating rather than hiding: a hue rail is the visible spectrum and a
+ * checkerboard is the convention for "this is transparent", so both are fixed
+ * by what they mean rather than chosen by a theme. They are the only literals
+ * in the framework's sheets and the colour-literal guard in
+ * `componentSheets.test.ts` names this file for them. Everything a theme can
+ * legitimately own here, which is the chrome around them, is a token.
+ */
+@layer mullion.components {
+  .mullion-color-picker {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mullion-spacing-xs);
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+
+  /*
+   * The surface. Two gradients over the current hue: white to transparent
+   * across, and transparent to black down, which is the standard HSV plane.
+   */
+  .mullion-color-surface {
+    position: relative;
+    block-size: 8rem;
+    border-radius: var(--mullion-radius-sm);
+    background:
+      linear-gradient(to top, rgb(0 0 0), rgb(0 0 0 / 0)),
+      linear-gradient(to right, rgb(255 255 255), rgb(255 255 255 / 0)),
+      var(--mullion-color-hue);
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  /*
+   * The thumb is a ring rather than a dot, so the colour under it stays
+   * visible: a filled marker hides the one pixel the user is choosing.
+   */
+  .mullion-color-thumb {
+    position: absolute;
+    inset-inline-start: var(--mullion-color-x, 0%);
+    inset-block-start: var(--mullion-color-y, 0%);
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    translate: -50% -50%;
+    border: 2px solid rgb(255 255 255);
+    border-radius: 999px;
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.4);
+    pointer-events: none;
+  }
+
+  /* The hue rail is the spectrum, so it is not a theme decision. */
+  .mullion-color-hue .mullion-slider-track {
+    block-size: 0.625rem;
+    background: linear-gradient(
+      to right,
+      #ff0000 0%,
+      #ffff00 17%,
+      #00ff00 33%,
+      #00ffff 50%,
+      #0000ff 67%,
+      #ff00ff 83%,
+      #ff0000 100%
+    );
+  }
+
+  /*
+   * The alpha rail is the current colour over a checkerboard, which is the
+   * convention for "what is behind shows through".
+   */
+  .mullion-color-alpha .mullion-slider-track {
+    block-size: 0.625rem;
+    background:
+      linear-gradient(to right, rgb(255 255 255 / 0), var(--mullion-color-current)),
+      repeating-conic-gradient(rgb(204 204 204) 0% 25%, rgb(255 255 255) 0% 50%) 0 0 / 0.5rem 0.5rem;
+  }
+
+  .mullion-color-hue .mullion-slider-indicator,
+  .mullion-color-alpha .mullion-slider-indicator {
+    background: none;
+  }
+
+  .mullion-color-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--mullion-spacing-xs) / 2);
+  }
+
+  .mullion-color-swatch,
+  .mullion-color-preview {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    padding: 0;
+    border: 1px solid var(--mullion-color-border-strong);
+    border-radius: var(--mullion-radius-sm);
+    background-color: var(--mullion-swatch, transparent);
+    background-image: repeating-conic-gradient(
+      rgb(204 204 204) 0% 25%,
+      rgb(255 255 255) 0% 50%
+    );
+    background-size: 0.5rem 0.5rem;
+    background-blend-mode: normal;
+    cursor: pointer;
+  }
+
+  /*
+   * The swatch paints its colour over the checkerboard rather than instead of
+   * it, so a semi-transparent value reads as semi-transparent. Two layers on
+   * one element: the colour as a gradient of itself, the board underneath.
+   */
+  .mullion-color-swatch,
+  .mullion-color-preview {
+    background-image:
+      linear-gradient(var(--mullion-swatch, transparent), var(--mullion-swatch, transparent)),
+      repeating-conic-gradient(rgb(204 204 204) 0% 25%, rgb(255 255 255) 0% 50%);
+    background-size: auto, 0.5rem 0.5rem;
+  }
+
+  .mullion-color-dropper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--mullion-color-text-muted);
+    cursor: pointer;
+  }
+
+  .mullion-color-dropper svg {
+    inline-size: 1em;
+    block-size: 1em;
+  }
+
+  .mullion-color-text {
+    font-family: var(--mullion-font-family-mono);
+  }
+}

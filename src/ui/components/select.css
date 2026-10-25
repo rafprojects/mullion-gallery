@@ -1,0 +1,261 @@
+/*
+ * The select family (P80-B).
+ *
+ * The popup reuses the menu's vocabulary rather than inventing a second one: a
+ * `menu-bg` ground with a `menu-bd` border, a leading rail in `primary-stroke`
+ * for the highlighted row, and no ground movement anywhere inside it. That
+ * last property is the one the menu's rail bought and it is worth keeping: if
+ * no ground moves, nothing painted on a row can be measured against a ground
+ * it was not audited on.
+ *
+ * A SELECTED option is marked by a check and by `primary-text`, never by a
+ * filled ground. Standing rule 8 calls a filled control flush with its
+ * container a layout defect, and a row inside a scrolling popup is exactly
+ * that. Measured over the 23 bundled themes: the rail on `primaryFill` is
+ * 1.00:1 on ten of them, because the engine sets `primaryStroke` equal to
+ * `primaryFill` whenever the fill already clears 3:1, so a selected row could
+ * not carry the highlight mark at all. `primary-text` on `menu-bg` clears
+ * 4.5:1 on all 23, worst 4.54 (solarized-dark).
+ */
+@layer mullion.components {
+  /* ── The control row ─────────────────────────────────────────────────── */
+
+  .mullion-field-control-select {
+    cursor: pointer;
+  }
+
+  .mullion-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--mullion-spacing-xs);
+    text-align: start;
+    cursor: inherit;
+  }
+
+  .mullion-select-value {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .mullion-select-placeholder {
+    color: var(--mullion-input-placeholder-color);
+  }
+
+  .mullion-select-icon,
+  .mullion-select-clear {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.5em;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--mullion-color-text-muted);
+    cursor: pointer;
+  }
+
+  .mullion-select-icon svg,
+  .mullion-select-clear svg {
+    inline-size: 1em;
+    block-size: 1em;
+  }
+
+  .mullion-select-chevron {
+    transition: transform var(--mullion-duration-fast) ease;
+  }
+
+  .mullion-select-trigger[data-popup-open] .mullion-select-chevron,
+  .mullion-select-icon[data-popup-open] .mullion-select-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* ── The popup ───────────────────────────────────────────────────────── */
+
+  /*
+   * `--anchor-width` is Base UI's measurement of the trigger, so a popup with
+   * no explicit width is exactly as wide as the control that opened it. A
+   * caller asking for a width gets one; nothing here computes one.
+   */
+  /*
+   * [P80-G] Never narrower than its field, as wide as its longest label, and
+   * capped; a label longer than the cap wraps rather than losing its end,
+   * because a list you choose from should not hide part of a choice. The
+   * designer's §6, 2026-10-06. A caller's `width` still sets it outright.
+   */
+  .mullion-select-popup {
+    inline-size: var(--mullion-select-popup-width, max-content);
+    min-inline-size: max(8rem, var(--anchor-width, 0px));
+    max-inline-size: min(24rem, calc(100vw - 16px));
+    padding-block: var(--mullion-spacing-xs);
+    border: 1px solid var(--mullion-menu-bd);
+    border-radius: var(--mullion-radius, var(--mullion-radius-md));
+    background-color: var(--mullion-menu-bg);
+    color: var(--mullion-color-text);
+    font-family: var(--mullion-font-family);
+    box-shadow: var(--mullion-shadow-md);
+    transition:
+      opacity var(--mullion-duration-fast) ease,
+      transform var(--mullion-duration-fast) ease;
+  }
+
+  .mullion-select-popup[data-starting-style],
+  .mullion-select-popup[data-ending-style] {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  .mullion-select-list {
+    max-block-size: var(--mullion-select-popup-max-height, min(18rem, var(--available-height)));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* ── Rows ────────────────────────────────────────────────────────────── */
+
+  .mullion-select-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1rem 1fr;
+    align-items: start;
+    gap: var(--mullion-spacing-xs);
+    padding-block: calc(var(--mullion-spacing-xs) / 1.5);
+    padding-inline: var(--mullion-spacing-sm);
+    font-size: var(--mullion-font-size-sm);
+    color: inherit;
+    cursor: default;
+    user-select: none;
+  }
+
+  /*
+   * The highlight, as the menu draws it: a leading rail, and the ground stays
+   * put. As in the menu (P80-G), a row the keyboard has focused takes the
+   * inset ring instead, because the rail covers the ring's inner halo band.
+   * Only a plain `Select` moves focus onto its options; a searchable field
+   * keeps focus in its input, so its options never match and keep the rail,
+   * which is their only keyboard mark.
+   */
+  .mullion-select-item[data-highlighted]:not(:focus-visible, [data-focus-visible])::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: 3px;
+    background-color: var(--mullion-color-primary-stroke);
+  }
+
+  /*
+   * The selected row. The check is the primary mark and the colour is the
+   * second, so selection never rests on colour alone (1.4.1). The attribute is
+   * Base UI's own `data-selected`; P77-C shipped a rule keyed on a
+   * `data-checked` that Mantine never set, and the guard in
+   * `select.test.tsx` reads the attribute name out of this rule and asserts
+   * the rendered option carries it.
+   */
+  .mullion-select-item[data-selected] {
+    color: var(--mullion-primary-text);
+  }
+
+  .mullion-select-item[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* One line tall, so a wrapped row keeps its check on the first line. */
+  .mullion-select-item-indicator {
+    display: inline-flex;
+    grid-column: 1;
+    block-size: 1lh;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mullion-select-check {
+    inline-size: 0.875em;
+    block-size: 0.875em;
+  }
+
+  /* Wraps, and a single long word breaks, so no option is ever cut. The closed field keeps its ellipsis. */
+  .mullion-select-item-text {
+    grid-column: 2;
+    overflow-wrap: anywhere;
+  }
+
+  .mullion-select-group-label {
+    padding-block: calc(var(--mullion-spacing-xs) / 1.5);
+    padding-inline: var(--mullion-spacing-sm);
+    font-size: var(--mullion-font-size-xs);
+    font-weight: 600;
+    color: var(--mullion-color-text-muted);
+  }
+
+  .mullion-select-empty {
+    padding-block: var(--mullion-spacing-xs);
+    padding-inline: var(--mullion-spacing-sm);
+    font-size: var(--mullion-font-size-sm);
+    color: var(--mullion-color-text-muted);
+  }
+
+  /* ── Chips ───────────────────────────────────────────────────────────── */
+
+  /*
+   * A chip field grows with its contents, so the row must not pin a height the
+   * way a single-line field does. The chips sit inside the field's border and
+   * share it, which is the same property the unit slot depends on.
+   */
+  .mullion-field-control-chips {
+    block-size: auto;
+    min-block-size: var(--mullion-control-height-md);
+    padding: calc(var(--mullion-spacing-xs) / 2);
+    overflow: visible;
+  }
+
+  .mullion-field[data-size='xs'] .mullion-field-control-chips {
+    min-block-size: var(--mullion-control-height-xs);
+  }
+
+  .mullion-field[data-size='sm'] .mullion-field-control-chips {
+    min-block-size: var(--mullion-control-height-sm);
+  }
+
+  .mullion-select-chips {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--mullion-spacing-xs) / 2);
+    min-inline-size: 0;
+  }
+
+  .mullion-select-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--mullion-spacing-xs) / 2);
+    padding-block: 1px;
+    padding-inline: var(--mullion-spacing-xs);
+    border-radius: var(--mullion-radius-sm);
+    background-color: var(--mullion-menu-hover-bg);
+    font-size: var(--mullion-font-size-xs);
+    line-height: 1.6;
+  }
+
+  .mullion-select-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1em;
+    block-size: 1em;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .mullion-select-chip-remove svg {
+    inline-size: 1em;
+    block-size: 1em;
+  }
+}

@@ -10,6 +10,9 @@
  *   ?theme=<id>           the provider's theme
  *   ?chrome=lock|follow   what the nested provider paints
  *
+ * A person can open it too, since P80-D: `src/ui/showcase/index.html` on the
+ * dev server, with `?keyboard=1` turning every opt-in section on.
+ *
  * Nothing in production imports this module, so it is absent from the build;
  * it is here rather than in `e2e/` so `tsc` and ESLint hold it to the same
  * rules as the components it renders.
@@ -50,12 +53,66 @@ import {
   Title,
   UnstyledButton,
   VisuallyHidden,
+  Drawer,
+  Menu,
+  Accordion,
+  Checkbox,
+  ColorInput,
+  Modal,
+  MultiSelect,
+  NumberInput,
+  Pagination,
+  PasswordInput,
+  Confirmations,
+  Notifications,
+  Popover,
+  SegmentedControl,
+  Select,
+  Slider,
+  Switch,
+  Tabs,
+  TagsInput,
+  Textarea,
+  TextInput,
+  Tooltip,
+  confirm,
+  notify,
 } from '../components';
 
 const params = new URLSearchParams(window.location.search);
 const useShadow = params.get('mount') !== 'light';
 const themeId = params.get('theme') ?? 'default-dark';
 const chromeMode = params.get('chrome') === 'follow' ? 'follow' : 'lock';
+/**
+ * P80-A's overlays are opt-in. Adding them to the default page would move the
+ * ui-showcase and theme-qa snapshot baselines for a section most of those
+ * checks do not look at, so `?overlays=1` appends them and every existing URL
+ * renders exactly what it rendered before.
+ */
+/**
+ * P80-D's keyboard suite, and the person running the screen-reader pass, want
+ * every section at once plus fixtures nothing else needs. One flag turns them
+ * all on, so no existing spec's page changes.
+ */
+const withKeyboard = params.get('keyboard') === '1';
+const withOverlays = withKeyboard || params.get('overlays') === '1';
+/**
+ * P80-B's select family, opt-in for the same reason. A select's popup goes
+ * somewhere different from an overlay's, so the browser suite needs triggers
+ * that live in the scope under test.
+ */
+const withSelects = withKeyboard || params.get('selects') === '1';
+/** P80-B's tabs, segmented control and accordion, opt-in for the same reason. */
+const withChoice = withKeyboard || params.get('choice') === '1';
+/**
+ * P80-C's managers, opt-in for the same reason. Unlike every other section
+ * these mount once rather than per-gallery: both stores are module singletons,
+ * so a second viewport subscribed to the same manager would render every toast
+ * twice and make each one a strict-mode violation to query.
+ */
+const withManagers = withKeyboard || params.get('managers') === '1';
+/** `?host=hostile` reproduces the P77-B probe around the whole fixture. */
+const hostileHost = params.get('host') === 'hostile';
 
 /** Every focusable component in the set, so the ring walk has something to walk. */
 function Focusables({ prefix }: { prefix: string }) {
@@ -177,6 +234,353 @@ function Gallery({ prefix }: { prefix: string }) {
         <Image alt="a placeholder" src="/missing.png" width={80} height={40} radius="sm" />
       </Center>
       <VisuallyHidden>hidden to the eye, present to a reader</VisuallyHidden>
+      {withOverlays && <Overlays prefix={prefix} />}
+      {withSelects && <Selects prefix={prefix} />}
+      {withChoice && <Choices prefix={prefix} />}
+      {withChoice && <Toggles prefix={prefix} />}
+      {withChoice && <Gaps prefix={prefix} />}
+      {withKeyboard && <KeyboardExtras prefix={prefix} />}
+    </Stack>
+  );
+}
+
+/**
+ * P80-B: tabs, the segmented control and the accordion. The segmented
+ * indicator is the part that cannot be proved in jsdom, which reports every
+ * box as zero: its position comes from a measurement of the checked segment,
+ * so a browser is the only place it means anything.
+ */
+function Choices({ prefix }: { prefix: string }) {
+  const [view, setView] = useState('grid');
+  const [tab, setTab] = useState<string | null>('one');
+  return (
+    <Stack gap="sm" padding="md" data-testid={`${prefix}-choices`}>
+      <Divider label="choices" labelPosition="left" />
+      <SegmentedControl
+        aria-label={`${prefix} view mode`}
+        data={['grid', 'list', 'map']}
+        value={view}
+        onChange={setView}
+        data-testid={`${prefix}-segmented`}
+      />
+      <Tabs value={tab} onChange={setTab} data-testid={`${prefix}-tabs`}>
+        <Tabs.List aria-label={`${prefix} sections`} data-testid={`${prefix}-tabs-list`}>
+          <Tabs.Tab value="one" data-testid={`${prefix}-tab-one`}>
+            first
+          </Tabs.Tab>
+          <Tabs.Tab value="two" data-testid={`${prefix}-tab-two`}>
+            second tab
+          </Tabs.Tab>
+          <Tabs.Tab value="three">third</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel value="one">first panel</Tabs.Panel>
+        <Tabs.Panel value="two">second panel</Tabs.Panel>
+        <Tabs.Panel value="three">third panel</Tabs.Panel>
+      </Tabs>
+      <Accordion defaultValue="a" data-testid={`${prefix}-accordion`}>
+        <Accordion.Item value="a">
+          <Accordion.Control data-testid={`${prefix}-accordion-a`}>appearance</Accordion.Control>
+          <Accordion.Panel>appearance body</Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value="b">
+          <Accordion.Control data-testid={`${prefix}-accordion-b`}>behaviour</Accordion.Control>
+          <Accordion.Panel>behaviour body</Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>
+    </Stack>
+  );
+}
+
+/**
+ * P80-B: the two components Base UI does not ship. The picker's surface is
+ * pointer-and-rect code of ours, so a browser is the only place its geometry
+ * means anything.
+ */
+function Gaps({ prefix }: { prefix: string }) {
+  const [page, setPage] = useState(4);
+  const [colour, setColour] = useState('rgba(18, 52, 86, 0.5)');
+  return (
+    <Stack gap="sm" padding="md" data-testid={`${prefix}-gaps`}>
+      <Divider label="gaps" labelPosition="left" />
+      <Pagination
+        value={page}
+        onChange={setPage}
+        total={20}
+        aria-label={`${prefix} pages`}
+        data-testid={`${prefix}-pagination`}
+      />
+      <ColorInput
+        label={`${prefix} background colour`}
+        value={colour}
+        onChange={setColour}
+        format="rgba"
+        swatches={['#102530', '#0d1117', '#ffffff', 'transparent']}
+        data-testid={`${prefix}-color-input`}
+      />
+    </Stack>
+  );
+}
+
+/**
+ * P80-B: the choice controls. The slider's thumb and its value bubble are the
+ * parts a browser has to measure; jsdom reports every box as zero.
+ */
+function Toggles({ prefix }: { prefix: string }) {
+  const [on, setOn] = useState(true);
+  const [opacity, setOpacity] = useState(0.5);
+  const [filter, setFilter] = useState('all');
+  return (
+    <Stack gap="sm" padding="md" data-testid={`${prefix}-toggles`}>
+      <Divider label="toggles" labelPosition="left" />
+      <Checkbox
+        label={`${prefix} purge analytics`}
+        description="cannot be undone"
+        data-testid={`${prefix}-checkbox`}
+      />
+      <Checkbox label={`${prefix} select all`} indeterminate data-testid={`${prefix}-checkbox-mixed`} />
+      <Switch
+        label={`${prefix} backdrop blur`}
+        description="blurs content behind open drawers"
+        checked={on}
+        onChange={setOn}
+        data-testid={`${prefix}-switch`}
+      />
+      <Slider
+        aria-label={`${prefix} opacity`}
+        value={opacity}
+        onChange={setOpacity}
+        min={0}
+        max={1}
+        step={0.05}
+        label={(v) => `${Math.round(v * 100)}%`}
+        marks={[{ value: 0, label: '0' }, { value: 0.5, label: '0.5' }, { value: 1, label: '1' }]}
+        data-testid={`${prefix}-slider`}
+      />
+      <Chip.Group multiple={false} value={filter} onChange={(v) => setFilter((v as string) || 'all')}>
+        <Group gap="xs" data-testid={`${prefix}-chip-group`}>
+          <Chip value="all">all</Chip>
+          <Chip value="mine">mine</Chip>
+          <Chip value="shared">shared</Chip>
+        </Group>
+      </Chip.Group>
+    </Stack>
+  );
+}
+
+/**
+ * P80-D: the fixtures a keyboard contract needs and no earlier section has.
+ * The input family has never been on this page, `MultiSelect` neither, and
+ * the overlay menu is too short for typeahead and has no disabled item.
+ */
+function KeyboardExtras({ prefix }: { prefix: string }) {
+  const [name, setName] = useState('');
+  const [width, setWidth] = useState<number | null>(12);
+  const [roles, setRoles] = useState<string[]>([]);
+  const [picked, setPicked] = useState('none');
+  return (
+    <Stack gap="sm" padding="md" data-testid={`${prefix}-keyboard`}>
+      <Divider label="keyboard extras" labelPosition="left" />
+      <TextInput
+        label={`${prefix} gallery name`}
+        description="shown above the gallery"
+        value={name}
+        onChange={(event) => setName(event.currentTarget.value)}
+        data-testid={`${prefix}-text-input`}
+      />
+      <Textarea label={`${prefix} caption`} minRows={2} data-testid={`${prefix}-textarea`} />
+      <PasswordInput label={`${prefix} api key`} data-testid={`${prefix}-password`} />
+      <NumberInput
+        label={`${prefix} gap`}
+        value={width}
+        onChange={setWidth}
+        min={0}
+        max={20}
+        step={2}
+        unit="px"
+        data-testid={`${prefix}-number`}
+      />
+      <MultiSelect
+        label={`${prefix} roles`}
+        data={SELECT_ROLES}
+        value={roles}
+        onChange={setRoles}
+        placeholder="pick roles"
+        data-testid={`${prefix}-multiselect`}
+      />
+      <Group gap="sm" align="center">
+        <Menu>
+          <Menu.Trigger render={<Button variant="outline" data-testid={`${prefix}-long-menu-trigger`} />}>
+            {prefix} long menu
+          </Menu.Trigger>
+          <Menu.Content data-testid={`${prefix}-long-menu`}>
+            <Menu.Item onClick={() => setPicked('archive')}>archive</Menu.Item>
+            <Menu.Item onClick={() => setPicked('copy')}>copy link</Menu.Item>
+            <Menu.Item disabled>disabled export</Menu.Item>
+            <Menu.Item onClick={() => setPicked('rename')}>rename</Menu.Item>
+            <Menu.Item onClick={() => setPicked('share')}>share</Menu.Item>
+          </Menu.Content>
+        </Menu>
+        <Text size="sm" data-testid={`${prefix}-long-menu-picked`}>
+          picked: {picked}
+        </Text>
+      </Group>
+    </Stack>
+  );
+}
+
+const SELECT_ROLES = [
+  { value: 'admin', label: 'Administrator' },
+  { value: 'editor', label: 'Editor' },
+  { value: 'viewer', label: 'Viewer' },
+];
+
+const SELECT_FONTS = [
+  { group: 'Recently used', items: [{ value: 'inter', label: 'Inter' }] },
+  {
+    group: 'System',
+    items: [
+      { value: 'system-ui', label: 'System UI' },
+      { value: 'georgia', label: 'Georgia' },
+    ],
+  },
+];
+
+/**
+ * P80-B: the select family. The triggers live in the scope under test, so the
+ * decisive question is observable in a browser: does the listbox land in the
+ * trigger's own root, and does arrowing to an option and pressing Enter pick
+ * it? That is the contract every Mantine dropdown in the product fails today.
+ */
+function Selects({ prefix }: { prefix: string }) {
+  const [role, setRole] = useState<string | null>(null);
+  const [font, setFont] = useState<string | null>(null);
+  const [tags, setTags] = useState<string[]>([]);
+  return (
+    <Stack gap="sm" padding="md" data-testid={`${prefix}-selects`}>
+      <Divider label="selects" labelPosition="left" />
+      <Group gap="sm" align="flex-end">
+        <Select
+          label={`${prefix} role`}
+          data={SELECT_ROLES}
+          value={role}
+          onChange={setRole}
+          placeholder="pick a role"
+          data-testid={`${prefix}-select-trigger`}
+        />
+        <Select
+          label={`${prefix} font`}
+          data={SELECT_FONTS}
+          value={font}
+          onChange={setFont}
+          searchable
+          searchPlaceholder="type to filter"
+          nothingFoundMessage="no font matches that"
+          data-testid={`${prefix}-select-search`}
+        />
+        <TagsInput
+          label={`${prefix} tags`}
+          value={tags}
+          onChange={setTags}
+          placeholder="type and press Enter"
+          data-testid={`${prefix}-tags-input`}
+        />
+      </Group>
+    </Stack>
+  );
+}
+
+/**
+ * P80-A: the overlays, each with a trigger the ring walk and the focus-return
+ * check can address. The triggers live in the scope under test, so a modal
+ * opened from inside the gallery shadow root has to return focus across that
+ * boundary, which is the defect Mantine has today.
+ */
+function Overlays({ prefix }: { prefix: string }) {
+  const [modal, setModal] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  // P80-F item 2: a modal stacked on another a commit later, and two siblings opened in one commit.
+  const [stacked, setStacked] = useState(false);
+  const [pair, setPair] = useState(false);
+  return (
+    <Stack gap="sm" padding="md" data-testid={`${prefix}-overlays`}>
+      <Divider label="overlays" labelPosition="left" />
+      <Group gap="sm">
+        <Button data-testid={`${prefix}-modal-trigger`} onClick={() => setModal(true)}>
+          {prefix} modal
+        </Button>
+        <Button variant="light" data-testid={`${prefix}-drawer-trigger`} onClick={() => setDrawer(true)}>
+          {prefix} drawer
+        </Button>
+        <Menu>
+          <Menu.Trigger render={<Button variant="outline" data-testid={`${prefix}-menu-trigger`} />}>
+            {prefix} menu
+          </Menu.Trigger>
+          <Menu.Content data-testid={`${prefix}-menu-content`}>
+            <Menu.Item data-testid={`${prefix}-menu-item`}>first item</Menu.Item>
+            <Menu.Item>second item</Menu.Item>
+            <Menu.Divider />
+            <Menu.Item tone="danger" data-testid={`${prefix}-menu-danger`}>
+              delete
+            </Menu.Item>
+          </Menu.Content>
+        </Menu>
+        <Popover>
+          <Popover.Trigger render={<Button variant="subtle" data-testid={`${prefix}-popover-trigger`} />}>
+            {prefix} popover
+          </Popover.Trigger>
+          <Popover.Content width={240} padding="md" data-testid={`${prefix}-popover-content`}>
+            <Text size="sm">popover body</Text>
+            <Button variant="light">inside the popover</Button>
+          </Popover.Content>
+        </Popover>
+        <Tooltip label={`${prefix} tooltip label`} openDelay={0}>
+          <Button variant="default" data-testid={`${prefix}-tooltip-trigger`}>
+            {prefix} tooltip
+          </Button>
+        </Tooltip>
+        <Button variant="default" data-testid={`${prefix}-pair-trigger`} onClick={() => setPair(true)}>
+          {prefix} two modals
+        </Button>
+      </Group>
+
+      <Modal
+        opened={modal}
+        onClose={() => setModal(false)}
+        title={`${prefix} modal`}
+        data-testid={`${prefix}-modal`}
+      >
+        <Stack gap="sm">
+          <Text size="sm">modal body</Text>
+          <Button data-testid={`${prefix}-modal-inside`}>inside the modal</Button>
+          <Button variant="light" data-testid={`${prefix}-stack-trigger`} onClick={() => setStacked(true)}>
+            stack another
+          </Button>
+        </Stack>
+      </Modal>
+
+      <Modal opened={stacked} onClose={() => setStacked(false)} title={`${prefix} stacked modal`}>
+        <Button data-testid={`${prefix}-stacked-inside`}>inside the stacked modal</Button>
+      </Modal>
+
+      <Modal opened={pair} onClose={() => setPair(false)} title={`${prefix} first of two`}>
+        <Text size="sm">first</Text>
+      </Modal>
+      <Modal opened={pair} onClose={() => setPair(false)} title={`${prefix} second of two`}>
+        <Text size="sm">second</Text>
+      </Modal>
+
+      <Drawer
+        opened={drawer}
+        onClose={() => setDrawer(false)}
+        title={`${prefix} drawer`}
+        position="right"
+        data-testid={`${prefix}-drawer`}
+      >
+        <Stack gap="sm">
+          <Text size="sm">drawer body</Text>
+          <Button data-testid={`${prefix}-drawer-inside`}>inside the drawer</Button>
+        </Stack>
+      </Drawer>
     </Stack>
   );
 }
@@ -186,6 +590,59 @@ function Gallery({ prefix }: { prefix: string }) {
  * portaled into the provider's container, which lives in the overlay root.
  * This is the case `adminChromeStyles()` exists to fake in the Mantine tree.
  */
+/**
+ * P80-C: the notification and confirmation managers. The triggers live here
+ * rather than in `Gallery` because `Gallery` renders twice, and a duplicated
+ * trigger is the strict-mode violation P80-B spent a batch scoping around.
+ */
+function Managers() {
+  return (
+    <Stack gap="sm" padding="md" data-testid="managers">
+      <Divider label="managers" labelPosition="left" />
+      <Group gap="sm">
+        <Button
+          data-testid="notify-success"
+          onClick={() =>
+            notify.show({ title: 'Layout saved', message: 'Your changes are live.', color: 'green' })
+          }
+        >
+          success toast
+        </Button>
+        <Button
+          data-testid="notify-danger"
+          onClick={() =>
+            notify.show({ title: 'Save failed', message: 'The server rejected it.', color: 'red', autoClose: false })
+          }
+        >
+          persistent danger toast
+        </Button>
+        <Button
+          data-testid="notify-plain"
+          onClick={() => notify.show({ message: 'Ungrouped', color: 'gray', autoClose: false })}
+        >
+          plain toast
+        </Button>
+        <Button data-testid="notify-clean" onClick={() => notify.clean()}>
+          clear toasts
+        </Button>
+        <Button
+          data-testid="confirm-open"
+          onClick={() =>
+            void confirm({
+              title: 'Discard changes?',
+              children: 'You have unsaved changes. Discard them?',
+              labels: { confirm: 'Discard', cancel: 'Keep editing' },
+              confirmProps: { color: 'red' },
+            })
+          }
+        >
+          open confirm
+        </Button>
+      </Group>
+    </Stack>
+  );
+}
+
 function Chrome() {
   const container = useMullionPortal();
   return createPortal(
@@ -209,13 +666,41 @@ const GROUND = {
 } as const;
 
 function Showcase() {
-  return (
+  const body = (
     <Container size="lg" padding="md" style={GROUND}>
       <Gallery prefix="inline" />
+      {withManagers && <Managers />}
+      {withManagers && <Notifications label="Notifications" closeButtonLabel="Dismiss" />}
+      {withManagers && <Confirmations />}
       <MullionProvider mode={chromeMode}>
         <Chrome />
       </MullionProvider>
     </Container>
+  );
+  if (!hostileHost) return body;
+  /*
+   * The P77-B probe: a transformed ancestor (which makes `position: fixed`
+   * resolve against it rather than the viewport) and a sticky header above
+   * every layer the scale defines. An overlay that is not portaled out of
+   * here is clipped by the transform and covered by the header.
+   */
+  return (
+    <div style={{ transform: 'translateZ(0)', position: 'relative' }} data-testid="hostile-host">
+      <div
+        data-testid="hostile-header"
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 9999,
+          padding: '8px 16px',
+          backgroundColor: 'var(--mullion-color-surface-raised)',
+          color: 'var(--mullion-color-text)',
+        }}
+      >
+        sticky header at z-index 9999
+      </div>
+      {body}
+    </div>
   );
 }
 
@@ -241,7 +726,8 @@ const host = document.getElementById('showcase') ?? document.body.appendChild(do
 host.id = 'showcase';
 
 const rootId = 'showcase';
-const portal = overlayRoot(rootId);
+/** `?portal=provider` uses the provider's own container in the light DOM rather than an overlay root. */
+const portal = params.get('portal') === 'provider' ? undefined : overlayRoot(rootId);
 
 if (useShadow) {
   const shadow = host.attachShadow({ mode: 'open' });
@@ -263,6 +749,30 @@ if (useShadow) {
     <StrictMode>
       <MullionProvider theme={themeId} scope="document" portal={portal} instanceId={rootId}>
         <Showcase />
+      </MullionProvider>
+    </StrictMode>,
+  );
+}
+
+/*
+ * `?twin=1`: a second gallery root on the page with its own provider and its
+ * own manager hosts, as a page with two shortcodes has (P80-F). One `notify` or
+ * `confirm()` must still produce one toast or one dialog.
+ */
+if (params.get('twin') === '1') {
+  const twinId = 'showcase-twin';
+  const twinHost = document.body.appendChild(document.createElement('div'));
+  twinHost.id = twinId;
+  const twinShadow = twinHost.attachShadow({ mode: 'open' });
+  const twinMount = twinShadow.appendChild(document.createElement('div'));
+  createRoot(twinMount).render(
+    <StrictMode>
+      <MullionProvider theme={themeId} scope={twinShadow} portal={overlayRoot(twinId)} instanceId={twinId}>
+        <Notifications label="Notifications" closeButtonLabel="Dismiss" />
+        <Confirmations />
+        <Text size="sm" data-testid="twin-ready">
+          second gallery
+        </Text>
       </MullionProvider>
     </StrictMode>,
   );

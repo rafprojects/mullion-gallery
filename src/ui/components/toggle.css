@@ -1,0 +1,280 @@
+/*
+ * The choice controls (P80-B): checkbox, switch and slider.
+ *
+ * The three states that matter are all data attributes Base UI writes, and the
+ * guard in `toggles.test.tsx` reads each attribute name out of the rule below
+ * and asserts the rendered control carries it. That is P77-C generalised, and
+ * it caught a dead rule in this very batch's tab bar.
+ *
+ * A checked box and a checked track are FILLED, which standing rule 8 allows
+ * because neither is flush: both sit inside a label row with the gap the outset
+ * ring needs. The `primaryFill` and `primaryOnFill` pair is the one the engine
+ * already audits for a filled control.
+ */
+@layer mullion.components {
+  /* ── The shared label row ────────────────────────────────────────────── */
+
+  .mullion-toggle {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--mullion-spacing-xs) / 2);
+    min-inline-size: 0;
+  }
+
+  .mullion-toggle-row {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--mullion-spacing-xs);
+    cursor: pointer;
+  }
+
+  .mullion-toggle[data-disabled] .mullion-toggle-row {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .mullion-toggle-label {
+    font-size: var(--mullion-font-size-sm);
+    line-height: 1.4;
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-toggle[data-size='xs'] .mullion-toggle-label {
+    font-size: var(--mullion-font-size-xs);
+  }
+
+  .mullion-toggle[data-size='lg'] .mullion-toggle-label,
+  .mullion-toggle[data-size='xl'] .mullion-toggle-label {
+    font-size: var(--mullion-font-size-md);
+  }
+
+  /*
+   * The description sits under the whole row rather than beside the label, so
+   * it lines up with the label's text on one column. Base UI's `Field` carries
+   * it to the control's `aria-describedby`; nothing here writes that id.
+   */
+  .mullion-toggle-description {
+    font-size: var(--mullion-font-size-xs);
+    line-height: 1.4;
+    color: var(--mullion-color-text-muted);
+  }
+
+  /* ── Checkbox ────────────────────────────────────────────────────────── */
+
+  .mullion-checkbox {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.125em;
+    block-size: 1.125em;
+    padding: 0;
+    border: 1px solid var(--mullion-checkbox-bd);
+    border-radius: var(--mullion-radius-sm);
+    background-color: var(--mullion-input-bg);
+    color: var(--mullion-color-primary-on);
+    font-size: var(--mullion-font-size-md);
+    cursor: inherit;
+    transition:
+      background-color var(--mullion-duration-fast) ease,
+      border-color var(--mullion-duration-fast) ease;
+  }
+
+  .mullion-checkbox[data-checked],
+  .mullion-checkbox[data-indeterminate] {
+    border-color: var(--mullion-color-primary);
+    background-color: var(--mullion-color-primary);
+  }
+
+  .mullion-checkbox-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 100%;
+    block-size: 100%;
+    /*
+     * `keepMounted` on the indicator so the mark can fade rather than appear,
+     * which means the resting state has to hide it here rather than relying on
+     * the element being absent.
+     */
+    opacity: 0;
+    transition: opacity var(--mullion-duration-fast) ease;
+  }
+
+  .mullion-checkbox[data-checked] .mullion-checkbox-indicator,
+  .mullion-checkbox[data-indeterminate] .mullion-checkbox-indicator {
+    opacity: 1;
+  }
+
+  .mullion-checkbox-indicator svg {
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  /* ── Switch ──────────────────────────────────────────────────────────── */
+
+  .mullion-switch {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    inline-size: 2.25em;
+    block-size: 1.25em;
+    padding: 2px;
+    border: 1px solid var(--mullion-switch-track-bd);
+    border-radius: 999px;
+    background-color: var(--mullion-switch-track-bg);
+    font-size: var(--mullion-font-size-sm);
+    cursor: inherit;
+    transition:
+      background-color var(--mullion-duration-fast) ease,
+      border-color var(--mullion-duration-fast) ease;
+  }
+
+  .mullion-switch[data-checked] {
+    border-color: var(--mullion-color-primary);
+    background-color: var(--mullion-color-primary);
+  }
+
+  .mullion-switch-thumb {
+    display: block;
+    inline-size: 1em;
+    block-size: 1em;
+    border-radius: 999px;
+    background-color: var(--mullion-color-surface);
+    translate: 0;
+    transition: translate var(--mullion-duration-fast) ease;
+  }
+
+  /*
+   * The thumb's ground changes with the track, because `surface` on
+   * `primaryFill` is not an audited pair and `primaryOnFill` is: it is the ink
+   * the engine derives for exactly this ground.
+   */
+  .mullion-switch[data-checked] .mullion-switch-thumb {
+    background-color: var(--mullion-color-primary-on);
+    translate: calc(2.25em - 1em - 8px) 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mullion-checkbox,
+    .mullion-checkbox-indicator,
+    .mullion-switch,
+    .mullion-switch-thumb {
+      transition: none;
+    }
+  }
+
+  /* ── Slider ──────────────────────────────────────────────────────────── */
+
+  .mullion-slider {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--mullion-spacing-xs) / 2);
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+
+  .mullion-slider-control {
+    display: flex;
+    align-items: center;
+    block-size: 1.25rem;
+    inline-size: 100%;
+    touch-action: none;
+  }
+
+  .mullion-slider-track {
+    position: relative;
+    inline-size: 100%;
+    block-size: 4px;
+    border-radius: 999px;
+    background-color: var(--mullion-color-surface3);
+  }
+
+  .mullion-slider-indicator {
+    position: absolute;
+    inset-block: 0;
+    border-radius: inherit;
+    background-color: var(--mullion-color-primary);
+  }
+
+  /*
+   * The thumb is a filled control and it is not flush: the control row is
+   * taller than the track, so the outset ring has its clearance inside the
+   * slider's own box. Rule 8 is satisfied without the container changing.
+   */
+  .mullion-slider-thumb {
+    position: relative;
+    display: block;
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    border: 2px solid var(--mullion-color-primary);
+    border-radius: 999px;
+    background-color: var(--mullion-color-surface);
+  }
+
+  .mullion-slider[data-disabled] {
+    opacity: 0.6;
+  }
+
+  /*
+   * The value over the thumb. Hidden until the thumb is dragged or focused,
+   * unless the caller asked for it always. It is `aria-hidden` in the TSX: the
+   * thumb already carries the number in `aria-valuenow`.
+   *
+   * `visibility` rather than opacity alone, and no transition on either. Two
+   * reasons, both measured. A bubble at `opacity: 0` is still a rendered
+   * element to axe, which composited it against the page and reported a 1.01:1
+   * contrast failure on text nobody can see. And a transitioned property
+   * animates once from its initial value when the component sheet is adopted,
+   * so the bubble faded out on every page load; the same mechanism is why the
+   * segmented indicator needs its `data-ready` gate.
+   */
+  .mullion-slider-value {
+    visibility: hidden;
+    position: absolute;
+    inset-block-end: calc(100% + 6px);
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    padding-block: 1px;
+    padding-inline: var(--mullion-spacing-xs);
+    border-radius: var(--mullion-radius-sm);
+    background-color: var(--mullion-tooltip-bg);
+    color: var(--mullion-tooltip-color);
+    font-size: var(--mullion-font-size-xs);
+    line-height: 1.4;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /*
+   * `:has(:focus-visible)`, because the focus target is a visually hidden
+   * `<input type="range">` INSIDE the thumb: a bare `:focus-visible` on the
+   * thumb matches nothing, and Base UI's `data-focused` is a Field state that
+   * a standalone slider never gets. That is the same fact that made the first
+   * draft name the group instead of the control.
+   */
+  .mullion-slider-thumb:has(:focus-visible) .mullion-slider-value,
+  .mullion-slider-thumb[data-dragging] .mullion-slider-value,
+  .mullion-slider[data-label-always] .mullion-slider-value {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .mullion-slider-marks {
+    position: relative;
+    block-size: 1rem;
+    inline-size: 100%;
+  }
+
+  .mullion-slider-mark {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: var(--mullion-slider-mark, 0);
+    translate: -50% 0;
+    font-size: var(--mullion-font-size-xs);
+    color: var(--mullion-color-text-muted);
+    white-space: nowrap;
+  }
+}

@@ -159,16 +159,20 @@ export default tseslint.config({
   ignores: [
     '**/*.test.{ts,tsx}',
     '**/*.stories.{ts,tsx}',
+    // [P80-C] The browser fixture. Nothing imports it in production, so it is
+    // absent from the build, and its labels are test data rather than chrome.
+    'src/ui/showcase/**',
   ],
   plugins: { mullion: { rules: { 'no-untranslated-notification': noUntranslatedNotification } } },
   rules: {
     'mullion/no-untranslated-notification': 'error',
   },
 }, {
-  // [P78-A] The Mantine import boundary. Everything the app renders comes from
-  // `@/ui`; a direct Mantine import outside it is an error. The files that
-  // already do so are exempted by the generated allow-list, which only shrinks.
-  // See src/ui/README.md and docs/PHASE78_REPORT.md track P78-A.
+  // [P78-A] The vendor UI import boundary. Everything the app renders comes
+  // from `@/ui`; a direct import of a restricted UI package outside it is an
+  // error. The files that already do so are exempted by the generated
+  // allow-list, which only shrinks. P80-A added `@base-ui/react` to the
+  // restricted set. See src/ui/README.md and the P78-A track notes.
   files: ['src/**/*.{ts,tsx}', 'packages/*/src/**/*.{ts,tsx}'],
   ignores: ['src/ui/**', ...mantineBoundary.files],
   rules: {
@@ -176,7 +180,7 @@ export default tseslint.config({
       patterns: [{
         group: mantineBoundary.restrictedPackages.flatMap((pkg) => [pkg, `${pkg}/*`]),
         message:
-          'Import UI primitives from `@/ui`, not from Mantine directly. See src/ui/README.md.',
+          'Import UI primitives from `@/ui`, not from a vendor package directly. See src/ui/README.md.',
       }],
     }],
   },

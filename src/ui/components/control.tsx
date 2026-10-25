@@ -11,7 +11,18 @@
  * how P77-F's ring missed the Switch track twice.
  */
 
-import { useCallback, useEffect, useState, type MouseEventHandler, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+  type MouseEventHandler,
+  type ReactNode,
+} from 'react';
+import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import {
   renderElement,
   cx,
@@ -21,6 +32,7 @@ import {
   type UiTone,
 } from './element';
 import { Loader } from './feedback';
+import { resolveRoleGlyph } from './roleGlyph';
 import { customProperties, radiusValue, type UiRadius, type UiScaleStep } from './scale';
 
 export type UiControlVariant = 'filled' | 'light' | 'outline' | 'subtle' | 'default' | 'transparent';
@@ -78,7 +90,12 @@ export interface ButtonProps extends ControlBaseProps {
   /** Trade the label's vertical padding for a denser row, as Mantine's `compact-*` sizes do. */
   compact?: boolean | undefined;
   fullWidth?: boolean | undefined;
-  leftSection?: ReactNode;
+  /**
+   * Content before the label. Omitted, a status tone supplies its role glyph;
+   * pass `false` to decline it. Most toned buttons name their action in the
+   * label and will decline it, but they decline it on purpose.
+   */
+  leftSection?: ReactNode | false;
   rightSection?: ReactNode;
   /** Swap the left section for a spinner and stop taking clicks. */
   loading?: boolean | undefined;
@@ -101,6 +118,7 @@ export function Button({
   disabled,
   ...rest
 }: ButtonProps) {
+  const glyph = resolveRoleGlyph(tone, leftSection);
   return (
     <ControlBase
       className={cx('mullion-button', className)}
@@ -116,8 +134,8 @@ export function Button({
     >
       {loading ? (
         <Loader className="mullion-button-section" size={size} />
-      ) : leftSection ? (
-        <span className="mullion-button-section">{leftSection}</span>
+      ) : glyph ? (
+        <span className="mullion-button-section">{glyph}</span>
       ) : null}
       <span className="mullion-button-label">{children}</span>
       {rightSection ? <span className="mullion-button-section">{rightSection}</span> : null}
@@ -191,6 +209,82 @@ export function CloseButton({ className, ...rest }: CloseButtonProps) {
   );
 }
 
+/**
+ * [P80-B] What a `Chip.Group` tells the chips under it.
+ *
+ * Null when a chip stands alone, which is the case P79-C built and which keeps
+ * working unchanged: a lone chip is its own checkbox with its own `checked`.
+ */
+interface ChipGroupValue {
+  value: string[];
+  multiple: boolean;
+  name: string;
+  toggle: (value: string, checked: boolean) => void;
+}
+
+const ChipGroupContext = createContext<ChipGroupValue | null>(null);
+setMullionDebugDisplayName(ChipGroupContext, 'ChipGroupContext');
+
+export interface ChipGroupProps {
+  children?: ReactNode;
+  /** A string for single choice, an array for multiple. */
+  value?: string | string[] | null | undefined;
+  defaultValue?: string | string[] | undefined;
+  /** Handed the new selection: a string (or `''`) for single, an array for multiple. */
+  onChange?: ((value: never) => void) | undefined;
+  /** More than one chip at a time. Two of the four call sites set it false explicitly. */
+  multiple?: boolean | undefined;
+}
+
+/**
+ * [P80-B] Several chips sharing one value.
+ *
+ * Ours rather than a primitive's, and the reason is the markup: a chip is
+ * already a real `<input>` inside a `<label>`, so a group only has to say which
+ * input type to render and hold the value. Under `multiple={false}` the chips
+ * become radios, which is what gives the group arrow keys and one tab stop for
+ * free from the platform; under `multiple` they stay checkboxes. Wrapping Base
+ * UI's `RadioGroup` or `CheckboxGroup` would mean replacing the chip's own
+ * element, which nothing here needs.
+ */
+export function ChipGroup({ children, value, defaultValue, onChange, multiple = true }: ChipGroupProps) {
+  const name = useId();
+  const [internal, setInternal] = useState<string[]>(() => toValues(defaultValue));
+  const controlled = value !== undefined;
+  const current = controlled ? toValues(value) : internal;
+
+  const toggle = useCallback(
+    (entry: string, checked: boolean) => {
+      const next = multiple
+        ? checked
+          ? [...current, entry]
+          : current.filter((v) => v !== entry)
+        : checked
+          ? [entry]
+          : [];
+      if (!controlled) setInternal(next);
+      // The shape a call site gets back matches the shape it passed in, which
+      // is how Mantine's group reads and how all four call sites read it.
+      (onChange as ((v: string | string[]) => void) | undefined)?.(
+        multiple ? next : (next[0] ?? ''),
+      );
+    },
+    [multiple, current, controlled, onChange],
+  );
+
+  const context = useMemo<ChipGroupValue>(
+    () => ({ value: current, multiple, name, toggle }),
+    [current, multiple, name, toggle],
+  );
+
+  return <ChipGroupContext.Provider value={context}>{children}</ChipGroupContext.Provider>;
+}
+
+function toValues(value: string | string[] | null | undefined): string[] {
+  if (value === null || value === undefined) return [];
+  return Array.isArray(value) ? [...value] : [value];
+}
+
 /** No `render`: the chip is a fixed label-and-input pair, so there is no single element to swap. */
 export interface ChipProps extends Omit<UiElementProps, 'render'> {
   checked?: boolean | undefined;
@@ -223,6 +317,16 @@ export function Chip({
   children,
   ...rest
 }: ChipProps) {
+  /*
+   * [P80-B] Inside a group the chip takes its state from the group and becomes
+   * a radio when the group is single-choice, which is what hands the platform
+   * the arrow keys and one tab stop. Outside a group nothing changes from
+   * P79-C: it is its own checkbox with its own `checked`.
+   */
+  const group = useContext(ChipGroupContext);
+  const grouped = group !== null && value !== undefined;
+  const isChecked = grouped ? group.value.includes(value) : checked;
+
   return (
     <label
       className={cx('mullion-chip', className)}
@@ -234,19 +338,28 @@ export function Chip({
     >
       <input
         className="mullion-chip-input"
-        type="checkbox"
+        type={grouped && !group.multiple ? 'radio' : 'checkbox'}
         {...focusableSibling}
-        {...(checked !== undefined ? { checked } : {})}
-        {...(defaultChecked !== undefined ? { defaultChecked } : {})}
+        {...(isChecked !== undefined ? { checked: isChecked } : {})}
+        {...(!grouped && defaultChecked !== undefined ? { defaultChecked } : {})}
         {...(value !== undefined ? { value } : {})}
-        {...(name !== undefined ? { name } : {})}
+        {...(grouped ? { name: group.name } : name !== undefined ? { name } : {})}
         {...(disabled ? { disabled: true } : {})}
-        onChange={(event) => onChange?.(event.currentTarget.checked)}
+        onChange={(event) => {
+          if (grouped) group.toggle(value, event.currentTarget.checked);
+          onChange?.(event.currentTarget.checked);
+        }}
       />
       <span className="mullion-chip-label">{children}</span>
     </label>
   );
 }
+
+/*
+ * Attached rather than exported alone, because all four call sites spell it
+ * `Chip.Group`. The standalone export exists so the barrel can name the type.
+ */
+Chip.Group = ChipGroup;
 
 export interface FileButtonProps {
   onChange: (files: File[]) => void;
@@ -274,11 +387,13 @@ export function FileButton({ onChange, accept, multiple, disabled, children }: F
   return (
     <>
       {children({ onClick: open, disabled: disabled === true })}
+      {/* Out of the tab order and the accessibility tree: the caller's button is the control. */}
       <input
         ref={setInput}
         type="file"
         className="mullion-visually-hidden"
         tabIndex={-1}
+        aria-hidden
         {...(accept !== undefined ? { accept } : {})}
         {...(multiple ? { multiple: true } : {})}
         {...(disabled ? { disabled: true } : {})}

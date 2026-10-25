@@ -14,7 +14,7 @@
 | P83-D | Store artwork — icon, banner, lockups, screenshots | In progress — assets in production with the designer; screenshots uncaptured | Medium |
 | P83-E | Premium launch validation — flips P62-A/B to "shipped" | Planned — blocked on A, B | Medium |
 | P83-F | Freemium ("lite") WP.org launch — account security, submission, review | In progress — account exists (P76-C); 2FA, SVN password, and submission remain | Small-Medium |
-| P83-G | Quality bars — manual assistive-tech audit | Planned — recommended, not a hard gate | Small |
+| P83-G | Quality bars: an automated product accessibility suite, then the remaining manual assistive-tech audit | Planned; recommended, not a hard gate | Medium |
 
 ---
 
@@ -268,20 +268,44 @@ The structural a11y CI gate exists and is green, but the manual assistive-tech p
 (keyboard, screen-reader, Shadow-DOM, reflow) has not been run, and no decision is on record
 for whether any finding from it would block launch or become a follow-on.
 
+**Moved here from Phase 80 on 2026-10-25, by user decision.** The user ran section 3 of the
+manual audit (G1 to G4, G6 and G7 pass; G5 found the 320px flicker now in P81-E) and stopped
+there, because Phases 81 and 82 change most of the surfaces the rest of the audit tests. The
+rest waits until the product is essentially complete. That includes Phase 80's own
+screen-reader pass over the framework components (§6B.3, track P80-E).
+
+Most of what remains is mechanical. Measured against the checklist on 2026-10-25, nearly every
+check in §§3 to 6 can be asserted in a browser the way P80-D asserted the framework's keyboard
+contracts: keyboard reach, focus order, traps and return, dialog names, labels, headings and
+alt text, 320px reflow, 200% zoom, reduced motion, the shadow-root ARIA checks, and G8's
+`outline: none` audit, which is a static CSS scan plus a focus check. What genuinely needs a
+person is what a screen reader *says*: about six checks (the card read-through, lightbox
+position, builder selection, live updates from settings and toasts, the ring at true size) plus
+screen-reader quirks such as the doubled list items in P81-E.
+
 ### Fix
 
-Run the QA script in [ACCESSIBILITY_MANUAL_AUDIT.md](guides/ACCESSIBILITY_MANUAL_AUDIT.md).
-Record the launch-blocking-vs-follow-on decision for whatever it finds, here or in
-[ACCESSIBILITY.md](guides/ACCESSIBILITY.md).
+1. **An automated product accessibility suite**, against fixed test data. The data exists:
+   `scripts/seed-a11y-fixtures.php` seeds a WordPress install with campaigns, captioned and
+   uncaptioned images, a video, a large set and a long title, and removes them again with
+   `cleanup`. For CI the suite should run against route-mocked fixtures, as the existing e2e
+   suites do, so it does not depend on a live site.
+2. **Rewrite [ACCESSIBILITY_MANUAL_AUDIT.md](guides/ACCESSIBILITY_MANUAL_AUDIT.md)** so each check
+   says whether it is automated and by which test, as P80-D did for §6B, leaving only the
+   speech checks for a person.
+3. **Run the remaining manual pass once**, including §6B.3, on the finished product. Record the
+   launch-blocking-vs-follow-on decision for each finding, here or in
+   [ACCESSIBILITY.md](guides/ACCESSIBILITY.md).
 
 ### Acceptance criteria
 
-- Audit run and findings recorded.
-- Explicit blocking/non-blocking decision made for each finding, not left implicit.
+- Every check in the audit doc that can be automated is, and names its test.
+- The manual pass is run, findings recorded, and an explicit blocking or non-blocking decision
+  made for each one, not left implicit.
 
 ### Validation
 
-- The audit script itself; no separate automated check. Growing the *structural* a11y gate's
+- The automated suite at CI parity, then the recorded manual pass. Growing the *structural* a11y gate's
   coverage is tracked separately in [FUTURE_TASKS.md](FUTURE_TASKS.md) → Accessibility and is
   not part of this track.
 

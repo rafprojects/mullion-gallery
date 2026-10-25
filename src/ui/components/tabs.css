@@ -1,0 +1,264 @@
+/*
+ * Tabs and the segmented control (P80-B).
+ *
+ * P77-C found three rules here that had never painted, and all three lost to an
+ * INLINE style the adapter set on the same property. Nothing here is inline:
+ * every state is a data attribute and every colour a token, so the P79-B static
+ * tests can see the rule and a mutation of the attribute name fails a test.
+ *
+ * The active tab's weight travels as `--mullion-tabs-tab-weight` rather than as
+ * a `font-weight` declaration, which is the same defect avoided the same way in
+ * `chrome-portable.scss` after it was reintroduced there in P80-A.
+ *
+ * The segmented control sits on the elevation ladder (P80-G): the track is
+ * `surface` and the indicator `surfaceRaised`, a real rung on every dark theme
+ * since P80-G re-derived `surface2` below it rather than equal to it. By rule 13 a dark theme
+ * shows the step by lightness alone and a light theme by a `border-strong`
+ * hairline, which is what `raised-bd` carries. Until P80-G the indicator
+ * needed that hairline on every theme, because `surfaceRaised` was identical
+ * to `surface2` on 21 of the 23.
+ */
+@layer mullion.components {
+  /* ── Tabs ────────────────────────────────────────────────────────────── */
+
+  .mullion-tabs {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+
+  .mullion-tabs-list {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: var(--mullion-spacing-xs);
+    border-block-end: 1px solid var(--mullion-color-border);
+  }
+
+  /*
+   * A scrolling bar. `overflow-x: auto` computes the block axis to `auto` as
+   * well, so this clips anything a tab paints outside its box; the ring inside
+   * is the inset variant for that reason and cannot be cut.
+   */
+  .mullion-tabs-list[data-scrollable] {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: thin;
+  }
+
+  .mullion-tabs[data-orientation='vertical'] {
+    flex-direction: row;
+  }
+
+  .mullion-tabs[data-orientation='vertical'] .mullion-tabs-list {
+    flex-direction: column;
+    border-block-end: 0;
+    border-inline-end: 1px solid var(--mullion-color-border);
+  }
+
+  .mullion-tabs-tab {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--mullion-spacing-xs);
+    padding-block: var(--mullion-spacing-xs);
+    padding-inline: var(--mullion-spacing-sm);
+    border: 0;
+    background: none;
+    color: var(--mullion-tab-color);
+    font: inherit;
+    font-size: var(--mullion-font-size-sm);
+    font-weight: var(--mullion-tabs-tab-weight, 400);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .mullion-tabs-tab:hover:not([data-disabled]) {
+    color: var(--mullion-tab-active-color);
+  }
+
+  /*
+   * The active tab. The weight is a custom property the rule sets rather than a
+   * declaration, so nothing downstream has to outrank an inline style to change
+   * it: that was the P77-C failure mode and it was reintroduced once already.
+   */
+  .mullion-tabs-tab[data-active] {
+    --mullion-tabs-tab-weight: 600;
+    color: var(--mullion-tab-active-color);
+  }
+
+  .mullion-tabs-tab[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /*
+   * Base UI's indicator. It publishes the active tab's box as `--active-tab-*`
+   * and this moves one element across them, so nothing in `tabs.tsx` measures
+   * a tab. The underline seats on the list's 1px rule, which is why the rule
+   * is there rather than on each tab.
+   */
+  .mullion-tabs-indicator {
+    position: absolute;
+    inset-block-end: -1px;
+    inset-inline-start: 0;
+    block-size: 2px;
+    inline-size: var(--active-tab-width);
+    translate: var(--active-tab-left) 0;
+    background-color: var(--mullion-tab-indicator-color);
+  }
+
+  /*
+   * The transition waits for `data-ready`, exactly as the segmented one does
+   * and for the same measured reason: a transitioned property animates once
+   * from its initial value when the component sheet is adopted, so an
+   * ungated indicator slides in from the left edge on every page load.
+   */
+  .mullion-tabs-list[data-ready] .mullion-tabs-indicator {
+    transition:
+      translate var(--mullion-duration-fast) ease,
+      inline-size var(--mullion-duration-fast) ease;
+  }
+
+  .mullion-tabs[data-orientation='vertical'] .mullion-tabs-indicator {
+    inset-block-start: 0;
+    inset-block-end: auto;
+    inset-inline-start: auto;
+    inset-inline-end: -1px;
+    inline-size: 2px;
+    block-size: var(--active-tab-height);
+    translate: 0 var(--active-tab-top);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mullion-tabs-list[data-ready] .mullion-tabs-indicator {
+      transition: none;
+    }
+  }
+
+  .mullion-tabs-panel {
+    min-inline-size: 0;
+  }
+
+  /* ── SegmentedControl ────────────────────────────────────────────────── */
+
+  .mullion-segmented {
+    position: relative;
+    display: inline-flex;
+    align-items: stretch;
+    /*
+     * A flex or grid parent stretches an `inline-flex` child across the cross
+     * axis, so the track would fill a column it was only meant to sit in.
+     * `fullWidth` is the way to ask for the whole width and its rule comes
+     * after this one.
+     */
+    inline-size: fit-content;
+    gap: 0;
+    padding: 2px;
+    border-radius: var(--mullion-radius, var(--mullion-radius-sm));
+    background-color: var(--mullion-color-surface);
+    block-size: var(--mullion-control-height-sm);
+  }
+
+  .mullion-segmented[data-size='xs'] {
+    block-size: var(--mullion-control-height-xs);
+  }
+
+  .mullion-segmented[data-size='md'] {
+    block-size: var(--mullion-control-height-md);
+  }
+
+  .mullion-segmented[data-size='lg'] {
+    block-size: var(--mullion-control-height-lg);
+  }
+
+  .mullion-segmented[data-size='xl'] {
+    block-size: var(--mullion-control-height-xl);
+  }
+
+  .mullion-segmented[data-full-width] {
+    display: flex;
+    inline-size: 100%;
+  }
+
+  .mullion-segmented[data-full-width] .mullion-segmented-item {
+    flex: 1 1 0;
+  }
+
+  /*
+   * The moving indicator, positioned from the two custom properties
+   * `tabs.tsx` publishes after reading the checked segment's box. Its border
+   * is the rule-13 hairline: transparent on a dark theme, `border-strong` on a
+   * light one (see this file's header).
+   */
+  .mullion-segmented-indicator {
+    position: absolute;
+    /* The measurement is of a border box, so the indicator has to be one. */
+    box-sizing: border-box;
+    inset-block: 2px;
+    inset-inline-start: 0;
+    inline-size: var(--mullion-segment-width, 0);
+    translate: var(--mullion-segment-left, 0) 0;
+    border: 1px solid var(--mullion-raised-bd);
+    border-radius: calc(var(--mullion-radius, var(--mullion-radius-sm)) - 1px);
+    background-color: var(--mullion-color-surface-raised);
+    pointer-events: none;
+  }
+
+  /*
+   * The transition arrives a frame after the first measurement, on the
+   * `data-ready` attribute `tabs.tsx` sets. Declaring it here from the start
+   * makes every mount animate the indicator in from zero width at the left
+   * edge, because the element's first resolved style has no measurement yet.
+   */
+  .mullion-segmented[data-ready] .mullion-segmented-indicator {
+    transition:
+      translate var(--mullion-duration-fast) ease,
+      inline-size var(--mullion-duration-fast) ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mullion-segmented[data-ready] .mullion-segmented-indicator {
+      transition: none;
+    }
+  }
+
+  .mullion-segmented-item {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-inline: var(--mullion-spacing-sm);
+    border: 0;
+    border-radius: calc(var(--mullion-radius, var(--mullion-radius-sm)) - 1px);
+    background: none;
+    color: var(--mullion-color-text-muted);
+    font: inherit;
+    font-size: var(--mullion-font-size-sm);
+    font-weight: var(--mullion-segment-weight, 400);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .mullion-segmented[data-size='xs'] .mullion-segmented-item {
+    font-size: var(--mullion-font-size-xs);
+  }
+
+  .mullion-segmented-item:hover:not([data-disabled]):not([data-checked]) {
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-segmented-item[data-checked] {
+    --mullion-segment-weight: 600;
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-segmented-item[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .mullion-segmented-item-label {
+    position: relative;
+  }
+}

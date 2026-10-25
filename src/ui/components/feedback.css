@@ -41,6 +41,35 @@
     color: inherit;
   }
 
+  /*
+   * [P80-A] The role glyph. It scales with the element's own type size so it
+   * reads at whatever size the control ships at, which is the constraint the
+   * designer set: judged at true size, not magnified. `em` rather than a
+   * token, because the glyph belongs to the label beside it.
+   */
+  .mullion-role-glyph {
+    inline-size: 1.15em;
+    block-size: 1.15em;
+    flex: none;
+  }
+
+  /*
+   * [P80-A] A badge's glyph. The badge is the component that needed the slot
+   * most: it had none, which is why a `tone="success"` badge reading "Tier 2"
+   * conveyed its role by colour alone, and on the light palette under
+   * protanopia that is the same colour as a warning badge.
+   */
+  .mullion-badge-icon {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    color: var(--mullion-tone);
+  }
+
+  .mullion-badge[data-variant='filled'] .mullion-badge-icon {
+    color: inherit;
+  }
+
   .mullion-alert-body {
     min-width: 0;
   }

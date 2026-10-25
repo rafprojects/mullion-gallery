@@ -15,6 +15,22 @@ still stands and is worth keeping: *pure colour math on fixed hexes can be trust
 any number that models the generator must be re-measured against the code before it becomes a
 value.* Three v1 numbers died by that rule; none of them survive here.
 
+**2026-10-02: §8 added.** The designer's standing rules, collected from the week of
+correspondence that ended 2026-09-14, plus the elevation rule from their 2026-10-02 answers.
+The copy before this change is archived in
+[`archive/2026-10-02-pre-standing-rules/`](archive/2026-10-02-pre-standing-rules/).
+
+**2026-10-07: rule 13 revised, rule 14 added.** Rule 13's second sentence is replaced with the
+designer's corrected text, and rule 14, the `border` floor, is the designer's decision of
+2026-10-06. The engineering note under rule 13 now records how the engine meets both. The copy
+before this change is archived in
+[`archive/2026-10-07-pre-rule-13-revision/`](archive/2026-10-07-pre-rule-13-revision/).
+
+**2026-10-07, later: the engineering note under rule 13 rewritten.** The designer reversed the dark
+half of P80-G's elevation resolution the same day, and the note now describes the reversed one. No
+rule's text changed. The copy before this change is archived in
+[`archive/2026-10-07-pre-elevation-reversal/`](archive/2026-10-07-pre-elevation-reversal/).
+
 ## 1. Theme tokens — what the plugin consumes
 
 Shipped as theme **`default-dark`** ("Mullion") in
@@ -204,6 +220,97 @@ worth over-engineering.
 3. **Is Layout Builder selection drawn in the theme accent?** It is drawn in
    `primaryStroke` — the contrast-selected rung, not the raw accent — and the builder
    outline/drop-target sites are in the 1.4.11 audit.
+
+## 8. Standing rules
+
+Added 2026-10-02. Rules 1 to 12 are the designer's own text, verbatim from
+[`designer-standing-rules-2026-09-14.md`](correspondences/designer-standing-rules-2026-09-14.md),
+which wrote them as an addendum for this file. They are what survived a week in which nine
+documents were exchanged and five of them reversed something. Rule 13 is from
+[`designer-answers-catching-up-2026-10-02.md`](correspondences/designer-answers-catching-up-2026-10-02.md).
+
+### Grounds and inks
+
+**1. Every ground a value is painted on belongs in that value's audit set, at the floor appropriate
+to what the value is.** Not every ground needs its own ink — there is often a cheaper answer — but
+no ground should be unmeasured. *(Origin: 99 failures across three derived grounds nobody had
+audited, 2026-09-13.)*
+
+**2. Tint the ground or colour the ink, never both.** A ground tinted toward its own ink loses
+contrast monotonically; there is no ink that escapes it. *(P79-C, June. Independently re-derived and
+then found already shipped, 2026-09-13.)*
+
+**3. Selection at the nearest passing rung has no margin by construction.** The semantic colours
+stop at the first rung clearing 4.5:1, which is why the tightest theme sits 0.03 above the floor and
+why any new derived ground breaks immediately. This is a property to remember, not a defect to fix —
+raising the target globally was priced and rejected.
+
+### Signals
+
+**4. The focus ring marks keyboard focus. It is not a selection mark, an active mark, or an emphasis
+mark.** Anything that needs to look chosen gets its own treatment. *(Reached for twice in one week,
+clipped both times it landed.)*
+
+**5. A non-colour signal must differ by shape or by words.** A role-coloured rail, border or dot is
+still colour and fails the same test: at full chroma, success and warning are ΔE00 2.7 apart under
+protanopia, and on a 14% wash they are 0.00. *(2026-09-14.)*
+
+**6. A pair contrast is a floor for function, not a target for appearance.** Raising `halo:core`
+past the pole ceiling can only come out of `halo:surface`, and the second is what makes an indicator
+findable. *(2026-09-11.)*
+
+### Geometry
+
+**7. The focus ring's reach is 6px.** The outline sits inside the halo's spread; they do not stack.
+A ring specified as three 2px bands cannot reach further than three 2px bands.
+
+**8. Filled controls take the outset ring and must be given ≥6px of clearance. Flush controls on
+neutral or washed grounds take the inset ring. Filled *and* flush is a layout defect, not a ring
+variant.**
+
+**9. Ring weight cannot be judged magnified.** 1/2/1 looks fine at 4× and loses its two-tone
+character at true size. Judge indicators at the size they ship. *(Same failure mode as the 16px
+aperture icon.)*
+
+### Measurement
+
+**10. ΔE is CIEDE2000 unless labelled otherwise.** ΔE\*ab inflates 1.1–2.6× at high chroma and
+1.06× on neutrals — which is an artefact, not a perceptual gap, and semantic colours are nothing but
+high-chroma colours.
+
+**11. A number is measured only if it came from the rendered result.** *(Yours, 2026-09-14.)*
+
+**12. Pure colour maths on fixed hex values reproduces exactly and can be used directly. Anything
+that models the plugin's own code must be measured before it is used.** *(2026-08-25, and it has
+held every time either of us ignored it since.)*
+
+### Elevation
+
+**13.** **Elevation is carried by ground lightness on dark themes and by border and shadow on light
+themes.** Dark themes have three rungs — `background`, `surface`, `surfaceRaised` — and a raised
+element needs no border to be read as raised. Light themes have two, and a raised element carries
+a 1px `borderStrong` hairline and its shadow. `surfaceRaised` must be strictly above `surface2` on
+every theme. **On dark themes** `surface2` and `surface3` sit between `surface` and
+`surfaceRaised`. **On light themes** they may instead recess below `surface`, as input fills;
+`surfaceRaised` must never be darker than `surface`. Neither is one side of an elevation pair on
+its own. *(2026-10-02; second sentence revised 2026-10-06.)*
+
+> **Engineering note, 2026-10-07: the bundled themes satisfy rules 13 and 14 (P80-G).** On the
+> bundled dark homages the step from `surface` to `surfaceRaised` is already ≥ ΔE00 2.0 on all thirteen; the
+> collision was `surface2`, not the ladder. The ports authored `surface2` as the rung itself, so when
+> a dark theme does not author `surfaceRaised`, the engine keeps that value as the raised ground and
+> re-derives `surface2` and `surface3` as the intermediates between it and `surface`. Only neutral
+> fills move; no accent, role text or ring colour does. A dark theme with no rung that far above
+> `surface` is lifted instead, toward `surface3`, stopping where role text would fall under 4.5:1;
+> no bundled theme needs that. A light theme that does not author `surfaceRaised` takes `surface`.
+> Every bundled theme is tested against both rules by name.
+
+**14.** **`border` must sit at least ΔE00 3.5 from every ground it can be drawn on, and the engine
+steps it when an authored value does not.** The floor is just under the tightest pair the default
+themes ship (default-dark, 3.84 on `surfaceRaised`). The step moves `border`'s lightness away from
+the grounds, lighter on dark themes and darker on light, holding hue, and stops before it reaches
+`borderStrong`. If there is no room, CI fails and names the theme. Move `border`, never the
+ladder. *(2026-10-06.)*
 
 ---
 

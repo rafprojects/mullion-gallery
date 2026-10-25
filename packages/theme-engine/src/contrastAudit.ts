@@ -60,6 +60,16 @@ export function intendedContrastChecks(
     { label: 'textMuted on surface', fg: rc.textMuted, bg: rc.surface, minRatio },
     { label: 'textMuted on surface3', fg: rc.textMuted, bg: rc.surface3, minRatio },
 
+    // [P80-A] surfaceRaised is the ground of every portaled panel: a menu
+    // dropdown, a popover and a tooltip all derive their background from it
+    // (`menu-bg`, `tooltip-bg`). Menus have painted text on it since long
+    // before the framework and it was never audited, because until the
+    // overlays became ours nothing named the pair. Measured across all 23
+    // bundled themes when it was added: the worst is 5.54 for text and 5.10
+    // for muted, so this pins behaviour rather than changing it.
+    { label: 'text on surfaceRaised', fg: rc.text, bg: rc.surfaceRaised, minRatio },
+    { label: 'textMuted on surfaceRaised', fg: rc.textMuted, bg: rc.surfaceRaised, minRatio },
+
     // Lowest-emphasis text: input placeholders (on surface2) + muted-2 body usage
     // (on surface). Placeholder text is subject to AA.
     { label: 'textMuted2 on surface', fg: rc.textMuted2, bg: rc.surface, minRatio },

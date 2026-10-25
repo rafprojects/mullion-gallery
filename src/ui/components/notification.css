@@ -1,0 +1,165 @@
+/*
+ * The toast stack (P80-C).
+ *
+ * A plain column, not an overlapping deck. Base UI supports the collapsed-deck
+ * presentation through `--toast-index` and `--toast-offset-y`, and it was
+ * rejected here: the migration's job is that 42 existing call sites keep
+ * behaving as they do, and Mantine stacks notifications in a column. A deck
+ * would also put the second toast behind the first at partial opacity, which is
+ * a contrast measurement nobody has taken.
+ *
+ * The ground is a border rather than an elevation step. `surfaceRaised` is
+ * ΔE00 0.00 from `surface2` on 21 of the 23 shipped themes, so "float it above
+ * the page" is not a treatment the token ladder can currently express; this is
+ * the same workaround the segmented indicator uses and it is filed with the
+ * designer (elevation-and-selected-rows-2026-09-14).
+ */
+@layer mullion.components {
+  .mullion-toast-viewport {
+    position: fixed;
+    z-index: var(--mullion-overlay-layer);
+    display: flex;
+    flex-direction: column;
+    gap: var(--mullion-spacing-sm);
+    inline-size: 22rem;
+    max-inline-size: calc(100vw - 2 * var(--mullion-spacing-lg));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /*
+   * Bottom positions stack upward, so the newest toast is nearest the edge the
+   * eye is already on. `column-reverse` does that without the store having to
+   * reverse its own list.
+   */
+  .mullion-toast-viewport[data-position^='bottom'] {
+    inset-block-end: var(--mullion-spacing-lg);
+    flex-direction: column-reverse;
+  }
+
+  .mullion-toast-viewport[data-position^='top'] {
+    inset-block-start: var(--mullion-spacing-lg);
+  }
+
+  .mullion-toast-viewport[data-position$='right'] {
+    inset-inline-end: var(--mullion-spacing-lg);
+  }
+
+  .mullion-toast-viewport[data-position$='left'] {
+    inset-inline-start: var(--mullion-spacing-lg);
+  }
+
+  .mullion-toast-viewport[data-position$='center'] {
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+  }
+
+  .mullion-toast {
+    position: relative;
+    display: flex;
+    gap: var(--mullion-spacing-sm);
+    align-items: flex-start;
+    box-sizing: border-box;
+    inline-size: 100%;
+    padding-block: var(--mullion-spacing-sm);
+    padding-inline: var(--mullion-spacing-md);
+    border: 1px solid var(--mullion-color-border-strong);
+    border-radius: var(--mullion-radius-md);
+    background-color: var(--mullion-color-surface);
+    box-shadow: var(--mullion-shadow-lg);
+    color: var(--mullion-color-text);
+    font-family: var(--mullion-font-family);
+    font-size: var(--mullion-font-size-sm);
+    transition:
+      opacity var(--mullion-duration-base) ease,
+      transform var(--mullion-duration-base) ease;
+  }
+
+  /*
+   * The role's colour on the leading edge, which is the only place a tone paints
+   * on this component. The body stays on the neutral surface: a washed ground
+   * would put four status colours ΔE00 0.00 apart under protanopia, which is
+   * the measurement the role glyphs exist for. The glyph carries the meaning and
+   * the rail is a redundant cue beside it.
+   */
+  .mullion-toast[data-mullion-tone='success'],
+  .mullion-toast[data-mullion-tone='warning'],
+  .mullion-toast[data-mullion-tone='danger'],
+  .mullion-toast[data-mullion-tone='info'],
+  .mullion-toast[data-mullion-tone='primary'] {
+    border-inline-start: 4px solid var(--mullion-tone);
+  }
+
+  .mullion-toast-icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    align-self: flex-start;
+    min-block-size: 1.35em;
+    color: var(--mullion-tone);
+  }
+
+  .mullion-toast-body {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+  }
+
+  .mullion-toast-title {
+    margin: 0;
+    font-size: var(--mullion-font-size-sm);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .mullion-toast-message {
+    margin: 0;
+    color: var(--mullion-color-text-muted);
+    line-height: 1.4;
+  }
+
+  /* With no title there is no heading above it, so the body is the message. */
+  .mullion-toast-body > .mullion-toast-message:only-child {
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-toast-close {
+    flex: none;
+    align-self: flex-start;
+  }
+
+  /*
+   * Entry and exit. Base UI stamps `data-starting-style` for the first frame and
+   * `data-ending-style` while the toast animates out; both are its own names,
+   * read out of the sheet and asserted against the rendered element by the
+   * browser suite, because P77-C and P80-B both shipped a rule keyed on an
+   * attribute the primitive never writes.
+   */
+  .mullion-toast[data-starting-style],
+  .mullion-toast[data-ending-style] {
+    opacity: 0;
+    transform: translateY(var(--mullion-spacing-sm));
+  }
+
+  /*
+   * A toast held back by the limit. `visibility` rather than opacity alone:
+   * axe composites an `opacity: 0` element against the page and measures the
+   * result, which is how a hidden slider bubble was reported at 1.01:1 in P80-B.
+   */
+  .mullion-toast[data-limited] {
+    visibility: hidden;
+    opacity: 0;
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mullion-toast {
+      transition: none;
+    }
+
+    .mullion-toast[data-starting-style],
+    .mullion-toast[data-ending-style] {
+      transform: none;
+    }
+  }
+}

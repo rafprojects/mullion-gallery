@@ -53,6 +53,27 @@ describe('component tokens across every bundled theme', () => {
       }
     });
 
+    it(`${def.id}: every colour token survives sanitising into the emitted CSS`, () => {
+      // [P80-A] The existing test below checks what `deriveComponentTokens`
+      // returns; this one checks what actually reaches the stylesheet. The gap
+      // between the two is where `menu-hover-bg` was lost: the generic value
+      // sanitiser rejected chroma's `rgb(r g b / a)` form and the emitter
+      // substituted `inherit`, silently, for every alpha-derived token.
+      const rc = resolveColors(def.colors as ThemeColors, def.colorScheme);
+      const css = generateCssVariables(rc, def);
+      const tokens = deriveComponentTokens(rc);
+
+      for (const name of Object.keys(COMPONENT_TOKEN_DERIVATIONS) as ComponentTokenKey[]) {
+        const emitted = new RegExp(`${DEFAULT_CSS_VAR_PREFIX}-${name}:\\s*([^;]+);`).exec(css)?.[1]?.trim();
+        expect(emitted, `${def.id} emits no value for ${name}`).toBeTruthy();
+        expect(
+          emitted,
+          `${def.id} ${name} was sanitised away and emitted as "inherit" (derived: ${tokens[name]})`,
+        ).not.toBe('inherit');
+        expect(chroma.valid(emitted!), `${def.id} ${name} emitted a non-colour: ${emitted}`).toBe(true);
+      }
+    });
+
     it(`${def.id}: every derived colour token parses as a colour`, () => {
       const rc = resolveColors(def.colors as ThemeColors, def.colorScheme);
       const tokens = deriveComponentTokens(rc);
@@ -118,6 +139,16 @@ describe('framework constants', () => {
           `${DEFAULT_CSS_VAR_PREFIX}-${name}: ${value};`,
         );
       }
+    }
+  });
+
+  it('gives a raised element the rule-13 hairline on light themes and none on dark', () => {
+    // P80-G: dark themes show elevation by lightness, light ones by a border-strong hairline.
+    for (const ext of bundledThemeDefinitions) {
+      const def = fullDefinition(ext);
+      const rc = resolveColors(def.colors as ThemeColors, def.colorScheme);
+      const expected = def.colorScheme === 'dark' ? 'transparent' : rc.borderStrong;
+      expect(deriveComponentTokens(rc)['raised-bd'], def.id).toBe(expected);
     }
   });
 

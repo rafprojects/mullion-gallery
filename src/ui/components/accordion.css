@@ -1,0 +1,139 @@
+/*
+ * The accordion (P80-B).
+ *
+ * `separated` is the default because all twelve call sites that set a variant
+ * ask for it: each item is its own card on `surface` with a `border`, which is
+ * the idiom `Card` and `Paper` already use rather than a second one.
+ *
+ * The control takes the OUTSET ring. That is not an oversight next to the menu
+ * row and the tab, which take the inset one: a control is the full width of an
+ * item and the items sit in a gap, so the 6px the outset ring reaches is there
+ * to reach into. Standing rule 8 puts flush controls on the inset variant and
+ * this one is not flush.
+ */
+@layer mullion.components {
+  .mullion-accordion {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+
+  .mullion-accordion[data-variant='separated'] {
+    gap: var(--mullion-spacing-xs);
+  }
+
+  .mullion-accordion-item {
+    min-inline-size: 0;
+  }
+
+  .mullion-accordion[data-variant='separated'] .mullion-accordion-item {
+    border: 1px solid var(--mullion-color-border);
+    border-radius: var(--mullion-radius, var(--mullion-radius-md));
+    background-color: var(--mullion-color-surface);
+    overflow: hidden;
+  }
+
+  .mullion-accordion[data-variant='contained'] .mullion-accordion-item + .mullion-accordion-item {
+    border-block-start: 1px solid var(--mullion-color-border);
+  }
+
+  .mullion-accordion-header {
+    margin: 0;
+    font: inherit;
+  }
+
+  .mullion-accordion-control {
+    display: flex;
+    inline-size: 100%;
+    align-items: center;
+    gap: var(--mullion-spacing-xs);
+    padding-block: var(--mullion-spacing-xs);
+    padding-inline: var(--mullion-spacing-sm);
+    border: 0;
+    border-radius: inherit;
+    background: none;
+    color: var(--mullion-color-text);
+    font: inherit;
+    font-size: var(--mullion-font-size-sm);
+    font-weight: 500;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .mullion-accordion-control:hover:not([data-disabled]) {
+    background-color: var(--mullion-menu-hover-bg);
+  }
+
+  .mullion-accordion-control[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .mullion-accordion-label {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+  }
+
+  .mullion-accordion-section {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    color: var(--mullion-color-text-muted);
+  }
+
+  /*
+   * The chevron leads or trails, and `order` decides which rather than a second
+   * markup path: one composition, one set of parts, and the position is a data
+   * attribute on the root like every other state here.
+   */
+  .mullion-accordion-chevron {
+    flex: none;
+    inline-size: 1em;
+    block-size: 1em;
+    color: var(--mullion-color-text-muted);
+    transition: transform var(--mullion-duration-fast) ease;
+  }
+
+  .mullion-accordion[data-chevron='right'] .mullion-accordion-chevron {
+    order: 2;
+  }
+
+  .mullion-accordion-control[data-panel-open] .mullion-accordion-chevron {
+    transform: rotate(180deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mullion-accordion-chevron {
+      transition: none;
+    }
+  }
+
+  /*
+   * The panel animates on its own measured height, which Base UI publishes as
+   * `--accordion-panel-height`. Nothing in `accordion.tsx` measures it, and the
+   * inner element carries the padding so the collapse does not animate padding
+   * against a zero height.
+   */
+  .mullion-accordion-panel {
+    block-size: var(--accordion-panel-height);
+    overflow: hidden;
+    transition: block-size var(--mullion-duration-base) ease;
+  }
+
+  .mullion-accordion-panel[data-starting-style],
+  .mullion-accordion-panel[data-ending-style] {
+    block-size: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mullion-accordion-panel {
+      transition: none;
+    }
+  }
+
+  .mullion-accordion-content {
+    padding-block: var(--mullion-spacing-xs) var(--mullion-spacing-sm);
+    padding-inline: var(--mullion-spacing-sm);
+    font-size: var(--mullion-font-size-sm);
+  }
+}

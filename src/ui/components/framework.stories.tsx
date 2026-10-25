@@ -12,6 +12,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import {
+  Accordion,
   ActionIcon,
   Alert,
   Anchor,
@@ -41,6 +42,21 @@ import {
   Title,
   UnstyledButton,
   VisuallyHidden,
+  Checkbox,
+  ColorInput,
+  ColorPicker,
+  MultiSelect,
+  NumberInput,
+  Pagination,
+  SegmentedControl,
+  Slider,
+  Switch,
+  Tabs,
+  PasswordInput,
+  Select,
+  TagsInput,
+  Textarea,
+  TextInput,
   type UiControlVariant,
   type UiTone,
 } from './index';
@@ -65,6 +81,118 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const Inputs: Story = {
+  name: 'Input family',
+  render: function Inputs() {
+    const [size, setSize] = useState<number | null>(16);
+    const [unit, setUnit] = useState('px');
+    return (
+      <Stack gap="md" padding="md">
+        <Section title="Text, password and multi-line">
+          <TextInput label="Campaign title" placeholder="Summer 2026" description="Shown in the listing" />
+          <TextInput label="Slug" defaultValue="summer-2026" error="Already taken" />
+          <TextInput label="Disabled" defaultValue="Locked" disabled />
+          <PasswordInput label="Password" placeholder="At least 12 characters" />
+          <Textarea label="Notes" minRows={2} maxRows={6} placeholder="Grows as you type, up to six rows" />
+        </Section>
+
+        <Section title="Numbers, the stepper and the scrub label">
+          <Group gap="md" align="flex-end">
+            <NumberInput label="Columns" defaultValue={3} min={1} max={12} withControls />
+            <NumberInput label="Gap" defaultValue={8} step={2} scrubbable description="Drag the label" />
+          </Group>
+        </Section>
+
+        <Section title="The unit slot">
+          <Text size="sm" tone="muted">
+            The slot is inside the field&rsquo;s border, so it shares the border and the height with
+            nothing to line up. A string is static text; a node is a control. The Typography panel
+            needs the second form, and it is the reason this slot exists.
+          </Text>
+          <Group gap="md" align="flex-end">
+            <NumberInput label="Static unit" defaultValue={24} unit="px" />
+            <NumberInput
+              label="Font size"
+              value={size}
+              onChange={setSize}
+              scrubbable
+              unit={
+                <select
+                  aria-label="Unit"
+                  value={unit}
+                  onChange={(e) => setUnit(e.currentTarget.value)}
+                  style={{ border: 0, background: 'none', color: 'inherit', font: 'inherit' }}
+                >
+                  {['px', 'rem', 'em', '%'].map((u) => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
+                  ))}
+                </select>
+              }
+            />
+          </Group>
+        </Section>
+
+        <Section title="Sizes">
+          {STEPS.map((step) => (
+            <NumberInput key={step} size={step} label={`size ${step}`} defaultValue={12} unit="px" withControls />
+          ))}
+        </Section>
+      </Stack>
+    );
+  },
+};
+
+export const RoleGlyphs: Story = {
+  name: 'Role glyphs (CVD)',
+  render: () => (
+    <Stack gap="md" padding="md">
+      <Section title="A status tone supplies its glyph by default">
+        <Text size="sm" tone="muted">
+          On the light palette under protanopia the success and warning washes are deltaE00 0.00
+          apart. The glyph is the non-colour signal, and the silhouettes differ on purpose: four
+          variations on a disc would measure identically and signal nothing. Check this story
+          through a CVD simulator with the colour removed.
+        </Text>
+        <Group gap="xs">
+          {(['success', 'warning', 'danger', 'info'] as const).map((tone) => (
+            <Badge key={tone} tone={tone}>
+              Tier 2
+            </Badge>
+          ))}
+        </Group>
+        <Group gap="sm">
+          {(['success', 'warning', 'danger', 'info'] as const).map((tone) => (
+            <Button key={tone} variant="light" tone={tone}>
+              Continue
+            </Button>
+          ))}
+        </Group>
+        {(['success', 'warning', 'danger', 'info'] as const).map((tone) => (
+          <Alert key={tone} tone={tone} title={`A ${tone} alert`}>
+            The glyph takes the tone through currentColor, audited at the 3:1 non-text floor.
+          </Alert>
+        ))}
+      </Section>
+      <Section title="Declining it is a deliberate act">
+        <Group gap="xs">
+          <Badge tone="success" icon={false}>
+            Passed
+          </Badge>
+          <Button variant="light" tone="danger" leftSection={false}>
+            Delete campaign
+          </Button>
+        </Group>
+        <Text size="sm" tone="muted">
+          Both labels name the role, so the glyph is redundant and declined explicitly rather than
+          by omission.
+        </Text>
+      </Section>
+    </Stack>
+  ),
+};
 
 export const Typography: Story = {
   render: () => (
@@ -401,6 +529,293 @@ export const DataAndUtilities: Story = {
             There is a visually hidden note here.
             <VisuallyHidden> Read only by a screen reader.</VisuallyHidden>
           </Text>
+        </Section>
+      </Stack>
+    );
+  },
+};
+
+const FONTS = [
+  {
+    group: 'Recently used',
+    items: [
+      { value: 'inter', label: 'Inter' },
+      { value: 'source-serif', label: 'Source Serif' },
+    ],
+  },
+  {
+    group: 'System',
+    items: [
+      { value: 'system-ui', label: 'System UI' },
+      { value: 'georgia', label: 'Georgia' },
+      { value: 'menlo', label: 'Menlo' },
+    ],
+  },
+];
+
+const ROLES = [
+  { value: 'admin', label: 'Administrator' },
+  { value: 'editor', label: 'Editor' },
+  { value: 'viewer', label: 'Viewer' },
+  { value: 'auditor', label: 'Auditor', disabled: true },
+];
+
+export const Selects: Story = {
+  name: 'Select family',
+  render: function Selects() {
+    const [one, setOne] = useState<string | null>('editor');
+    const [font, setFont] = useState<string | null>(null);
+    const [many, setMany] = useState<string[]>(['editor', 'viewer']);
+    const [tags, setTags] = useState<string[]>(['landscape']);
+    return (
+      <Stack gap="md" padding="md">
+        <Section title="One value">
+          <Text size="sm" tone="muted">
+            The popup opens in the trigger&rsquo;s own root rather than the provider&rsquo;s overlay
+            container, because a combobox names its list by id and an id reference cannot cross a
+            shadow boundary. Arrow through it: the highlighted row takes a rail and the inset ring,
+            and no ground in the popup moves.
+          </Text>
+          <Group gap="md" align="flex-end">
+            <Select label="Role" data={ROLES} value={one} onChange={setOne} placeholder="Pick a role" />
+            <Select label="Clearable" data={ROLES} value={one} onChange={setOne} clearable />
+            <Select label="Disabled" data={ROLES} value="admin" disabled />
+            <Select label="With an error" data={ROLES} error="Pick a role" />
+          </Group>
+        </Section>
+
+        <Section title="Groups and search">
+          <Group gap="md" align="flex-end">
+            <Select label="Font" data={FONTS} value={font} onChange={setFont} placeholder="System UI" />
+            <Select
+              label="Font (searchable)"
+              data={FONTS}
+              searchable
+              nothingFoundMessage="No font matches that"
+              searchPlaceholder="Type to filter"
+            />
+          </Group>
+        </Section>
+
+        <Section title="Several values, and free-form tags">
+          <Group gap="md" align="flex-start">
+            <MultiSelect label="Roles" data={ROLES} value={many} onChange={setMany} placeholder="Add a role" />
+            <TagsInput
+              label="Tags"
+              value={tags}
+              onChange={setTags}
+              placeholder="Type and press Enter"
+              description="Anything typed becomes a tag"
+            />
+          </Group>
+        </Section>
+
+        <Section title="Sizes">
+          <Group gap="md" align="flex-end">
+            {STEPS.map((step) => (
+              <Select key={step} size={step} label={step} data={ROLES} defaultValue="editor" />
+            ))}
+          </Group>
+        </Section>
+      </Stack>
+    );
+  },
+};
+
+export const Choices: Story = {
+  name: 'Tabs, segments and disclosure',
+  render: function Choices() {
+    const [view, setView] = useState('grid');
+    const [tab, setTab] = useState<string | null>('overview');
+    return (
+      <Stack gap="md" padding="md">
+        <Section title="Segmented control">
+          <Text size="sm" tone="muted">
+            A radio group, which is the pattern for picking one value. The indicator carries a
+            border rather than resting on an elevation step: measured over the 23 bundled themes,
+            <code> surfaceRaised </code> is identical to <code> surface2 </code> on 21 of them.
+          </Text>
+          <Group gap="md" align="center">
+            <SegmentedControl aria-label="View" data={['grid', 'list', 'map']} value={view} onChange={setView} />
+            <SegmentedControl
+              aria-label="Sizing"
+              size="xs"
+              data={[
+                { value: 'fill', label: 'Fill' },
+                { value: 'fit', label: 'Fit' },
+                { value: 'manual', label: 'Manual', disabled: true },
+              ]}
+              defaultValue="fill"
+            />
+          </Group>
+          <SegmentedControl aria-label="Full width" fullWidth data={['day', 'week', 'month']} defaultValue="week" />
+        </Section>
+
+        <Section title="Tabs">
+          <Text size="sm" tone="muted">
+            Arrow keys move focus and Enter selects. Selecting on focus would mount every panel on
+            the way past, and the Admin Panel&rsquo;s seven tabs each load their own data.
+          </Text>
+          <Tabs value={tab} onChange={setTab}>
+            <Tabs.List aria-label="Campaign sections">
+              <Tabs.Tab value="overview">Overview</Tabs.Tab>
+              <Tabs.Tab value="media">Media</Tabs.Tab>
+              <Tabs.Tab value="access">Access</Tabs.Tab>
+              <Tabs.Tab value="archive" disabled>
+                Archive
+              </Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value="overview">
+              <Text size="sm">The overview panel.</Text>
+            </Tabs.Panel>
+            <Tabs.Panel value="media">
+              <Text size="sm">The media panel.</Text>
+            </Tabs.Panel>
+            <Tabs.Panel value="access">
+              <Text size="sm">The access panel.</Text>
+            </Tabs.Panel>
+            <Tabs.Panel value="archive">
+              <Text size="sm">The archive panel.</Text>
+            </Tabs.Panel>
+          </Tabs>
+        </Section>
+
+        <Section title="Accordion">
+          <Text size="sm" tone="muted">
+            Every header is its own tab stop. Roving focus was removed from this pattern by the
+            Authoring Practices, and Base UI followed.
+          </Text>
+          <Accordion defaultValue="appearance">
+            <Accordion.Item value="appearance">
+              <Accordion.Control>Card appearance</Accordion.Control>
+              <Accordion.Panel>
+                <Text size="sm">Corner rounding, shadow and border.</Text>
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item value="grid">
+              <Accordion.Control rightSection={<Badge tone="primary">3</Badge>}>
+                Grid and pagination
+              </Accordion.Control>
+              <Accordion.Panel>
+                <Text size="sm">Columns, gaps and how many cards a page holds.</Text>
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item value="locked" disabled>
+              <Accordion.Control>Locked section</Accordion.Control>
+              <Accordion.Panel>
+                <Text size="sm">Unreachable.</Text>
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
+        </Section>
+      </Stack>
+    );
+  },
+};
+
+export const Toggles: Story = {
+  name: 'Checkbox, switch and slider',
+  render: function Toggles() {
+    const [blur, setBlur] = useState(true);
+    const [opacity, setOpacity] = useState(0.5);
+    const [filter, setFilter] = useState('all');
+    return (
+      <Stack gap="md" padding="md">
+        <Section title="Checkbox and switch">
+          <Text size="sm" tone="muted">
+            Both hand <code>onChange</code> the new state rather than an event. The description is
+            carried to the control by Base UI&rsquo;s Field, so no id relationship is written here.
+          </Text>
+          <Checkbox label="Purge analytics" description="Cannot be undone" />
+          <Checkbox label="Select all" indeterminate />
+          <Checkbox label="Locked" disabled defaultChecked />
+          <Switch
+            label="Settings drawer backdrop blur"
+            description="Blurs content behind open settings drawers"
+            checked={blur}
+            onChange={setBlur}
+          />
+          <Switch label="Disabled and on" defaultChecked disabled />
+        </Section>
+
+        <Section title="Slider">
+          <Text size="sm" tone="muted">
+            Arrow keys step, Home and End reach the ends, and the page keys move by
+            <code> largeStep</code>. The bubble is the call site&rsquo;s own formatter.
+          </Text>
+          <Slider
+            aria-label="Locked card opacity"
+            value={opacity}
+            onChange={setOpacity}
+            min={0}
+            max={1}
+            step={0.05}
+            label={(v) => `${Math.round(v * 100)}%`}
+            marks={[
+              { value: 0, label: '0' },
+              { value: 0.5, label: '0.5' },
+              { value: 1, label: '1' },
+            ]}
+          />
+          <Slider aria-label="Angle" defaultValue={45} min={0} max={360} step={1} largeStep={45} label={(v) => `${v}deg`} />
+        </Section>
+
+        <Section title="Chip group">
+          <Text size="sm" tone="muted">
+            One choice renders radios, so the arrow keys and the single tab stop come from the
+            platform. Several renders checkboxes.
+          </Text>
+          <Chip.Group multiple={false} value={filter} onChange={(v) => setFilter((v as string) || 'all')}>
+            <Group gap="xs">
+              <Chip value="all">All</Chip>
+              <Chip value="mine">My access</Chip>
+              <Chip value="shared">Shared with me</Chip>
+            </Group>
+          </Chip.Group>
+        </Section>
+      </Stack>
+    );
+  },
+};
+
+export const Gaps: Story = {
+  name: 'Pagination and the colour picker',
+  render: function Gaps() {
+    const [page, setPage] = useState(4);
+    const [colour, setColour] = useState('rgba(18, 52, 86, 0.5)');
+    const [hex, setHex] = useState('#3aa3c9');
+    return (
+      <Stack gap="md" padding="md">
+        <Section title="Pagination">
+          <Text size="sm" tone="muted">
+            The run of numbers keeps a constant width as the current page moves, so the control does
+            not reflow under the pointer between clicks. Every control is named: &ldquo;button
+            3&rdquo; says nothing.
+          </Text>
+          <Pagination value={page} onChange={setPage} total={20} aria-label="Campaign pages" />
+          <Pagination value={2} onChange={() => {}} total={3} size="xs" aria-label="Short" />
+        </Section>
+
+        <Section title="Colour">
+          <Text size="sm" tone="muted">
+            Base UI ships no colour picker, so the surface, the arithmetic and the parsing are ours.
+            The hue and opacity rails are the framework&rsquo;s Slider, so they arrive with arrows,
+            Home, End and the page keys rather than a second implementation of them. The text field
+            is the keyboard path: a two-dimensional gradient has no ARIA pattern that expresses it.
+          </Text>
+          <Group gap="md" align="flex-start">
+            <ColorInput
+              label="Background colour"
+              description="Stored as rgba"
+              value={colour}
+              onChange={setColour}
+              format="rgba"
+              swatches={['#102530', '#0d1117', '#ffffff', 'transparent']}
+              withEyeDropper
+            />
+            <ColorInput label="Accent" value={hex} onChange={setHex} />
+          </Group>
+          <ColorPicker value={colour} onChange={setColour} format="rgba" swatches={['#ff0000', '#00ff00', '#0000ff']} />
         </Section>
       </Stack>
     );

@@ -143,6 +143,7 @@ export {
   type MullionPersistence,
 } from './provider/MullionProvider';
 export { useMullionTheme, useMullionScope, useMullionPortal } from './provider/hooks';
+export { usePageHost } from './components/pageHost';
 export type { MullionThemeManager, MullionScopeValue, MullionScopeMode } from './provider/mullionContexts';
 export {
   BRAND_THEME_ID,

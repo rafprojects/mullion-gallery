@@ -2,7 +2,7 @@
 
 **Status:** Planned — no code yet
 **Created:** 2026-08-25
-**Last updated:** 2026-08-28 (renumbered 77 → 79; content unchanged)
+**Last updated:** 2026-10-24 (P82-E added at the user's request: adopt the standalone theme package that raftools extracts from `packages/theme-engine`). 2026-10-02 (P82-D added from Phase 80's follow-ons: recover from a stale chunk after a deploy)
 
 ### Tracks
 
@@ -11,6 +11,8 @@
 | P82-A | Single-source the distribution exclude list — `release.yml`'s inline `zip -x` consumes `.distignore` instead of duplicating it | Planned | Small-Medium |
 | P82-B | Add `actionlint` to CI so the four workflow YAMLs are linted, closing Phase 75's "manual review substitutes for tooling" gap | Planned | Small |
 | P82-C | Make `mullion_fs()`'s no-op result actually cache — `isset()` is false for `null`, so the credential-less path re-runs on every entitlement check | Planned | Small |
+| P82-D | Recover from a stale chunk after a deploy, instead of showing an error to every tab that was open when the release landed | Planned | Small |
+| P82-E | Adopt the standalone theme package in place of `packages/theme-engine`, with byte-identical token output on every bundled theme | Planned, blocked on P81-D and on the package's first release | Medium |
 
 ---
 
@@ -30,6 +32,8 @@
 
 3. **Success.** There is exactly one list of files that do not ship, and both the GitHub Release ZIPs and the WordPress.org SVN package are built from it. A malformed workflow YAML fails a PR instead of a `workflow_dispatch` run. `mullion_fs()` resolves once per request instead of once per entitlement check.
 
+4. **P82-E has a different origin.** On 2026-10-24 the user chose to move the theme engine into its own repository, as one package that Mullion and raftools (a local tool suite) both consume, instead of two copies that drift. raftools extracts and publishes it first. Mullion adopts it here, after Phase 81 has deleted the Mantine adapter, so the extraction never has to carry adapter-only fields. It belongs in this phase because it is a dependency and packaging change, and the acceptance criteria make it invisible to users.
+
 ## Key Decisions
 
 | # | Decision | Resolution |
@@ -39,10 +43,12 @@
 | C | Fix the known drift by hand now, or only via single-sourcing? | **Only via single-sourcing.** Hand-patching `zip -x` to add `phpunit`, `.distignore`, `.DS_Store`, and `Thumbs.db` would close today's gap and leave the mechanism that produced it. The drift is the bug; the four missing entries are the symptom. |
 | D | `actionlint` only, or also a markdown link checker? | **`actionlint` only.** Phase 75's Follow-On Candidates row bundles the two, but they are unrelated tools solving unrelated problems, and the link checker has a much worse signal-to-noise profile against ~200 cross-linked docs with historical phase reports that intentionally reference moved paths. Keep the link checker as a Follow-On here rather than pulling it in. |
 | E | P82-C: is the missing cache also load-bearing? | **Settle it explicitly, do not just add a cache.** Because `mullion_fs()` re-reads the `mullion_freemius_config` filter on every call, credentials registered *after* the bootstrap call currently start working on the next entitlement check. Caching freezes that. The documented injection paths (a `wp-config.php` constant, or an mu-plugin — both of which load before regular plugins) are unaffected, so the track should cache and say so; but a filter added on `init` or `plugins_loaded` would change behaviour. Name it in the code comment rather than discovering it from a support ticket. |
+| F | P82-E: adopt before the first release, or after? | **Before, as a no-op.** The user placed it in this phase. The swap is held to byte-identical CSS variable output on every bundled theme, so users see nothing change. If the package is not ready when A to D are, P82-E moves to the first phase after the release rather than holding the release. |
+| G | P82-E: where do the themes live? | **The generic bundled themes ship in the package; the two brand themes stay here.** `Mullion` (`default-dark`) and `Mullion Light` (`default-light`) are this product's identity and register through `src/ui/provider/registry.ts`. The homage themes (Nord, Catppuccin, Tokyo Night and the rest) are useful to any consumer. The catalogue order the WordPress settings field shows must not change. |
 
 ## Execution Priority
 
-All three are independent. **P82-B** is the smallest and validates itself on its own PR, so land it first if they are split. **P82-C** touches PHP only and cannot collide with A or B.
+All five are independent of each other. **P82-B** is the smallest and validates itself on its own PR, so land it first if they are split. **P82-C** touches PHP only and cannot collide with A or B. **P82-D** touches only the front end's loading path and must land before the first public release, since the first release is also the first deploy a real user's open tab will meet. **P82-E** waits on P81-D and on the package's first tagged release; it does not block the release (Key Decision F).
 
 ---
 
@@ -187,6 +193,71 @@ Nothing else in the plugin reads `global $mullion_fs` (grep confirms the only oc
 
 ---
 
+## Track P82-D - Recover from a stale chunk after a deploy
+
+### Problem
+
+Found 2026-09-14 during Phase 80 testing, filed in that phase's follow-ons as a FUTURE_TASKS entry and never actually written there; placed here on 2026-10-02.
+
+A tab that was open before a deploy holds the previous build's entry bundle. When the user then opens something loaded lazily, the entry asks for a hashed chunk that the new build has deleted, the import rejects, and the error boundary shows "Something went wrong" over an "error loading dynamically imported module" message. The deployed build was verified self-consistent and the service worker correctly declines to cache hashed assets, so nothing is broken on the server: the client is simply stale, and a reload fixes it.
+
+It reaches every lazy boundary: `AdminPanel` and `SettingsPanel` in `App.tsx`, `CampaignViewer` in `CardGallery.tsx`, the gallery config editor in two places, `ArchiveCompanyModal`, and the two wp-admin apps `main.tsx` imports dynamically. Nothing in `src/` handles a failed dynamic import today.
+
+It belongs in this phase because it is about what a release does to a running client, and because the first public release is the first time a stranger's open tab meets a deploy.
+
+### Fix
+
+Catch the failure where it happens and reload the page once before showing an error. Vite fires `vite:preloadError` on `window` when a chunk's preload fails, and the import itself rejects when the chunk is gone; handle both. Guard the reload with a flag in `sessionStorage` so a chunk that is genuinely missing after a reload falls through to the error boundary instead of looping.
+
+One constraint is specific to this product: a reload discards whatever is on screen. The Settings panel and the Layout Builder already autosave drafts and offer to restore them, so a reload there loses nothing; anything else that holds unsaved input when it triggers a lazy import should be checked before the reload is made unconditional.
+
+### Acceptance criteria
+
+- With the entry bundle from one build and the chunks of the next, opening a lazily loaded panel reloads the page once and the panel opens.
+- If the chunk is still missing after that reload, the error boundary shows, and the page does not reload again.
+- Both failure paths are covered: the preload event and the rejected import.
+
+### Validation
+
+- A browser test that serves a fresh entry, deletes or renames a chunk, and opens a lazy panel, asserting one reload and then success; and the same with the chunk kept missing, asserting the error boundary and no second reload.
+- A manual check on the dev site: deploy twice with a tab left open in between.
+
+---
+
+## Track P82-E - Adopt the standalone theme package
+
+### Problem
+
+`packages/theme-engine` has been framework-neutral since P51-L: theme definitions, the OKLCH colour generator, validation, the contrast audits, the component-token tier and the CSS variable emitter, with `chroma-js` as its only outside dependency. raftools needs the same engine for its own theming (light, dark and black modes, a user-chosen accent, density). On 2026-10-24 the user chose one standalone package for both projects over a second copy.
+
+raftools extracts the package in its Phase 08, starting from this directory as it stands when Phase 81 closes. Two copies would drift: a derivation fix such as P80-G's elevation ladder would land in one product and not the other. The extraction drops the definition fields that only the Mantine adapter reads (`components` and the `dark` tuple), which is why adoption waits for P81-D. Everything else, including the ten-step ramp and the `--mullion` prefix as a parameter, is carried unchanged.
+
+### Fix
+
+- Replace `packages/theme-engine` with the package as a dependency pinned to an exact version or tag.
+- Repoint the three places that resolve the engine from source today: the `@mullion/theme-engine` alias in `vite.config.ts`, the path mapping in `tsconfig.json`, and the coverage `include` in `vite.config.ts`'s test block. The nine source files that import `@mullion/theme-engine` change only their import specifier, and only if the package's name differs.
+- Repoint `scripts/theme-catalog.mjs` and `scripts/validate-themes.mjs`, which read `packages/theme-engine/src/definitions/` directly. Retire `validate-themes.mjs` if the package's own validation covers what it checks.
+- Move the two brand themes out of the package's definitions into this repo, registered through the registry (Key Decision G).
+- Delete `packages/theme-engine` and its workspace entry. The engine's own tests (validation, colour generation, both contrast audits) live in the package; this repo keeps the tests for its registry, provider and token sheet. `@mullion/shared-utils` keeps its sanitisers for its other users.
+- **Then, once the package is integrated, settle P80-G's open lift-branch item** (filed in the PHASE80 report's P80-G reversal note, 2026-10-07). When a dark theme has no rung ΔE00 2.0 above `surface`, `resolveElevation()` lifts `surfaceRaised` (`liftRaised()`), but keeps the theme's authored `surface2` and `surface3` instead of re-deriving them from the lifted ground. The designer assumed they are re-derived, which is consistent with the reversal. Make the change in the package with a test for that branch, then archive `COLOR-SPEC.md` and add *authored* `surface3` and the re-derivation to the engineering note under rule 13. No bundled theme takes the branch, so no bundled theme's output moves; that is part of the check.
+
+### Acceptance criteria
+
+- For every bundled theme, `generateCssVariables` with the `--mullion` prefix gives byte-identical output before and after the swap. The output is captured as a fixture on the commit before the swap.
+- The theme-qa baselines and `e2e/ui-showcase.spec.ts`'s contrast measurements pass unchanged on every bundled theme.
+- The generated catalogue the WordPress settings field reads lists the same themes in the same order.
+- No path under `packages/theme-engine` remains, and nothing outside archived docs refers to one.
+- `tsc -b`, ESLint, Vitest with the coverage thresholds, and the e2e suite pass.
+- The lift branch re-derives `surface2` and `surface3` from the lifted ground, proved by a test on a theme with no rung of its own, and the CSS variable fixture is still byte-identical for every bundled theme afterwards.
+
+### Validation
+
+- Diff the captured CSS variable fixture for all bundled themes against the post-swap output.
+- Run the theme-qa and showcase e2e suites.
+- Package both release ZIPs as in P82-A's dry run and confirm the file sets are unchanged: the engine is bundled into the built assets, and no package sources or `node_modules` ship.
+
+---
+
 ## Follow-On Candidates
 
 | Candidate | Why it is deferred |
@@ -197,8 +268,8 @@ Nothing else in the plugin reads `global $mullion_fs` (grep confirms the only oc
 
 ## Implementation Notes
 
-Not started. All three tracks are the residue of the [Phase 75 branch review](archive/phases/PHASE75_REPORT.md#branch-review-2026-08-25) after its findings were placed into Phase 76 — the items that were not blocked on a human gate and had nowhere else to go. With P82-C filed, every item that review surfaced has an owner.
+Not started. A, B and C are the residue of the [Phase 75 branch review](archive/phases/PHASE75_REPORT.md#branch-review-2026-08-25) after its findings were placed into Phase 76: the items that were not blocked on a human gate and had nowhere else to go. With P82-C filed, every item that review surfaced has an owner. P82-D came later, from Phase 80's follow-ons (2026-10-02). P82-E was added on 2026-10-24 from raftools' planning, where the standalone theme package is created.
 
 ## Outcome
 
-**Planned.** No track blocks a release. P82-A closes a correctness gap that currently only bites a manual packager, and removes the mechanism that produced it; P82-B replaces "manual review substitutes for tooling" with tooling; P82-C makes a cache that never fired actually fire, and settles whether late-registered credentials are a supported path or an accident.
+**Planned.** No track blocks a release. P82-A closes a correctness gap that currently only bites a manual packager, and removes the mechanism that produced it; P82-B replaces "manual review substitutes for tooling" with tooling; P82-C makes a cache that never fired actually fire, and settles whether late-registered credentials are a supported path or an accident. P82-E replaces an in-repo copy of the theme engine with the shared package, without changing a single emitted token.

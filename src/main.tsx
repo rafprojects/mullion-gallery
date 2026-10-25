@@ -25,7 +25,7 @@ import { createAppQueryClient } from './services/queryClient'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { resolveWpThemeIds } from './services/wpThemeId'
 import { useTheme } from './hooks/useTheme'
-import { MullionProvider } from './ui'
+import { MullionProvider, usePageHost } from './ui'
 import { RootIdProvider } from '@mullion/shared-ui'
 import { parseProps, parseNodeConfig, type MountProps, type NodeConfig } from './mountConfig'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -154,6 +154,8 @@ function MantineBridge({
   portal: ReturnType<typeof usePortalTarget>
 }) {
   const { mantineTheme, colorScheme } = useTheme()
+  // P80-F: Mantine's two stores are module-wide, so a host per gallery showed every toast and opened every confirm once per gallery.
+  const isPageHost = usePageHost('mantine-managers')
 
   // P60-D: give every Mantine close button (modals, drawers) an accessible name.
   // Mantine leaves CloseButton unlabeled by default, which trips axe `button-name`
@@ -187,16 +189,20 @@ function MantineBridge({
         }
       >
         <OverlayRootSync portal={portal} colorScheme={colorScheme} />
-        <Notifications withinPortal={false} />
-        <ModalsProvider>
-          {/* P69-D: public-facing boundary. No isAdmin prop → a public visitor
-              sees generic copy, never a raw exception message (Sentry still gets
-              the full error). Admin sub-trees have their own inner ErrorBoundary
-              passing isAdmin so operators keep raw messages for troubleshooting. */}
-          <ErrorBoundary>
-            <App {...props} />
-          </ErrorBoundary>
-        </ModalsProvider>
+        {/*
+          * One of each per page, beside the app rather than around it so a
+          * handover never remounts it: confirming both of a gallery pair's
+          * dialogs ran the action twice. Nothing reads the modals context.
+          */}
+        {isPageHost && <Notifications withinPortal={false} />}
+        {isPageHost && <ModalsProvider />}
+        {/* P69-D: public-facing boundary. With no isAdmin prop a public visitor
+            sees generic copy, never a raw exception message (Sentry still gets
+            the full error). Admin sub-trees have their own inner ErrorBoundary
+            passing isAdmin so operators keep raw messages for troubleshooting. */}
+        <ErrorBoundary>
+          <App {...props} />
+        </ErrorBoundary>
       </MantineProvider>
   )
 }

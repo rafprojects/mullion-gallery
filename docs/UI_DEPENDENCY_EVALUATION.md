@@ -502,7 +502,7 @@ out by several phases in exchange for shipping on the final architecture.
 |-------|---------|-----------------------------------|
 | [78](PHASE78_REPORT.md) | UI boundary, primitive bake-off, token model | 0, 1, 2 |
 | [79](PHASE79_REPORT.md) | Framework core and theme manager | 3, 6 |
-| [80](PHASE80_REPORT.md) | Behavioural components | 4, 5 |
+| [80](archive/phases/PHASE80_REPORT.md) | Behavioural components | 4, 5 |
 | [81](PHASE81_REPORT.md) | Consumer migration and Mantine removal | 7, 8 |
 | [82](PHASE82_REPORT.md) | Release pipeline hygiene (was Phase 79) | none |
 | [83](PHASE83_REPORT.md) | Go-live (was Phase 80) | none |
