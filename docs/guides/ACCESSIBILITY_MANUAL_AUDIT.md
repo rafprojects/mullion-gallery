@@ -64,16 +64,50 @@ looks like*. When in doubt, log it as ⚠️ with a note and we'll triage.
 
 | OS | Screen reader | Best browser | Turn on/off |
 |---|---|---|---|
-| Windows | **NVDA** (free — download from nvaccess.org) | Firefox (or Chrome) | Ctrl+Alt+N / NVDA menu → Exit |
+| Windows | **NVDA** (free, from nvaccess.org) | Firefox (or Chrome) | Start: `Ctrl+Alt+N`. Quit: `NVDA+Q`, then `Enter` |
 | macOS | **VoiceOver** (built in) | Safari | **⌘+F5** toggles it |
 
 **Minimum screen-reader commands you'll need:**
 
-- **NVDA** (modifier = `Insert` or `CapsLock`): `Tab`/`Shift+Tab` move focus · `H` next heading · `D` next
-  landmark · `F` next form field · `B` next button · `K` next link · `NVDA+Space` toggle browse/focus
-  mode · `NVDA+F7` elements list · `Insert+Down` read from here.
+- **NVDA**: see the next subsection. The keys depend on which mode NVDA is in, which is the usual
+  reason a command "does nothing".
 - **VoiceOver** (modifier `VO` = `Ctrl+Option`): `VO+→`/`VO+←` navigate · `VO+U` rotor (headings /
   landmarks / form controls / links) · `VO+Space` activate · `Ctrl+Option+Cmd+H` next heading.
+
+### NVDA: setup and the two modes
+
+*Rewritten 2026-10-25 against the NVDA user guide, after the earlier quick reference was found not to
+do what it said.*
+
+**Setup, once.**
+
+- **The NVDA key is `Insert`** (either `Insert` or the numpad one). `CapsLock` works only if you
+  turned it on, in the welcome dialog or under NVDA menu, Preferences, Settings, Keyboard. Below,
+  `NVDA+X` means hold the NVDA key and press X.
+- **`Ctrl+Alt+N` starts NVDA** only if the desktop shortcut was created at install. Otherwise start
+  it from the Start menu. It does not quit NVDA; `NVDA+Q`, then `Enter`, does.
+- **The NVDA menu** is `NVDA+N`. Open **Tools, Speech viewer** before you start: it shows every
+  utterance as text, so you can copy what was said into the results table instead of transcribing
+  from memory.
+- **Check the keyboard layout** under Preferences, Settings, Keyboard. A few commands differ: "read
+  from here" is `NVDA+Down` on the Desktop layout and `NVDA+A` on the Laptop layout.
+
+**The two modes.** Most confusion comes from here.
+
+- **Browse mode** is for reading a page. The arrow keys move NVDA's own reading cursor, and single
+  letters jump between elements: `H` heading, `D` landmark, `F` form field, `B` button, `K` link,
+  with `Shift` to go back. `NVDA+F7` lists the page's headings, links, landmarks and fields.
+- **Focus mode** is for operating a control. Keys go to the page, so the arrows move inside a menu
+  or listbox and **the single letters type text or do nothing**. NVDA switches to focus mode on its
+  own when you Tab onto a text field, combobox or menu, and plays a short tone when it does.
+- **`NVDA+Space` toggles** between the two. **`Escape` leaves focus mode** if NVDA entered it on its
+  own, so the first `Escape` inside a menu or dialog may be taken by NVDA and only switch modes. If
+  `Escape` did not close the popup, press it again. To be certain a key reaches the page, press
+  `NVDA+F2` first: it passes the next key straight through.
+
+So: **Tab and Shift+Tab** are the test of keyboard order, and work in either mode. **The single
+letters** are for exploring what a screen reader exposes, and work only in browse mode. If a letter
+key types or does nothing, press `NVDA+Space` first.
 
 ### Keyboard-only basics (used everywhere)
 
@@ -322,6 +356,13 @@ product tooltips that do today.
 One screen reader is enough: NVDA with Firefox, or VoiceOver with Safari. Do it on the shadow mount,
 once on `default-dark` and once on `default-light`. Listen for what each row names; anything
 different is a row in §7.
+
+**With NVDA**, read §2's two-modes note first. Keep the Speech viewer open and paste from it into
+6B.4. Use `Tab` to reach each control, `Enter` or `Space` to open it, the arrows inside it, and
+`Escape` to close. When an `Escape` only announces "browse mode", that was NVDA leaving focus mode,
+not the popup failing to close: press it again before recording a failure. The "In browse mode"
+checks in the table mean press `NVDA+Space` until NVDA says "browse mode", then explore with the
+arrows and single letters.
 
 | Family | Do | Listen for |
 |---|---|---|

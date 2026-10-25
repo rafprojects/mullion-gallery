@@ -239,6 +239,7 @@ raftools extracts the package in its Phase 08, starting from this directory as i
 - Repoint `scripts/theme-catalog.mjs` and `scripts/validate-themes.mjs`, which read `packages/theme-engine/src/definitions/` directly. Retire `validate-themes.mjs` if the package's own validation covers what it checks.
 - Move the two brand themes out of the package's definitions into this repo, registered through the registry (Key Decision G).
 - Delete `packages/theme-engine` and its workspace entry. The engine's own tests (validation, colour generation, both contrast audits) live in the package; this repo keeps the tests for its registry, provider and token sheet. `@mullion/shared-utils` keeps its sanitisers for its other users.
+- **Then, once the package is integrated, settle P80-G's open lift-branch item** (filed in the PHASE80 report's P80-G reversal note, 2026-10-07). When a dark theme has no rung ΔE00 2.0 above `surface`, `resolveElevation()` lifts `surfaceRaised` (`liftRaised()`), but keeps the theme's authored `surface2` and `surface3` instead of re-deriving them from the lifted ground. The designer assumed they are re-derived, which is consistent with the reversal. Make the change in the package with a test for that branch, then archive `COLOR-SPEC.md` and add *authored* `surface3` and the re-derivation to the engineering note under rule 13. No bundled theme takes the branch, so no bundled theme's output moves; that is part of the check.
 
 ### Acceptance criteria
 
@@ -247,6 +248,7 @@ raftools extracts the package in its Phase 08, starting from this directory as i
 - The generated catalogue the WordPress settings field reads lists the same themes in the same order.
 - No path under `packages/theme-engine` remains, and nothing outside archived docs refers to one.
 - `tsc -b`, ESLint, Vitest with the coverage thresholds, and the e2e suite pass.
+- The lift branch re-derives `surface2` and `surface3` from the lifted ground, proved by a test on a theme with no rung of its own, and the CSS variable fixture is still byte-identical for every bundled theme afterwards.
 
 ### Validation
 

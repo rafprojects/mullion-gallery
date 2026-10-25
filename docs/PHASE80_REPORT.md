@@ -364,7 +364,7 @@ Three rows below say "FUTURE_TASKS" and were **never actually filed there**: the
 
 **`COLOR-SPEC.md`.** Archived again, as `archive/2026-10-07-pre-elevation-reversal/`, in the repo and the designer's folder. Then the engineering note under rule 13 was rewritten to describe the reversed resolution, opening with the sentence the designer asked for, so the next person to see a 0.00 suspects `surface2` rather than the ladder. No rule's text changed.
 
-**Signed off by the designer the same day** (`designer-signoff-elevation-2026-10-07.md`), after recomputing the re-derived intermediates on six themes to ΔE00 0.00. **One item is left for the phase close-out.** The designer assumed that the lift branch, after picking a ground, re-derives `surface2` and `surface3` from it, and asked for the word *authored* to be added to the spec's note. The code keeps the theme's authored intermediates in that branch instead. No bundled theme takes the branch. The recommendation is to re-derive them there too, consistent with the reversal, and then make the note say so. It needs a test, and the spec archived again before its note changes.
+**Signed off by the designer the same day** (`designer-signoff-elevation-2026-10-07.md`), after recomputing the re-derived intermediates on six themes to ΔE00 0.00. **One item was left open, and on 2026-10-25 the user moved it to Phase 82's P82-E, to be done after the standalone theme package is integrated.** The designer assumed that the lift branch, after picking a ground, re-derives `surface2` and `surface3` from it, and asked for the word *authored* to be added to the spec's note. The code keeps the theme's authored intermediates in that branch instead. No bundled theme takes the branch. The recommendation is to re-derive them there too, consistent with the reversal, and then make the note say so. It needs a test, and the spec archived again before its note changes.
 
 **The two-tone rail.** The designer suggested it as the thing to reach for before moving an accent, for any theme that does take the lift. It is filed in [FUTURE_TASKS.md](FUTURE_TASKS.md) under Accessibility, to be validated on a user-authored theme that needs a lift before anyone builds it, because no bundled theme does.
 
@@ -857,11 +857,25 @@ The one real decision is that **the range keeps a constant width as the current 
 
 ## Outcome
 
-_Reopened 2026-10-02. P80-A, P80-B and P80-C landed by 2026-09-14; P80-D, P80-E and P80-F were added to close the keyboard gate (redefined in Key Decision C) and to fix the framework follow-ons before Phase 81 builds on them. The section below describes the first three tracks and is updated when the rest land._
+_Updated 2026-10-25. All tracks but P80-E have landed. P80-E, the screen-reader pass, is the user's, and this section is finished from its results at close-out._
 
-**What Phase 80 built.** Every `@mullion/ui` component that handles a keypress, plus the two imperative stores that raise chrome without one. Nothing was migrated onto them: Key Decision B holds, and Phase 81 owns the move.
+**What Phase 80 built.** Every `@mullion/ui` component that handles a keypress, plus the two imperative stores that raise chrome without one. Nothing was migrated onto them: Key Decision B holds, and Phase 81 owns the move. The one exception is a two-line mount fix in `main.tsx` for a live defect, recorded under P80-F.
 
-**The four gates of Key Decision C, phase-wide.** Three of four, for every component in all three tracks. The axe structural gate, the P77-F ring walk and the P79-B static sheet rules are met and mutation-checked. **The manual keyboard pass in `ACCESSIBILITY_MANUAL_AUDIT.md` §6B has never been run.** *(Redefined 2026-10-02 as an automated suite plus a screen-reader pass; P80-D and P80-E close it.)* It is the same gap P80-A opened, P80-B inherited and P80-C now shares, and it is the one thing standing between this phase and a clean four-of-four.
+**The four gates of Key Decision C, phase-wide.** The axe structural gate, the P77-F ring walk and the P79-B static sheet rules are met and mutation-checked for every component. The fourth, the keyboard gate, was redefined on 2026-10-02 as an automated contract suite plus one recorded screen-reader pass. The automated half is P80-D: 64 browser tests on both mounts, every family mutation-checked, and every defect it found fixed in P80-F with no expected-failure marks left. The screen-reader half is P80-E: *pending, see §6B.4 of `ACCESSIBILITY_MANUAL_AUDIT.md`.*
+
+**What D, F and G changed.**
+
+- **P80-D found six defects nobody knew about**, two of them in the shipped configuration: Tab could not leave an open menu or popover, and open menus had no name.
+- **P80-F settled the framework's portal rule (Key Decision F).** Anchored popups mount in their trigger's root; dialogs mount in the overlay root, with a modal stack that hides what is beside them there.
+  - The overlay-root axe gates had never scanned anything, and once repaired they found two unnamed dialogs.
+  - A two-gallery page ran a confirmed action twice in today's product; that is fixed in `main.tsx`, and the framework's hosts are page singletons.
+- **P80-G took the designer's answers.**
+  - The rail gives way to the ring under the keyboard.
+  - Every popup sets its own font, and select popups grow to their longest label.
+  - `border` keeps a ΔE00 3.5 floor (rule 14).
+  - The elevation ladder was resolved twice in one day. The first resolution lifted the dark themes' raised ground and repainted accents on ten themes. The before-and-after table showed it, and the designer reversed it to keep each theme's own rung, so no chromatic token moved. The one open branch of that logic went to P82-E.
+
+**A lesson from D to G that matches the one from A to C below.** Twice a gate or a prediction looked sound and was not: six axe gates that scanned zero nodes, and a "no signed-off colour moves" that only a full before-and-after table could test. Both were caught by measuring what the check actually touched.
 
 **What the phase found that none of the three plans contained.** Each track surfaced at least one defect its own acceptance criteria could not have caught, and in two cases the criterion was satisfiable while the thing it was meant to protect was broken. P80-A shipped four invented token names; the answer was a standing rule rather than a fix. P80-B reproduced P77-C exactly, a sheet rule keyed on an attribute the primitive never writes, and the unit test that should have caught it was the weak form; it is now the strong form across five components. P80-C found that the i18n gate its criteria told it to keep green was keyed on callee names and would have gone blind the moment Phase 81 renamed them. The pattern is worth carrying into Phase 81: **a criterion phrased as "X still passes" is worth nothing unless someone checks that X still looks at the thing it was written for.**
 
