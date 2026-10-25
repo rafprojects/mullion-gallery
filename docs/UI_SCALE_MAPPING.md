@@ -53,7 +53,7 @@ Never moved by pass 1:
 
 ## Pass 2: renames
 
-Pass 2 runs per component name. The rows below were settled by the designer on 2026-10-25 (`docs/design/correspondences/designer-answers-ui-scale-mapping-2026-10-25.md`); the two marked **open** wait on questions sent back the same day (`ui-scale-mapping-data-2026-10-25.md`).
+Pass 2 runs per component name. The rows below were settled by the designer on 2026-10-25 (`docs/design/correspondences/designer-answers-ui-scale-mapping-2026-10-25.md`); the two left open went back with data the same day (`ui-scale-mapping-data-2026-10-25.md`) and were settled in `designer-answers-scale-data-2026-10-25.md`.
 
 ### Props
 
@@ -65,14 +65,14 @@ Pass 2 runs per component name. The rows below were settled by the designer on 2
 | `Text tt="uppercase"` | `transform="uppercase"` | |
 | `Text fs="italic"` | `italic` | |
 | `Text ff="monospace"` | `font="mono"` | |
-| `Text fz` / `Text size` | `size` | Any size below the smallest text token (`xs`, 0.75rem) floors to `xs` and is listed for review. Five sites today: three field affixes at 10px, an asset name at 10px, a thumbnail caption at 9px. |
+| `Text fz` / `Text size` | `size` | Any size below the smallest text token (`xs`, 0.75rem) floors to `xs` and is listed for review, because a size below the scale is a flag for an unaudited ground. The three 10px field affixes (`W`, `H`, `°`) take `xs` and `tone="muted"`. The 10px asset name takes `xs`. The 9px white caption over a media thumbnail takes `xs` on a bottom scrim reaching `rgba(0,0,0,0.60)` at the caption line (white on `#666666`, 5.74:1 over the worst case, a white image); if one line loses too much, the tile grows. |
 | `Title size="h3"` | `size={3}` | |
 | `Image w` `h` | `width` `height` | |
 | `Button size="compact-xs"` | `size="xs" compact` | 8 sites. |
 | `ActionIcon size={14}` and other numbers | unchanged | The framework takes a number. |
 | `Badge variant="dot"` | `variant="outline"` with the tone | The toned badge's role glyph replaces the dot, which removes four colour-only signals. 4 sites. |
 | Field `variant="filled"` | dropped | The framework field already sits on `surface2`, which is the filled input. If dropping it changes the reading, the default field is wrong. 31 sites, 29 of them in the Layout Builder's property panels. |
-| Field `variant="unstyled"` | **open** | 2 sites. `UnitScrubField`'s unit picker moves onto the framework number field's unit slot. The builder's title-bar rename needs a `bare` field or a small component of its own. |
+| Field `variant="unstyled"` | `bare`, or the unit slot | 2 sites. `UnitScrubField`'s unit picker moves onto the framework number field's unit slot. The builder's title-bar rename takes a new `bare` prop on the framework field: at rest it reads as the text it is, with no box; on hover the ground washes to `surface2` with the field's radius and a `text` cursor, ink unchanged; on focus the inset ring, ground staying on the wash. An `EditableText` component waits for a second inline-edit site. |
 | `Container size="sm"` | `size="sm"` | Takes the framework's 48rem (768px), 48px wider than Mantine's 720px, and is reviewed on its surface. `size={720}` only if the layout was tuned to that width. One site. |
 
 ### Colour
@@ -105,4 +105,15 @@ The rule for every colour prop, `c`, `bg` or `color`: **a Mantine palette name o
 |---|---|---|---|---|---|---|
 | Sites | 9 | 16 | 2 | 69 | 36 | 4 |
 
-The designer proposed `3xs` (2px) and `2xs` (4px) below `xs` (10px), which takes 85 of them. **Open:** 6px has 36 sites and no step under that proposal; the question went back with the histogram. A literal survives pass 2 only where the value is deliberately off-scale, and it is emitted in the tokens' basis.
+Three rungs join the spacing scale below `xs`: `4xs` 2px, `3xs` 4px, `2xs` 6px. The scale's bottom becomes 2, 4, 6, 10, 12, 16, 20, 32.
+
+| Number | Sites | Becomes | Review |
+|---|---|---|---|
+| 0 | 9 | `0` | no |
+| 2 | 16 | `4xs` | no |
+| 3 | 2 | `3xs` | yes: one control (the gradient-direction buttons), two files |
+| 4 | 69 | `3xs` | no |
+| 6 | 36 | `2xs` | no |
+| 8 | 4 | `xs` | yes: 2px looser |
+
+130 of 136 move mechanically. A literal survives pass 2 only where the value is deliberately off-scale, and it is emitted in the tokens' basis.
