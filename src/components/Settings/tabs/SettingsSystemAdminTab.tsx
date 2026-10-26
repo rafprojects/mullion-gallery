@@ -34,7 +34,7 @@ function MagicLinkPageSelector({
   ];
 
   return (
-    <Paper withBorder padding="md" radius="md">
+    <Paper raised elevated padding="md" radius="md">
       <Stack gap="xs">
         <Text size="sm" weight={600}>{t('set_sys_magic_title', 'Access Request Magic-Link')}</Text>
         <Text size="xs" tone="muted">

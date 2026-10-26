@@ -229,9 +229,11 @@ Added 2026-10-02. Rules 1 to 12 are the designer's own text, verbatim from
 which wrote them as an addendum for this file. They are what survived a week in which nine
 documents were exchanged and five of them reversed something. Rule 13 is from
 [`designer-answers-catching-up-2026-10-02.md`](correspondences/designer-answers-catching-up-2026-10-02.md),
-and rule 14 from
+rule 14 is the designer's decision of 2026-10-07 (above), and rule 15 is from
 [`designer-answers-text-title-2026-10-26.md`](correspondences/designer-answers-text-title-2026-10-26.md)
 as revised in [`designer-answers-badges-scrim-2026-10-26.md`](correspondences/designer-answers-badges-scrim-2026-10-26.md).
+Rule 13's last two paragraphs are from
+[`designer-answers-surfaces-classified-2026-10-26.md`](correspondences/designer-answers-surfaces-classified-2026-10-26.md).
 
 ### Grounds and inks
 
@@ -249,7 +251,7 @@ stop at the first rung clearing 4.5:1, which is why the tightest theme sits 0.03
 why any new derived ground breaks immediately. This is a property to remember, not a defect to fix —
 raising the target globally was priced and rejected.
 
-**14. A caption over an image sits on a scrim that reaches the audited opacity at the caption
+**15. A caption over an image sits on a scrim that reaches the audited opacity at the caption
 line, with the fade complete before the first glyph.** Where the surface is not themed (the media
 picker's thumbnails, the visitor lightbox), the scrim is black at 0.60 with white text: 5.74:1 over
 a white image, on every theme. Where it is themed (the admin media preview), the scrim is the
@@ -309,6 +311,15 @@ every theme. **On dark themes** `surface2` and `surface3` sit between `surface` 
 `surfaceRaised`. **On light themes** they may instead recess below `surface`, as input fills;
 `surfaceRaised` must never be darker than `surface`. Neither is one side of an elevation pair on
 its own. *(2026-10-02; second sentence revised 2026-10-06.)*
+
+A container's ground is one rung above the ground it sits on; where there is no rung above, it stays
+on that ground and is separated by `border`. A container that went up a rung, the first rung
+included, carries `raised-bd`: the hairline on a light theme, nothing on a dark one, plus its shadow.
+`border` is only ever a divider between things on the same ground. *(2026-10-26.)*
+
+A floating surface with a backdrop, a dialog or a drawer, paints `surface`: the dimmed page behind
+it is its elevation. A floating surface without one, a menu, a popover or a bar over a list, paints
+`surfaceRaised`. *(2026-10-26.)*
 
 > **Engineering note, 2026-10-07: the bundled themes satisfy rules 13 and 14 (P80-G).** On the
 > bundled dark homages the step from `surface` to `surfaceRaised` is already ≥ ΔE00 2.0 on all thirteen; the

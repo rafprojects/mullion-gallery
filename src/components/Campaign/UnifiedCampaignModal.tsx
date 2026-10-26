@@ -212,7 +212,7 @@ const UnifiedCampaignDetailsPanel: NamedComponent<UnifiedCampaignDetailsPanelPro
         required
       />
 
-      <Card withBorder>
+      <Card raised elevated>
         <Stack gap="sm">
           <Text weight={500}>{t('admin_camp_thumbnail', 'Campaign Thumbnail (Card Image)')}</Text>
           <Image
@@ -835,7 +835,7 @@ function MediaTabContent({
       ) : (
         <SimpleGrid cols={{ base: 2, sm: 3, md: 4 }} spacing="sm">
           {mediaItems.map((media) => (
-            <Card key={media.id} shadow="sm" padding="xs" radius="md" withBorder role="group" aria-label={t('admin_camp_media_item_aria', 'Media item {{label}}', { label: media.caption || media.url })}>
+            <Card key={media.id} shadow="sm" padding="xs" radius="md" raised elevated role="group" aria-label={t('admin_camp_media_item_aria', 'Media item {{label}}', { label: media.caption || media.url })}>
               <Card.Section>
                 <Image src={media.thumbnail || media.url} height={100} alt={media.caption || t('admin_camp_media_alt', 'Media')} fallbackSrc={FALLBACK_IMAGE_SRC} />
               </Card.Section>
@@ -865,7 +865,7 @@ function MediaTabContent({
       />
 
       {/* Upload section */}
-      <Card withBorder>
+      <Card raised elevated>
         <Stack gap="sm">
           <Group><IconUpload size={20} /><Text weight={500}>{t('admin_camp_upload_new', 'Upload New File')}</Text></Group>
           <FileButton onChange={(files) => files && void onUploadFile(files)} accept="image/*,video/*" multiple>
@@ -903,7 +903,7 @@ function MediaTabContent({
       </Card>
 
       {/* External URL section */}
-      <Card withBorder>
+      <Card raised elevated>
         <Stack gap="sm">
           <Group><IconLink size={20} /><Text weight={500}>{t('admin_camp_add_url', 'Add External URL')}</Text></Group>
           <Select

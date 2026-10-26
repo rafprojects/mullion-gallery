@@ -92,7 +92,7 @@ export function PresetGalleryModal({
             key={preset.name}
             shadow="sm"
             padding="sm"
-            withBorder
+            raised elevated
             style={{ cursor: 'pointer', transition: 'transform 0.15s, box-shadow 0.15s' }}
             onClick={() => {
               onSelect(preset);

@@ -607,7 +607,7 @@ function TemplateGridCard({ template, onEdit, onDuplicate, onDelete, onExport }:
   const { t: tr } = useTranslation('mullion');
   const t = template;
   return (
-    <Card shadow="xs" radius="md" withBorder padding="sm" style={{ position: 'relative' }}>
+    <Card shadow="xs" radius="md" raised elevated padding="sm" style={{ position: 'relative' }}>
       {/* P72-G: the primary "edit" action is a real button wrapping the preview +
           title, not a role="button" Card wrapping the menu button (which axe
           flagged as nested-interactive). The menu is a sibling, rendered after. */}

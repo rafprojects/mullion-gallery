@@ -28,7 +28,7 @@ export function MediaLibraryPicker({
 }: MediaLibraryPickerProps) {
   const { t } = useTranslation('mullion');
   return (
-    <Card withBorder>
+    <Card raised elevated>
       <Stack gap="sm">
         <Group justify="space-between">
           <Group>
@@ -67,7 +67,7 @@ export function MediaLibraryPicker({
                   shadow="xs"
                   padding={0}
                   radius="sm"
-                  withBorder
+                  raised withBorder
                   style={{
                     opacity: alreadyAdded ? 0.5 : 1,
                     cursor: alreadyAdded ? 'not-allowed' : 'pointer',

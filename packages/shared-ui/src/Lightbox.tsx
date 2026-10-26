@@ -280,7 +280,7 @@ export function Lightbox({ isOpen, media, currentIndex, onPrev, onNext, onClose,
           <Box
             p="lg"
             // The caption can overlap a wide image, so it sits on the black scrim every
-            // caption over an image uses (COLOR-SPEC rule 14), with white ink only.
+            // caption over an image uses (COLOR-SPEC rule 15), with white ink only.
             style={{
               position: 'absolute',
               bottom: '0',

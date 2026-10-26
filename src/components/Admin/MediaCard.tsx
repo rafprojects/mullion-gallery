@@ -52,7 +52,7 @@ export const MediaCard = forwardRef<HTMLDivElement, MediaCardProps>(
           shadow="sm"
           padding={compact ? 'xs' : 'sm'}
           radius="md"
-          withBorder
+          raised elevated
           style={cardStyle}
         >
           <Card.Section

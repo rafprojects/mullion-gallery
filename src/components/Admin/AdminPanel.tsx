@@ -237,7 +237,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
   const campaignsRows = useCampaignsRows({ campaigns, campaignActions, grantSummary, apiClient, canMoveCampaigns, onAddMedia: setAddMediaCampaign, categoryItems: campaignCategories });
 
   return (
-    <Card {...getMullionDebugProps('AdminPanel')} shadow="sm" radius="md" withBorder tabIndex={-1} onKeyDown={campaignActions.hotkeyHandler} style={{ outline: 'none' }}>
+    <Card {...getMullionDebugProps('AdminPanel')} shadow="sm" radius="md" elevated tabIndex={-1} onKeyDown={campaignActions.hotkeyHandler} style={{ outline: 'none' }}>
       <Group {...getMullionDebugProps('AdminPanel', 'header')} justify="space-between" wrap="wrap" gap="sm" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         <Group>
           <ActionIcon variant="light" size="lg" onClick={onClose} aria-label={t('admin_back_to_gallery', 'Back to gallery')}>

@@ -81,7 +81,7 @@ export function CampaignsMobileList({
       return (
         <Card
           key={c.id}
-          withBorder
+          raised elevated
           radius="md"
           padding="sm"
           data-selected={isSelected || undefined}

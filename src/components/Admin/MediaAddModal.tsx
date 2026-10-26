@@ -155,7 +155,7 @@ export function MediaAddModal({
             {targetExtra}
           </Stack>
         )}
-        <Paper
+        <Paper raised elevated
           ref={dropRef}
           padding="md"
           role="region"
@@ -338,7 +338,7 @@ export function MediaAddModal({
         </Stack>
 
         {externalPreview && (
-          <Card style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
+          <Card raised elevated style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
             <Stack>
               {externalPreview.html ? (
                 <div

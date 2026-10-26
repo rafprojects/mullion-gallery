@@ -56,7 +56,7 @@ export function TemplatePickerModal({ opened, onClose, apiClient, onSelect }: Pr
         <SimpleGrid cols={{ base: 1, xs: 2, sm: 3 }} spacing="sm">
           {/* Always-first "Start Blank" card */}
           <Card
-            withBorder
+            raised elevated
             radius="md"
             padding="md"
             className={classes.card!}
@@ -81,7 +81,7 @@ export function TemplatePickerModal({ opened, onClose, apiClient, onSelect }: Pr
             return (
               <Card
                 key={tpl.id}
-                withBorder
+                raised elevated
                 radius="md"
                 padding="md"
                 className={classes.card!}

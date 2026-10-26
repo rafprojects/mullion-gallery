@@ -40,7 +40,7 @@ export function BulkActionsBar({
       shadow="sm"
       padding="xs"
       radius="md"
-      withBorder
+      raised elevated
       style={{
         position: 'sticky',
         bottom: 12,
