@@ -311,6 +311,18 @@ The parity spec's `settle` now waits two frames and then for every shadow root's
 
 **The designer's crop** was captured from the current tree and from a worktree at the commit before, on the same light-theme page with three photo campaigns and the viewer open; it is in the correspondence folder as the preview of what the dialogs will change.
 
+### The campaign viewer's admin affordances, ahead of the dialogs (2026-10-26)
+
+The designer placed the viewer's new admin action and settled the details the crop showed (rule 21). Built now, under Mantine's dialog, each failing a new `theme-qa.spec.ts` test first:
+
+- **"Edit campaign"** is a subtle text button with a pencil on the title's meta line, admin-only, calling the campaign context's `onEditCampaign`; with the cover hidden there is no meta line, so it leads the content instead.
+- **The cover gear** moved out of the top-left corner it shared with the company badge into a row after it, `xs` apart, so it can no longer overlap the badge.
+- **The close button** is black at 0.60, stepping to 0.75 on hover, through a class rather than Mantine's inline `styles`, which cannot express hover.
+- **A 24px target for small icon buttons, in the framework.** The 36px gear inside Mantine's dialog was not Mantine's sizing: `global.scss` gave every `button` in the gallery root a 36px minimum (44px on phones), a pre-framework touch-target rule that turned every 18 and 22px framework icon button in the gallery into a 36px one. The rule now skips framework controls (`:not([data-mullion-focus])`), and the framework gives its `xs` and `sm` icon buttons a band out to 24px instead, measured from outside their 1px border; `control-parity.spec.ts` checks the band reaches 24px and no further. The close button keeps its pseudo-elements for its cross and is not banded at those sizes.
+- **One new string**, "Edit campaign", harvested and translated in all five locales from the existing "Edit Campaign".
+
+**For the dialogs' return, added to the reapply:** the floating Admin button sits under the backdrop, with a test that nothing outside the top dialog paints above `--mullion-backdrop`; Escape closes only the editor over the viewer and focus returns to "Edit campaign" (a `test.fixme` in `theme-qa.spec.ts` until then, since Mantine closes every modal on Escape); and the patch's campaign viewer close button takes the same `.close` class.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.

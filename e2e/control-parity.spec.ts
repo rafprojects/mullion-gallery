@@ -812,3 +812,34 @@ for (const theme of ['default-light', 'default-dark'] as const) {
   });
 }
 
+
+// [P81-A] WCAG 2.2's 24px target for the small icon buttons (designer,
+// 2026-10-26, first for the viewer's gears): an 18px `xs` and a 22px `sm`
+// keep their drawn size and take a band out to 24px, so nothing around them
+// moves. Checked at the band's edge, half a pixel in.
+test('small icon buttons have a 24px target', async ({ page }) => {
+  await serveShowcase(page);
+  await page.goto('/ui-showcase?mount=shadow&controls=1&theme=default-light&chrome=follow');
+  for (const [size, drawn] of [['xs', 18], ['sm', 22]] as const) {
+    const icon = page.getByTestId(`inline-ai-${size}`);
+    await icon.scrollIntoViewIfNeeded();
+    const got = await icon.evaluate((el, drawn) => {
+      const box = el.getBoundingClientRect();
+      const reach = (24 - drawn) / 2;
+      const root = el.getRootNode() as ShadowRoot;
+      const at = (x: number, y: number) => root.elementFromPoint(x, y)?.closest('.mullion-action-icon') === el;
+      const cy = box.top + box.height / 2;
+      const cx = box.left + box.width / 2;
+      return {
+        width: box.width,
+        left: at(box.left - reach + 0.5, cy),
+        right: at(box.right + reach - 0.5, cy),
+        top: at(cx, box.top - reach + 0.5),
+        beyond: at(box.left - reach - 1.5, cy),
+      };
+    }, drawn);
+    expect.soft(got.width, `${size} keeps its drawn size`).toBeCloseTo(drawn, 1);
+    expect.soft([got.left, got.right, got.top], `${size} reaches 24px`).toEqual([true, true, true]);
+    expect.soft(got.beyond, `${size} goes no further`).toBe(false);
+  }
+});

@@ -10660,3 +10660,7 @@ msgstr "Mullion 浅色"
 #: includes/settings/class-mullion-settings-renderer.php:45
 msgid "Mullion Settings"
 msgstr "Mullion 设置"
+
+#: includes/i18n/class-mullion-frontend-strings.php:2786
+msgid "Edit campaign"
+msgstr "编辑活动"

@@ -48,13 +48,18 @@
 
 .mullion-gallery button {
   font: inherit;
-  // Ensure minimum touch target size for mobile (44x44px WCAG guideline)
+}
+
+// Ensure minimum touch target size for mobile (44x44px WCAG guideline). Not on framework
+// controls (P81-A): they carry their own sizes and a 24px target, and this rule turned a
+// 22px icon button into a 36px one.
+.mullion-gallery button:not([data-mullion-focus]) {
   min-height: 36px;
   min-width: 36px;
 }
 
 @media (max-width: 576px) {
-  .mullion-gallery button {
+  .mullion-gallery button:not([data-mullion-focus]) {
     min-height: 44px;
     min-width: 44px;
   }

@@ -31,3 +31,16 @@
     --mullion-gap: var(--mullion-spacing-md);
   }
 }
+
+// The close button over the cover: black at 0.60, the one number for black over a photo,
+// stepping to 0.75 on hover, since hover adds (designer, 2026-10-26).
+.close {
+  color: white;
+  background-color: rgb(0 0 0 / 0.6);
+  border-radius: 50%;
+
+  &:hover {
+    background-color: rgb(0 0 0 / 0.75);
+  }
+}
+

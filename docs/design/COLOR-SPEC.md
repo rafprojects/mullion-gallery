@@ -244,6 +244,8 @@ with the switch's states in rule 18 from
 [`designer-signoff-fields-2026-10-26.md`](correspondences/designer-signoff-fields-2026-10-26.md).
 Rule 20 is from
 [`designer-answers-overlays-2026-10-26.md`](correspondences/designer-answers-overlays-2026-10-26.md).
+Rule 21 is from
+[`designer-answers-dialogs-held-2026-10-26.md`](correspondences/designer-answers-dialogs-held-2026-10-26.md).
 
 ### Grounds and inks
 
@@ -436,6 +438,16 @@ rather than clipping when it wraps.
 | motion | the two animation settings users choose, and `prefers-reduced-motion`, under which an overlay appears without sliding or scaling |
 
 *(2026-10-26.)*
+
+**21. Every control has a 24px target, and nothing outside the top dialog paints above its
+backdrop.** A control drawn smaller than 24px, WCAG 2.2's minimum, takes a band out to 24px that
+moves nothing: the slider's row, the 18 and 22px icon buttons, the viewer's gears. Black over a
+photo is 0.60 everywhere, the viewer's close button included, which steps to 0.75 on hover because
+hover adds. While a dialog is open the page behind it is inert, so no page chrome, the floating Admin
+button included, draws above `--mullion-backdrop`. In the campaign viewer an admin's way to the
+editor is a subtle "Edit campaign" text button with a pencil, on the title's meta line; the editor
+opens over the viewer, Escape closes only it, and focus returns to the button. The cover's admin
+gear sits clear of the company badge by at least `xs`. *(2026-10-26.)*
 
 ---
 

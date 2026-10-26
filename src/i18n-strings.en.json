@@ -2756,6 +2756,7 @@
   "cv_saved": "Campaign gallery config updated.",
   "cv_err_save": "Failed to save campaign gallery config.",
   "cv_close_aria": "Close campaign viewer",
+  "cv_edit_campaign": "Edit campaign",
   "cv_modal_title": "Campaign details for {{title}}",
   "cv_about_section": "About Section",
   "cv_show_about": "Show About",

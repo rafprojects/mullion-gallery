@@ -6,8 +6,8 @@ import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullio
 import { uiRem, Box, ActionIcon } from '@/ui';
 
 interface InContextEditorProps {
-  /** Position relative to the nearest positioned parent. */
-  position?: 'top-right' | 'top-left' | 'bottom-right';
+  /** Position relative to the nearest positioned parent, or `inline` to sit in its parent's flow. */
+  position?: 'top-right' | 'top-left' | 'bottom-right' | 'inline';
   /** Only show when true (typically isAdmin && showInContextEditors). */
   visible?: boolean;
   /** Popup content — form fields for the relevant settings. */
@@ -68,6 +68,7 @@ const positionStyles: Record<string, React.CSSProperties> = {
   'top-right': { position: 'absolute', top: 8, right: 8, zIndex: 10 },
   'top-left': { position: 'absolute', top: 8, left: 8, zIndex: 10 },
   'bottom-right': { position: 'absolute', bottom: 8, right: 8, zIndex: 10 },
+  inline: { display: 'inline-flex', position: 'relative', zIndex: 10 },
 };
 
 /**

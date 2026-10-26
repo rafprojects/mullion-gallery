@@ -1,6 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IconCalendar, IconTag } from '@tabler/icons-react';
+import { IconCalendar, IconPencil, IconTag } from '@tabler/icons-react';
 import { Modal, Image, Loader } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import type { Campaign, GalleryBehaviorSettings, GalleryConfig } from '@/types';
@@ -27,7 +27,7 @@ import {
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { UnifiedGallerySection } from './UnifiedGallerySection';
 import { PerTypeGallerySection } from './PerTypeGallerySection';
-import { uiRem, Group, Stack, Title, Text, SimpleGrid, Box, Center, Badge, Paper, Alert, inkOn, Switch } from '@/ui';
+import { uiRem, Group, Stack, Title, Text, SimpleGrid, Box, Center, Badge, Paper, Alert, inkOn, Switch, Button } from '@/ui';
 import styles from './CampaignViewer.module.scss';
 
 /** A settings length in the size basis: a number is pixels, as Mantine's `h` read it. */
@@ -63,6 +63,22 @@ interface CampaignViewerCoverHeaderProps {
   campaignTitleStyle: React.CSSProperties | undefined;
   campaignDateStyle: React.CSSProperties | undefined;
   coverHeights: { base: string | number; sm: string | number; md: string | number };
+  /** An admin's "Edit campaign", on the title's meta line; absent for visitors. */
+  onEdit?: (() => void) | undefined;
+}
+
+/**
+ * [P81-A] An admin's way into the campaign editor from the viewer (designer,
+ * 2026-10-26). In words rather than a third gear, and with the campaign's name
+ * rather than the window's controls; the editor opens over the viewer.
+ */
+function EditCampaignAction({ onEdit }: { onEdit: () => void }) {
+  const { t } = useTranslation('mullion');
+  return (
+    <Button variant="subtle" size="xs" leftSection={<IconPencil size={14} />} onClick={onEdit}>
+      {t('cv_edit_campaign', 'Edit campaign')}
+    </Button>
+  );
 }
 
 function CampaignViewerCoverHeader({
@@ -73,6 +89,7 @@ function CampaignViewerCoverHeader({
   campaignTitleStyle,
   campaignDateStyle,
   coverHeights,
+  onEdit,
 }: CampaignViewerCoverHeaderProps) {
   const { t } = useTranslation('mullion');
   return (
@@ -86,26 +103,6 @@ function CampaignViewerCoverHeader({
       }}
       render={<div />}
     >
-      <InContextEditor
-        visible={isAdmin && settings.showInContextEditors}
-        position="top-left"
-      >
-        <Stack gap="sm">
-          <Text weight={600} size="xs">{t('cv_hdr', 'Campaign Header')}</Text>
-          <Switch label={t('cv_show_company', 'Show Company Name')} checked={settings.showCampaignCompanyName !== false} onChange={(checked) => inContextSave('showCampaignCompanyName', checked)} size="xs" />
-          <Switch label={t('cv_show_date', 'Show Date')} checked={settings.showCampaignDate !== false} onChange={(checked) => inContextSave('showCampaignDate', checked)} size="xs" />
-          <Text weight={500} size="xs" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('cv_title_typo', 'Title Typography')}</Text>
-          <TypographyEditor
-            value={settings.typographyOverrides.campaignTitle ?? {}}
-            onChange={(value) => {
-              const overrides = { ...settings.typographyOverrides };
-              if (Object.keys(value).length === 0) delete overrides.campaignTitle;
-              else overrides.campaignTitle = value;
-              inContextSave('typographyOverrides', overrides);
-            }}
-          />
-        </Stack>
-      </InContextEditor>
       <Image
         src={displayedCampaign.coverImage}
         alt={displayedCampaign.title}
@@ -121,24 +118,48 @@ function CampaignViewerCoverHeader({
         }}
       />
 
-      {settings.showCampaignCompanyName !== false && (
-        <Badge tone="default" variant="filled"
-          style={{ position: 'absolute', top: uiRem(1), left: uiRem(1), backgroundColor: displayedCampaign.company.brandColor, color: inkOn(displayedCampaign.company.brandColor) }}
-          size="lg"
+      {/* The company badge, then the admin's cover gear clear of it by `xs` (designer, 2026-10-26). */}
+      <Group gap="xs" style={{ position: 'absolute', top: uiRem(1), left: uiRem(1), zIndex: 10 }}>
+        {settings.showCampaignCompanyName !== false && (
+          <Badge tone="default" variant="filled"
+            style={{ backgroundColor: displayedCampaign.company.brandColor, color: inkOn(displayedCampaign.company.brandColor) }}
+            size="lg"
+          >
+            <Group gap="2xs">
+              <CompanyLogo logo={displayedCampaign.company.logo} companyName={displayedCampaign.company.name} />
+              <span>{displayedCampaign.company.name}</span>
+            </Group>
+          </Badge>
+        )}
+        <InContextEditor
+          visible={isAdmin && settings.showInContextEditors}
+          position="inline"
         >
-          <Group gap="2xs">
-            <CompanyLogo logo={displayedCampaign.company.logo} companyName={displayedCampaign.company.name} />
-            <span>{displayedCampaign.company.name}</span>
-          </Group>
-        </Badge>
-      )}
+          <Stack gap="sm">
+            <Text weight={600} size="xs">{t('cv_hdr', 'Campaign Header')}</Text>
+            <Switch label={t('cv_show_company', 'Show Company Name')} checked={settings.showCampaignCompanyName !== false} onChange={(checked) => inContextSave('showCampaignCompanyName', checked)} size="xs" />
+            <Switch label={t('cv_show_date', 'Show Date')} checked={settings.showCampaignDate !== false} onChange={(checked) => inContextSave('showCampaignDate', checked)} size="xs" />
+            <Text weight={500} size="xs" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('cv_title_typo', 'Title Typography')}</Text>
+            <TypographyEditor
+              value={settings.typographyOverrides.campaignTitle ?? {}}
+              onChange={(value) => {
+                const overrides = { ...settings.typographyOverrides };
+                if (Object.keys(value).length === 0) delete overrides.campaignTitle;
+                else overrides.campaignTitle = value;
+                inContextSave('typographyOverrides', overrides);
+              }}
+            />
+          </Stack>
+        </InContextEditor>
+      </Group>
 
       <Box className={styles.coverText} style={{ position: 'absolute', bottom: '0', left: '0', right: '0' }}>
         <Title order={2} size={3} style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))', ...campaignTitleStyle }}>
           {displayedCampaign.title}
         </Title>
-        {settings.showCampaignDate !== false && (
-          <Group gap="lg" wrap="wrap">
+        {(settings.showCampaignDate !== false || onEdit) && (
+          <Group gap="lg" wrap="wrap" align="center">
+            {settings.showCampaignDate !== false && (
             <Group gap="3xs">
               <IconCalendar size={16} color="var(--mullion-color-text-muted)" />
               <Text size="sm" tone="muted" style={campaignDateStyle}>
@@ -149,7 +170,8 @@ function CampaignViewerCoverHeader({
                 })}
               </Text>
             </Group>
-            {settings.showCampaignTags !== false && (
+            )}
+            {settings.showCampaignDate !== false && settings.showCampaignTags !== false && (
               <Group gap="3xs">
                 <IconTag size={16} color="var(--mullion-color-text-muted)" />
                 <Text size="sm" tone="muted">
@@ -157,6 +179,7 @@ function CampaignViewerCoverHeader({
                 </Text>
               </Group>
             )}
+            {onEdit && <EditCampaignAction onEdit={onEdit} />}
           </Group>
         )}
       </Box>
@@ -295,7 +318,7 @@ export function CampaignViewer({
 }: CampaignViewerProps) {
   const { t } = useTranslation('mullion');
   const s = galleryBehaviorSettings;
-  const { setActiveCampaign, setOnEditGalleryConfig } = useCampaignContext();
+  const { setActiveCampaign, setOnEditGalleryConfig, onEditCampaign } = useCampaignContext();
   const [viewerCampaign, setViewerCampaign] = useState(campaign);
   const [galleryConfigEditorOpen, setGalleryConfigEditorOpen] = useState(false);
   const [galleryConfigEditorValue, setGalleryConfigEditorValue] = useState<Partial<GalleryConfig> | undefined>(undefined);
@@ -470,6 +493,8 @@ export function CampaignViewer({
     }
     return undefined; // 'theme' = no override
   }, [useFullscreen, s.modalBgType, s.modalBgColor, s.modalBgGradient]);
+  const showCover = !galleriesOnly && s.showCampaignCoverImage !== false;
+  const onEdit = isAdmin && onEditCampaign ? () => onEditCampaign(displayedCampaign) : undefined;
   return (
     <Modal
       {...getMullionDebugProps('CampaignViewer')}
@@ -481,6 +506,7 @@ export function CampaignViewer({
       size={modalSize}
       padding={0}
       withCloseButton
+      classNames={{ close: styles.close ?? '' }}
       closeButtonProps={{
         ...getMullionDebugProps('CampaignViewer', 'close'),
         'aria-label': t('cv_close_aria', 'Close campaign viewer'),
@@ -496,7 +522,7 @@ export function CampaignViewer({
           ? { overflow: 'auto', maxHeight: '100dvh', ...modalBgStyle }
           : { overflow: 'auto', maxHeight: `${clampedMaxHeight}dvh` },
         header: { position: 'absolute', top: 8, right: 8, zIndex: 10, background: 'transparent', padding: 0 },
-        close: { color: 'white', background: 'rgba(0,0,0,0.65)', borderRadius: '50%', width: 36, height: 36 },
+        close: { width: 36, height: 36 },
         // P60-D: the dialog's accessible name comes from `title` (aria-labelledby).
         // The campaign uses a custom cover header, so hide the title text visually
         // (sr-only) while keeping it exposed to assistive tech.
@@ -505,7 +531,7 @@ export function CampaignViewer({
       title={t('cv_modal_title', 'Campaign details for {{title}}', { title: displayedCampaign.title })}
     >
       {/* Cover Image Header — hidden in galleries-only mode or when cover image disabled */}
-      {!galleriesOnly && s.showCampaignCoverImage !== false && (
+      {showCover && (
         <CampaignViewerCoverHeader
           displayedCampaign={displayedCampaign}
           settings={s}
@@ -514,6 +540,7 @@ export function CampaignViewer({
           campaignTitleStyle={campaignTitleStyle}
           campaignDateStyle={campaignDateStyle}
           coverHeights={coverHeights}
+          onEdit={onEdit}
         />
       )}
 
@@ -524,6 +551,12 @@ export function CampaignViewer({
         style={{ width: '100%', maxWidth: contentMaxWidth, marginLeft: 'auto', marginRight: 'auto', padding: galleriesOnly ? 0 : toCssOrNumber(clampedInnerPadding, innerPaddingUnit), display: 'flex', flexDirection: 'column' as const, flex: 1, justifyContent: s.modalContentVerticalAlign === 'center' ? 'center' : s.modalContentVerticalAlign === 'bottom' ? 'flex-end' : undefined }}
       >
         <Stack gap="lg" style={{ width: '100%' }}>
+          {/* With the cover hidden there is no meta line, so the admin's action leads the content. */}
+          {onEdit && !showCover && (
+            <Group>
+              <EditCampaignAction onEdit={onEdit} />
+            </Group>
+          )}
           {/* Description — hidden in galleries-only mode */}
           {!galleriesOnly && s.showCampaignAbout !== false && (
             <Box style={{ position: 'relative' }}>

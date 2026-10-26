@@ -10660,3 +10660,7 @@ msgstr "Mullion clair"
 #: includes/settings/class-mullion-settings-renderer.php:45
 msgid "Mullion Settings"
 msgstr "Paramètres de Mullion"
+
+#: includes/i18n/class-mullion-frontend-strings.php:2786
+msgid "Edit campaign"
+msgstr "Modifier la campagne"

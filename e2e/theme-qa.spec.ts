@@ -503,3 +503,73 @@ test.describe('phase-1 visual snapshots', () => {
     await expect(page).toHaveScreenshot('theme-selector-open-default-light.png', { maxDiffPixelRatio: 0.1 });
   });
 });
+
+// [P81-A] The campaign viewer, by the designer's answers of 2026-10-26: an
+// admin's "Edit campaign" sits on the title's meta line and returns focus when
+// the editor closes; the cover gear clears the company badge by at least `xs`;
+// each 22px gear has a 24px target; the close button is black at 0.60, 0.75 on hover.
+test.describe('campaign viewer', () => {
+  test.use({ viewport: { width: 1280, height: 860 } });
+
+  test('the admin affordances follow the designer', async ({ page }) => {
+    await installThemeSession(page, { themeId: 'default-light' });
+    const campaign = {
+      id: '101', companyId: 'acme', title: 'Harbour at dusk', description: 'A campaign with a photo',
+      thumbnail: '', coverImage: '', status: 'active', visibility: 'public', tags: ['coast'],
+      createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-02T00:00:00.000Z',
+    };
+    await page.route('**/wp-json/mullion-gallery/v1/campaigns**', (r) =>
+      r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [campaign], mediaByCampaign: { '101': [] } }) }),
+    );
+    await page.goto('/');
+    await waitForShadowMount(page);
+    await page.getByRole('button', { name: /Open campaign Harbour at dusk/ }).click();
+    const viewer = page.getByRole('dialog', { name: /Harbour at dusk/ });
+    await expect(viewer).toBeVisible();
+    await page.waitForTimeout(400);
+
+    const edit = viewer.getByRole('button', { name: 'Edit campaign' });
+    const date = viewer.getByText(/2025|2026/).first();
+    const [editBox, dateBox] = [(await edit.boundingBox())!, (await date.boundingBox())!];
+    expect.soft(Math.abs(editBox.y + editBox.height / 2 - (dateBox.y + dateBox.height / 2)), 'on the meta line').toBeLessThan(12);
+
+    const gears = viewer.getByRole('button', { name: 'Edit settings' });
+    const coverGear = (await gears.first().boundingBox())!;
+    const badge = (await viewer.getByText('ACME', { exact: false }).first().boundingBox())!;
+    const overlapsBadge = coverGear.x < badge.x + badge.width && coverGear.x + coverGear.width > badge.x
+      && coverGear.y < badge.y + badge.height && coverGear.y + coverGear.height > badge.y;
+    expect.soft(overlapsBadge, 'the cover gear clears the badge').toBe(false);
+    const gap = Math.max(coverGear.x - (badge.x + badge.width), badge.x - (coverGear.x + coverGear.width), coverGear.y - (badge.y + badge.height));
+    expect.soft(gap, 'by at least xs').toBeGreaterThanOrEqual(10);
+    expect.soft(coverGear.width, 'a 22px gear').toBeCloseTo(22, 0);
+    const hits = await page.evaluate(({ x, y }) => {
+      const deep = (px: number, py: number) => {
+        let el: Element | null = document.elementFromPoint(px, py);
+        while (el?.shadowRoot) {
+          const inner = el.shadowRoot.elementFromPoint(px, py);
+          if (!inner || inner === el) break;
+          el = inner;
+        }
+        return el?.closest('button')?.getAttribute('aria-label') ?? null;
+      };
+      return { left: deep(x - 0.5, y), right: deep(x + 22.5, y) };
+    }, { x: coverGear.x, y: coverGear.y + coverGear.height / 2 });
+    expect.soft(hits, 'a 24px target around the 22px gear').toEqual({ left: 'Edit settings', right: 'Edit settings' });
+
+    const close = viewer.getByRole('button', { name: 'Close campaign viewer' });
+    const ground = () => close.evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect.soft(await ground(), 'black at 0.60').toBe('rgba(0, 0, 0, 0.6)');
+    await close.hover();
+    await expect.poll(ground, { message: 'hover steps to 0.75' }).toBe('rgba(0, 0, 0, 0.75)');
+
+    await edit.click();
+    await expect(page.getByRole('dialog', { name: /Edit Campaign/i })).toBeVisible();
+  });
+
+  // Mantine closes every open modal on Escape, so these wait for the framework
+  // dialogs, which close only the top one (designer, 2026-10-26).
+  test.fixme('Escape closes only the editor, and focus returns to Edit campaign', async () => {
+    // With the dialogs: open the viewer, press Edit campaign, press Escape; the
+    // editor closes, the viewer stays, and Edit campaign has focus again.
+  });
+});

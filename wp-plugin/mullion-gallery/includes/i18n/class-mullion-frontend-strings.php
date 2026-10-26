@@ -2783,6 +2783,7 @@ class Mullion_Frontend_Strings {
             'cv_saved' => __('Campaign gallery config updated.', 'mullion-gallery'),
             'cv_err_save' => __('Failed to save campaign gallery config.', 'mullion-gallery'),
             'cv_close_aria' => __('Close campaign viewer', 'mullion-gallery'),
+            'cv_edit_campaign' => __('Edit campaign', 'mullion-gallery'),
             'cv_modal_title' => __('Campaign details for {{title}}', 'mullion-gallery'),
             'cv_about_section' => __('About Section', 'mullion-gallery'),
             'cv_show_about' => __('Show About', 'mullion-gallery'),

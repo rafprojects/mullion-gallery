@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-27T02:59:44+00:00\n"
+"POT-Creation-Date: 2026-10-26T20:24:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: mullion-gallery\n"
@@ -233,7 +233,7 @@ msgid "Forbidden"
 msgstr ""
 
 #. translators: %s: the shortcode reference that did not resolve, e.g. space="acme".
-#: includes/class-mullion-embed.php:518
+#: includes/class-mullion-embed.php:513
 #, php-format
 msgid "Mullion: this shortcode reference could not be resolved (%s) — showing the default space instead. Only site administrators see this notice."
 msgstr ""
@@ -875,7 +875,7 @@ msgid "Rescanned: {{media}} media items updated across {{campaigns}} campaigns."
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:170
-#: includes/i18n/class-mullion-frontend-strings.php:2870
+#: includes/i18n/class-mullion-frontend-strings.php:2871
 msgid "All media types are correct."
 msgstr ""
 
@@ -1684,7 +1684,7 @@ msgstr ""
 #: includes/i18n/class-mullion-frontend-strings.php:376
 #: includes/i18n/class-mullion-frontend-strings.php:2502
 #: includes/i18n/class-mullion-frontend-strings.php:2602
-#: includes/i18n/class-mullion-frontend-strings.php:2823
+#: includes/i18n/class-mullion-frontend-strings.php:2824
 msgid "Discard"
 msgstr ""
 
@@ -1709,7 +1709,7 @@ msgid "Clear Campaign Overrides"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:382
-#: includes/i18n/class-mullion-frontend-strings.php:2799
+#: includes/i18n/class-mullion-frontend-strings.php:2800
 msgid "Adapter applied when this campaign renders images and videos together."
 msgstr ""
 
@@ -2126,12 +2126,12 @@ msgid "{{failures}} of {{total}} files could not be uploaded."
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:496
-#: includes/i18n/class-mullion-frontend-strings.php:2884
+#: includes/i18n/class-mullion-frontend-strings.php:2885
 msgid "Upload failed"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:497
-#: includes/i18n/class-mullion-frontend-strings.php:2885
+#: includes/i18n/class-mullion-frontend-strings.php:2886
 msgid "Upload failed."
 msgstr ""
 
@@ -3805,7 +3805,7 @@ msgid "Heading for the campaign description section (default \"About\")."
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:893
-#: includes/i18n/class-mullion-frontend-strings.php:2789
+#: includes/i18n/class-mullion-frontend-strings.php:2790
 msgid "Show Description"
 msgstr ""
 
@@ -8977,7 +8977,7 @@ msgid "Layout \"{{name}}\" saved"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2505
-#: includes/i18n/class-mullion-frontend-strings.php:2866
+#: includes/i18n/class-mullion-frontend-strings.php:2867
 msgid "Save failed"
 msgstr ""
 
@@ -9266,17 +9266,17 @@ msgid "System & Admin"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2596
-#: includes/i18n/class-mullion-frontend-strings.php:2815
+#: includes/i18n/class-mullion-frontend-strings.php:2816
 msgid "just now"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2597
-#: includes/i18n/class-mullion-frontend-strings.php:2816
+#: includes/i18n/class-mullion-frontend-strings.php:2817
 msgid "{{count}} minute ago"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2598
-#: includes/i18n/class-mullion-frontend-strings.php:2817
+#: includes/i18n/class-mullion-frontend-strings.php:2818
 msgid "{{count}} minutes ago"
 msgstr ""
 
@@ -9357,7 +9357,7 @@ msgid "Add {{type}} media: {{label}}"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2624
-#: includes/i18n/class-mullion-frontend-strings.php:2840
+#: includes/i18n/class-mullion-frontend-strings.php:2841
 msgid "Added"
 msgstr ""
 
@@ -9860,400 +9860,404 @@ msgid "Close campaign viewer"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2786
-msgid "Campaign details for {{title}}"
+msgid "Edit campaign"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2787
-msgid "About Section"
+msgid "Campaign details for {{title}}"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2788
+msgid "About Section"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2789
 msgid "Show About"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2790
+#: includes/i18n/class-mullion-frontend-strings.php:2791
 msgid "Heading Typography"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2791
+#: includes/i18n/class-mullion-frontend-strings.php:2792
 msgid "About this Campaign"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2792
+#: includes/i18n/class-mullion-frontend-strings.php:2793
 msgid "This campaign is private. Sign in or request access to view media."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2793
+#: includes/i18n/class-mullion-frontend-strings.php:2794
 msgid "No media available for this campaign."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2794
+#: includes/i18n/class-mullion-frontend-strings.php:2795
 msgid "Campaign Gallery Config"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2795
+#: includes/i18n/class-mullion-frontend-strings.php:2796
 msgid "This campaign currently stores custom gallery overrides. Changes preview in the viewer immediately, revert on cancel, and persist only when you save."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2796
+#: includes/i18n/class-mullion-frontend-strings.php:2797
 msgid "This campaign is currently inheriting global gallery settings. Changes preview in the viewer immediately, revert on cancel, and persist only when you save."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2797
+#: includes/i18n/class-mullion-frontend-strings.php:2798
 msgid "Save Campaign Gallery Config"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2798
+#: includes/i18n/class-mullion-frontend-strings.php:2799
 msgid "Preview Inherited Gallery Settings"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2800
+#: includes/i18n/class-mullion-frontend-strings.php:2801
 msgid "Sort campaigns"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2801
+#: includes/i18n/class-mullion-frontend-strings.php:2802
 msgid "Pro feature"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2802
+#: includes/i18n/class-mullion-frontend-strings.php:2803
 msgid "Upgrade"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2803
+#: includes/i18n/class-mullion-frontend-strings.php:2804
 msgid "Text layers are a Pro feature. Upgrade to add and edit text in your layouts."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2804
+#: includes/i18n/class-mullion-frontend-strings.php:2805
 msgid "Per-breakpoint responsive editing is a Pro feature. Upgrade to fine-tune tablet and mobile layouts."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2805
+#: includes/i18n/class-mullion-frontend-strings.php:2806
 msgid "The starter template library is a Pro feature. Upgrade to start from a curated preset."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2806
+#: includes/i18n/class-mullion-frontend-strings.php:2807
 msgid "Template updated in another tab"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2807
+#: includes/i18n/class-mullion-frontend-strings.php:2808
 msgid "This template was saved elsewhere. Close and reopen to load the latest version."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2808
+#: includes/i18n/class-mullion-frontend-strings.php:2809
 msgid "Reordered"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2809
+#: includes/i18n/class-mullion-frontend-strings.php:2810
 msgid "Media order updated."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2810
+#: includes/i18n/class-mullion-frontend-strings.php:2811
 msgid "Reorder failed"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2811
+#: includes/i18n/class-mullion-frontend-strings.php:2812
 msgid "Failed to reorder media."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2812
+#: includes/i18n/class-mullion-frontend-strings.php:2813
 msgid "Draft restored"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2813
+#: includes/i18n/class-mullion-frontend-strings.php:2814
 msgid "Your previous session has been restored."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2814
+#: includes/i18n/class-mullion-frontend-strings.php:2815
 msgid "Draft discarded."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2818
+#: includes/i18n/class-mullion-frontend-strings.php:2819
 msgid "Draft conflict detected"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2819
+#: includes/i18n/class-mullion-frontend-strings.php:2820
 msgid "Unsaved draft found"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2820
+#: includes/i18n/class-mullion-frontend-strings.php:2821
 msgid "This template was saved in another session after your draft was created ({{age}}). Restoring your draft will overwrite those changes."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2821
+#: includes/i18n/class-mullion-frontend-strings.php:2822
 msgid "An autosaved draft from {{age}} was found. Would you like to restore it?"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2822
+#: includes/i18n/class-mullion-frontend-strings.php:2823
 msgid "Restore draft"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2824
+#: includes/i18n/class-mullion-frontend-strings.php:2825
 msgid "Overlay added to canvas"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2825
+#: includes/i18n/class-mullion-frontend-strings.php:2826
 msgid "Overlay uploaded and added to canvas"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2826
+#: includes/i18n/class-mullion-frontend-strings.php:2827
 msgid "Background image uploaded and applied"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2827
+#: includes/i18n/class-mullion-frontend-strings.php:2828
 msgid "Mask image uploaded"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2828
+#: includes/i18n/class-mullion-frontend-strings.php:2829
 msgid "Overlay upload failed"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2829
+#: includes/i18n/class-mullion-frontend-strings.php:2830
 msgid "Background image applied"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2830
+#: includes/i18n/class-mullion-frontend-strings.php:2831
 msgid "Background image upload failed"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2831
+#: includes/i18n/class-mullion-frontend-strings.php:2832
 msgid "Background upload failed"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2832
+#: includes/i18n/class-mullion-frontend-strings.php:2833
 msgid "Invalid layout file"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2833
+#: includes/i18n/class-mullion-frontend-strings.php:2834
 msgid "The file is missing required fields (name, slots, canvasAspectRatio)."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2834
+#: includes/i18n/class-mullion-frontend-strings.php:2835
 msgid "Layout imported"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2835
-msgid "\"{{name}}\" loaded successfully."
-msgstr ""
-
 #: includes/i18n/class-mullion-frontend-strings.php:2836
-#: includes/i18n/class-mullion-frontend-strings.php:2857
-msgid "Import failed"
+msgid "\"{{name}}\" loaded successfully."
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2837
 #: includes/i18n/class-mullion-frontend-strings.php:2858
-msgid "Could not parse JSON file."
+msgid "Import failed"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2838
-msgid "Invalid URL"
+#: includes/i18n/class-mullion-frontend-strings.php:2859
+msgid "Could not parse JSON file."
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2839
+msgid "Invalid URL"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2840
 msgid "Please enter a valid https URL."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2841
+#: includes/i18n/class-mullion-frontend-strings.php:2842
 msgid "External media added."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2842
+#: includes/i18n/class-mullion-frontend-strings.php:2843
 msgid "Add failed"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2843
+#: includes/i18n/class-mullion-frontend-strings.php:2844
 msgid "Failed to add external media."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2844
+#: includes/i18n/class-mullion-frontend-strings.php:2845
 msgid "Preview loaded"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2845
+#: includes/i18n/class-mullion-frontend-strings.php:2846
 msgid "Preview available"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2846
+#: includes/i18n/class-mullion-frontend-strings.php:2847
 msgid "Preview failed"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2847
+#: includes/i18n/class-mullion-frontend-strings.php:2848
 msgid "Failed to load preview."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2848
+#: includes/i18n/class-mullion-frontend-strings.php:2849
 msgid "Nothing to export"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2849
+#: includes/i18n/class-mullion-frontend-strings.php:2850
 msgid "No gallery adapter settings have been configured yet."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2850
+#: includes/i18n/class-mullion-frontend-strings.php:2851
 msgid "Invalid settings file"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2851
+#: includes/i18n/class-mullion-frontend-strings.php:2852
 msgid "Expected a JSON object."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2852
+#: includes/i18n/class-mullion-frontend-strings.php:2853
 msgid "Invalid gallery config structure."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2853
+#: includes/i18n/class-mullion-frontend-strings.php:2854
 msgid "Unknown adapter ID \"{{id}}\" ({{bp}} {{scope}}). Valid IDs: {{ids}}."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2854
+#: includes/i18n/class-mullion-frontend-strings.php:2855
 msgid "Unknown adapter setting keys in {{bp}} {{scope}}: {{keys}}."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2855
+#: includes/i18n/class-mullion-frontend-strings.php:2856
 msgid "Adapter settings imported"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2856
+#: includes/i18n/class-mullion-frontend-strings.php:2857
 msgid "Gallery adapter settings applied. Save to persist."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2859
+#: includes/i18n/class-mullion-frontend-strings.php:2860
 msgid "Could not read the selected file."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2860
+#: includes/i18n/class-mullion-frontend-strings.php:2861
 msgid "Deleted"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2861
+#: includes/i18n/class-mullion-frontend-strings.php:2862
 msgid "Media removed."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2862
+#: includes/i18n/class-mullion-frontend-strings.php:2863
 msgid "Delete failed"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2863
+#: includes/i18n/class-mullion-frontend-strings.php:2864
 msgid "Failed to delete media."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2864
+#: includes/i18n/class-mullion-frontend-strings.php:2865
 msgid "Saved"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2865
+#: includes/i18n/class-mullion-frontend-strings.php:2866
 msgid "Media updated."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2867
+#: includes/i18n/class-mullion-frontend-strings.php:2868
 msgid "Failed to save media."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2868
+#: includes/i18n/class-mullion-frontend-strings.php:2869
 msgid "Rescan Complete"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2869
+#: includes/i18n/class-mullion-frontend-strings.php:2870
 msgid "Updated {{updated}} of {{total}} media items."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2871
+#: includes/i18n/class-mullion-frontend-strings.php:2872
 msgid "Rescan failed"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2872
+#: includes/i18n/class-mullion-frontend-strings.php:2873
 msgid "Failed to rescan media types."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2873
+#: includes/i18n/class-mullion-frontend-strings.php:2874
 msgid "Some files were skipped"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2874
+#: includes/i18n/class-mullion-frontend-strings.php:2875
 msgid "{{count}} non-media file was ignored."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2875
+#: includes/i18n/class-mullion-frontend-strings.php:2876
 msgid "{{count}} non-media files were ignored."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2876
+#: includes/i18n/class-mullion-frontend-strings.php:2877
 msgid "Batch limit reached"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2877
+#: includes/i18n/class-mullion-frontend-strings.php:2878
 msgid "Only the first {{count}} files were kept."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2878
+#: includes/i18n/class-mullion-frontend-strings.php:2879
 msgid "{{uploaded}} of {{total}} file uploaded successfully."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2879
+#: includes/i18n/class-mullion-frontend-strings.php:2880
 msgid "{{uploaded}} of {{total}} files uploaded successfully."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2880
+#: includes/i18n/class-mullion-frontend-strings.php:2881
 msgid "{{count}} file could not be added to the campaign."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2881
+#: includes/i18n/class-mullion-frontend-strings.php:2882
 msgid "{{count}} files could not be added to the campaign."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2882
+#: includes/i18n/class-mullion-frontend-strings.php:2883
 msgid "Upload complete with issues"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2883
+#: includes/i18n/class-mullion-frontend-strings.php:2884
 msgid "Upload complete"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2886
+#: includes/i18n/class-mullion-frontend-strings.php:2887
 msgid "Existing image added"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2887
+#: includes/i18n/class-mullion-frontend-strings.php:2888
 msgid "Using existing image for \"{{filename}}\"."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2888
+#: includes/i18n/class-mullion-frontend-strings.php:2889
 msgid "Failed to add image"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2889
+#: includes/i18n/class-mullion-frontend-strings.php:2890
 msgid "Could not add existing image."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2890
+#: includes/i18n/class-mullion-frontend-strings.php:2891
 msgid "Image uploaded"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2891
+#: includes/i18n/class-mullion-frontend-strings.php:2892
 msgid "\"{{filename}}\" uploaded successfully."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2892
+#: includes/i18n/class-mullion-frontend-strings.php:2893
 msgid "Settings restored"
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2893
+#: includes/i18n/class-mullion-frontend-strings.php:2894
 msgid "Your previous unsaved changes have been restored."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2894
+#: includes/i18n/class-mullion-frontend-strings.php:2895
 msgid "Unsaved settings discarded."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2895
+#: includes/i18n/class-mullion-frontend-strings.php:2896
 msgid "Session expired. Please sign in again."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2896
+#: includes/i18n/class-mullion-frontend-strings.php:2897
 msgid "Loading campaigns..."
 msgstr ""
 
-#: includes/i18n/class-mullion-frontend-strings.php:2897
+#: includes/i18n/class-mullion-frontend-strings.php:2898
 msgid " (page {{completed}} of {{total}})"
 msgstr ""
 
