@@ -2,8 +2,8 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { ApiClient, CampaignTemplate } from '@/services/apiClient';
-import { Tabs, Button, Card, Title, ActionIcon, Center, Loader, Chip, Tooltip, Select, Switch, Menu, Collapse, Badge, Box } from '@mantine/core';
-import { Group } from '@/ui';
+import { Tabs, Button, Card, ActionIcon, Center, Loader, Chip, Tooltip, Select, Switch, Menu, Collapse, Badge, Box } from '@mantine/core';
+import { Group, Title } from '@/ui';
 import { useReloadSafeView } from '@/hooks/useReloadSafeView';
 import { IconPlus, IconArrowLeft, IconFileImport, IconKeyboard, IconSettings, IconDotsVertical, IconAdjustments, IconStack2 } from '@tabler/icons-react';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
@@ -247,7 +247,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
           <ActionIcon variant="light" size="lg" onClick={onClose} aria-label={t('admin_back_to_gallery', 'Back to gallery')}>
             <IconArrowLeft />
           </ActionIcon>
-          <Title order={2} size="h3">{t('admin_panel_title', 'Admin Panel')}</Title>
+          <Title order={2} size={3}>{t('admin_panel_title', 'Admin Panel')}</Title>
           {spaceName && <Badge color={color ?? 'blue'} variant="light" size="sm">{spaceName}</Badge>}
         </Group>
         <Group gap="xs" wrap="wrap">

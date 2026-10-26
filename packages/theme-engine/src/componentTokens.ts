@@ -265,6 +265,15 @@ export function frameworkConstants(prefix: string): Record<string, string> {
     'duration-base': '200ms',
     'duration-slow': '300ms',
 
+    // [P81-A] Body line height follows the size step, as Mantine's does:
+    // tighter for small text, looser for large. Mantine's defaults, which no
+    // bundled theme overrides; `Text` picks the rung for its size.
+    'line-height-xs': '1.4',
+    'line-height-sm': '1.45',
+    'line-height-md': '1.55',
+    'line-height-lg': '1.6',
+    'line-height-xl': '1.65',
+
     // `layer-host-offset` is deliberately NOT declared here. Every step reads
     // it through `var(..., 0)`, so a host that sets it above the gallery (the
     // WordPress embed does, when the admin bar is showing) inherits into every

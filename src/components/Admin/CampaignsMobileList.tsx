@@ -9,7 +9,6 @@ import {
   Loader,
   Menu,
   Pagination,
-  Text,
   Tooltip,
 } from '@mantine/core';
 import {
@@ -21,7 +20,7 @@ import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack } from '@/ui';
+import { uiRem, Group, Stack, Text } from '@/ui';
 
 // Returns an i18next key + English default so the caller can translate in render.
 function scheduleLabel(publishAt?: string, unpublishAt?: string): { key: string; text: string; color: string } | null {
@@ -102,7 +101,7 @@ export function CampaignsMobileList({
                   aria-label={t('admin_select_item', 'Select {{title}}', { title: c.title })}
                   size="xs"
                 />
-                <Text fw={700} size="sm" truncate style={{ flex: 1 }}>{c.title}</Text>
+                <Text weight={700} size="sm" truncate style={{ flex: 1 }}>{c.title}</Text>
                 {hasCampaignGalleryOverrides(c) && (
                   <Tooltip label={t('admin_custom_gallery', 'Custom gallery: {{summary}}', { summary: galleryOverrideSummary.join(', ') || t('admin_nested_overrides', 'Nested overrides') })} withArrow>
                     <Box component="span" role="img" aria-label={t('admin_custom_gallery_aria', 'Custom gallery overrides')} style={{ display: 'inline-flex' }}>
@@ -115,7 +114,7 @@ export function CampaignsMobileList({
 
             {/* Description */}
             {c.description && (
-              <Text size="xs" c="dimmed" lineClamp={2}>{c.description}</Text>
+              <Text size="xs" tone="muted" lineClamp={2}>{c.description}</Text>
             )}
 
             {/* Badges */}
@@ -192,7 +191,7 @@ export function CampaignsMobileList({
     restoringIds, archivingIds, deletingIds, t,
   ]);
 
-  if (error) return <Text c="red" role="alert">{error}</Text>;
+  if (error) return <Text tone="danger" role="alert">{error}</Text>;
 
   if (isLoading) {
     return <Center py="xl"><Loader size="sm" /></Center>;
@@ -203,7 +202,7 @@ export function CampaignsMobileList({
       <Stack gap="sm">{cards}</Stack>
       {totalPages > 1 && (
         <Group justify="space-between" style={{ marginTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
-          <Text size="sm" c="dimmed">{t('admin_campaign_count', '{{count}} campaigns', { count: total })}</Text>
+          <Text size="sm" tone="muted">{t('admin_campaign_count', '{{count}} campaigns', { count: total })}</Text>
           <Pagination value={page} onChange={onPageChange} total={totalPages} size="sm" />
         </Group>
       )}

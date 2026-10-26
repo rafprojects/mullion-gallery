@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
-  Text,
   Button,
   Select,
   Slider,
@@ -26,14 +25,14 @@ import { useBuilderDock } from './BuilderDockContext';
 import { AssetUploader } from './AssetUploader';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group } from '@/ui';
+import { uiRem, Stack, Group, Text } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────
 
 function GRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <Group gap="2xs" align="center" wrap="nowrap">
-      <Text size="xs" c="dimmed" style={{ width: 40, flexShrink: 0 }}>{label}</Text>
+      <Text size="xs" tone="muted" style={{ width: 40, flexShrink: 0 }}>{label}</Text>
       {children}
     </Group>
   );
@@ -43,7 +42,7 @@ setMullionDebugDisplayName(GRow, 'LayoutBuilder:GRow');
 function SectionHeader({ label }: { label: string }) {
   return (
     <Box style={{ marginTop: uiRem(0.375), marginBottom: uiRem(0.125), paddingBottom: uiRem(0.1875), borderBottom: '1px solid var(--mantine-color-default-border)' }}>
-      <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>{label}</Text>
+      <Text size="xs" weight={700} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>{label}</Text>
     </Box>
   );
 }
@@ -140,7 +139,7 @@ function BackgroundModeControls({
   );
 
   if (mode === 'none') {
-    return <Text size="xs" c="dimmed" style={{ marginTop: uiRem(0.25) }}>{t('lb_bg_transparent', 'Transparent background — no fill applied.')}</Text>;
+    return <Text size="xs" tone="muted" style={{ marginTop: uiRem(0.25) }}>{t('lb_bg_transparent', 'Transparent background — no fill applied.')}</Text>;
   }
 
   if (mode === 'color') {
@@ -223,7 +222,7 @@ function BackgroundModeControls({
                       onClick={() => { builder.setTemplateField('backgroundGradientDirection', d.value); builder.setTemplateField('backgroundGradientAngle', undefined); }}
                       aria-label={t(`lb_bg_dir_${d.value}`, d.label)}
                     >
-                      <Text size="xs" fw={600}>{d.icon}</Text>
+                      <Text size="xs" weight={600}>{d.icon}</Text>
                     </ActionIcon>
                   </Tooltip>
                 ))}
@@ -317,7 +316,7 @@ function BackgroundModeControls({
           </Button>
         </Box>
       ) : (
-        <Text size="xs" c="dimmed">{t('lb_bg_no_image', 'No background image set.')}</Text>
+        <Text size="xs" tone="muted">{t('lb_bg_no_image', 'No background image set.')}</Text>
       )}
 
       <AssetUploader
@@ -331,7 +330,7 @@ function BackgroundModeControls({
       {builder.template.backgroundImage && (
         <>
           <Group gap="2xs" align="center" wrap="nowrap">
-            <Text size="xs" c="dimmed" style={{ width: 40, flexShrink: 0 }}>{t('lb_slot_fit', 'Fit')}</Text>
+            <Text size="xs" tone="muted" style={{ width: 40, flexShrink: 0 }}>{t('lb_slot_fit', 'Fit')}</Text>
             <Select
               size="xs"
               value={builder.template.backgroundImageFit ?? 'cover'}
@@ -341,7 +340,7 @@ function BackgroundModeControls({
             />
           </Group>
           <Group gap="2xs" align="center" wrap="nowrap">
-            <Text size="xs" c="dimmed" style={{ width: 40, flexShrink: 0 }}>{t('lb_bg_alpha', 'Alpha')}</Text>
+            <Text size="xs" tone="muted" style={{ width: 40, flexShrink: 0 }}>{t('lb_bg_alpha', 'Alpha')}</Text>
             <Box style={{ flex: 1 }}>
               <Slider value={builder.template.backgroundImageOpacity ?? 1} onChange={(val) => builder.setTemplateField('backgroundImageOpacity', val)} min={0} max={1} step={0.05} size="xs" label={(v) => `${Math.round(v * 100)}%`} />
             </Box>

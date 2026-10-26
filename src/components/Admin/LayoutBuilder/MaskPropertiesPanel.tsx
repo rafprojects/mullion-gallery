@@ -2,7 +2,6 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ASSET_MIME } from './DesignAssetsGrid';
 import {
-  Text,
   NumberInput,
   SegmentedControl,
   FileButton,
@@ -23,7 +22,7 @@ import { DEFAULT_MASK_LAYER } from '@/types';
 import type { AssetLibraryItem } from './BuilderDockContext';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group } from '@/ui';
+import { uiRem, Stack, Group, Text } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -43,7 +42,7 @@ function PropRow({ label, children, tooltip }: { label: string; children: React.
   return (
     <Group gap="2xs" align="center" wrap="nowrap" style={{ minHeight: 28 }}>
       <Group gap="4xs" align="center" wrap="nowrap" style={{ width: 70, flexShrink: 0 }}>
-        <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
+        <Text size="xs" tone="muted" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
         {tooltip && (
           <Tooltip label={tooltip} multiline style={{ width: uiRem(15) }} position="left" withArrow>
             <ActionIcon size={14} variant="transparent" c="dimmed" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })}>
@@ -64,7 +63,7 @@ function SectionHeader({ label }: { label: string }) {
     <Box
       style={{ marginTop: uiRem(0.375), marginBottom: uiRem(0.125), paddingBottom: uiRem(0.1875), borderBottom: '1px solid var(--mantine-color-default-border)' }}
     >
-      <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>
+      <Text size="xs" weight={700} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>
         {label}
       </Text>
     </Box>
@@ -94,7 +93,7 @@ export function MaskPropertiesPanel({
   if (!hasMask) {
     return (
       <Stack gap="xs" padding={4}>
-        <Text size="xs" c="dimmed">
+        <Text size="xs" tone="muted">
           {t('lb_mask_no_mask', 'No mask layer on this slot. Add a mask from the Layers panel first.')}
         </Text>
       </Stack>
@@ -157,7 +156,7 @@ export function MaskPropertiesPanel({
         }}
       >
         {!hasImage && (
-          <Text size="xs" c="dimmed">{t('lb_mask_no_image', 'No mask image — drag here or pick below')}</Text>
+          <Text size="xs" tone="muted">{t('lb_mask_no_image', 'No mask image — drag here or pick below')}</Text>
         )}
       </Box>
 

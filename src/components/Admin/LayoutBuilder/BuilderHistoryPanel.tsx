@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, Box, ActionIcon, Tooltip, ScrollArea, UnstyledButton } from '@mantine/core';
-import { Stack, Group } from '@/ui';
+import { Box, ActionIcon, Tooltip, ScrollArea, UnstyledButton } from '@mantine/core';
+import { Stack, Group, Text } from '@/ui';
 import { IconClockHour4, IconTrash } from '@tabler/icons-react';
 import type { IDockviewPanelProps } from 'dockview';
 import { useBuilderDock } from './BuilderDockContext';
@@ -39,7 +39,7 @@ export function BuilderHistoryPanel(_props: IDockviewPanelProps) {
           size={32}
           style={{ opacity: 0.5, marginBottom: 8 }}
         />
-        <Text size="sm" c="dimmed" ta="center">
+        <Text size="sm" tone="muted" align="center">
           {t('lb_hist_none', 'No history yet.')}
           <br />
           {t('lb_hist_none_hint', 'Make a change to see the history.')}
@@ -52,7 +52,7 @@ export function BuilderHistoryPanel(_props: IDockviewPanelProps) {
     <Box style={{ height: '100%', display: 'flex', flexDirection: 'column' }} p="xs">
       {/* Header */}
       <Group justify="space-between" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} paddingInline={4}>
-        <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+        <Text size="xs" weight={600} tone="muted" transform="uppercase">
           {t('lb_hist_title', 'History ({{count}})', { count: historyEntries.length })}
         </Text>
         <Group gap="3xs">
@@ -111,14 +111,14 @@ export function BuilderHistoryPanel(_props: IDockviewPanelProps) {
               >
                 <Text
                   size="xs"
-                  fw={isCurrent ? 600 : 400}
+                  weight={isCurrent ? 600 : 400}
                   {...(isCurrent ? { c: 'blue' as const } : {})}
                   truncate
                   style={{ flex: 1 }}
                 >
                   {entry.label}
                 </Text>
-                <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
+                <Text size="xs" tone="muted" style={{ flexShrink: 0 }}>
                   {new Date(entry.timestamp).toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -144,7 +144,7 @@ export function BuilderHistoryPanel(_props: IDockviewPanelProps) {
             }}
             aria-label={t('lb_hist_jump_initial', 'Jump to initial state')}
           >
-            <Text size="xs" c="dimmed" fs="italic" style={{ flex: 1 }}>
+            <Text size="xs" tone="muted" italic style={{ flex: 1 }}>
               {isHistoryTrimmed ? t('lb_hist_oldest', 'Oldest state') : t('lb_hist_initial', 'Initial state')}
             </Text>
             <IconTrash size={12} style={{ opacity: 0.5 }} />

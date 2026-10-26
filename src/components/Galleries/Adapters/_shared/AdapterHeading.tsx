@@ -1,5 +1,5 @@
-import { Title } from '@mantine/core';
-import { Group } from '@/ui';
+
+import { Group, Title } from '@/ui';
 import type { CSSProperties, ReactNode } from 'react';
 import type { ResolvedGalleryHeading, SharedGalleryCommonSettings } from './runtimeCommon';
 
@@ -31,7 +31,7 @@ export function AdapterHeading({ common, heading, icon, titleStyle }: AdapterHea
   const justify = common.galleryLabelJustification || 'left';
 
   return (
-    <Title order={3} size="h5" ta={justify} style={titleStyle}>
+    <Title order={3} size={5} align={justify} style={titleStyle}>
       {icon !== undefined ? (
         <Group gap="2xs" render={<span />} justify={justify}>
           {common.showGalleryLabelIcon && icon}

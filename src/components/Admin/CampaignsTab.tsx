@@ -1,10 +1,10 @@
 
-import { Button, Pagination, Skeleton, Table, Text, Checkbox } from '@mantine/core';
+import { Button, Pagination, Skeleton, Table, Checkbox } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Text } from '@/ui';
 
 /** P13-C: Skeleton rows displayed while campaign list loads. */
 function CampaignSkeletonRows({ withCheckbox }: { withCheckbox: boolean }) {
@@ -75,7 +75,7 @@ export function CampaignsTab({
 }: CampaignsTabProps) {
   const { t } = useTranslation('mullion');
   if (error) {
-    return <Text c="red" role="alert" aria-live="assertive">{error}</Text>;
+    return <Text tone="danger" role="alert" aria-live="assertive">{error}</Text>;
   }
 
   const allSelected = totalCount > 0 && selectedCount === totalCount;
@@ -120,7 +120,7 @@ export function CampaignsTab({
 
       {totalPages > 1 && (
         <Group justify="space-between" style={{ marginTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
-          <Text size="sm" c="dimmed">{t('admin_campaign_count', '{{count}} campaigns', { count: total })}</Text>
+          <Text size="sm" tone="muted">{t('admin_campaign_count', '{{count}} campaigns', { count: total })}</Text>
           <Pagination value={page} onChange={onPageChange} total={totalPages} size="sm" />
         </Group>
       )}

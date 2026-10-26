@@ -5,11 +5,11 @@ import {
   FileButton,
   Button,
   Loader,
-  Text,
 } from '@mantine/core';
 import {
   Group,
   Stack,
+  Text,
 } from '@/ui';
 import { IconTrash, IconUpload, IconWorld, IconWorldOff } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -98,8 +98,8 @@ export function FontLibraryManager({ apiClient, onFontsChange, isSystemAdmin = f
 
   return (
     <Stack gap="xs">
-      <Text size="sm" fw={500}>{t('admin_font_title', 'Custom Fonts')}</Text>
-      <Text size="xs" c="dimmed">
+      <Text size="sm" weight={500}>{t('admin_font_title', 'Custom Fonts')}</Text>
+      <Text size="xs" tone="muted">
         {t('admin_font_desc', 'Upload .woff2, .woff, .ttf, or .otf font files. Uploaded fonts appear in the font picker for all typography editors.')}
       </Text>
 

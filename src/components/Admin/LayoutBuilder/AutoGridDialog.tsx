@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, NumberInput, Switch, Button, Text } from '@mantine/core';
+import { Modal, NumberInput, Switch, Button } from '@mantine/core';
 import { computeGridSlots } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group } from '@/ui';
+import { uiRem, Stack, Group, Text } from '@/ui';
 
 export interface AutoGridDialogProps {
   opened: boolean;
@@ -62,7 +62,7 @@ export function AutoGridDialog({ opened, onClose, onGenerate, hasExistingSlots =
 
         {/* Live preview — same geometry as generation */}
         <div>
-          <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.25) }}>
+          <Text size="xs" tone="muted" style={{ marginBottom: uiRem(0.25) }}>
             {t('lb_grid_preview', 'Preview ({{count}} slot)', { count: cells.length })}
           </Text>
           <div
@@ -93,7 +93,7 @@ export function AutoGridDialog({ opened, onClose, onGenerate, hasExistingSlots =
             ))}
           </div>
           {!canGenerate && (
-            <Text size="xs" c="red" style={{ marginTop: uiRem(0.25) }}>
+            <Text size="xs" tone="danger" style={{ marginTop: uiRem(0.25) }}>
               {t('lb_grid_no_room', 'These settings leave no room for cells — reduce the gap or margin.')}
             </Text>
           )}

@@ -3,7 +3,6 @@ import {
   Modal,
   Button,
   TextInput,
-  Text,
   Switch,
   Divider,
 } from '@mantine/core';
@@ -11,7 +10,7 @@ import { IconCopy } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { AdminCampaign } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack } from '@/ui';
+import { uiRem, Group, Stack, Text } from '@/ui';
 
 export interface CampaignDuplicateModalProps {
   /** Source campaign to duplicate; null when modal is closed. */
@@ -50,10 +49,10 @@ function CampaignDuplicateModalOptions({
   return (
     <Stack {...getMullionDebugProps('CampaignDuplicateModal', 'stack')} gap="md">
       <div>
-        <Text size="sm" c="dimmed" style={{ marginBottom: uiRem(0.25) }}>
+        <Text size="sm" tone="muted" style={{ marginBottom: uiRem(0.25) }}>
           {t('admin_dup_source_label', 'Source:')}
         </Text>
-        <Text fw={600}>{source?.title}</Text>
+        <Text weight={600}>{source?.title}</Text>
       </div>
 
       <TextInput
@@ -75,7 +74,7 @@ function CampaignDuplicateModalOptions({
           onChange={(e) => setCopyMedia(e.currentTarget.checked)}
         />
         {!copyMedia && (
-          <Text size="xs" c="dimmed">
+          <Text size="xs" tone="muted">
             {t('admin_dup_empty_media', 'The duplicate will start with an empty media library.')}
           </Text>
         )}
@@ -88,7 +87,7 @@ function CampaignDuplicateModalOptions({
               onChange={(e) => setDuplicateLayoutTemplate(e.currentTarget.checked)}
             />
             {!duplicateLayoutTemplate && (
-              <Text size="xs" c="dimmed">
+              <Text size="xs" tone="muted">
                 {t('admin_dup_layout_keep', 'The duplicate will keep pointing at the original layout template.')}
               </Text>
             )}

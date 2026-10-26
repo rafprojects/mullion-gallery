@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { ActionIcon, Box, Button, NumberInput, SimpleGrid, Switch, Text, TextInput, Tooltip, type SelectProps } from '@mantine/core';
+import { ActionIcon, Box, Button, NumberInput, SimpleGrid, Switch, TextInput, Tooltip, type SelectProps } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { useGalleryAdapterSettingsIO } from '@/hooks/useGalleryAdapterSettingsIO';
@@ -12,7 +12,7 @@ import { tFieldLabel, tFieldDescription, tFieldPlaceholder, tFieldOptions } from
 import { ModalSelect } from '@/components/Common/ModalSelect';
 import { cloneGalleryConfig, collectGalleryAdapterSettingValues, GALLERY_BREAKPOINTS, getGalleryConfigScopeAdapterIds, resolveGalleryConfig, setGalleryAdapterSetting } from '@/utils/galleryConfig';
 import { DimensionInput } from './DimensionInput';
-import { uiRem, Group, Stack } from '@/ui';
+import { uiRem, Group, Stack, Text } from '@/ui';
 
 export type UpdateGallerySetting = <K extends keyof GalleryBehaviorSettings>(
   key: K,
@@ -68,10 +68,10 @@ const renderAdapterOption: NonNullable<SelectProps['renderOption']> = ({ option 
   return (
     <Stack gap={0}>
       <Box bg="gray.0" px={6} py={3} style={{ borderRadius: 'var(--mantine-radius-sm)' }}>
-        <Text size="sm" fw={500}>{option.label}</Text>
+        <Text size="sm" weight={500}>{option.label}</Text>
       </Box>
       {caps.length > 0 && (
-        <Text size="xs" c="dimmed" style={{ paddingInline: uiRem(0.375), paddingTop: uiRem(0.125), paddingBottom: uiRem(0.0625) }}>
+        <Text size="xs" tone="muted" style={{ paddingInline: uiRem(0.375), paddingTop: uiRem(0.125), paddingBottom: uiRem(0.0625) }}>
           {caps.map((cap) => translateCapability(cap)).join(' · ')}
         </Text>
       )}
@@ -394,13 +394,13 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
 
       {isUnifiedMode ? (
         <Box>
-          <Text size="sm" fw={500} style={{ marginBottom: uiRem(0.25) }}>{t('set_ad_unified_bp_title', 'Unified Breakpoint Adapters')}</Text>
-          <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.5) }}>
+          <Text size="sm" weight={500} style={{ marginBottom: uiRem(0.25) }}>{t('set_ad_unified_bp_title', 'Unified Breakpoint Adapters')}</Text>
+          <Text size="xs" tone="muted" style={{ marginBottom: uiRem(0.5) }}>
             {t('set_ad_unified_bp_desc', 'Choose the unified gallery adapter used at each breakpoint.')}
           </Text>
           <SimpleGrid cols={2} spacing="xs" style={{ marginBottom: uiRem(0.25) }}>
-            <Text size="xs" fw={600} ta="center" c="dimmed"> </Text>
-            <Text size="xs" fw={600} ta="center">{t('set_ad_col_unified', 'Unified')}</Text>
+            <Text size="xs" weight={600} align="center" tone="muted"> </Text>
+            <Text size="xs" weight={600} align="center">{t('set_ad_col_unified', 'Unified')}</Text>
           </SimpleGrid>
           {GALLERY_BREAKPOINTS.map((breakpoint) => {
             const adapterOptions = getAdapterSelectOptions({
@@ -412,7 +412,7 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
             return (
               <Box key={breakpoint} style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
                 <SimpleGrid cols={2} spacing="xs">
-                  <Text size="sm" fw={500} style={{ display: 'flex', alignItems: 'center' }}>
+                  <Text size="sm" weight={500} style={{ display: 'flex', alignItems: 'center' }}>
                     {bpLabel(breakpoint)}
                   </Text>
                   <ModalSelect
@@ -430,7 +430,7 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
                   />
                 </SimpleGrid>
                 {hasMobileUnsupported && (
-                  <Text size="xs" c="dimmed" style={{ marginTop: uiRem(0.25) }}>
+                  <Text size="xs" tone="muted" style={{ marginTop: uiRem(0.25) }}>
                     {t('set_ad_mobile_unsupported', 'Some adapters are unavailable on mobile — they require a larger screen (shown greyed out above).')}
                   </Text>
                 )}
@@ -440,14 +440,14 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
         </Box>
       ) : (
         <Box>
-          <Text size="sm" fw={500} style={{ marginBottom: uiRem(0.25) }}>{t('set_ad_pertype_bp_title', 'Per-Type Breakpoint Adapters')}</Text>
-          <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.5) }}>
+          <Text size="sm" weight={500} style={{ marginBottom: uiRem(0.25) }}>{t('set_ad_pertype_bp_title', 'Per-Type Breakpoint Adapters')}</Text>
+          <Text size="xs" tone="muted" style={{ marginBottom: uiRem(0.5) }}>
             {t('set_ad_pertype_bp_desc', 'Choose separate image and video adapters for each breakpoint.')}
           </Text>
           <SimpleGrid cols={3} spacing="xs" style={{ marginBottom: uiRem(0.25) }}>
-            <Text size="xs" fw={600} ta="center" c="dimmed"> </Text>
-            <Text size="xs" fw={600} ta="center">{t('set_ad_col_image', 'Image')}</Text>
-            <Text size="xs" fw={600} ta="center">{t('set_ad_col_video', 'Video')}</Text>
+            <Text size="xs" weight={600} align="center" tone="muted"> </Text>
+            <Text size="xs" weight={600} align="center">{t('set_ad_col_image', 'Image')}</Text>
+            <Text size="xs" weight={600} align="center">{t('set_ad_col_video', 'Video')}</Text>
           </SimpleGrid>
           {GALLERY_BREAKPOINTS.map((breakpoint) => {
             const adapterOptions = getAdapterSelectOptions({
@@ -459,7 +459,7 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
             return (
               <Box key={breakpoint} style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
                 <SimpleGrid cols={3} spacing="xs">
-                  <Text size="sm" fw={500} style={{ display: 'flex', alignItems: 'center' }}>
+                  <Text size="sm" weight={500} style={{ display: 'flex', alignItems: 'center' }}>
                     {bpLabel(breakpoint)}
                   </Text>
                   <ModalSelect
@@ -482,7 +482,7 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
                   />
                 </SimpleGrid>
                 {hasMobileUnsupported && (
-                  <Text size="xs" c="dimmed" style={{ marginTop: uiRem(0.25) }}>
+                  <Text size="xs" tone="muted" style={{ marginTop: uiRem(0.25) }}>
                     {t('set_ad_mobile_unsupported', 'Some adapters are unavailable on mobile — they require a larger screen (shown greyed out above).')}
                   </Text>
                 )}
@@ -493,8 +493,8 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
       )}
 
       <Box>
-        <Text size="sm" fw={500} style={{ marginBottom: uiRem(0.25) }}>{t('set_ad_thresholds_title', 'Breakpoint Pixel Thresholds')}</Text>
-        <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.5) }}>
+        <Text size="sm" weight={500} style={{ marginBottom: uiRem(0.25) }}>{t('set_ad_thresholds_title', 'Breakpoint Pixel Thresholds')}</Text>
+        <Text size="xs" tone="muted" style={{ marginBottom: uiRem(0.5) }}>
           {t('set_ad_thresholds_desc', 'Width thresholds (px) used by the classic carousel adapter to determine the active breakpoint. Defaults match Mantine (768 / 1200).')}
         </Text>
         <SimpleGrid cols={2} spacing="xs">
@@ -544,7 +544,7 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
       {sectionSettingGroups.map((groupDefinition) => renderSettingGroup(groupDefinition, resolvedAdapterSettings, settings, updateConfiguredAdapterSetting, imageAdapterIds, videoAdapterIds, isUnifiedMode, batchUpdateAdapterSettings))}
 
       <Stack gap="3xs">
-        <Text size="xs" c="dimmed">
+        <Text size="xs" tone="muted">
           {t('set_ad_export_note', 'Exports adapter configuration and carousel/media settings. Global navigation, breakpoint, and presentation settings are not included.')}
         </Text>
         <Group justify="space-between">

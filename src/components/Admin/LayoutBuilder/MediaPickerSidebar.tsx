@@ -11,7 +11,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Text,
   Button,
   ScrollArea,
   Badge,
@@ -36,7 +35,7 @@ import {
 } from '@tabler/icons-react';
 import type { LayoutSlot, LayoutTemplate, MediaItem } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group } from '@/ui';
+import { uiRem, Stack, Group, Text } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -182,7 +181,7 @@ export function MediaPickerSidebar({
   return (
     <Stack gap="sm" style={{ height: '100%' }}>
       <Group justify="space-between" wrap="nowrap">
-        <Text size="sm" fw={600}>
+        <Text size="sm" weight={600}>
           {t('lb_mps_media_count', 'Media ({{count}})', { count: media.length })}
         </Text>
         <Menu shadow="md" width={190} withinPortal>
@@ -256,11 +255,11 @@ export function MediaPickerSidebar({
       </Group>
 
       {singleSelectedSlotId ? (
-        <Text size="xs" c="dimmed">
+        <Text size="xs" tone="muted">
           {t('lb_mps_hint_selected', 'Click or drag a media item to assign it to the selected slot.')}
         </Text>
       ) : (
-        <Text size="xs" c="dimmed">
+        <Text size="xs" tone="muted">
           {t('lb_mps_hint_none', 'Select a slot first, then choose media to assign.')}
         </Text>
       )}
@@ -268,7 +267,7 @@ export function MediaPickerSidebar({
       {/* Assigned media per slot — quick overview */}
       {template.slots.some((s) => s.mediaId) && (
         <>
-          <Text size="xs" fw={500} style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
+          <Text size="xs" weight={500} style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
             {t('lb_mps_assignments', 'Assignments')}
           </Text>
           <Stack gap="4xs">
@@ -340,7 +339,7 @@ export function MediaPickerSidebar({
                     <Text size="xs" truncate>
                       {item.title || `Media #${item.order + 1}`}
                     </Text>
-                    <Text size="xs" c="dimmed" truncate>
+                    <Text size="xs" tone="muted" truncate>
                       {item.type}
                       {item.width && item.height ? ` · ${item.width}×${item.height}` : ''}
                     </Text>
@@ -355,7 +354,7 @@ export function MediaPickerSidebar({
             })}
 
             {filteredMedia.length === 0 && (
-              <Text size="xs" c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-lg, var(--mantine-spacing-lg))' }}>
+              <Text size="xs" tone="muted" align="center" style={{ paddingBlock: 'var(--mullion-spacing-lg, var(--mantine-spacing-lg))' }}>
                 {searchQuery ? t('lb_mps_no_results', 'No results.') : t('lb_mps_no_media', 'No media items available.')}
               </Text>
             )}
@@ -404,11 +403,13 @@ export function MediaPickerSidebar({
                       bottom: 0,
                       left: 0,
                       right: 0,
-                      background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-                      padding: '2px 4px 3px',
+                      // White text over an arbitrary thumbnail: the scrim reaches 0.60 black at the
+                      // caption line, which holds AA (5.74:1) over the worst image, a white one.
+                      background: 'linear-gradient(transparent, rgba(0,0,0,0.6) 0.375rem, rgba(0,0,0,0.7))',
+                      padding: '0.375rem 4px 3px',
                     }}
                   >
-                    <Text size="9px" c="white" truncate lineClamp={1}>
+                    <Text size="xs" truncate style={{ color: '#fff' }}>
                       {item.title || `#${item.order + 1}`}
                     </Text>
                   </div>
@@ -427,7 +428,7 @@ export function MediaPickerSidebar({
             })}
 
             {filteredMedia.length === 0 && (
-              <Text size="xs" c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-lg, var(--mantine-spacing-lg))', gridColumn: '1 / -1' }}>
+              <Text size="xs" tone="muted" align="center" style={{ paddingBlock: 'var(--mullion-spacing-lg, var(--mantine-spacing-lg))', gridColumn: '1 / -1' }}>
                 {searchQuery ? t('lb_mps_no_results', 'No results.') : t('lb_mps_no_media', 'No media items available.')}
               </Text>
             )}

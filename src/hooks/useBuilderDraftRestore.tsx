@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
-import { Text } from '@mantine/core';
+import { Text } from '@/ui';
 import { useLatestRef } from '@mullion/shared-utils';
 import i18n from '@/i18n';
 import type { LayoutTemplate } from '@/types';

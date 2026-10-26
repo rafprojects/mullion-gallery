@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Box, Text, Button, Divider, SegmentedControl, NumberInput } from '@mantine/core';
+import { Box, Button, Divider, SegmentedControl, NumberInput } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { IDockviewPanelProps } from 'dockview';
@@ -10,7 +10,7 @@ import { MaskPropertiesPanel } from './MaskPropertiesPanel';
 import { BackgroundPropertiesPanel } from './BackgroundPropertiesPanel';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
-import { uiRem, Stack, Group } from '@/ui';
+import { uiRem, Stack, Group, Text } from '@/ui';
 
 // P62-G: gate the Pro text editor behind the build flag so the free WP.org build
 // dead-code-eliminates TextPropertiesPanel (and its heavyweight TypographyEditor).
@@ -54,7 +54,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
   if (builder.isPreview) {
     return (
       <Box p="sm" style={{ ...panelStyle }}>
-        <Text size="sm" c="dimmed">{t('lb_props_preview_unavailable', 'Properties are unavailable in preview mode.')}</Text>
+        <Text size="sm" tone="muted">{t('lb_props_preview_unavailable', 'Properties are unavailable in preview mode.')}</Text>
       </Box>
     );
   }
@@ -63,7 +63,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
   if (isBackgroundSelected) {
     return (
       <Box p="sm" style={panelStyle}>
-        <Text size="xs" fw={600} c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_background', 'BACKGROUND')}</Text>
+        <Text size="xs" weight={600} tone="muted" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_background', 'BACKGROUND')}</Text>
         <BackgroundPropertiesPanel />
       </Box>
     );
@@ -73,7 +73,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
   if (selectedMaskSlotId && selectedSlot) {
     return (
       <Box p="sm" style={panelStyle}>
-        <Text size="xs" fw={600} c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_mask', 'MASK PROPERTIES')}</Text>
+        <Text size="xs" weight={600} tone="muted" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_mask', 'MASK PROPERTIES')}</Text>
         <MaskPropertiesPanel
           slot={selectedSlot}
           onUpdate={(updates) => builder.updateSlot(selectedSlot.id, updates)}
@@ -87,7 +87,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
   if (selectedSlot) {
     return (
       <Box p="sm" style={panelStyle}>
-        <Text size="xs" fw={600} c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_slot', 'SLOT PROPERTIES')}</Text>
+        <Text size="xs" weight={600} tone="muted" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_slot', 'SLOT PROPERTIES')}</Text>
         <SlotPropertiesPanel
           slot={selectedSlot}
           onUpdate={(updates) => builder.updateSlot(selectedSlot.id, updates)}
@@ -104,7 +104,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
   if (selectedOverlay) {
     return (
       <Box style={panelStyle}>
-        <Text size="xs" fw={600} c="dimmed" style={{ padding: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))', paddingBottom: '0' }}>{t('lb_props_hdr_graphic', 'GRAPHIC LAYER')}</Text>
+        <Text size="xs" weight={600} tone="muted" style={{ padding: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))', paddingBottom: '0' }}>{t('lb_props_hdr_graphic', 'GRAPHIC LAYER')}</Text>
         <GraphicLayerPropertiesPanel
           key={selectedOverlay.id}
           overlay={selectedOverlay}
@@ -128,7 +128,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
     const textIndex = (builder.template.texts ?? []).findIndex((txt) => txt.id === selectedText.id);
     return (
       <Box style={panelStyle}>
-        <Text size="xs" fw={600} c="dimmed" style={{ padding: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))', paddingBottom: '0' }}>{t('lb_props_hdr_text', 'TEXT LAYER')}</Text>
+        <Text size="xs" weight={600} tone="muted" style={{ padding: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))', paddingBottom: '0' }}>{t('lb_props_hdr_text', 'TEXT LAYER')}</Text>
         {__MULLION_PREMIUM__ && TextPropertiesPanel && isPro ? (
           <Suspense fallback={null}>
             <TextPropertiesPanel
@@ -154,7 +154,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
           //  • premium build, unlicensed runtime (!isPro) — we must NOT show a live
           //    editor: the server freezes `texts` on save (enforce_license_gates),
           //    so an editable panel would silently discard the user's edits (P62-A).
-          <Text size="sm" c="dimmed" style={{ padding: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
+          <Text size="sm" tone="muted" style={{ padding: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
             {t('upsell_text_layers', 'Text layers are a Pro feature. Upgrade to add and edit text in your layouts.')}
           </Text>
         )}
@@ -169,19 +169,19 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
 
   return (
     <Box p="sm" style={panelStyle}>
-      <Text size="xs" fw={600} c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_canvas', 'CANVAS')}</Text>
+      <Text size="xs" weight={600} tone="muted" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_canvas', 'CANVAS')}</Text>
       <Stack gap="xs">
         <Box>
-          <Text size="xs" c="dimmed">{t('lb_props_slots', 'Slots')}</Text>
-          <Text size="sm" fw={500}>{slotCount}</Text>
+          <Text size="xs" tone="muted">{t('lb_props_slots', 'Slots')}</Text>
+          <Text size="sm" weight={500}>{slotCount}</Text>
         </Box>
         <Box>
-          <Text size="xs" c="dimmed">{t('lb_props_graphic_layers', 'Graphic layers')}</Text>
-          <Text size="sm" fw={500}>{overlayCount}</Text>
+          <Text size="xs" tone="muted">{t('lb_props_graphic_layers', 'Graphic layers')}</Text>
+          <Text size="sm" weight={500}>{overlayCount}</Text>
         </Box>
         <Divider />
         <Box>
-          <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.25) }}>{t('lb_props_aspect_ratio', 'Aspect ratio')}</Text>
+          <Text size="xs" tone="muted" style={{ marginBottom: uiRem(0.25) }}>{t('lb_props_aspect_ratio', 'Aspect ratio')}</Text>
           <SegmentedControl
             size="xs"
             value={String(builder.template.canvasAspectRatio)}
@@ -191,7 +191,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
           />
         </Box>
         <Box>
-          <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.25) }}>{t('lb_props_height_mode', 'Height mode')}</Text>
+          <Text size="xs" tone="muted" style={{ marginBottom: uiRem(0.25) }}>{t('lb_props_height_mode', 'Height mode')}</Text>
           <Group gap="2xs" wrap="nowrap">
             <SegmentedControl
               size="xs"
@@ -234,9 +234,9 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
         {recentActions.length > 0 && (
           <>
             <Divider />
-            <Text size="xs" fw={600} c="dimmed">{t('lb_props_recent_actions', 'Recent actions')}</Text>
+            <Text size="xs" weight={600} tone="muted">{t('lb_props_recent_actions', 'Recent actions')}</Text>
             {recentActions.map((entry) => (
-              <Text key={entry.id} size="xs" c="dimmed" truncate="end">{entry.label}</Text>
+              <Text key={entry.id} size="xs" tone="muted" truncate>{entry.label}</Text>
             ))}
           </>
         )}

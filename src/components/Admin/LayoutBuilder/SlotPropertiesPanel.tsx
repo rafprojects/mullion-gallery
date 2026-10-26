@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Text,
   NumberInput,
   Select,
   SegmentedControl,
@@ -40,7 +39,7 @@ import type {
 } from '@/types';
 import { buildSlotEntranceCss, REVEAL_CLASS } from '@/utils/slotEntrance';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group } from '@/ui';
+import { uiRem, Stack, Group, Text } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -129,7 +128,7 @@ function PropRow({ label, children, tooltip }: { label: string; children: React.
   return (
     <Group gap="2xs" align="center" wrap="nowrap" style={{ minHeight: 28 }}>
       <Group gap="4xs" align="center" wrap="nowrap" style={{ width: 70, flexShrink: 0 }}>
-        <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
+        <Text size="xs" tone="muted" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
         {tooltip && (
           <Tooltip label={tooltip} multiline style={{ width: uiRem(15) }} position="left" withArrow>
             <ActionIcon size={14} variant="transparent" c="dimmed" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })}>
@@ -152,7 +151,7 @@ function SectionHeader({ label }: { label: string }) {
         borderBottom: '1px solid var(--mantine-color-default-border)',
       }}
     >
-      <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>
+      <Text size="xs" weight={700} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>
         {label}
       </Text>
     </Box>
@@ -495,7 +494,7 @@ export function SlotPropertiesPanel({
       {/* ── Layout ─────────────────────────────────────────── */}
       <Accordion.Item value="layout">
         <Accordion.Control>
-          <Text size="xs" fw={600} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_acc_layout', 'Layout')}</Text>
+          <Text size="xs" weight={600} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_acc_layout', 'Layout')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap="3xs">
@@ -540,7 +539,7 @@ export function SlotPropertiesPanel({
                   }}
                   min={1} max={100} step={0.5} size="xs" decimalScale={2} variant="filled"
                   aria-label={t('lb_slot_width_aria', 'Width %')}
-                  leftSection={<Text size="10px" c="dimmed">W</Text>}
+                  leftSection={<Text size="xs" tone="muted">W</Text>}
                 />
               </Box>
               <Tooltip label={lockSizeRatio ? t('lb_slot_unlock', 'Unlock aspect ratio') : t('lb_slot_lock', 'Lock aspect ratio')} position="top">
@@ -566,7 +565,7 @@ export function SlotPropertiesPanel({
                   }}
                   min={1} max={100} step={0.5} size="xs" decimalScale={2} variant="filled"
                   aria-label={t('lb_slot_height_aria', 'Height %')}
-                  leftSection={<Text size="10px" c="dimmed">H</Text>}
+                  leftSection={<Text size="xs" tone="muted">H</Text>}
                 />
               </Box>
             </Group>
@@ -596,7 +595,7 @@ export function SlotPropertiesPanel({
               onPointerUp={() => { rotScrubRef.current = null; }}
               onPointerCancel={() => { rotScrubRef.current = null; }}
             >
-              <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_rotation', 'Rotation')}</Text>
+              <Text size="xs" weight={700} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_rotation', 'Rotation')}</Text>
             </div>
             <Group gap="2xs" align="center" wrap="nowrap">
               <NumberInput
@@ -607,7 +606,7 @@ export function SlotPropertiesPanel({
                 }}
                 min={0} max={359} step={1} size="xs" variant="filled"
                 aria-label={t('lb_slot_rot_aria', 'Rotation degrees')}
-                rightSection={<Text size="10px" c="dimmed">°</Text>}
+                rightSection={<Text size="xs" tone="muted">°</Text>}
                 style={{ flex: 1 }}
               />
               {(slot.rotation ?? 0) !== 0 && (
@@ -675,7 +674,7 @@ export function SlotPropertiesPanel({
       ) : (
       <Accordion.Item value="image">
         <Accordion.Control>
-          <Text size="xs" fw={600} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_acc_image', 'Image')}</Text>
+          <Text size="xs" weight={600} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_acc_image', 'Image')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap="3xs">
@@ -793,7 +792,7 @@ export function SlotPropertiesPanel({
       {/* ── Effects ────────────────────────────────────────── */}
       <Accordion.Item value="effects">
         <Accordion.Control>
-          <Text size="xs" fw={600} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_acc_effects', 'Effects')}</Text>
+          <Text size="xs" weight={600} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_acc_effects', 'Effects')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap="3xs">
@@ -828,7 +827,7 @@ export function SlotPropertiesPanel({
       {/* ── Stacking & Interaction ─────────────────────────── */}
       <Accordion.Item value="stacking">
         <Accordion.Control>
-          <Text size="xs" fw={600} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_acc_stacking', 'Stacking & Interaction')}</Text>
+          <Text size="xs" weight={600} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_acc_stacking', 'Stacking & Interaction')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
           <Stack gap="3xs">

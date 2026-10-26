@@ -10,14 +10,14 @@
  * is presentational + local filter state only.
  */
 import { useMemo, useState } from 'react';
-import { Box, Text, TextInput, Button, Chip, Badge, Center, Loader } from '@mantine/core';
+import { Box, TextInput, Button, Chip, Badge, Center, Loader } from '@mantine/core';
 import { IconSearch, IconCheck } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import { CHECKERED_BG } from '@/utils/checkeredBg';
 import { getAssetFileType } from '@/utils/assetFileType';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Text } from '@/ui';
 
 export interface SpaceAssetLibraryProps {
   assets: AssetLibraryItem[];
@@ -71,7 +71,7 @@ export function SpaceAssetLibrary({
   }
 
   if (!assets.length) {
-    return <Text size="xs" c="dimmed">{t('admin_sal_empty', 'No assets in the global library yet. Upload assets from the Layout Builder.')}</Text>;
+    return <Text size="xs" tone="muted">{t('admin_sal_empty', 'No assets in the global library yet. Upload assets from the Layout Builder.')}</Text>;
   }
 
   return (
@@ -116,7 +116,7 @@ export function SpaceAssetLibrary({
       )}
 
       {filtered.length === 0 ? (
-        <Text size="xs" c="dimmed" style={{ paddingBlock: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>{t('admin_sal_no_match', 'No assets match the current filter.')}</Text>
+        <Text size="xs" tone="muted" style={{ paddingBlock: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>{t('admin_sal_no_match', 'No assets match the current filter.')}</Text>
       ) : (
         <div
           style={{
@@ -178,7 +178,7 @@ export function SpaceAssetLibrary({
                   {fileType}
                 </Badge>
 
-                <Text size="10px" truncate style={{ paddingInline: uiRem(0.25), paddingBlock: uiRem(0.125) }} title={asset.name}>{asset.name}</Text>
+                <Text size="xs" truncate style={{ paddingInline: uiRem(0.25), paddingBlock: uiRem(0.125) }} title={asset.name}>{asset.name}</Text>
               </Box>
             );
           })}

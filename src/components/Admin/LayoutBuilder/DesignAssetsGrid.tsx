@@ -1,4 +1,5 @@
-import { Box, Text, ActionIcon, Tooltip, Badge, Popover, TagsInput } from '@mantine/core';
+import { Box, ActionIcon, Tooltip, Badge, Popover, TagsInput } from '@mantine/core';
+import { Text } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { IconX, IconWorld, IconWorldOff, IconTag } from '@tabler/icons-react';
 import type { AssetLibraryItem } from './BuilderDockContext';
@@ -39,7 +40,7 @@ export function DesignAssetsGrid({
 }: DesignAssetsGridProps) {
   const { t } = useTranslation('mullion');
   if (!items.length) {
-    return <Text size="xs" c="dimmed">{t('lb_dag_empty', 'No design assets in library yet.')}</Text>;
+    return <Text size="xs" tone="muted">{t('lb_dag_empty', 'No design assets in library yet.')}</Text>;
   }
 
   return (

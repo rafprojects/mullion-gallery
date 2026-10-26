@@ -23,13 +23,13 @@ import {
   SegmentedControl,
   Slider,
   Switch,
-  Text,
   TextInput,
   Tooltip,
 } from '@mantine/core';
 import {
   Group,
   Stack,
+  Text,
 } from '@/ui';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -114,22 +114,22 @@ function FilterEffectsControls({
   const { t } = useTranslation('mullion');
   return (
     <Stack gap="3xs">
-      <Text size="xs" c="dimmed">{t('lb_gl_brightness', 'Brightness')}</Text>
+      <Text size="xs" tone="muted">{t('lb_gl_brightness', 'Brightness')}</Text>
       <Slider value={effects.brightness ?? 100} onChange={(v) => set({ brightness: v })}
         min={0} max={200} step={1} size="xs" label={(v) => `${v}%`} aria-label={t('lb_gl_brightness', 'Brightness')} />
-      <Text size="xs" c="dimmed">{t('lb_gl_contrast', 'Contrast')}</Text>
+      <Text size="xs" tone="muted">{t('lb_gl_contrast', 'Contrast')}</Text>
       <Slider value={effects.contrast ?? 100} onChange={(v) => set({ contrast: v })}
         min={0} max={200} step={1} size="xs" label={(v) => `${v}%`} aria-label={t('lb_gl_contrast', 'Contrast')} />
-      <Text size="xs" c="dimmed">{t('lb_gl_saturate', 'Saturate')}</Text>
+      <Text size="xs" tone="muted">{t('lb_gl_saturate', 'Saturate')}</Text>
       <Slider value={effects.saturate ?? 100} onChange={(v) => set({ saturate: v })}
         min={0} max={200} step={1} size="xs" label={(v) => `${v}%`} aria-label={t('lb_gl_saturate', 'Saturate')} />
-      <Text size="xs" c="dimmed">{t('lb_gl_blur', 'Blur')}</Text>
+      <Text size="xs" tone="muted">{t('lb_gl_blur', 'Blur')}</Text>
       <Slider value={effects.blur ?? 0} onChange={(v) => set({ blur: v })}
         min={0} max={20} step={0.5} size="xs" label={(v) => `${v}px`} aria-label={t('lb_gl_blur', 'Blur')} />
-      <Text size="xs" c="dimmed">{t('lb_gl_grayscale', 'Grayscale')}</Text>
+      <Text size="xs" tone="muted">{t('lb_gl_grayscale', 'Grayscale')}</Text>
       <Slider value={effects.grayscale ?? 0} onChange={(v) => set({ grayscale: v })}
         min={0} max={100} step={1} size="xs" label={(v) => `${v}%`} aria-label={t('lb_gl_grayscale', 'Grayscale')} />
-      <Text size="xs" c="dimmed">{t('lb_gl_hue_rotate', 'Hue rotate')}</Text>
+      <Text size="xs" tone="muted">{t('lb_gl_hue_rotate', 'Hue rotate')}</Text>
       <Slider value={effects.hueRotate ?? 0} onChange={(v) => set({ hueRotate: v })}
         min={0} max={360} step={1} size="xs" label={(v) => `${v}°`} aria-label={t('lb_gl_hue_rotate', 'Hue rotate')} />
     </Stack>
@@ -165,7 +165,7 @@ function ShadowControls({
             <NumberInput label={t('lb_slot_offy', 'Off Y')} value={sh.offsetY} onChange={(v) => set({ offsetY: Number(v) || 0 })}
               min={-50} max={50} size="xs" suffix=" px" />
           </Group>
-          <Text size="xs" c="dimmed">{t('lb_gl_blur', 'Blur')}</Text>
+          <Text size="xs" tone="muted">{t('lb_gl_blur', 'Blur')}</Text>
           <Slider value={sh.blur} onChange={(v) => set({ blur: v })}
             min={0} max={50} step={1} size="xs" label={(v) => `${v}px`} aria-label={t('lb_gl_shadow_blur', 'Shadow blur')} />
           <ColorInput label={t('lb_slot_color', 'Color')} value={sh.color} onChange={(v) => set({ color: v })}
@@ -304,7 +304,7 @@ export function GraphicLayerPropertiesPanel({
 
       {/* ── Transform ── */}
       <Divider label={t('lb_gl_transform', 'Transform')} labelPosition="left" />
-      <Text size="xs" c="dimmed">{t('lb_gl_rotation', 'Rotation')}</Text>
+      <Text size="xs" tone="muted">{t('lb_gl_rotation', 'Rotation')}</Text>
       <Slider
         value={overlay.rotation ?? 0}
         onChange={(val) => set({ rotation: val })}
@@ -338,7 +338,7 @@ export function GraphicLayerPropertiesPanel({
 
       {/* ── Opacity ── */}
       <Divider label={t('lb_gl_appearance', 'Appearance')} labelPosition="left" />
-      <Text size="xs" c="dimmed">{t('lb_gl_opacity', 'Opacity')}</Text>
+      <Text size="xs" tone="muted">{t('lb_gl_opacity', 'Opacity')}</Text>
       <Slider
         value={overlay.opacity}
         onChange={(val) => set({ opacity: val })}
@@ -362,7 +362,7 @@ export function GraphicLayerPropertiesPanel({
       <Accordion variant="separated" multiple chevronPosition="right" defaultValue={[]}>
         <Accordion.Item value="shape">
           <Accordion.Control>
-            <Text size="xs" fw={600}>{t('lb_gl_shape_border', 'Shape & Border')}</Text>
+            <Text size="xs" weight={600}>{t('lb_gl_shape_border', 'Shape & Border')}</Text>
           </Accordion.Control>
           <Accordion.Panel>
             <Stack gap="xs">
@@ -421,7 +421,7 @@ export function GraphicLayerPropertiesPanel({
 
         <Accordion.Item value="mask">
           <Accordion.Control>
-            <Text size="xs" fw={600}>{t('lb_gl_mask', 'Mask')}</Text>
+            <Text size="xs" weight={600}>{t('lb_gl_mask', 'Mask')}</Text>
           </Accordion.Control>
           <Accordion.Panel>
             <Stack gap="xs">
@@ -466,7 +466,7 @@ export function GraphicLayerPropertiesPanel({
                     <NumberInput label={t('lb_gl_h', 'H %')} size="xs" value={mask.height} min={1}
                       onChange={(v) => set({ maskLayer: { ...mask, height: Math.max(1, Number(v) || 1) } })} />
                   </Group>
-                  <Text size="xs" c="dimmed">{t('lb_gl_feather', 'Feather')}</Text>
+                  <Text size="xs" tone="muted">{t('lb_gl_feather', 'Feather')}</Text>
                   <Slider value={mask.feather} onChange={(v) => set({ maskLayer: { ...mask, feather: v } })}
                     min={0} max={50} step={1} size="xs" label={(v) => `${v}px`} aria-label={t('lb_gl_mask_feather', 'Mask feather')} />
                   <Button size="xs" variant="subtle" color="red" onClick={() => set({ maskLayer: undefined })}>
@@ -480,7 +480,7 @@ export function GraphicLayerPropertiesPanel({
 
         <Accordion.Item value="effects">
           <Accordion.Control>
-            <Text size="xs" fw={600}>{t('lb_gl_effects', 'Effects')}</Text>
+            <Text size="xs" weight={600}>{t('lb_gl_effects', 'Effects')}</Text>
           </Accordion.Control>
           <Accordion.Panel>
             <Stack gap="sm">
@@ -562,7 +562,7 @@ export function GraphicLayerPropertiesPanel({
       <Divider label={t('lb_gl_danger_zone', 'Danger zone')} labelPosition="left" />
       {confirmOpen ? (
         <Stack gap="3xs">
-          <Text size="xs" c="dimmed">{t('lb_gl_remove_confirm', 'Remove this graphic layer?')}</Text>
+          <Text size="xs" tone="muted">{t('lb_gl_remove_confirm', 'Remove this graphic layer?')}</Text>
           <Group gap="3xs">
             <Button size="xs" variant="subtle" onClick={closeConfirm} style={{ flex: 1 }}>
               {t('lb_gl_cancel', 'Cancel')}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Button, Checkbox, Modal, Text } from '@mantine/core';
-import { Group, Stack } from '@/ui';
+import { Button, Checkbox, Modal } from '@mantine/core';
+import { Group, Stack, Text } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 

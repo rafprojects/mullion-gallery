@@ -1,10 +1,10 @@
 
-import { Modal, SimpleGrid, Card, Text, Badge, Box } from '@mantine/core';
+import { Modal, SimpleGrid, Card, Badge, Box } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { IconLayoutDashboard } from '@tabler/icons-react';
 import { LAYOUT_PRESETS, type LayoutPreset } from '@/data/layoutPresets';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Text } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -76,13 +76,13 @@ export function PresetGalleryModal({
       title={
         <Group gap="xs">
           <IconLayoutDashboard size={20} />
-          <Text fw={600}>{t('lb_preset_title', 'Start from Template')}</Text>
+          <Text weight={600}>{t('lb_preset_title', 'Start from Template')}</Text>
         </Group>
       }
       size="xl"
       centered
     >
-      <Text size="sm" c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
+      <Text size="sm" tone="muted" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         {t('lb_preset_desc', 'Choose a preset layout as your starting point. You can customize slots, shapes, and properties after creation.')}
       </Text>
 
@@ -109,10 +109,10 @@ export function PresetGalleryModal({
             }}
           >
             <PresetPreview preset={preset} />
-            <Text size="sm" fw={600} style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} ta="center">
+            <Text size="sm" weight={600} style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} align="center">
               {preset.name}
             </Text>
-            <Text size="xs" c="dimmed" ta="center" lineClamp={2}>
+            <Text size="xs" tone="muted" align="center" lineClamp={2}>
               {preset.description}
             </Text>
             <Group gap="3xs" style={{ marginTop: uiRem(0.25) }} justify="center">

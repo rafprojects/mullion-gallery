@@ -9,8 +9,6 @@ import {
   Drawer,
   Loader,
   Center,
-  Text,
-  Title,
   NativeScrollArea,
   Tabs,
 } from '@mantine/core';
@@ -38,7 +36,7 @@ import {
   type SettingsData,
   type SettingsDataInput,
 } from '@/contexts/SettingsStore';
-import { uiLayer, Group, Stack } from '@/ui';
+import { uiLayer, Group, Stack, Text, Title } from '@/ui';
 import { SettingTooltip } from './SettingTooltip';
 import type { CustomFontEntry } from '../Common/TypographyEditor';
 import type { UpdateGallerySetting } from '../Settings/GalleryAdapterSettingsSection';

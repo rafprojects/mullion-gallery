@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { getHotkeyHandler, useElementSize, useMergedRef } from '@mantine/hooks';
 import {
   Box,
-  Text,
   NumberInput,
   Switch,
   Slider,
@@ -27,7 +26,7 @@ import { safeLocalStorage, fitRectsIntoBand } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Text } from '@/ui';
 
 // ── P30-C: Device preview presets ────────────────────────────────────────────
 
@@ -367,7 +366,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
             radius={0}
             style={{ flexShrink: 0, borderBottom: '1px solid var(--mullion-builder-border)' }}
           >
-            <Text size="xs" ta="center">
+            <Text size="xs" align="center">
               {tr('lb_canvas_editing_pre', 'Editing ')}
               <strong>
                 {tr(`admin_bp_${builder.activeBreakpoint}`, builder.activeBreakpoint.charAt(0).toUpperCase() + builder.activeBreakpoint.slice(1))}
@@ -514,7 +513,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
           >
             <Group gap="md" justify="center" wrap="nowrap">
               <Group gap="3xs" wrap="nowrap">
-                <Text size="xs" c="dimmed">{tr('lb_canvas_max_width', 'Max width:')}</Text>
+                <Text size="xs" tone="muted">{tr('lb_canvas_max_width', 'Max width:')}</Text>
                 <NumberInput
                   value={builder.template.canvasMaxWidth || 0}
                   onChange={(val) => {
@@ -551,7 +550,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
 
               {/* ── Snap mode selector ──────────────────────────── */}
               <Group gap="2xs" wrap="nowrap" align="center">
-                <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>{tr('lb_canvas_snap', 'Snap:')}</Text>
+                <Text size="xs" tone="muted" style={{ whiteSpace: 'nowrap' }}>{tr('lb_canvas_snap', 'Snap:')}</Text>
                 <SegmentedControl
                   data={SNAP_MODE_DATA}
                   value={snapMode}
@@ -561,7 +560,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                 />
                 {snapMode !== 'off' && (
                   <>
-                    <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
+                    <Text size="xs" tone="muted" style={{ whiteSpace: 'nowrap' }}>
                       {tr('lb_canvas_sensitivity', 'Sensitivity:')}
                     </Text>
                     <Slider
@@ -626,7 +625,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
 
               {/* ── Persistent guides (P57-E) ──────────────────── */}
               <Group gap="3xs" wrap="nowrap" align="center">
-                <Text size="xs" c="dimmed">{tr('lb_canvas_guides', 'Guides:')}</Text>
+                <Text size="xs" tone="muted">{tr('lb_canvas_guides', 'Guides:')}</Text>
                 <Tooltip label={tr('lb_canvas_add_vguide', 'Add vertical guide')}>
                   <ActionIcon size="sm" variant="subtle" onClick={() => addGuide('x')} aria-label={tr('lb_canvas_add_vguide', 'Add vertical guide')}>
                     <IconSeparatorVertical size={14} />
@@ -649,7 +648,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
               {__MULLION_PREMIUM__ && (
                 <>
                   <Group gap="2xs" wrap="nowrap" align="center">
-                    <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>{tr('lb_canvas_breakpoint', 'Breakpoint:')}</Text>
+                    <Text size="xs" tone="muted" style={{ whiteSpace: 'nowrap' }}>{tr('lb_canvas_breakpoint', 'Breakpoint:')}</Text>
                     <SegmentedControl
                       data={breakpointEditData}
                       value={builder.activeBreakpoint}
@@ -755,7 +754,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
             }}
           >
             <Group gap="md" justify="center" wrap="nowrap">
-              <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>{tr('lb_canvas_preview', 'Preview:')}</Text>
+              <Text size="xs" tone="muted" style={{ whiteSpace: 'nowrap' }}>{tr('lb_canvas_preview', 'Preview:')}</Text>
               <SegmentedControl
                 data={presetSegmentedData}
                 value={previewPreset}

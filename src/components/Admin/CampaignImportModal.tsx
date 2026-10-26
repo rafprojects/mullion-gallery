@@ -2,13 +2,13 @@ import { useState, useRef } from 'react';
 import {
   Modal,
   Button,
-  Text,
   Alert,
   FileButton,
 } from '@mantine/core';
 import {
   Group,
   Stack,
+  Text,
 } from '@/ui';
 import { IconUpload, IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -50,7 +50,7 @@ function CampaignImportModalContent({
   const hasFile = parsed !== null || zipFile !== null;
   return (
     <Stack {...getMullionDebugProps('CampaignImportModal', 'stack')} gap="md">
-      <Text size="sm" c="dimmed">
+      <Text size="sm" tone="muted">
         {t('admin_import_desc', 'Select a {{json}} or {{zip}} file exported from Mullion. Campaigns will be created as drafts — media and layout templates are imported by value.', { json: '.json', zip: '.zip' })}
       </Text>
 

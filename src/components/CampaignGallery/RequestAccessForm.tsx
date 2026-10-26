@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Box, Button, Text, TextInput, Alert } from '@mantine/core';
+import { Box, Button, TextInput, Alert } from '@mantine/core';
 import { IconMail, IconCheck, IconAlertCircle } from '@tabler/icons-react';
 import { Trans, useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack } from '@/ui';
+import { uiRem, Stack, Text } from '@/ui';
 
 interface RequestAccessFormProps {
   campaignId: string;
@@ -53,7 +53,7 @@ export function RequestAccessForm({ campaignId, campaignTitle, apiClient }: Requ
         onClick={(e) => e.stopPropagation()}
       >
         <IconCheck size={24} color="var(--mantine-color-green-4)" />
-        <Text size="sm" style={{ marginTop: uiRem(0.375) }} c="dimmed">
+        <Text size="sm" style={{ marginTop: uiRem(0.375) }} tone="muted">
           {/* P64-C: no confirmation email is sent on submit anymore (that was a
               mail-bombing vector on this public endpoint); the requester hears
               back only once an admin resolves the request. */}
@@ -76,11 +76,11 @@ export function RequestAccessForm({ campaignId, campaignTitle, apiClient }: Requ
       onClick={(e) => e.stopPropagation()}
     >
       <Stack gap="xs">
-        <Text size="xs" fw={500} ta="center" c="dimmed">
+        <Text size="xs" weight={500} align="center" tone="muted">
           <Trans
             i18nKey="raf_request_to"
             values={{ title: campaignTitle }}
-            components={{ strong: <Text component="span" fw={700} inherit /> }}
+            components={{ strong: <Text render={<span />} weight={700} /> }}
             defaults="Request access to <strong>{{title}}</strong>"
           />
         </Text>

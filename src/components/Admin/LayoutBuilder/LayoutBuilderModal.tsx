@@ -5,7 +5,6 @@ import {
   Button,
   TextInput,
   ActionIcon,
-  Text,
   Tooltip,
   Divider,
   Box,
@@ -30,7 +29,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useGetSettings } from '@/services/settingsQuery';
 import { AdminChromeProvider } from '@/components/Admin/AdminChromeProvider';
 import { adminChromeAttributes, adminChromeClassNames, adminChromeStyles, resolveChromeThemeId } from '@/themes/chromeTheme';
-import { getThemeEntry, Group } from '@/ui';
+import { getThemeEntry, Group, Text } from '@/ui';
 import { useLatestRef } from '@mullion/shared-utils';
 import { DockviewReact, DockviewDefaultTab } from 'dockview';
 import { debugGroup, debugLog, debugGroupEnd } from '@/utils/debug';
@@ -502,8 +501,8 @@ export function LayoutBuilderModal({
               padding: 32,
             }}
           >
-            <Text fw={600} size="lg">{tr('lb_mod_err_title', 'Something went wrong in the Layout Editor')}</Text>
-            <Text size="sm" c="dimmed" ta="center">
+            <Text weight={600} size="lg">{tr('lb_mod_err_title', 'Something went wrong in the Layout Editor')}</Text>
+            <Text size="sm" tone="muted" align="center">
               {tr('lb_mod_err_body', 'An unexpected error occurred. Close the editor and try again.')}
             </Text>
             <Button variant="light" color="red" onClick={onClose}>

@@ -6,13 +6,13 @@ import {
   Checkbox,
   Modal,
   Select,
-  Text,
   TextInput,
   Tooltip,
 } from '@mantine/core';
 import {
   Group,
   Stack,
+  Text,
 } from '@/ui';
 import { IconAlertCircle, IconUserPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -70,7 +70,7 @@ function QuickAddUserSuccessState({ quickAddResult, onClose, onNotify }: QuickAd
         <Text size="sm">{quickAddResult.message}</Text>
         {quickAddResult.resetUrl && (
           <Box style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
-            <Text size="sm" fw={500}>{t('admin_qau_reset_link_label', 'Password Reset Link:')}</Text>
+            <Text size="sm" weight={500}>{t('admin_qau_reset_link_label', 'Password Reset Link:')}</Text>
             <TextInput
               label={t('admin_qau_reset_link_input', 'Password reset link')}
               value={quickAddResult.resetUrl}
@@ -104,7 +104,7 @@ function QuickAddUserSuccessState({ quickAddResult, onClose, onNotify }: QuickAd
                 {t('admin_qau_copy_link', 'Copy Link')}
               </Button>
             </Group>
-            <Text size="xs" c="dimmed" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
+            <Text size="xs" tone="muted" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
               {t('admin_qau_share_note', 'Share this link securely with the user. They can use it to set their own password.')}
             </Text>
           </Box>

@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconPhoto, IconPlayerPlay, IconZoomIn } from '@tabler/icons-react';
-import { ActionIcon, Image, Text, Box } from '@mantine/core';
+import { ActionIcon, Image, Box } from '@mantine/core';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import type { GalleryAdapterProps, ListingItem } from './GalleryAdapter';
@@ -36,7 +36,7 @@ import {
   shouldLoopCarousel,
   shouldUseSyntheticCarouselLoop,
 } from './carouselBehavior';
-import { uiRem, Stack } from '@/ui';
+import { uiRem, Stack, Text } from '@/ui';
 
 type GalleryRuntimeCommonSettings = ReturnType<typeof resolveGalleryComponentCommonSettings>;
 
@@ -704,7 +704,7 @@ export function MediaCarouselInner({ media, settings, commonSettings, breakpoint
       </Box>
 
       {/* Caption */}
-      <Text {...getMullionDebugProps('MediaCarouselAdapter', 'caption')} size="sm" c="dimmed">
+      <Text {...getMullionDebugProps('MediaCarouselAdapter', 'caption')} size="sm" tone="muted">
         {currentItem?.caption || (isCurrentVideo ? t('carousel_untitled_video', 'Untitled video') : t('carousel_untitled_image', 'Untitled image'))}
       </Text>
 

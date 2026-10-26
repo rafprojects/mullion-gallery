@@ -1,12 +1,12 @@
 import { forwardRef, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react';
-import { Card, Image, Text, Box, ActionIcon, Badge } from '@mantine/core';
+import { Card, Image, Box, ActionIcon, Badge } from '@mantine/core';
 import { IconPhoto, IconTrash, IconGripVertical } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
 import { FALLBACK_IMAGE_SRC } from '@/utils/fallback';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import styles from './MediaCard.module.scss';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Text } from '@/ui';
 
 interface MediaCardProps {
   item: MediaItem;
@@ -129,7 +129,7 @@ export const MediaCard = forwardRef<HTMLDivElement, MediaCardProps>(
               <Box style={{ flex: 1, minWidth: 0 }}>
                 <Text size="sm" lineClamp={1}>{item.caption || '—'}</Text>
                 {showUrl && item.url && (
-                  <Text size="xs" c="dimmed" lineClamp={1}>
+                  <Text size="xs" tone="muted" lineClamp={1}>
                     <a href={item.url} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>{item.url}</a>
                   </Text>
                 )}

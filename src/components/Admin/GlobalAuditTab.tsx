@@ -1,11 +1,11 @@
 
-import { Button, ScrollArea, Skeleton, Table, Text, TextInput } from '@mantine/core';
+import { Button, ScrollArea, Skeleton, Table, TextInput } from '@mantine/core';
 import { useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import type { AuditEntry, AuditFilters } from '@/services/adminQuery';
 import { AuditEventRow } from './AuditEventRow';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Text } from '@/ui';
 
 type GlobalFilters = AuditFilters & { campaignId?: string };
 
@@ -56,10 +56,10 @@ export function GlobalAuditTab({ entries, loading, filters, onFiltersChange, onE
 
   return (
     <>
-      <Text size="sm" fw={600} id="global-audit-heading" style={{ marginBottom: uiRem(0.125) }}>
+      <Text size="sm" weight={600} id="global-audit-heading" style={{ marginBottom: uiRem(0.125) }}>
         {t('admin_gaudit_heading', 'System Audit')}
       </Text>
-      <Text size="xs" c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('admin_gaudit_subtitle', 'Cross-campaign and plugin-wide admin events.')}</Text>
+      <Text size="xs" tone="muted" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('admin_gaudit_subtitle', 'Cross-campaign and plugin-wide admin events.')}</Text>
       <Group style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }} wrap="wrap" gap="sm">
         <TextInput
           size="xs"
@@ -125,7 +125,7 @@ export function GlobalAuditTab({ entries, loading, filters, onFiltersChange, onE
           </Table>
         </Table.ScrollContainer>
       ) : entries.length === 0 ? (
-        <Text c="dimmed" role="status" aria-live="polite">{t('admin_gaudit_none', 'No audit entries found.')}</Text>
+        <Text tone="muted" role="status" aria-live="polite">{t('admin_gaudit_none', 'No audit entries found.')}</Text>
       ) : (
         <ScrollArea offsetScrollbars type="always" scrollbars="y" className="mullion-scrollarea" style={{ height: uiRem(25) }}>
           <Table.ScrollContainer minWidth={750}>

@@ -1,5 +1,6 @@
-import { Badge, Button, Card, Center, Image, Loader, SimpleGrid, Text, TextInput } from '@mantine/core';
-import { Group, Stack } from '@/ui';
+
+import { Badge, Button, Card, Center, Image, Loader, SimpleGrid, TextInput } from '@mantine/core';
+import { Group, Stack, Text } from '@/ui';
 import { IconPhoto } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
@@ -32,7 +33,7 @@ export function MediaLibraryPicker({
         <Group justify="space-between">
           <Group>
             <IconPhoto size={20} />
-            <Text fw={500}>{t('medialib_heading', 'Pick from Media Library')}</Text>
+            <Text weight={500}>{t('medialib_heading', 'Pick from Media Library')}</Text>
           </Group>
           <Button
             variant="subtle"
@@ -53,7 +54,7 @@ export function MediaLibraryPicker({
         {libraryLoading ? (
           <Center py="md"><Loader size="sm" /></Center>
         ) : libraryMedia.length === 0 ? (
-          <Text size="sm" c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
+          <Text size="sm" tone="muted" align="center" style={{ paddingBlock: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
             {t('medialib_empty', 'Click "Load Library" to browse existing media')}
           </Text>
         ) : (
@@ -99,7 +100,7 @@ export function MediaLibraryPicker({
                       {item.type}
                     </Badge>
                     {alreadyAdded && (
-                      <Text size="xs" c="green">{t('medialib_added', 'Added')}</Text>
+                      <Text size="xs" tone="success">{t('medialib_added', 'Added')}</Text>
                     )}
                   </Stack>
                 </Card>

@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
-import { Modal, Table, Text, Badge, Button, ActionIcon, Tooltip, TextInput } from '@mantine/core';
+import { Modal, Table, Badge, Button, ActionIcon, Tooltip, TextInput } from '@mantine/core';
 import { IconEdit, IconCheck, IconX, IconRotateClockwise } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { ACTION_IDS, ACTION_DEFAULTS, type ShortcutActionId, type ShortcutConfigHandle } from '@/hooks/useShortcutConfig';
-import { uiRem, Stack, Group } from '@/ui';
+import { uiRem, Stack, Group, Text } from '@/ui';
 
 // ── Key display helpers ───────────────────────────────────────────────────────
 
@@ -55,7 +55,7 @@ function Keys({ keys }: { keys: string[] }) {
             {k}
           </kbd>
           {i < keys.length - 1 && (
-            <Text span size="xs" c="dimmed" style={{ marginInline: uiRem(0.125) }}>
+            <Text span size="xs" tone="muted" style={{ marginInline: uiRem(0.125) }}>
               +
             </Text>
           )}
@@ -144,8 +144,8 @@ function EditRow({ id, currentKey, defaultKey, config }: EditRowProps) {
                 )
               }
             />
-            {error && <Text size="xs" c="red">{error}</Text>}
-            <Text size="xs" c="dimmed">{t('admin_ksc_press_hint', 'Press any key combo, then ✓ to confirm')}</Text>
+            {error && <Text size="xs" tone="danger">{error}</Text>}
+            <Text size="xs" tone="muted">{t('admin_ksc_press_hint', 'Press any key combo, then ✓ to confirm')}</Text>
           </Stack>
         ) : (
           <Group gap="2xs" wrap="nowrap">
@@ -214,7 +214,7 @@ export function KeyboardShortcutsModal({ opened, onClose, config }: KeyboardShor
       onClose={handleClose}
       title={
         <Group gap="sm">
-          <Text fw={500}>{t('admin_ksc_title', 'Keyboard Shortcuts')}</Text>
+          <Text weight={500}>{t('admin_ksc_title', 'Keyboard Shortcuts')}</Text>
           {config && (
             <Button
               size="compact-xs"
@@ -303,7 +303,7 @@ export function KeyboardShortcutsModal({ opened, onClose, config }: KeyboardShor
           )}
         </Stack>
 
-        <Text size="xs" c="dimmed">
+        <Text size="xs" tone="muted">
           {t('admin_ksc_footer', 'macOS: ⌘ replaces Ctrl. Shortcuts are disabled when focus is inside a text input.')}
         </Text>
       </Stack>

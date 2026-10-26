@@ -1,5 +1,5 @@
 
-import { Accordion, Button, Text } from '@mantine/core';
+import { Accordion, Button } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { usePersistentAccordion } from '@/hooks/usePersistentAccordion';
 
@@ -8,7 +8,7 @@ import type { GalleryBehaviorSettings } from '@/types';
 import { GalleryAdapterSettingsSection, type UpdateGallerySetting } from './GalleryAdapterSettingsSection';
 import { GalleryLayoutDetailSections } from './GalleryLayoutDetailSections';
 import { GalleryPresentationSections } from './GalleryPresentationSections';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Text } from '@/ui';
 
 interface GalleryLayoutSettingsSectionProps {
   settings: GalleryBehaviorSettings;
@@ -30,7 +30,7 @@ export function GalleryLayoutSettingsSection({
         <Accordion.Control>{t('set_gl_adapters_title', 'Gallery Adapters')}</Accordion.Control>
         <Accordion.Panel>
           <Group justify="space-between" align="flex-start" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
-            <Text size="sm" c="dimmed" style={{ maxWidth: uiRem(35) }}>
+            <Text size="sm" tone="muted" style={{ maxWidth: uiRem(35) }}>
               {t('set_gl_adapters_desc', 'Quick breakpoint selectors stay inline here. Use the responsive editor when you need shared layout settings, adapter-specific fields, or deeper nested config changes.')}
             </Text>
             <Button variant="light" onClick={onOpenResponsiveConfig}>

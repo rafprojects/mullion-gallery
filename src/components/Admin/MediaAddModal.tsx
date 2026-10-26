@@ -9,7 +9,6 @@ import {
   Paper,
   Progress,
   Select,
-  Text,
   TextInput,
   Textarea,
 } from '@mantine/core';
@@ -17,7 +16,7 @@ import { IconUpload, IconX, IconFile, IconVideo } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { OEmbedResponse } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack } from '@/ui';
+import { uiRem, Group, Stack, Text } from '@/ui';
 
 interface MediaAddModalProps {
   opened: boolean;
@@ -190,12 +189,12 @@ export function MediaAddModal({
                 >
                   {(props) => <Button leftSection={<IconUpload />} {...props}>{t('admin_media_choose_files', 'Choose files')}</Button>}
                 </FileButton>
-                <Text size="sm" c={isDragOver ? 'blue' : 'dimmed'} fw={isDragOver ? 600 : undefined}>
+                <Text size="sm" tone={isDragOver ? 'primary' : 'muted'} weight={isDragOver ? 600 : undefined}>
                   {isDragOver ? t('admin_media_drop_here', 'Drop files here') : t('admin_media_drag_drop', 'or drag & drop files here')}
                 </Text>
               </Group>
               {hasFiles && (
-                <Text size="sm" c="dimmed">
+                <Text size="sm" tone="muted">
                   {isBatchSelection ? t('admin_media_queued', '{{count}} file queued', { count: selectedFiles.length }) : selectedFiles[0]?.name}
                 </Text>
               )}
@@ -204,7 +203,7 @@ export function MediaAddModal({
             {hasFiles && (
               <Stack gap="xs">
                 <Group justify="space-between">
-                  <Text size="sm" fw={500}>
+                  <Text size="sm" weight={500}>
                     {t('admin_media_queued', '{{count}} file queued', { count: selectedFiles.length })}
                   </Text>
                   {onClearFiles && (
@@ -257,7 +256,7 @@ export function MediaAddModal({
                           </ActionIcon>
                         )}
                         <Text size="xs" lineClamp={1} title={file.name} style={{ marginTop: uiRem(0.125) }}>{file.name}</Text>
-                        {error && <Text size="xs" c="red" lineClamp={2}>{error}</Text>}
+                        {error && <Text size="xs" tone="danger" lineClamp={2}>{error}</Text>}
                         {progress !== null && (
                           <Progress value={progress} size="xs" color={error ? 'red' : 'blue'} style={{ marginTop: uiRem(0.125) }} striped animated={uploading && progress < 100} />
                         )}
@@ -289,7 +288,7 @@ export function MediaAddModal({
             )}
 
             {isBatchSelection && (
-              <Text size="xs" c="dimmed">
+              <Text size="xs" tone="muted">
                 {t('admin_media_batch_hint', 'When uploading multiple files, each item uses its filename as the default caption.')}
               </Text>
             )}
@@ -320,7 +319,7 @@ export function MediaAddModal({
           </Stack>
         </Paper>
 
-        <Text fw={600}>{t('admin_camp_add_url', 'Add External URL')}</Text>
+        <Text weight={600}>{t('admin_camp_add_url', 'Add External URL')}</Text>
         <Stack gap="sm">
           <TextInput
             label={t('admin_media_ext_url_label', 'External URL')}
@@ -367,8 +366,8 @@ export function MediaAddModal({
                     />
                   )}
                   <div>
-                    <Text fw={700}>{externalPreview.title}</Text>
-                    <Text size="sm" c="dimmed">{externalPreview.provider_name}</Text>
+                    <Text weight={700}>{externalPreview.title}</Text>
+                    <Text size="sm" tone="muted">{externalPreview.provider_name}</Text>
                   </div>
                 </Group>
               )}

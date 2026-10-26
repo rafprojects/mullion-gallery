@@ -22,12 +22,11 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Select,
-  Text,
   ColorSwatch,
   type SelectProps,
 } from '@mantine/core';
 import { useTheme } from '@/hooks/useTheme';
-import { groupThemes, themeSwatches, useMullionTheme, Group, Stack } from '@/ui';
+import { groupThemes, themeSwatches, useMullionTheme, Group, Stack, Text } from '@/ui';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 
 // ---------------------------------------------------------------------------
@@ -91,10 +90,10 @@ export function ThemeSelector({
           ))}
         </Group>
         <Stack gap={0} style={{ minWidth: 0 }}>
-          <Text size="sm" fw={500} truncate>
+          <Text size="sm" weight={500} truncate>
             {option.label}
           </Text>
-          <Text size="xs" c="dimmed" truncate>
+          <Text size="xs" tone="muted" truncate>
             {desc}
           </Text>
         </Stack>

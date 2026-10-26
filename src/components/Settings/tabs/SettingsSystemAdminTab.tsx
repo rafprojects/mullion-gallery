@@ -1,6 +1,6 @@
 import { memo, type ReactNode } from 'react';
-import { Paper, Select, Text } from '@mantine/core';
-import { Stack } from '@/ui';
+import { Paper, Select } from '@mantine/core';
+import { Stack, Text } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import type { ApiClient } from '@/services/apiClient';
@@ -36,8 +36,8 @@ function MagicLinkPageSelector({
   return (
     <Paper withBorder p="md" radius="md">
       <Stack gap="xs">
-        <Text size="sm" fw={600}>{t('set_sys_magic_title', 'Access Request Magic-Link')}</Text>
-        <Text size="xs" c="dimmed">
+        <Text size="sm" weight={600}>{t('set_sys_magic_title', 'Access Request Magic-Link')}</Text>
+        <Text size="xs" tone="muted">
           {t('set_sys_magic_desc_pre', 'When an admin clicks a one-click approval link, the result is shown on this page (via ')}
           {/* eslint-disable-next-line i18next/no-literal-string -- literal URL query-string token (not translatable prose); same precedent as P60-I taxonomy tree-indent glyph */}
           <code>?mullion_result=approved|expired|used|invalid</code>

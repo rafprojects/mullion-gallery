@@ -12,13 +12,12 @@ import {
   Box,
   Popover,
   ScrollArea,
-  Text,
   Tooltip,
   UnstyledButton,
 } from '@mantine/core';
 import { IconClockHour4, IconTrash } from '@tabler/icons-react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack } from '@/ui';
+import { uiRem, Stack, Text } from '@/ui';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -96,7 +95,7 @@ export function BuilderHistoryDropdown({
       <Popover.Dropdown style={{ padding: '0' }}>
         {/* Header */}
         <Box px="sm" style={{ paddingTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))', paddingBottom: uiRem(0.25), borderBottom: '1px solid var(--mantine-color-default-border)' }}>
-          <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+          <Text size="xs" weight={600} tone="muted" transform="uppercase">
             {t('lb_hist_title', 'History ({{count}})', { count })}
           </Text>
         </Box>
@@ -105,7 +104,7 @@ export function BuilderHistoryDropdown({
           /* Empty state */
           <Box p="md" style={{ textAlign: 'center' }}>
             <IconClockHour4 size={24} style={{ opacity: 0.4, marginBottom: 6 }} />
-            <Text size="sm" c="dimmed">
+            <Text size="sm" tone="muted">
               {t('lb_hist_none', 'No history yet.')}
               <br />
               {t('lb_histd_none_hint', 'Make a change to see history.')}
@@ -140,14 +139,14 @@ export function BuilderHistoryDropdown({
                   >
                     <Text
                       size="xs"
-                      fw={isCurrent ? 600 : 400}
+                      weight={isCurrent ? 600 : 400}
                       {...(isCurrent ? { c: 'blue' as const } : {})}
                       truncate
                       style={{ flex: 1 }}
                     >
                       {entry.label}
                     </Text>
-                    <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
+                    <Text size="xs" tone="muted" style={{ flexShrink: 0 }}>
                       {new Date(entry.timestamp).toLocaleTimeString([], {
                         hour: '2-digit',
                         minute: '2-digit',
@@ -172,7 +171,7 @@ export function BuilderHistoryDropdown({
                   opacity: historyCurrentIndex === -1 ? 1 : 0.45,
                 }}
               >
-                <Text size="xs" c="dimmed" fs="italic" style={{ flex: 1 }}>
+                <Text size="xs" tone="muted" italic style={{ flex: 1 }}>
                   {isHistoryTrimmed ? t('lb_hist_oldest', 'Oldest state') : t('lb_hist_initial', 'Initial state')}
                 </Text>
                 <IconTrash size={12} style={{ opacity: 0.5 }} />

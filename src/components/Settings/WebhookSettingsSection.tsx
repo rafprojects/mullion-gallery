@@ -13,13 +13,13 @@ import {
   Modal,
   MultiSelect,
   Switch,
-  Text,
   TextInput,
   Tooltip,
 } from '@mantine/core';
 import {
   Group,
   Stack,
+  Text,
 } from '@/ui';
 import { IconCopy, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -73,7 +73,7 @@ function SecretReveal({ secret }: { secret: string }) {
       }}
     >
       <Group justify="space-between" wrap="nowrap" gap="xs">
-        <Text size="xs" ff="monospace" c="green">
+        <Text size="xs" font="mono" tone="success">
           {secret}
         </Text>
         <CopyButton value={secret}>
@@ -127,7 +127,7 @@ function EndpointRow({
             <Text size="sm" style={{ wordBreak: 'break-all' }}>
               {endpoint.url}
             </Text>
-            <Text size="xs" c="dimmed" ff="monospace">
+            <Text size="xs" tone="muted" font="mono">
               secret: ...{endpoint.secretHint.slice(-8)}
             </Text>
           </Box>
@@ -283,12 +283,12 @@ export function WebhookSettingsSection({ apiClient }: Props) {
 
   return (
     <Stack gap="md">
-      <Text size="sm" c="dimmed">
+      <Text size="sm" tone="muted">
         {t('set_wh_desc', 'Webhook endpoints receive signed HMAC-SHA256 POST requests when campaign events occur. Payloads include the event type, ISO timestamp, and event data. Use the {{header}} header to verify delivery authenticity.', { header: 'X-MULLION-Signature' })}
       </Text>
 
       {endpoints.length === 0 && (
-        <Text size="sm" c="dimmed">
+        <Text size="sm" tone="muted">
           {t('set_wh_none', 'No webhook endpoints configured.')}
         </Text>
       )}

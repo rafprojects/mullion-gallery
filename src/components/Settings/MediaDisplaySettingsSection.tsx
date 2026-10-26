@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
-
-import { Accordion, Divider, NumberInput, Slider, Switch, Text, TextInput } from '@mantine/core';
-import { Group, Stack } from '@/ui';
+import { Accordion, Divider, NumberInput, Slider, Switch, TextInput } from '@mantine/core';
+import { Group, Stack, Text } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { usePersistentAccordion } from '@/hooks/usePersistentAccordion';
@@ -503,7 +502,7 @@ export function GalleryNavigationAccordion({ settings, updateSetting, tooltipLab
               step={1}
             />
 
-            <Text size="sm" fw={500}>{t('set_md_arrow_hover_scale', 'Hover Scale Factor')}</Text>
+            <Text size="sm" weight={500}>{t('set_md_arrow_hover_scale', 'Hover Scale Factor')}</Text>
             <Slider
               value={getAdapterSettingValue('navArrowHoverScale')}
               onChange={(value) => updateAdapterSetting('navArrowHoverScale', value)}
@@ -596,7 +595,7 @@ export function GalleryNavigationAccordion({ settings, updateSetting, tooltipLab
                   step={1}
                 />
 
-                <Text size="sm" fw={500}>{t('set_md_dot_active_scale', 'Active Dot Scale')}</Text>
+                <Text size="sm" weight={500}>{t('set_md_dot_active_scale', 'Active Dot Scale')}</Text>
                 <Slider
                   value={getAdapterSettingValue('dotNavActiveScale')}
                   onChange={(value) => updateAdapterSetting('dotNavActiveScale', value)}

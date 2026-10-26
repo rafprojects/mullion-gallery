@@ -29,6 +29,45 @@ const GAP_RUNGS = {
 
 const PADDING = { p: 'padding', px: 'paddingInline', py: 'paddingBlock' };
 
+/** A prop's literal value, or undefined when it is an expression. */
+function literal(attr) {
+  const init = attr.initializer;
+  if (!init) return true;
+  if (ts.isStringLiteral(init)) return init.text;
+  const e = ts.isJsxExpression(init) ? init.expression : undefined;
+  if (e && (ts.isStringLiteral(e) || ts.isNoSubstitutionTemplateLiteral(e))) return e.text;
+  if (e && ts.isNumericLiteral(e)) return Number(e.text);
+  return undefined;
+}
+
+/**
+ * Mantine colour names on text to roles (designer, 2026-10-25): a name maps to
+ * a role, never to a hex. `teal` and `blue` are read per site, so they are
+ * rewritten to the default and listed.
+ */
+const TEXT_TONES = { dimmed: 'muted', gray: 'muted', red: 'danger', green: 'success', orange: 'warning', yellow: 'warning' };
+const TEXT_TONES_REVIEW = { teal: ['primary', 'teal is primary unless it reports an outcome'], blue: ['info', 'blue on text: info unless it is an action'] };
+
+/** Text sizes below the smallest token floor to it and are listed (designer, 2026-10-25). */
+const SMALLEST_TEXT_PX = 12;
+
+const textColour = (attr) => {
+  const v = literal(attr);
+  if (typeof v !== 'string') return { blocked: 'colour is an expression' };
+  if (v === 'dark' || v === 'inherit') return { replace: '' };
+  if (TEXT_TONES[v]) return { replace: `tone="${TEXT_TONES[v]}"` };
+  if (TEXT_TONES_REVIEW[v]) return { replace: `tone="${TEXT_TONES_REVIEW[v][0]}"`, review: TEXT_TONES_REVIEW[v][1] };
+  return { blocked: 'a shade or a literal colour has no role yet' };
+};
+const rename = (to) => (attr) => ({ replace: `${to}${attr.initializer ? `=${attr.initializer.getText()}` : ''}` });
+const textSize = (attr) => {
+  const v = literal(attr);
+  if (typeof v === 'string' && /^\d+(\.\d+)?px$/.test(v) && parseFloat(v) < SMALLEST_TEXT_PX) {
+    return { replace: 'size="xs"', review: `${v} floored to xs` };
+  }
+  return null;
+};
+
 /** Per component: renames, props handled specially, and Mantine props with no framework meaning. */
 const RULES = {
   Stack: { gapProp: 'gap', rename: PADDING, unsupported: ['variant', 'classNames', 'styles', 'unstyled', 'mod', 'vars'] },
@@ -36,6 +75,34 @@ const RULES = {
     gapProp: 'gap',
     rename: PADDING,
     unsupported: ['preventGrowOverflow', 'variant', 'classNames', 'styles', 'unstyled', 'mod', 'vars'],
+  },
+  Text: {
+    rename: {},
+    unsupported: ['inherit', 'variant', 'gradient', 'classNames', 'styles', 'unstyled', 'mod', 'vars', 'inline'],
+    props: {
+      c: textColour,
+      fw: rename('weight'),
+      ta: rename('align'),
+      tt: rename('transform'),
+      fz: rename('size'),
+      size: textSize,
+      fs: (attr) => (literal(attr) === 'italic' ? { replace: 'italic' } : { blocked: 'font style other than italic' }),
+      ff: (attr) => (literal(attr) === 'monospace' ? { replace: 'font="mono"' } : { blocked: 'font family other than monospace' }),
+      truncate: (attr) => (literal(attr) === 'end' ? { replace: 'truncate' } : null),
+    },
+  },
+  Title: {
+    rename: {},
+    unsupported: ['variant', 'classNames', 'styles', 'unstyled', 'mod', 'vars', 'lineClamp'],
+    props: {
+      c: textColour,
+      ta: rename('align'),
+      size: (attr) => {
+        const v = literal(attr);
+        if (typeof v === 'string' && /^h[1-6]$/.test(v)) return { replace: `size={${v.slice(1)}}` };
+        return { blocked: 'a title size that is not a heading level' };
+      },
+    },
   },
 };
 
@@ -125,7 +192,16 @@ for (const file of [...walk('src'), ...walk('packages')]) {
         const init = attr.initializer;
         const expr = init && ts.isJsxExpression(init) ? init.expression : undefined;
         const where = `${file}:${line(attr)}  ${comp} ${attr.getText()}`;
-        if (rule.unsupported.includes(name)) {
+        const handler = rule.props?.[name];
+        const outcome = handler ? handler(attr) : null;
+        if (outcome?.blocked) {
+          report.blocked.push(`${where}  (${outcome.blocked})`);
+        } else if (outcome) {
+          // An empty replacement drops the attribute with the space before it.
+          if (outcome.replace === '') edits.push([attr.getFullStart(), attr.getEnd(), '']);
+          else edits.push([attr.getStart(), attr.getEnd(), outcome.replace]);
+          if (outcome.review) report.review.push(`${where}  ${outcome.review}`);
+        } else if (rule.unsupported.includes(name)) {
           report.blocked.push(`${where}  (no framework equivalent)`);
         } else if (name in rule.rename) {
           if (expr && ts.isObjectLiteralExpression(expr)) report.blocked.push(`${where}  (responsive object)`);

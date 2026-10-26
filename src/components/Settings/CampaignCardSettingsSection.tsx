@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Accordion, Divider, NumberInput, Slider, Switch, Text, TextInput } from '@mantine/core';
-import { Stack } from '@/ui';
+import { Accordion, Divider, NumberInput, Slider, Switch, TextInput } from '@mantine/core';
+import { Stack, Text } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { ModalSelect } from '@/components/Common/ModalSelect';
@@ -38,7 +38,7 @@ function ResetLink({ fieldKey, unitKey, hasOverride, onReset, label }: ResetLink
   return (
     <Text
       size="xs"
-      c="dimmed"
+      tone="muted"
       style={{ cursor: 'pointer' }}
       onClick={() => onReset(fieldKey, unitKey)}
     >
@@ -549,7 +549,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
         <Accordion.Control>{t('set_card_internals', 'Card Internals')}</Accordion.Control>
         <Accordion.Panel>
           <Stack gap="md">
-            <Text size="sm" fw={500}>{t('set_card_locked_opacity', 'Locked Card Opacity')}</Text>
+            <Text size="sm" weight={500}>{t('set_card_locked_opacity', 'Locked Card Opacity')}</Text>
             <Slider
               value={resolved.cardLockedOpacity}
               onChange={(value) => writeField('cardLockedOpacity', value)}
@@ -559,7 +559,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
               marks={[{ value: 0, label: '0' }, { value: 0.5, label: '0.5' }, { value: 1, label: '1' }]}
             />
             <ResetLink fieldKey="cardLockedOpacity" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
-            <Text size="sm" fw={500}>{t('set_card_grad_start', 'Gradient Start Opacity')}</Text>
+            <Text size="sm" weight={500}>{t('set_card_grad_start', 'Gradient Start Opacity')}</Text>
             <Slider
               value={resolved.cardGradientStartOpacity}
               onChange={(value) => writeField('cardGradientStartOpacity', value)}
@@ -568,7 +568,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
               step={0.05}
             />
             <ResetLink fieldKey="cardGradientStartOpacity" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
-            <Text size="sm" fw={500}>{t('set_card_grad_end', 'Gradient End Opacity')}</Text>
+            <Text size="sm" weight={500}>{t('set_card_grad_end', 'Gradient End Opacity')}</Text>
             <Slider
               value={resolved.cardGradientEndOpacity}
               onChange={(value) => writeField('cardGradientEndOpacity', value)}
@@ -622,7 +622,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
               max={1000}
             />
             <ResetLink fieldKey="cardThumbnailHoverTransitionMs" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
-            <Text size="sm" fw={500}>{t('set_card_page_opacity', 'Page Transition Opacity')}</Text>
+            <Text size="sm" weight={500}>{t('set_card_page_opacity', 'Page Transition Opacity')}</Text>
             <Slider
               value={resolved.cardPageTransitionOpacity}
               onChange={(value) => writeField('cardPageTransitionOpacity', value)}
@@ -647,7 +647,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
         <Accordion.Control>{t('set_card_listing', 'Campaign Listing')}</Accordion.Control>
         <Accordion.Panel>
           <Stack gap="md">
-            <Text size="xs" c="dimmed">
+            <Text size="xs" tone="muted">
               {t('set_card_listing_intro', 'Choose the layout adapter used to render the public campaign listing. Adapter-specific knobs (gap, columns, target row height) are shared with per-campaign galleries in Phase 1.')}
             </Text>
             <ModalSelect

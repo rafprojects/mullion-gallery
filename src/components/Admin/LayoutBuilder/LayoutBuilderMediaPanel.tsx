@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Select,
-  Text,
   Accordion,
   Box,
   Button,
@@ -15,7 +14,7 @@ import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { MediaUploadController, GENERAL_LIBRARY_TARGET } from '../MediaUploadController';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useRootId } from '@mullion/shared-ui';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Text } from '@/ui';
 
 export function LayoutBuilderMediaPanel(_props: IDockviewPanelProps) {
   const { t } = useTranslation('mullion');
@@ -104,7 +103,7 @@ export function LayoutBuilderMediaPanel(_props: IDockviewPanelProps) {
           <Accordion.Control>{t('lb_mp_asset_library', 'Asset Library')}</Accordion.Control>
           <Accordion.Panel>
             <Group justify="space-between" align="center" style={{ marginBottom: uiRem(0.375) }}>
-              <Text size="xs" c="dimmed">
+              <Text size="xs" tone="muted">
                 {t('lb_mp_asset_desc', 'Decorative assets, shared across campaigns. Drag onto the canvas to place.')}
               </Text>
             </Group>

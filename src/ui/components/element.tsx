@@ -14,7 +14,14 @@
  * `cloneElement` carries it with the rest.
  */
 
-import { cloneElement, isValidElement, createElement, type CSSProperties, type ReactElement } from 'react';
+import {
+  cloneElement,
+  isValidElement,
+  createElement,
+  type CSSProperties,
+  type HTMLAttributes,
+  type ReactElement,
+} from 'react';
 
 /**
  * A style object that may also carry `--mullion-*` custom properties. A union
@@ -35,6 +42,17 @@ export interface UiRenderProps {
  * props the component would have rendered.
  */
 export type UiRender = ReactElement | ((props: UiRenderProps) => ReactElement);
+
+/**
+ * The ordinary attributes of the element a component renders. They always
+ * reached the DOM through the rest props; this lets a caller type `role`, `id`
+ * or an event handler without a cast (P81-A). `color` is left out because
+ * colour is a tone, never a prop.
+ */
+export type UiAttributes<E extends HTMLElement = HTMLElement> = Omit<
+  HTMLAttributes<E>,
+  'style' | 'className' | 'children' | 'color'
+>;
 
 export interface UiElementProps {
   className?: string | undefined;

@@ -1,11 +1,11 @@
 
-import { Button, ScrollArea, Skeleton, Table, Text, TextInput } from '@mantine/core';
+import { Button, ScrollArea, Skeleton, Table, TextInput } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CampaignSelector, type CampaignSelectItem } from '@/components/Common/CampaignSelector';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import type { AuditFilters } from '@/services/adminQuery';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Text } from '@/ui';
 
 function mergeFilter(base: AuditFilters, key: keyof AuditFilters, value: string): AuditFilters {
   const next = { ...base };
@@ -71,10 +71,10 @@ export function AuditTab({
   const { t } = useTranslation('mullion');
   return (
     <>
-      <Text size="sm" fw={600} id="audit-heading" style={{ marginBottom: uiRem(0.125) }}>
+      <Text size="sm" weight={600} id="audit-heading" style={{ marginBottom: uiRem(0.125) }}>
         {t('admin_audit_heading', 'Campaign Activity')}
       </Text>
-      <Text size="xs" c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('admin_audit_subtitle', 'All activity recorded for the selected campaign.')}</Text>
+      <Text size="xs" tone="muted" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('admin_audit_subtitle', 'All activity recorded for the selected campaign.')}</Text>
       <Group style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }} wrap="wrap" gap="sm">
         <CampaignSelector
           data={campaignSelectData}
@@ -138,9 +138,9 @@ export function AuditTab({
           </Table>
         </Table.ScrollContainer>
       ) : auditError ? (
-        <Text c="red" role="alert" aria-live="assertive">{t('admin_audit_load_fail', 'Failed to load audit entries: {{message}}', { message: auditError.message })}</Text>
+        <Text tone="danger" role="alert" aria-live="assertive">{t('admin_audit_load_fail', 'Failed to load audit entries: {{message}}', { message: auditError.message })}</Text>
       ) : auditEntriesCount === 0 ? (
-        <Text c="dimmed" role="status" aria-live="polite">{t('admin_audit_none', 'No audit entries yet.')}</Text>
+        <Text tone="muted" role="status" aria-live="polite">{t('admin_audit_none', 'No audit entries yet.')}</Text>
       ) : (
         <ScrollArea
           offsetScrollbars

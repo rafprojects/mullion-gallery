@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   Box,
-  Text,
   Select,
   Slider,
   NumberInput,
@@ -12,6 +11,7 @@ import {
 import {
   Stack,
   Group,
+  Text,
 } from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import type { GradientStop, GradientDirection, GradientType, RadialShape, RadialSize } from '@/types';
@@ -26,7 +26,7 @@ interface GradientEditorProps {
 function GRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <Group gap="2xs" align="center" wrap="nowrap">
-      <Text size="xs" c="dimmed" style={{ width: 40, flexShrink: 0 }}>{label}</Text>
+      <Text size="xs" tone="muted" style={{ width: 40, flexShrink: 0 }}>{label}</Text>
       {children}
     </Group>
   );
@@ -103,7 +103,7 @@ export function GradientEditor({ value, onChange }: GradientEditorProps) {
                     onClick={() => update({ direction: d.value, angle: undefined })}
                     aria-label={d.label}
                   >
-                    <Text size="xs" fw={600}>{d.icon}</Text>
+                    <Text size="xs" weight={600}>{d.icon}</Text>
                   </ActionIcon>
                 </Tooltip>
               ))}

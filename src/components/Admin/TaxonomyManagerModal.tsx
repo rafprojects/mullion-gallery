@@ -5,7 +5,6 @@ import {
   Button,
   Modal,
   Tabs,
-  Text,
   TextInput,
 } from '@mantine/core';
 import { IconCheck, IconPencil, IconPlus, IconTrash, IconX } from '@tabler/icons-react';
@@ -21,7 +20,7 @@ import {
   useMediaTags,
 } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack } from '@/ui';
+import { uiRem, Group, Stack, Text } from '@/ui';
 
 interface TaxonomyManagerModalProps {
   opened: boolean;
@@ -101,7 +100,7 @@ function CategoryRow({ cat, depth, parentName, apiClient, onNotify, onMutate }: 
     <Group gap="xs" justify="space-between" style={{ paddingLeft: uiRem(depth) }}>
       <Group gap="xs">
         {/* eslint-disable-next-line i18next/no-literal-string -- tree-indent glyph, not translatable text */}
-        {depth > 0 && <Text size="xs" c="dimmed">↳</Text>}
+        {depth > 0 && <Text size="xs" tone="muted">↳</Text>}
         <Text size="sm">{cat.name}</Text>
         {parentName && <Badge size="xs" variant="light" color="gray">{parentName}</Badge>}
         {cat.count > 0 && <Badge size="xs" variant="light">{cat.count}</Badge>}
@@ -283,7 +282,7 @@ export function TaxonomyManagerModal({ opened, apiClient, onClose, onNotify }: T
         <Tabs.Panel value="categories" style={{ paddingTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           <Stack gap="xs">
             {campaignCategories.length === 0 && (
-              <Text size="sm" c="dimmed">{t('admin_tax_no_categories', 'No categories yet.')}</Text>
+              <Text size="sm" tone="muted">{t('admin_tax_no_categories', 'No categories yet.')}</Text>
             )}
             {(() => {
               const byId = new Map(campaignCategories.map((c) => [c.id, c]));
@@ -324,7 +323,7 @@ export function TaxonomyManagerModal({ opened, apiClient, onClose, onNotify }: T
         <Tabs.Panel value="campaign-tags" style={{ paddingTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           <Stack gap="xs">
             {campaignTags.length === 0 && (
-              <Text size="sm" c="dimmed">{t('admin_tax_no_campaign_tags', 'No campaign tags yet.')}</Text>
+              <Text size="sm" tone="muted">{t('admin_tax_no_campaign_tags', 'No campaign tags yet.')}</Text>
             )}
             {campaignTags.map((tag) => (
               <TagRow
@@ -341,7 +340,7 @@ export function TaxonomyManagerModal({ opened, apiClient, onClose, onNotify }: T
         <Tabs.Panel value="media-tags" style={{ paddingTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           <Stack gap="xs">
             {mediaTags.length === 0 && (
-              <Text size="sm" c="dimmed">{t('admin_tax_no_media_tags', 'No media tags yet.')}</Text>
+              <Text size="sm" tone="muted">{t('admin_tax_no_media_tags', 'No media tags yet.')}</Text>
             )}
             {mediaTags.map((tag) => (
               <TagRow

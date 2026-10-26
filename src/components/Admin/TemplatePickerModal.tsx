@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
-import { Modal, SimpleGrid, Card, Text, Badge, Loader, Center } from '@mantine/core';
-import { Stack, Group } from '@/ui';
+import { Modal, SimpleGrid, Card, Badge, Loader, Center } from '@mantine/core';
+import { Stack, Group, Text } from '@/ui';
 import { IconLayoutGrid } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient, CampaignTemplate } from '@/services/apiClient';
@@ -66,9 +66,9 @@ export function TemplatePickerModal({ opened, onClose, apiClient, onSelect }: Pr
             <Stack gap="3xs">
               <Group gap="xs" wrap="nowrap">
                 <IconLayoutGrid size={16} />
-                <Text fw={600} size="sm" truncate>{t('admin_tpick_start_blank', 'Start Blank')}</Text>
+                <Text weight={600} size="sm" truncate>{t('admin_tpick_start_blank', 'Start Blank')}</Text>
               </Group>
-              <Text size="xs" c="dimmed">{t('admin_tpick_no_settings', 'No pre-configured settings.')}</Text>
+              <Text size="xs" tone="muted">{t('admin_tpick_no_settings', 'No pre-configured settings.')}</Text>
             </Stack>
           </Card>
 
@@ -89,13 +89,13 @@ export function TemplatePickerModal({ opened, onClose, apiClient, onSelect }: Pr
               >
                 <Stack gap="3xs">
                   <Group gap="xs" wrap="nowrap" justify="space-between">
-                    <Text fw={600} size="sm" truncate style={{ flex: 1 }}>{tpl.name}</Text>
+                    <Text weight={600} size="sm" truncate style={{ flex: 1 }}>{tpl.name}</Text>
                     <Badge size="xs" variant="light" color={tpl.source === 'builtin' ? 'blue' : 'gray'}>
                       {tpl.source === 'builtin' ? t('admin_tpick_builtin', 'Built-in') : t('admin_tpick_custom', 'Custom')}
                     </Badge>
                   </Group>
                   {tpl.description && (
-                    <Text size="xs" c="dimmed" lineClamp={2}>{tpl.description}</Text>
+                    <Text size="xs" tone="muted" lineClamp={2}>{tpl.description}</Text>
                   )}
                 </Stack>
               </Card>

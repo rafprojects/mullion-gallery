@@ -1,4 +1,5 @@
-import { Badge, Table, Text } from '@mantine/core';
+import { Badge, Table } from '@mantine/core';
+import { Text } from '@/ui';
 import type { AuditEntry } from '@/services/adminQuery';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 
@@ -24,7 +25,7 @@ export function AuditEventRow({ entry, showCampaignCol = false }: AuditEventRowP
       <Table.Td>{new Date(entry.createdAt).toLocaleString()}</Table.Td>
       <Table.Td>
         <Text size="sm">{summary}</Text>
-        {resource && <Text size="xs" c="dimmed">{resource}</Text>}
+        {resource && <Text size="xs" tone="muted">{resource}</Text>}
       </Table.Td>
       <Table.Td>
         <Badge color={severityColor} variant="light" size="xs">

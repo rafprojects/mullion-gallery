@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
-
-import { Accordion, Alert, Badge, Divider, Loader, NumberInput, Select, Slider, Switch, Text, TextInput } from '@mantine/core';
-import { Group, Stack } from '@/ui';
+import { Accordion, Alert, Badge, Divider, Loader, NumberInput, Select, Slider, Switch, TextInput } from '@mantine/core';
+import { Group, Stack, Text } from '@/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
@@ -41,7 +40,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
 
   return (
     <>
-      <Text size="sm" c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
+      <Text size="sm" tone="muted" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         {t('set_adv_intro', 'Fine-grained controls for power users. These settings override internal defaults across all gallery components. Change with care.')}
       </Text>
       <Accordion variant="separated" onChange={onChange}>
@@ -244,18 +243,18 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
           <Accordion.Panel>
             {mounted.has('adv-tile') ? (
               <Stack gap="md">
-                <Text size="sm" fw={500}>{tooltipLabel(t('set_adv_hover_opacity', 'Hover Overlay Opacity'), 'tileHoverOverlayOpacity')}</Text>
+                <Text size="sm" weight={500}>{tooltipLabel(t('set_adv_hover_opacity', 'Hover Overlay Opacity'), 'tileHoverOverlayOpacity')}</Text>
                 <Slider value={settings.tileHoverOverlayOpacity} onChange={(value) => updateSetting('tileHoverOverlayOpacity', value)} min={0} max={1} step={0.05} />
-                <Text size="sm" fw={500}>{tooltipLabel(t('set_adv_bounce_hover', 'Bounce Scale (Hover)'), 'tileBounceScaleHover')}</Text>
+                <Text size="sm" weight={500}>{tooltipLabel(t('set_adv_bounce_hover', 'Bounce Scale (Hover)'), 'tileBounceScaleHover')}</Text>
                 <Slider value={settings.tileBounceScaleHover} onChange={(value) => updateSetting('tileBounceScaleHover', value)} min={1} max={1.3} step={0.01} />
-                <Text size="sm" fw={500}>{tooltipLabel(t('set_adv_bounce_active', 'Bounce Scale (Active)'), 'tileBounceScaleActive')}</Text>
+                <Text size="sm" weight={500}>{tooltipLabel(t('set_adv_bounce_active', 'Bounce Scale (Active)'), 'tileBounceScaleActive')}</Text>
                 <Slider value={settings.tileBounceScaleActive} onChange={(value) => updateSetting('tileBounceScaleActive', value)} min={0.9} max={1.1} step={0.01} />
                 <NumberInput label={tooltipLabel(t('set_adv_bounce_dur', 'Bounce Duration (ms)'), 'tileBounceDurationMs')} value={settings.tileBounceDurationMs} onChange={(value) => updateSetting('tileBounceDurationMs', typeof value === 'number' ? value : 300)} min={0} max={1000} />
                 <NumberInput label={tooltipLabel(t('set_adv_base_trans', 'Base Transition Duration (ms)'), 'tileBaseTransitionDurationMs')} value={settings.tileBaseTransitionDurationMs} onChange={(value) => updateSetting('tileBaseTransitionDurationMs', typeof value === 'number' ? value : 250)} min={0} max={1000} />
                 <NumberInput label={tooltipLabel(t('set_adv_tile_trans', 'Tile Transition Duration (ms)'), 'tileTransitionDurationMs')} value={settings.tileTransitionDurationMs} onChange={(value) => updateSetting('tileTransitionDurationMs', typeof value === 'number' ? value : 200)} min={0} max={1000} />
-                <Text size="sm" fw={500}>{tooltipLabel(t('set_adv_hex_overlap', 'Hex Vertical Overlap Ratio'), 'hexVerticalOverlapRatio')}</Text>
+                <Text size="sm" weight={500}>{tooltipLabel(t('set_adv_hex_overlap', 'Hex Vertical Overlap Ratio'), 'hexVerticalOverlapRatio')}</Text>
                 <Slider value={settings.hexVerticalOverlapRatio} onChange={(value) => updateSetting('hexVerticalOverlapRatio', value)} min={0} max={0.5} step={0.01} />
-                <Text size="sm" fw={500}>{tooltipLabel(t('set_adv_diamond_overlap', 'Diamond Vertical Overlap Ratio'), 'diamondVerticalOverlapRatio')}</Text>
+                <Text size="sm" weight={500}>{tooltipLabel(t('set_adv_diamond_overlap', 'Diamond Vertical Overlap Ratio'), 'diamondVerticalOverlapRatio')}</Text>
                 <Slider value={settings.diamondVerticalOverlapRatio} onChange={(value) => updateSetting('diamondVerticalOverlapRatio', value)} min={0} max={0.5} step={0.01} />
                 <TextInput label={tooltipLabel(t('set_adv_hex_clip', 'Hex Clip Path'), 'hexClipPath')} value={settings.hexClipPath} onChange={(event) => updateSetting('hexClipPath', event.currentTarget.value)} />
                 <TextInput label={tooltipLabel(t('set_adv_diamond_clip', 'Diamond Clip Path'), 'diamondClipPath')} value={settings.diamondClipPath} onChange={(event) => updateSetting('diamondClipPath', event.currentTarget.value)} />
@@ -263,7 +262,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
                 <TextInput label={tooltipLabel(t('set_adv_masonry_bp', 'Masonry Auto Column Breakpoints'), 'masonryAutoColumnBreakpoints')} description={t('set_adv_masonry_bp_desc', 'Format: 480:2,768:3,1024:4,1280:5')} value={settings.masonryAutoColumnBreakpoints} onChange={(event) => updateSetting('masonryAutoColumnBreakpoints', event.currentTarget.value)} />
                 <TextInput label={tooltipLabel(t('set_adv_grid_hover_shadow', 'Grid Card Hover Shadow'), 'gridCardHoverShadow')} value={settings.gridCardHoverShadow} onChange={(event) => updateSetting('gridCardHoverShadow', event.currentTarget.value)} />
                 <TextInput label={tooltipLabel(t('set_adv_grid_shadow', 'Grid Card Default Shadow'), 'gridCardDefaultShadow')} value={settings.gridCardDefaultShadow} onChange={(event) => updateSetting('gridCardDefaultShadow', event.currentTarget.value)} />
-                <Text size="sm" fw={500}>{tooltipLabel(t('set_adv_grid_hover_scale', 'Grid Card Hover Scale'), 'gridCardHoverScale')}</Text>
+                <Text size="sm" weight={500}>{tooltipLabel(t('set_adv_grid_hover_scale', 'Grid Card Hover Scale'), 'gridCardHoverScale')}</Text>
                 <Slider value={settings.gridCardHoverScale} onChange={(value) => updateSetting('gridCardHoverScale', value)} min={1} max={1.2} step={0.01} />
               </Stack>
             ) : null}
@@ -277,7 +276,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
               <Stack gap="md">
                 <NumberInput label={tooltipLabel(t('set_adv_lb_trans', 'Transition Duration (ms)'), 'lightboxTransitionMs')} value={settings.lightboxTransitionMs} onChange={(value) => updateSetting('lightboxTransitionMs', typeof value === 'number' ? value : 250)} min={0} max={1000} />
                 <TextInput label={tooltipLabel(t('set_adv_lb_backdrop', 'Backdrop Color'), 'lightboxBackdropColor')} value={settings.lightboxBackdropColor} onChange={(event) => updateSetting('lightboxBackdropColor', event.currentTarget.value)} />
-                <Text size="sm" fw={500}>{tooltipLabel(t('set_adv_lb_entry', 'Entry Scale'), 'lightboxEntryScale')}</Text>
+                <Text size="sm" weight={500}>{tooltipLabel(t('set_adv_lb_entry', 'Entry Scale'), 'lightboxEntryScale')}</Text>
                 <Slider value={settings.lightboxEntryScale} onChange={(value) => updateSetting('lightboxEntryScale', value)} min={0.5} max={1} step={0.01} />
                 <DimensionInput label={tooltipLabel(t('set_adv_lb_vmaxw', 'Video Max Width'), 'lightboxVideoMaxWidth')} value={settings.lightboxVideoMaxWidth} unit={settings.lightboxVideoMaxWidthUnit ?? 'px'} onValueChange={(value) => updateSetting('lightboxVideoMaxWidth', value)} onUnitChange={(unit) => updateSetting('lightboxVideoMaxWidthUnit', unit as GalleryBehaviorSettings['lightboxVideoMaxWidthUnit'])} allowedUnits={CSS_WIDTH_UNITS} max={1920} />
                 <DimensionInput label={tooltipLabel(t('set_adv_lb_vheight', 'Video Height'), 'lightboxVideoHeight')} value={settings.lightboxVideoHeight} unit={settings.lightboxVideoHeightUnit ?? 'px'} onValueChange={(value) => updateSetting('lightboxVideoHeight', value)} onUnitChange={(unit) => updateSetting('lightboxVideoHeightUnit', unit as GalleryBehaviorSettings['lightboxVideoHeightUnit'])} allowedUnits={CSS_HEIGHT_UNITS} max={1080} />
@@ -298,9 +297,9 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
                 <NumberInput label={tooltipLabel(t('set_adv_arrow_hit', 'Arrow Min Hit Target (px)'), 'navArrowMinHitTarget')} value={settings.navArrowMinHitTarget} onChange={(value) => updateSetting('navArrowMinHitTarget', typeof value === 'number' ? value : 44)} min={24} max={80} />
                 <NumberInput label={tooltipLabel(t('set_adv_arrow_fade', 'Arrow Fade Duration (ms)'), 'navArrowFadeDurationMs')} value={settings.navArrowFadeDurationMs} onChange={(value) => updateSetting('navArrowFadeDurationMs', typeof value === 'number' ? value : 200)} min={0} max={1000} />
                 <NumberInput label={tooltipLabel(t('set_adv_arrow_scale', 'Arrow Scale Transition (ms)'), 'navArrowScaleTransitionMs')} value={settings.navArrowScaleTransitionMs} onChange={(value) => updateSetting('navArrowScaleTransitionMs', typeof value === 'number' ? value : 150)} min={0} max={1000} />
-                <Text size="sm" fw={500}>{tooltipLabel(t('set_adv_vh_mobile', 'Viewport Height Mobile Ratio'), 'viewportHeightMobileRatio')}</Text>
+                <Text size="sm" weight={500}>{tooltipLabel(t('set_adv_vh_mobile', 'Viewport Height Mobile Ratio'), 'viewportHeightMobileRatio')}</Text>
                 <Slider value={settings.viewportHeightMobileRatio} onChange={(value) => updateSetting('viewportHeightMobileRatio', value)} min={0.3} max={1} step={0.05} />
-                <Text size="sm" fw={500}>{tooltipLabel(t('set_adv_vh_tablet', 'Viewport Height Tablet Ratio'), 'viewportHeightTabletRatio')}</Text>
+                <Text size="sm" weight={500}>{tooltipLabel(t('set_adv_vh_tablet', 'Viewport Height Tablet Ratio'), 'viewportHeightTabletRatio')}</Text>
                 <Slider value={settings.viewportHeightTabletRatio} onChange={(value) => updateSetting('viewportHeightTabletRatio', value)} min={0.3} max={1} step={0.05} />
                 <NumberInput label={tooltipLabel(t('set_adv_search_minw', 'Search Input Min Width (px)'), 'searchInputMinWidth')} value={settings.searchInputMinWidth} onChange={(value) => updateSetting('searchInputMinWidth', typeof value === 'number' ? value : 200)} min={100} max={400} />
                 <NumberInput label={tooltipLabel(t('set_adv_search_maxw', 'Search Input Max Width (px)'), 'searchInputMaxWidth')} value={settings.searchInputMaxWidth} onChange={(value) => updateSetting('searchInputMaxWidth', typeof value === 'number' ? value : 280)} min={150} max={600} />
@@ -403,7 +402,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
                 {!isHealthLoading && !isHealthError && healthData && (
                   <>
                     <Group gap="xs">
-                      <Text size="sm" fw={500}>{t('set_adv_persistent_cache', 'Persistent cache')}</Text>
+                      <Text size="sm" weight={500}>{t('set_adv_persistent_cache', 'Persistent cache')}</Text>
                       {healthData.objectCache.persistent ? (
                         <Badge color="green" size="sm">{t('set_adv_cache_active', 'Active')}</Badge>
                       ) : (
@@ -423,17 +422,17 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
                     )}
 
                     {healthData.objectCache.persistent && !healthData.objectCache.stats_available && (
-                      <Text size="sm" c="dimmed">
+                      <Text size="sm" tone="muted">
                         {t('set_adv_no_stats', 'Cache backend detected but no runtime stats are exposed by this drop-in.')}
                       </Text>
                     )}
 
                     {healthData.objectCache.stats_available && healthData.objectCache.stats && (
                       <Stack gap="xs">
-                        <Text size="sm" fw={500}>{t('set_adv_backend_stats', 'Backend stats')}</Text>
+                        <Text size="sm" weight={500}>{t('set_adv_backend_stats', 'Backend stats')}</Text>
                         {Object.entries(healthData.objectCache.stats).map(([key, val]) => (
                           <Group key={key} justify="space-between" gap="xs">
-                            <Text size="xs" c="dimmed">{key}</Text>
+                            <Text size="xs" tone="muted">{key}</Text>
                             <Text size="xs">{String(val)}</Text>
                           </Group>
                         ))}
@@ -448,7 +447,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
 
         <Accordion.Item value="danger-zone">
           <Accordion.Control>
-            <Text c="red" size="sm" fw={600}>{t('set_adv_danger_zone', 'Danger Zone')}</Text>
+            <Text tone="danger" size="sm" weight={600}>{t('set_adv_danger_zone', 'Danger Zone')}</Text>
           </Accordion.Control>
           <Accordion.Panel>
             {mounted.has('danger-zone') ? (

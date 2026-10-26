@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { IconLock, IconEye } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Card, Image, Badge, Text, Box, UnstyledButton } from '@mantine/core';
+import { Card, Image, Badge, Box, UnstyledButton } from '@mantine/core';
 import type { Campaign, GalleryBehaviorSettings } from '@/types';
 import { DEFAULT_GALLERY_BEHAVIOR_SETTINGS } from '@/types';
 import type { ApiClient } from '@/services/apiClient';
@@ -11,7 +11,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { RequestAccessForm } from './RequestAccessForm';
 import { CompanyLogo } from '@/components/Common/CompanyLogo';
 import styles from './CampaignCard.module.scss';
-import { uiRem, Group, Stack } from '@/ui';
+import { uiRem, Group, Stack, Text } from '@/ui';
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -190,13 +190,13 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
             <Card.Section p="md">
               <Stack gap="sm">
                 {settings?.showCardTitle !== false && (
-                  <Text fw={600} size="lg" lineClamp={1} style={cardTitleStyle}>
+                  <Text weight={600} size="lg" lineClamp={1} style={cardTitleStyle}>
                     {campaign.title}
                   </Text>
                 )}
 
                 {settings?.showCardDescription !== false && (
-                  <Text size="sm" c="dimmed" lineClamp={2}>
+                  <Text size="sm" tone="muted" lineClamp={2}>
                     {campaign.description}
                   </Text>
                 )}

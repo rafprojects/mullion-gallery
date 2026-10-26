@@ -15,8 +15,8 @@
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Center, Text } from '@mantine/core';
-import { Stack } from '@/ui';
+import { Button, Center } from '@mantine/core';
+import { Stack, Text } from '@/ui';
 import { OverlayArrows } from '@/components/Galleries/Shared/OverlayArrows';
 import { DotNavigator } from '@/components/Galleries/Shared/DotNavigator';
 import { Box } from '@mantine/core';
@@ -213,7 +213,7 @@ export function CardGalleryHostPagination({
               settings={settings}
             />
           )}
-          <Text size="xs" c="dimmed">
+          <Text size="xs" tone="muted">
             {t('cardpg_page_of', 'Page {{current}} of {{total}}', { current: currentPage + 1, total: totalPages })}
           </Text>
         </Stack>

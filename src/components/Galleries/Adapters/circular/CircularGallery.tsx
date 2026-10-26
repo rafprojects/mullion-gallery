@@ -8,8 +8,8 @@
  */
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Text } from '@mantine/core';
-import { Stack } from '@/ui';
+import { Box } from '@mantine/core';
+import { Stack, Text } from '@/ui';
 import { IconCircles, IconPlayerPlay, IconZoomIn } from '@tabler/icons-react';
 import { OVERLAY_BG, OVERLAY_TEXT } from '../_shared/overlayStyles';
 import type {

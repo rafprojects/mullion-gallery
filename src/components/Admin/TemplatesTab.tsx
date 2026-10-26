@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   Button,
-  Text,
   Badge,
   ActionIcon,
   Tooltip,
   Modal,
   TextInput,
   Select,
-  Title,
   Divider,
   Loader,
   Center,
@@ -17,6 +15,8 @@ import {
 import {
   Stack,
   Group,
+  Text,
+  Title,
 } from '@/ui';
 import { IconTrash, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -110,15 +110,15 @@ export function TemplatesTab({ apiClient, campaigns, onNotify }: Props) {
         <Center py="xl"><Loader size="sm" /></Center>
       ) : (
         <>
-          <Text size="sm" fw={500} c="dimmed">{t('admin_tmpl_builtin', 'Built-in')}</Text>
+          <Text size="sm" weight={500} tone="muted">{t('admin_tmpl_builtin', 'Built-in')}</Text>
           {builtins.map((tpl) => (
             <TemplateRow key={tpl.id} tpl={tpl} deletingId={deletingId} onDelete={handleDelete} />
           ))}
 
           <Divider />
-          <Text size="sm" fw={500} c="dimmed">{t('admin_tmpl_custom', 'Custom')}</Text>
+          <Text size="sm" weight={500} tone="muted">{t('admin_tmpl_custom', 'Custom')}</Text>
           {user.length === 0 ? (
-            <Text size="sm" c="dimmed">{t('admin_tmpl_no_custom', 'No custom templates yet.')}</Text>
+            <Text size="sm" tone="muted">{t('admin_tmpl_no_custom', 'No custom templates yet.')}</Text>
           ) : (
             user.map((tpl) => (
               <TemplateRow key={tpl.id} tpl={tpl} deletingId={deletingId} onDelete={handleDelete} />
@@ -188,12 +188,12 @@ function TemplateRow({
     <Group justify="space-between" wrap="wrap" paddingInline="xs" paddingBlock={4}>
       <Stack gap="4xs" style={{ flex: 1, minWidth: 0 }}>
         <Group gap="xs" wrap="nowrap">
-          <Text size="sm" fw={500} truncate>{tpl.name}</Text>
+          <Text size="sm" weight={500} truncate>{tpl.name}</Text>
           <Badge size="xs" variant="light" color={tpl.source === 'builtin' ? 'blue' : 'gray'}>
             {tpl.source === 'builtin' ? t('admin_tmpl_builtin', 'Built-in') : t('admin_tmpl_custom', 'Custom')}
           </Badge>
         </Group>
-        {tpl.description && <Text size="xs" c="dimmed" truncate>{tpl.description}</Text>}
+        {tpl.description && <Text size="xs" tone="muted" truncate>{tpl.description}</Text>}
       </Stack>
       {tpl.editable && (
         <Tooltip label={t('admin_tmpl_delete_tt', 'Delete template')}>

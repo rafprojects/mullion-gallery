@@ -1,5 +1,6 @@
-import { Modal, Text } from '@mantine/core';
-import { Group } from '@/ui';
+
+import { Modal } from '@mantine/core';
+import { Group, Text } from '@/ui';
 import { IconStack2 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
@@ -21,7 +22,7 @@ export function SpaceManagementModal({ opened, apiClient, onClose, onNotify, onS
     <Modal
       opened={opened}
       onClose={onClose}
-      title={<Group gap="xs"><IconStack2 size={16} /><Text fw={600}>{t('admin_space_modal_title', 'Manage spaces')}</Text></Group>}
+      title={<Group gap="xs"><IconStack2 size={16} /><Text weight={600}>{t('admin_space_modal_title', 'Manage spaces')}</Text></Group>}
       size="lg"
       centered
     >

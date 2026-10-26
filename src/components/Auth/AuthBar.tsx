@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Container, Button, Tooltip, ActionIcon, Text, Menu } from '@mantine/core';
-import { Group } from '@/ui';
+import { Box, Container, Button, Tooltip, ActionIcon, Menu } from '@mantine/core';
+import { Group, Text } from '@/ui';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconSettings, IconLogout, IconDashboard, IconDotsVertical } from '@tabler/icons-react';
 import type { GalleryBehaviorSettings } from '@/types';
@@ -228,7 +228,7 @@ function AuthBarFull({
         <Group {...getMullionDebugProps('AuthBar', 'content')} justify="space-between" wrap="nowrap" gap="sm">
           {!isAuthenticated ? (
             <>
-              <Text size="sm" c="dimmed">{t('auth_sign_in_prompt', 'Sign in to access private campaigns.')}</Text>
+              <Text size="sm" tone="muted">{t('auth_sign_in_prompt', 'Sign in to access private campaigns.')}</Text>
               <Button variant="light" size="sm" onClick={onOpenSignIn}>{t('auth_sign_in', 'Sign in')}</Button>
             </>
           ) : (

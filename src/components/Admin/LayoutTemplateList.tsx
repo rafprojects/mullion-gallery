@@ -21,7 +21,6 @@ import {
   SegmentedControl,
   Skeleton,
   Table,
-  Text,
   TextInput,
   Tooltip,
   UnstyledButton,
@@ -65,7 +64,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useBuilderDeepLink } from '@mullion/shared-utils';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group, Stack } from '@/ui';
+import { uiRem, Group, Stack, Text } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -439,7 +438,7 @@ export function LayoutTemplateList({ apiClient, onNotify, initialTemplateId, spa
         <Center py="xl">
           <Stack align="center" gap="xs">
             <IconLayoutDashboard size={48} color="var(--mantine-color-dimmed)" />
-            <Text c="dimmed">
+            <Text tone="muted">
               {searchQuery ? tr('admin_lt_no_match', 'No layouts match your search.') : tr('admin_lt_none', 'No layout templates yet.')}
             </Text>
             {!searchQuery && (
@@ -491,7 +490,7 @@ export function LayoutTemplateList({ apiClient, onNotify, initialTemplateId, spa
               {filtered.map((t) => (
                 <Table.Tr key={t.id}>
                   <Table.Td>
-                    <Text size="sm" fw={500}>{t.name}</Text>
+                    <Text size="sm" weight={500}>{t.name}</Text>
                   </Table.Td>
                   <Table.Td>
                     <Badge size="sm" variant="light">{tr('admin_lt_n_slots', '{{count}} slot', { count: t.slots.length })}</Badge>
@@ -500,7 +499,7 @@ export function LayoutTemplateList({ apiClient, onNotify, initialTemplateId, spa
                     <Text size="sm">{aspectLabel(t.canvasAspectRatio)}</Text>
                   </Table.Td>
                   <Table.Td>
-                    <Text size="sm" c="dimmed">{shortDate(t.updatedAt)}</Text>
+                    <Text size="sm" tone="muted">{shortDate(t.updatedAt)}</Text>
                   </Table.Td>
                   <Table.Td>
                     <Group gap="3xs">
@@ -663,8 +662,8 @@ function TemplateGridCard({ template, onEdit, onDuplicate, onDelete, onExport }:
 
         {/* paddingRight reserves the gutter the absolutely-positioned menu occupies. */}
         <Box style={{ overflow: 'hidden', paddingRight: 28 }}>
-          <Text size="sm" fw={600} lineClamp={1}>{t.name}</Text>
-          <Text size="xs" c="dimmed">
+          <Text size="sm" weight={600} lineClamp={1}>{t.name}</Text>
+          <Text size="xs" tone="muted">
             {tr('admin_lt_n_slots', '{{count}} slot', { count: t.slots.length })} · {shortDate(t.updatedAt)}
           </Text>
         </Box>

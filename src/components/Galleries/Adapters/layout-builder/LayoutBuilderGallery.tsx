@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
 import type { ListingItem } from '@/components/Galleries/Adapters/GalleryAdapter';
 import { useRecordAnalyticsEvent } from '@/hooks/useRecordAnalyticsEvent';
-import { Box, Center, Loader, Text } from '@mantine/core';
+import { Box, Center, Loader } from '@mantine/core';
 import { IconLayoutDashboard, IconAlertTriangle, IconInfoCircle } from '@tabler/icons-react';
 import type {
   GalleryBehaviorSettings,
@@ -50,7 +50,7 @@ import { useViewportHeight } from '@mullion/shared-utils';
 import { sanitizeCssUrl, toCssOrNumber } from '@mullion/shared-utils';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { resolveAdapterShellStyle, resolveGalleryComponentCommonSettings, resolveGalleryHeading } from '../_shared/runtimeCommon';
-import { uiRem, Stack } from '@/ui';
+import { uiRem, Stack, Text } from '@/ui';
 
 // ── TiltWrapper: applies mouse-reactive 3D tilt to children ──────────────────
 
@@ -197,7 +197,7 @@ function GallerySlotView({
         }}
         aria-hidden="true"
       >
-        <Text size="xs" c="dimmed" ta="center">
+        <Text size="xs" tone="muted" align="center">
           {t('gallery_empty_slot', 'Empty')}
         </Text>
       </div>
@@ -482,7 +482,7 @@ export function LayoutBuilderGallery({
       <Center py="xl" style={{ minHeight: uiRem(12.5) }}>
         <Stack align="center" gap="xs">
           <Loader size="md" aria-label={t('layout_loading_aria', 'Loading layout template')} />
-          <Text size="sm" c="dimmed">{t('layout_loading_text', 'Loading gallery…')}</Text>
+          <Text size="sm" tone="muted">{t('layout_loading_text', 'Loading gallery…')}</Text>
         </Stack>
       </Center>
     );
@@ -492,7 +492,7 @@ export function LayoutBuilderGallery({
     return (
       <Stack align="center" gap="xs" paddingBlock="xl">
         <IconAlertTriangle size={32} color="var(--mantine-color-yellow-6)" />
-        <Text size="sm" c="dimmed">
+        <Text size="sm" tone="muted">
           {error ?? t('layout_not_found', 'Layout template not found')}
         </Text>
       </Stack>
@@ -727,7 +727,7 @@ function LayoutBuilderGalleryInner({
 
       {/* Header */}
       {heading.visible && (
-        <Text size="sm" fw={500} component="div" ta={common.galleryLabelJustification || 'left'}>
+        <Text size="sm" weight={500} render={<div />} align={common.galleryLabelJustification || 'left'}>
           <Box component="span" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             {common.showGalleryLabelIcon && <IconLayoutDashboard size={16} />}
             {heading.label}

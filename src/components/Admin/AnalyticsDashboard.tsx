@@ -12,13 +12,13 @@ import {
   Select,
   SimpleGrid,
   Table,
-  Text,
-  Title,
   Tooltip,
 } from '@mantine/core';
 import {
   Group,
   Stack,
+  Text,
+  Title,
 } from '@/ui';
 import {
   CartesianGrid,
@@ -94,7 +94,7 @@ function StatCard({
     <Paper withBorder p="md" radius="md">
       <Stack gap="3xs" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
         {icon}
-        <Text size="sm" c="dimmed" fw={500}>
+        <Text size="sm" tone="muted" weight={500}>
           {label}
         </Text>
       </Stack>
@@ -235,7 +235,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
               </Badge>
             )}
             {lastUpdatedAt > 0 && (
-              <Text size="xs" c="dimmed" aria-live="polite">
+              <Text size="xs" tone="muted" aria-live="polite">
                 {t('admin_analytics_updated', 'Updated {{time}}', { time: formatUpdatedAt(lastUpdatedAt) })}
               </Text>
             )}
@@ -301,10 +301,10 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
               <Center>
                 <Stack align="center" gap="xs">
                   <IconChartLine size={32} color="var(--mantine-color-dimmed)" />
-                  <Text c="dimmed" size="sm">
+                  <Text tone="muted" size="sm">
                     {t('admin_analytics_no_events', 'No view events recorded for this period.')}
                   </Text>
-                  <Text c="dimmed" size="xs">
+                  <Text tone="muted" size="xs">
                     {t('admin_analytics_enable_pre', 'Make sure ')}<strong>{t('admin_analytics_enable_strong', 'Enable Analytics')}</strong>{t('admin_analytics_enable_post', ' is turned on in Settings → Advanced.')}
                   </Text>
                 </Stack>
@@ -374,7 +374,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
                 </Center>
               )}
               {!mediaLoading && mediaItems.length === 0 && (
-                <Text size="sm" c="dimmed">
+                <Text size="sm" tone="muted">
                   {t('admin_analytics_no_media', 'No per-media events recorded for this period. Lightbox interactions with media IDs will appear here.')}
                 </Text>
               )}
@@ -392,7 +392,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
                       {mediaItems.map((item) => (
                         <Table.Tr key={item.media_id}>
                           <Table.Td>
-                            <Text size="xs" ff="monospace">{item.media_id}</Text>
+                            <Text size="xs" font="mono">{item.media_id}</Text>
                           </Table.Td>
                           <Table.Td style={{ textAlign: 'right' }}>
                             <Badge variant="light" color="blue" size="sm">{item.views.toLocaleString()}</Badge>

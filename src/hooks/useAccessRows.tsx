@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Table, Text, Tooltip, Badge, ActionIcon } from '@mantine/core';
-import { Stack, Group } from '@/ui';
+import { Table, Tooltip, Badge, ActionIcon } from '@mantine/core';
+import { Stack, Group, Text } from '@/ui';
 import { modals } from '@mantine/modals';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -98,8 +98,8 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
           <Table.Td>
             {a.user ? (
               <Stack gap="4xs">
-                <Text size="sm" fw={500}>{a.user.displayName}</Text>
-                <Text size="xs" c="dimmed">{a.user.email}</Text>
+                <Text size="sm" weight={500}>{a.user.displayName}</Text>
+                <Text size="xs" tone="muted">{a.user.email}</Text>
               </Stack>
             ) : (
               <Text size="sm">{t('accessrow_user_fallback', 'User #{{id}}', { id: a.userId })}</Text>
@@ -116,7 +116,7 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
                 <Badge variant="light" color="gray" size="xs">{t('admin_sched_expired', 'Expired')}</Badge>
               )}
               {accessViewMode === 'all' && a.source === 'campaign' && a.campaignTitle && (
-                <Text size="xs" c="dimmed">{a.campaignTitle}</Text>
+                <Text size="xs" tone="muted">{a.campaignTitle}</Text>
               )}
             </Stack>
           </Table.Td>
@@ -143,7 +143,7 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
               <Text size="xs">{a.grantedAt ? new Date(a.grantedAt).toLocaleString() : '—'}</Text>
               {a.expires_at && (
                 <Tooltip label={isExpired ? t('accessrow_expires_tip_expired', 'This grant has expired') : t('accessrow_expires_tip_active', 'Grant expires at this time')}>
-                  <Text size="xs" c={isExpired ? 'red' : 'dimmed'}>
+                  <Text size="xs" tone={isExpired ? 'danger' : 'muted'}>
                     {t('accessrow_expires_label', 'Expires: {{date}}', { date: new Date(a.expires_at).toLocaleString() })}
                   </Text>
                 </Tooltip>

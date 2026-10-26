@@ -4,12 +4,12 @@ import {
   NumberInput,
   Select,
   ActionIcon,
-  Text,
   Badge,
 } from '@mantine/core';
 import {
   Group,
   Stack,
+  Text,
 } from '@/ui';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -299,7 +299,7 @@ export function TypographyEditor({ value, onChange, customFonts }: TypographyEdi
               clearable
             />
           </Group>
-          <Text size="xs" c="dimmed">
+          <Text size="xs" tone="muted">
             {t('typo_terminal', 'Terminal: {{family}}', { family: terminalFamily })}
           </Text>
         </Stack>
@@ -392,7 +392,7 @@ export function TypographyEditor({ value, onChange, customFonts }: TypographyEdi
         {/* Stroke */}
         <Accordion.Item value="stroke">
           <Accordion.Control>
-            <Text size="xs" fw={500}>
+            <Text size="xs" weight={500}>
               {t('typo_stroke', 'Stroke')} {hasStroke ? '●' : ''}
             </Text>
           </Accordion.Control>
@@ -419,7 +419,7 @@ export function TypographyEditor({ value, onChange, customFonts }: TypographyEdi
         {/* Shadow */}
         <Accordion.Item value="shadow">
           <Accordion.Control>
-            <Text size="xs" fw={500}>
+            <Text size="xs" weight={500}>
               {t('typo_shadow', 'Shadow')} {hasShadow ? '●' : ''}
             </Text>
           </Accordion.Control>
@@ -466,7 +466,7 @@ export function TypographyEditor({ value, onChange, customFonts }: TypographyEdi
         {/* Glow */}
         <Accordion.Item value="glow">
           <Accordion.Control>
-            <Text size="xs" fw={500}>
+            <Text size="xs" weight={500}>
               {t('typo_glow', 'Glow')} {hasGlow ? '●' : ''}
             </Text>
           </Accordion.Control>

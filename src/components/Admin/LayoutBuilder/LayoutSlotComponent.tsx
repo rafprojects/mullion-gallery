@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Rnd } from 'react-rnd';
-import { Text } from '@mantine/core';
+import { Text } from '@/ui';
 import { IconLock } from '@tabler/icons-react';
 import type { LayoutSlot, MaskLayer, MediaItem } from '@/types';
 import { getClipPath } from '@/utils/clipPath';
@@ -593,7 +593,7 @@ export function LayoutSlotComponent({
           justifyContent: 'center',
         }}
       >
-        <Text size="xs" c="dimmed">
+        <Text size="xs" tone="muted">
           {t('lb_slotc_empty', 'Empty')}
         </Text>
       </div>
@@ -877,7 +877,7 @@ export function LayoutSlotComponent({
                   justifyContent: 'center',
                 }}
               >
-                <Text size="xs" c="dimmed" style={{ pointerEvents: 'none' }}>
+                <Text size="xs" tone="muted" style={{ pointerEvents: 'none' }}>
                   {index + 1}
                 </Text>
               </div>
@@ -954,7 +954,7 @@ export function LayoutSlotComponent({
                 justifyContent: 'center',
               }}
             >
-              <Text size="xs" c="dimmed" style={{ pointerEvents: 'none' }}>
+              <Text size="xs" tone="muted" style={{ pointerEvents: 'none' }}>
                 {index + 1}
               </Text>
             </div>

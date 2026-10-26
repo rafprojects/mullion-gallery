@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import {
   Tabs,
-  Text,
   Badge,
   Button,
   TextInput,
@@ -28,7 +27,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { SpaceAssetLibrary } from './SpaceAssetLibrary';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import type { FontLibraryEntry } from '@mullion/shared-utils';
-import { uiRem, Stack, Group } from '@/ui';
+import { uiRem, Stack, Group, Text } from '@/ui';
 
 interface SpaceGrant {
   userId: number;
@@ -339,7 +338,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                         {space.isDefault && <Badge size="xs" variant="light">{t('admin_space_default', 'default')}</Badge>}
                       </Group>
                     </Table.Td>
-                    <Table.Td><Text size="sm" c="dimmed">{space.slug}</Text></Table.Td>
+                    <Table.Td><Text size="sm" tone="muted">{space.slug}</Text></Table.Td>
                     <Table.Td>
                       <Badge size="xs" color={space.isolationMode === 'delegated' ? 'orange' : 'gray'} variant="outline">
                         {t(`admin_space_mode_${space.isolationMode}`, space.isolationMode)}
@@ -421,8 +420,8 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
       <Tabs.Panel value="settings" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         {selectedSpace ? (
           <Stack gap="sm">
-            <Text size="sm" c="dimmed">
-              {t('admin_space_settings_pre', 'Configure display settings for ')}<Text span fw={500}>{selectedSpace.name}</Text>{t('admin_space_settings_post', '. Unset fields inherit the global defaults.')}
+            <Text size="sm" tone="muted">
+              {t('admin_space_settings_pre', 'Configure display settings for ')}<Text span weight={500}>{selectedSpace.name}</Text>{t('admin_space_settings_post', '. Unset fields inherit the global defaults.')}
             </Text>
             <Button
               leftSection={<IconSettings size={14} />}
@@ -434,14 +433,14 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
             </Button>
           </Stack>
         ) : (
-          <Text c="dimmed" size="sm">{t('admin_space_settings_empty', 'Select a space from the Spaces tab to edit its settings.')}</Text>
+          <Text tone="muted" size="sm">{t('admin_space_settings_empty', 'Select a space from the Spaces tab to edit its settings.')}</Text>
         )}
       </Tabs.Panel>
 
       <Tabs.Panel value="access" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         {selectedSpace ? (
           <Stack gap="md">
-            <Text size="sm" fw={500}>{t('admin_space_grants_for', 'Access grants for {{name}}', { name: selectedSpace.name })}</Text>
+            <Text size="sm" weight={500}>{t('admin_space_grants_for', 'Access grants for {{name}}', { name: selectedSpace.name })}</Text>
 
             {grantsLoading ? (
               <Center py="md"><Loader size="sm" /></Center>
@@ -461,7 +460,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                       <Table.Td>
                         <Stack gap={0}>
                           <Text size="sm">{grant.user?.displayName ?? t('admin_space_user_num', 'User #{{id}}', { id: grant.userId })}</Text>
-                          {grant.user?.email && <Text size="xs" c="dimmed">{grant.user.email}</Text>}
+                          {grant.user?.email && <Text size="xs" tone="muted">{grant.user.email}</Text>}
                         </Stack>
                       </Table.Td>
                       {/* P75-I: read-only — grants are viewer-only (P53-D). A legacy
@@ -483,7 +482,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                         </Tooltip>
                       </Table.Td>
                       <Table.Td>
-                        <Text size="xs" c="dimmed">
+                        <Text size="xs" tone="muted">
                           {grant.grantedAt ? new Date(grant.grantedAt).toLocaleDateString() : '—'}
                         </Text>
                       </Table.Td>
@@ -505,7 +504,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                 </Table.Tbody>
               </Table>
             ) : (
-              <Text size="sm" c="dimmed">{t('admin_space_no_grants', 'No access grants. Everyone with the manage_mullion capability can access this space.')}</Text>
+              <Text size="sm" tone="muted">{t('admin_space_no_grants', 'No access grants. Everyone with the manage_mullion capability can access this space.')}</Text>
             )}
 
             <Divider label={t('admin_space_grant_divider', 'Grant access')} labelPosition="center" />
@@ -540,28 +539,28 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
             </Group>
           </Stack>
         ) : (
-          <Text c="dimmed" size="sm">{t('admin_space_access_empty', 'Select a space from the Spaces tab to manage access.')}</Text>
+          <Text tone="muted" size="sm">{t('admin_space_access_empty', 'Select a space from the Spaces tab to manage access.')}</Text>
         )}
       </Tabs.Panel>
 
       <Tabs.Panel value="library" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         {!selectedSpace ? (
-          <Text c="dimmed" size="sm">{t('admin_space_library_empty', 'Select a space from the Spaces tab to manage its shared library.')}</Text>
+          <Text tone="muted" size="sm">{t('admin_space_library_empty', 'Select a space from the Spaces tab to manage its shared library.')}</Text>
         ) : !isDelegated ? (
           <Alert icon={<IconInfoCircle size={16} />} color="blue" variant="light">
-            <Text size="sm" fw={500} style={{ marginBottom: uiRem(0.125) }}>{t('admin_space_open_title', '{{name}} is an open space.', { name: selectedSpace.name })}</Text>
+            <Text size="sm" weight={500} style={{ marginBottom: uiRem(0.125) }}>{t('admin_space_open_title', '{{name}} is an open space.', { name: selectedSpace.name })}</Text>
             <Text size="sm">
               {t('admin_space_open_desc', 'Open spaces can use every asset in the library — per-space selection only applies to delegated spaces. Switch this space to delegated isolation mode to restrict its assets.')}
             </Text>
           </Alert>
         ) : (
           <Stack gap="lg">
-            <Text size="sm" c="dimmed">
-              {t('admin_space_lib_pre', 'Select the assets ')}<Text span fw={500}>{selectedSpace.name}</Text>{t('admin_space_lib_post', ' is allowed to use. Unselected assets are hidden in this space.')}
+            <Text size="sm" tone="muted">
+              {t('admin_space_lib_pre', 'Select the assets ')}<Text span weight={500}>{selectedSpace.name}</Text>{t('admin_space_lib_post', ' is allowed to use. Unselected assets are hidden in this space.')}
             </Text>
 
             <Stack gap="xs">
-              <Text size="sm" fw={500}>{t('admin_space_assets', 'Assets')}</Text>
+              <Text size="sm" weight={500}>{t('admin_space_assets', 'Assets')}</Text>
               <SpaceAssetLibrary
                 assets={allAssets ?? []}
                 associatedIds={spaceLibrary?.asset ?? []}
@@ -572,11 +571,11 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
             </Stack>
 
             <Stack gap="xs">
-              <Text size="sm" fw={500}>{t('admin_space_fonts', 'Fonts')}</Text>
+              <Text size="sm" weight={500}>{t('admin_space_fonts', 'Fonts')}</Text>
               {fontsLoading || libraryLoading ? (
                 <Center py="xs"><Loader size="sm" /></Center>
               ) : !allFonts?.length ? (
-                <Text size="xs" c="dimmed">{t('admin_space_no_fonts', 'No fonts in the global library.')}</Text>
+                <Text size="xs" tone="muted">{t('admin_space_no_fonts', 'No fonts in the global library.')}</Text>
               ) : (
                 allFonts.map((font) => (
                   <Checkbox

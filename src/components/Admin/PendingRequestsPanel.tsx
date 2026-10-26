@@ -6,12 +6,12 @@ import {
   Button,
   Loader,
   Table,
-  Text,
-  Title,
 } from '@mantine/core';
 import {
   Group,
   Stack,
+  Text,
+  Title,
 } from '@/ui';
 import { IconAlertCircle, IconCheck, IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -70,7 +70,7 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
 
   if (!campaignId) {
     return (
-      <Text size="sm" c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
+      <Text size="sm" tone="muted" align="center" style={{ paddingBlock: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         {t('admin_req_select_campaign', 'Select a campaign to see access requests.')}
       </Text>
     );
@@ -100,14 +100,14 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
           <Loader size="sm" />
         </Box>
       ) : pendingRequests.length === 0 && resolvedRequests.length === 0 ? (
-        <Text size="sm" c="dimmed" ta="center" style={{ paddingBlock: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
+        <Text size="sm" tone="muted" align="center" style={{ paddingBlock: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           {t('admin_req_none', 'No access requests for this campaign.')}
         </Text>
       ) : (
         <Stack gap="xs">
           {pendingRequests.length > 0 && (
             <>
-              <Text size="xs" tt="uppercase" fw={600} c="orange.4">
+              <Text size="xs" transform="uppercase" weight={600} tone="warning">
                 {t('admin_req_pending', 'Pending')}
               </Text>
               <Table striped highlightOnHover withTableBorder withColumnBorders>
@@ -127,7 +127,7 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
                         </Text>
                       </Table.Td>
                       <Table.Td>
-                        <Text size="xs" c="dimmed">
+                        <Text size="xs" tone="muted">
                           {formatDate(req.requestedAt)}
                         </Text>
                       </Table.Td>
@@ -166,7 +166,7 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
 
           {resolvedRequests.length > 0 && (
             <>
-              <Text size="xs" tt="uppercase" fw={600} c="dimmed" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
+              <Text size="xs" transform="uppercase" weight={600} tone="muted" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
                 {t('admin_req_resolved', 'Resolved')}
               </Text>
               <Table withTableBorder withColumnBorders>
@@ -195,7 +195,7 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
                         </Badge>
                       </Table.Td>
                       <Table.Td>
-                        <Text size="xs" c="dimmed">
+                        <Text size="xs" tone="muted">
                           {req.resolvedAt ? formatDate(req.resolvedAt) : '—'}
                         </Text>
                       </Table.Td>

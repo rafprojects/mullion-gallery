@@ -60,5 +60,17 @@ for (const mount of ['shadow', 'light'] as const) {
       .evaluate((el) => [...el.children].map((k) => k.getBoundingClientRect()).map((r) => ({ top: r.top, width: r.width })));
     expect(boxes[0]!.top).toBe(boxes[1]!.top);
     expect(boxes[0]!.width).toBeCloseTo(boxes[1]!.width, 0);
+
+    // An inner Text reads Mantine's way: size, line height and transform from
+    // the enclosing Text, weight reset to regular.
+    const [outer, innerText] = await Promise.all(
+      ['inline-nest-outer-text', 'inline-nest-inner-text'].map((id) =>
+        page.getByTestId(id).evaluate((el) => {
+          const cs = getComputedStyle(el);
+          return { size: cs.fontSize, lineHeight: cs.lineHeight, weight: cs.fontWeight, transform: cs.textTransform };
+        }),
+      ),
+    );
+    expect(innerText).toEqual({ size: outer!.size, lineHeight: outer!.lineHeight, weight: '400', transform: 'uppercase' });
   });
 }

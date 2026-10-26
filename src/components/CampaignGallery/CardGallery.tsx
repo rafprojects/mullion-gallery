@@ -13,8 +13,8 @@
  */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Container, Title, Text, Chip, SegmentedControl, Alert, Box, Center, Loader, TextInput, Switch, Select } from '@mantine/core';
-import { Group, Stack } from '@/ui';
+import { Container, Chip, SegmentedControl, Alert, Box, Center, Loader, TextInput, Switch, Select } from '@mantine/core';
+import { Group, Stack, Title, Text } from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { IconSearch } from '@tabler/icons-react';
 import { CampaignCard } from './CampaignCard';
@@ -243,7 +243,7 @@ export function CardGallery({
   const emptyNode = filteredCampaigns.length === 0 ? (
     <Center py={{ base: 60, md: 80 }} role="status" aria-live="polite">
       <Stack align="center" gap="md">
-        <Text size="lg" c="dimmed" ta="center">
+        <Text size="lg" tone="muted" align="center">
           {searchQuery.trim()
             ? t('cardgal_empty_search', 'No campaigns match your search.')
             : !isAuthenticated && campaigns.length === 0
@@ -271,7 +271,7 @@ export function CardGallery({
           position="top-right"
         >
           <Stack gap="sm">
-            <Text fw={600} size="xs">{t('cardgal_hdr_settings', 'Viewer Header Settings')}</Text>
+            <Text weight={600} size="xs">{t('cardgal_hdr_settings', 'Viewer Header Settings')}</Text>
             <Switch
               label={t('cardgal_show_title', 'Show Title')}
               checked={galleryBehaviorSettings.showGalleryTitle}
@@ -316,7 +316,7 @@ export function CardGallery({
                 size="xs"
               />
             )}
-            <Text fw={500} size="xs" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('cardgal_title_typo', 'Title Typography')}</Text>
+            <Text weight={500} size="xs" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('cardgal_title_typo', 'Title Typography')}</Text>
             <TypographyEditor
               value={galleryBehaviorSettings.typographyOverrides['viewerTitle'] ?? {}}
               onChange={(v) => {
@@ -335,13 +335,13 @@ export function CardGallery({
               <Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
                 {(galleryBehaviorSettings.showGalleryTitle || galleryBehaviorSettings.showGallerySubtitle) && (
                   <Stack gap={0}>
-                    {galleryBehaviorSettings.showGalleryTitle && <Title order={1} size="h3" style={viewerTitleStyle}>{galleryBehaviorSettings.galleryTitleText || t('cardgal_gallery_fallback', 'Gallery')}</Title>}
-                    {galleryBehaviorSettings.showGallerySubtitle && galleryBehaviorSettings.gallerySubtitleText && <Text c="dimmed" size="sm" style={viewerSubtitleStyle}>{galleryBehaviorSettings.gallerySubtitleText}</Text>}
+                    {galleryBehaviorSettings.showGalleryTitle && <Title order={1} size={3} style={viewerTitleStyle}>{galleryBehaviorSettings.galleryTitleText || t('cardgal_gallery_fallback', 'Gallery')}</Title>}
+                    {galleryBehaviorSettings.showGallerySubtitle && galleryBehaviorSettings.gallerySubtitleText && <Text tone="muted" size="sm" style={viewerSubtitleStyle}>{galleryBehaviorSettings.gallerySubtitleText}</Text>}
                   </Stack>
                 )}
                 {isAdmin && galleryBehaviorSettings.showAccessMode && (
                   <Group gap="sm" align="center">
-                    <Text size="xs" fw={600} tt="uppercase" c="dimmed">{t('cardgal_access_mode', 'Access mode')}</Text>
+                    <Text size="xs" weight={600} transform="uppercase" tone="muted">{t('cardgal_access_mode', 'Access mode')}</Text>
                     <SegmentedControl
                       value={accessMode}
                       onChange={(v) => onAccessModeChange?.(v as 'lock' | 'hide')}

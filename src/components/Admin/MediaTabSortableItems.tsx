@@ -1,5 +1,5 @@
 import { type CSSProperties, type KeyboardEventHandler } from 'react';
-import { Image, Text, Badge, Table, ActionIcon, Grid, Box, Skeleton } from '@mantine/core';
+import { Image, Badge, Table, ActionIcon, Grid, Box, Skeleton } from '@mantine/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { IconGripVertical, IconPhoto, IconTrash } from '@tabler/icons-react';
@@ -9,7 +9,7 @@ import { MediaUsageBadge } from './MediaUsageBadge';
 import { FALLBACK_IMAGE_SRC } from '@/utils/fallback';
 import type { ApiClient } from '@/services/apiClient';
 import type { MediaItem } from '@/types';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Text } from '@/ui';
 
 export type SharedSortableProps = {
   item: MediaItem;
@@ -89,7 +89,7 @@ export function SortableListRow({
           <Badge size="xs" variant="filled" color={mediaTypeColor}>{mediaTypeLabel}</Badge>
           <Badge size="xs" variant="light" color={sourceColor}>{sourceLabel}</Badge>
         </Group>
-        <Text size="xs" c="dimmed" lineClamp={1}>{item.url}</Text>
+        <Text size="xs" tone="muted" lineClamp={1}>{item.url}</Text>
       </Table.Td>
       <Table.Td><Text size="sm">{item.type}</Text></Table.Td>
       <Table.Td><Text size="sm">{item.source}</Text></Table.Td>

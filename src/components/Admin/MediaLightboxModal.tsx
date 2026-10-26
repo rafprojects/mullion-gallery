@@ -1,9 +1,10 @@
-import { ActionIcon, Box, Image, Modal, Text } from '@mantine/core';
+
+import { ActionIcon, Box, Image, Modal } from '@mantine/core';
 import { IconChevronLeft, IconChevronRight, IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Text } from '@/ui';
 
 interface MediaLightboxModalProps {
   opened: boolean;
@@ -80,8 +81,8 @@ export function MediaLightboxModal({
             p="md"
             style={{ position: 'absolute', bottom: '0', left: '0', right: '0', background: 'linear-gradient(transparent, color-mix(in srgb, var(--mullion-color-background) 80%, transparent))' }}
           >
-            <Text c="white" size="sm">{currentItem.caption || t('admin_untitled', 'Untitled')}</Text>
-            <Text c="dimmed" size="xs">{lightboxIndex + 1} / {imageItems.length}</Text>
+            <Text size="sm">{currentItem.caption || t('admin_untitled', 'Untitled')}</Text>
+            <Text tone="muted" size="xs">{lightboxIndex + 1} / {imageItems.length}</Text>
           </Box>
         </Box>
       )}

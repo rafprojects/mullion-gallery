@@ -11,8 +11,8 @@
  */
 import { useState, useCallback, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Text } from '@mantine/core';
-import { Stack } from '@/ui';
+import { Box } from '@mantine/core';
+import { Stack, Text } from '@/ui';
 import { IconPlayerPlay, IconZoomIn } from '@tabler/icons-react';
 import { OVERLAY_BG, OVERLAY_TEXT } from './overlayStyles';
 import type {

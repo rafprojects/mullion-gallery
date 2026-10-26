@@ -9,7 +9,6 @@ import {
   NumberInput,
   Slider,
   Button,
-  Text,
   ActionIcon,
   Tooltip,
 } from '@mantine/core';
@@ -21,7 +20,7 @@ import {
 import type { LayoutTextLayer, LayoutTextSemanticTag, LayoutTextAlign, TypographyOverride } from '@/types';
 import { TypographyEditor } from '@/components/Common/TypographyEditor';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group } from '@/ui';
+import { uiRem, Stack, Group, Text } from '@/ui';
 
 export interface TextPropertiesPanelProps {
   text: LayoutTextLayer;
@@ -108,7 +107,7 @@ export function TextPropertiesPanel({
         comboboxProps={{ withinPortal: false }}
       />
       <div>
-        <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.25) }}>{t('lb_text_alignment', 'Alignment')}</Text>
+        <Text size="xs" tone="muted" style={{ marginBottom: uiRem(0.25) }}>{t('lb_text_alignment', 'Alignment')}</Text>
         <SegmentedControl
           size="xs"
           fullWidth
@@ -146,9 +145,9 @@ export function TextPropertiesPanel({
 
       {/* ── Transform & appearance ── */}
       <Divider label={t('lb_gl_transform', 'Transform')} labelPosition="left" />
-      <Text size="xs" c="dimmed">{t('lb_gl_rotation', 'Rotation')}</Text>
+      <Text size="xs" tone="muted">{t('lb_gl_rotation', 'Rotation')}</Text>
       <Slider value={text.rotation ?? 0} onChange={(v) => set({ rotation: v })} min={-180} max={180} step={1} size="xs" label={(v) => `${v}°`} aria-label={t('lb_gl_rotation', 'Rotation')} />
-      <Text size="xs" c="dimmed">{t('lb_gl_opacity', 'Opacity')}</Text>
+      <Text size="xs" tone="muted">{t('lb_gl_opacity', 'Opacity')}</Text>
       <Slider value={text.opacity} onChange={(v) => set({ opacity: v })} min={0} max={1} step={0.05} size="xs" label={(v) => `${Math.round(v * 100)}%`} aria-label={t('lb_gl_opacity', 'Opacity')} />
 
       {/* ── Stacking ── */}
@@ -164,7 +163,7 @@ export function TextPropertiesPanel({
       <Divider label={t('lb_gl_danger_zone', 'Danger zone')} labelPosition="left" />
       {confirmOpen ? (
         <Stack gap="3xs">
-          <Text size="xs" c="dimmed">{t('lb_text_remove_confirm', 'Remove this text layer?')}</Text>
+          <Text size="xs" tone="muted">{t('lb_text_remove_confirm', 'Remove this text layer?')}</Text>
           <Group gap="3xs">
             <Button size="xs" variant="subtle" onClick={closeConfirm} style={{ flex: 1 }}>{t('lb_gl_cancel', 'Cancel')}</Button>
             <Button size="xs" color="red" onClick={() => { closeConfirm(); onRemove(text.id); }} leftSection={<IconTrash size={12} />} style={{ flex: 1 }} aria-label={t('lb_gl_confirm_remove', 'Confirm remove')}>{t('lb_gl_remove', 'Remove')}</Button>

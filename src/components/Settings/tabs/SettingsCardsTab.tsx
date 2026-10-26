@@ -1,6 +1,6 @@
 import { memo } from 'react';
-import { Accordion, Box, SegmentedControl, Text } from '@mantine/core';
-import { Stack } from '@/ui';
+import { Accordion, Box, SegmentedControl } from '@mantine/core';
+import { Stack, Text } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
 import type { CardConfigBreakpoint } from '@/types';
@@ -36,7 +36,7 @@ export const SettingsCardsTab = memo(function SettingsCardsTab({
   return (
     <Stack gap="md">
       <Box>
-        <Text size="sm" c="dimmed" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
+        <Text size="sm" tone="muted" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
           {t('set_cards_tab_intro', 'Desktop edits the base card settings. Tablet and mobile can override selected layout and appearance fields without changing the desktop baseline.')}
         </Text>
         <SegmentedControl

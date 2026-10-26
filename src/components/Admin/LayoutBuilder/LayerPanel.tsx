@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, ScrollArea, ActionIcon, Tooltip } from '@mantine/core';
+import { ScrollArea, ActionIcon, Tooltip } from '@mantine/core';
 import { IconChevronDown, IconChevronRight, IconLayersLinked, IconLayersOff } from '@tabler/icons-react';
 import { buildLayerList, getLayerName, type GroupLayerItem } from '@/utils/layerList';
 import { LayerRow } from './LayerRow';
 import type { LayoutTemplate } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack } from '@/ui';
+import { uiRem, Stack, Text } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -280,7 +280,7 @@ export function LayerPanel({
     >
       <Text
         size="xs"
-        fw={600}
+        weight={600}
         style={{ paddingInline: uiRem(0.375), paddingBlock: uiRem(0.25),
           borderBottom: '1px solid var(--mullion-builder-border)',
           letterSpacing: '0.05em',
@@ -362,11 +362,11 @@ export function LayerPanel({
                     {isCollapsed ? <IconChevronRight size={12} /> : <IconChevronDown size={12} />}
                   </ActionIcon>
                   <IconLayersLinked size={13} style={{ flexShrink: 0, color: 'var(--mantine-color-blue-5)' }} />
-                  <Text size="xs" fw={500} style={{ flex: 1 }} truncate>
+                  <Text size="xs" weight={500} style={{ flex: 1 }} truncate>
                     {groupItem.name || t('lb_lp_group', 'Group')}
                   </Text>
                   {/* P30-G: show total descendant count (not just direct members) */}
-                  <Text size="xs" c="dimmed">{groupItem.totalDescendantCount}</Text>
+                  <Text size="xs" tone="muted">{groupItem.totalDescendantCount}</Text>
                   {onDissolveGroup && (
                     <Tooltip label={t('lb_lp_ungroup', 'Ungroup')}>
                       <ActionIcon

@@ -10,8 +10,8 @@
  * responsive object form migrate to `className` in Phase 81.
  */
 
-import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
-import { renderElement, cx, type UiElementProps } from './element';
+import type { CSSProperties, ReactNode } from 'react';
+import { renderElement, cx, type UiAttributes, type UiElementProps } from './element';
 import {
   customProperties,
   splitPadding,
@@ -26,12 +26,8 @@ import { uiRem } from '../styles/rootScale';
 type Align = NonNullable<CSSProperties['alignItems']>;
 type Justify = NonNullable<CSSProperties['justifyContent']>;
 
-/**
- * The ordinary attributes of the element a layout primitive renders. Each one
- * already reached the DOM through the rest props; this lets a caller type
- * `role`, `draggable` or a drag handler without a cast (P81-A).
- */
-export type UiDivAttributes = Omit<HTMLAttributes<HTMLDivElement>, 'style' | 'className' | 'children' | 'color'>;
+/** A layout primitive renders a `<div>`; see `UiAttributes`. */
+export type UiDivAttributes = UiAttributes<HTMLDivElement>;
 
 interface FlexProps extends UiElementProps, UiPaddingProps, UiDivAttributes {
   gap?: UiSpacing | undefined;

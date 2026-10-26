@@ -30,14 +30,21 @@ export {
   Grid,
   Paper,
   SimpleGrid,
-  Text,
-  Title,
 } from '@mantine/core';
 
 // [P81-A] Flipped to the framework, with their consumers' props rewritten by
 // scripts/ui-codemod-pass2.mjs in the same commit. Importing the module also
 // registers the component sheets into the style list (P79-B).
-export { Group, Stack, type GroupProps, type StackProps } from './components';
+export {
+  Group,
+  Stack,
+  Text,
+  Title,
+  type GroupProps,
+  type StackProps,
+  type TextProps,
+  type TitleProps,
+} from './components';
 
 // ── Inputs and controls ────────────────────────────────────────────────────
 export {

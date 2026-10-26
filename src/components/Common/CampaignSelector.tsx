@@ -1,4 +1,5 @@
-import { Select, Text } from '@mantine/core';
+import { Select } from '@mantine/core';
+import { Text } from '@/ui';
 import type { CSSProperties } from 'react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 
@@ -27,7 +28,7 @@ export function CampaignSelector({
 }: CampaignSelectorProps) {
   return (
     <Select
-      label={<Text size="sm" fw={500}>{label}</Text>}
+      label={<Text size="sm" weight={500}>{label}</Text>}
       placeholder={placeholder}
       data={data}
       value={value}

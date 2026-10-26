@@ -3,14 +3,13 @@ import {
   Modal,
   Button,
   Select,
-  Text,
   Alert,
 } from '@mantine/core';
 import { IconArrowsExchange, IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { AdminCampaign, SpaceInfo } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack } from '@/ui';
+import { uiRem, Group, Stack, Text } from '@/ui';
 
 export interface CampaignMoveSpaceModalProps {
   /** Campaign to move; null when modal is closed. */
@@ -71,10 +70,10 @@ export function CampaignMoveSpaceModal({
     >
       <Stack {...getMullionDebugProps('CampaignMoveSpaceModal', 'stack')} gap="md">
         <div>
-          <Text size="sm" c="dimmed" style={{ marginBottom: uiRem(0.25) }}>{t('admin_move_campaign_label', 'Campaign:')}</Text>
-          <Text fw={600}>{source?.title}</Text>
-          <Text size="sm" c="dimmed" style={{ marginTop: uiRem(0.25) }}>
-            {t('admin_move_from_space', 'From space:')} <Text component="span" fw={600} c="inherit">{sourceSpace?.name ?? '—'}</Text>
+          <Text size="sm" tone="muted" style={{ marginBottom: uiRem(0.25) }}>{t('admin_move_campaign_label', 'Campaign:')}</Text>
+          <Text weight={600}>{source?.title}</Text>
+          <Text size="sm" tone="muted" style={{ marginTop: uiRem(0.25) }}>
+            {t('admin_move_from_space', 'From space:')} <Text render={<span />} weight={600}>{sourceSpace?.name ?? '—'}</Text>
           </Text>
         </div>
 

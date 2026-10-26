@@ -1,5 +1,6 @@
-import { Button, Image, Modal, Text, Badge } from '@mantine/core';
-import { Group, Stack } from '@/ui';
+
+import { Button, Image, Modal, Badge } from '@mantine/core';
+import { Group, Stack, Text } from '@/ui';
 import { Trans, useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import type { UploadDuplicateCampaign } from '@/types';
@@ -67,7 +68,7 @@ export function NearDuplicateWarning({
 
         <Group align="flex-start" gap="md">
           <Stack gap="2xs" style={{ flex: 1, minWidth: 0 }}>
-            <Text size="xs" c="dimmed">{t('ndw_existing_image', 'Existing image')}</Text>
+            <Text size="xs" tone="muted">{t('ndw_existing_image', 'Existing image')}</Text>
             <Image
               {...getMullionDebugProps('NearDuplicateWarning', 'similar-image')}
               src={similarUrl}
@@ -79,14 +80,14 @@ export function NearDuplicateWarning({
             />
             <Stack gap="4xs">
               {originalName ? (
-                <Text size="xs" c="dimmed">
+                <Text size="xs" tone="muted">
                   <strong>{t('ndw_original_label', 'Original:')}</strong> {originalName}
                 </Text>
               ) : null}
               <Text
                 {...getMullionDebugProps('NearDuplicateWarning', 'campaign-line')}
                 size="xs"
-                c="dimmed"
+                tone="muted"
               >
                 {formatCampaignLine(campaigns)}
               </Text>
@@ -102,7 +103,7 @@ export function NearDuplicateWarning({
           </Stack>
         </Group>
 
-        <Text size="xs" c="dimmed">
+        <Text size="xs" tone="muted">
           {t('ndw_help', 'Use the existing image to avoid duplicates, or upload this file anyway.')}
         </Text>
 

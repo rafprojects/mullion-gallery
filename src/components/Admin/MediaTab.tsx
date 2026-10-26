@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, useRef, memo } from 'react';
-import { Button, Grid, Text, Select, Table, Box, Tooltip, Pagination, Skeleton, Switch, type Primitive } from '@mantine/core';
+import { Button, Grid, Select, Table, Box, Tooltip, Pagination, Skeleton, Switch, type Primitive } from '@mantine/core';
 import { SegmentedControl } from '@mantine/core';
 
 // Mantine's SegmentedControl calls setState inside its ref callbacks, which triggers
@@ -52,7 +52,7 @@ import { useMediaExternal } from '@/hooks/useMediaExternal';
 import { useMediaCrud } from '@/hooks/useMediaCrud';
 import { useMediaDisplay } from '@/hooks/useMediaDisplay';
 import styles from './MediaTab.module.scss';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Text } from '@/ui';
 
 // Position the DragOverlay so its top-center sits just below the cursor.
 // The overlay is 140 px wide; placing the cursor at (width/2, 12) gives a natural
@@ -311,8 +311,8 @@ export default function MediaTab({ campaignId, apiClient, onCampaignsUpdated }: 
     <div ref={scrollContainerRef} style={{ overflowY: 'auto', maxHeight: '70vh' }}>
       <Group justify="space-between" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} wrap="wrap" gap="sm">
         <Group gap="md" wrap="wrap">
-          <Text fw={700}>{t('admin_media_heading', 'Media')}</Text>
-          <Text size="sm" c="dimmed">({displayedMedia.length}{orphanFilter ? ` / ${media.length}` : ''} {t('admin_media_items', 'items')})</Text>
+          <Text weight={700}>{t('admin_media_heading', 'Media')}</Text>
+          <Text size="sm" tone="muted">({displayedMedia.length}{orphanFilter ? ` / ${media.length}` : ''} {t('admin_media_items', 'items')})</Text>
         </Group>
         <Group gap="sm" wrap="wrap" style={{ flex: '1 1 auto', justifyContent: 'flex-end' }}>
           {/* View Mode Toggle */}

@@ -15,12 +15,14 @@
  */
 
 import type { ReactNode } from 'react';
-import { renderElement, cx, focusable, type UiElementProps, type UiTone } from './element';
+import { renderElement, cx, focusable, type UiAttributes, type UiElementProps, type UiTone } from './element';
 import { customProperties, fontSizeValue, type UiFontSize } from './scale';
 
 type TextAlign = 'left' | 'center' | 'right' | 'justify' | 'start' | 'end';
 
-export interface TextProps extends UiElementProps {
+const SIZE_STEPS: readonly string[] = ['xs', 'sm', 'md', 'lg', 'xl'];
+
+export interface TextProps extends UiElementProps, UiAttributes<HTMLParagraphElement> {
   size?: UiFontSize | undefined;
   tone?: UiTone | undefined;
   /** 400 to 700, or any CSS `font-weight` value. */
@@ -69,6 +71,9 @@ export function Text({
       style: {
         ...customProperties({
           '--mullion-font-size': fontSizeValue(size),
+          // [P81-A] A size step brings its own line height, as Mantine's does;
+          // any other size leaves it to the nearest ancestor Text, or md.
+          '--mullion-line-height': typeof size === 'string' && SIZE_STEPS.includes(size) ? `var(--mullion-line-height-${size})` : undefined,
           '--mullion-font-weight': weight,
           '--mullion-text-align': align,
           '--mullion-text-transform': transform,
@@ -84,7 +89,7 @@ export function Text({
 
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-export interface TitleProps extends UiElementProps {
+export interface TitleProps extends UiElementProps, UiAttributes<HTMLHeadingElement> {
   /** The heading level, which sets both the tag and the default size. */
   order?: HeadingLevel | undefined;
   /** Paint a different level than the tag, for a heading that must sit lower in the outline than it looks. */

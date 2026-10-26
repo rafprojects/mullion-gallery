@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, Text, Box, Badge, Tooltip, Button, Checkbox, Select, Menu } from '@mantine/core';
+import { Table, Box, Badge, Tooltip, Button, Checkbox, Select, Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconEdit, IconCopy, IconDownload, IconFileZip, IconArchive, IconArchiveOff, IconLayoutGrid, IconTrash, IconChevronDown, IconArrowsExchange, IconPhotoPlus } from '@tabler/icons-react';
 import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
@@ -10,7 +10,7 @@ import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { CompanyCombobox } from '@/components/Common/CompanyCombobox';
 import type { ApiClient } from '@/services/apiClient';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Text } from '@/ui';
 
 function toSlug(name: string): string {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -89,7 +89,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
           <Table.Td>
             <Box>
               <Group gap="2xs">
-                <Text fw={700}>{c.title}</Text>
+                <Text weight={700}>{c.title}</Text>
                 {hasCampaignGalleryOverrides(c) && (
                   <Tooltip label={t('admin_custom_gallery', 'Custom gallery: {{summary}}', { summary: overrideText })} withArrow>
                     <Box
@@ -103,7 +103,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                   </Tooltip>
                 )}
               </Group>
-              <Text size="xs" c="dimmed">{c.description?.slice(0, 120)}</Text>
+              <Text size="xs" tone="muted">{c.description?.slice(0, 120)}</Text>
             </Box>
           </Table.Td>
           <Table.Td>
@@ -179,7 +179,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                 )}
               </Group>
             ) : (
-              <Text size="xs" c="dimmed">—</Text>
+              <Text size="xs" tone="muted">—</Text>
             )}
           </Table.Td>
           <Table.Td>
@@ -190,7 +190,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                 ))}
               </Group>
             ) : (
-              <Text size="xs" c="dimmed">—</Text>
+              <Text size="xs" tone="muted">—</Text>
             )}
           </Table.Td>
           <Table.Td>
@@ -201,7 +201,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                 ))}
               </Group>
             ) : (
-              <Text size="xs" c="dimmed">—</Text>
+              <Text size="xs" tone="muted">—</Text>
             )}
           </Table.Td>
           <Table.Td>

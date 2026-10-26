@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text } from '@mantine/core';
+import { Text } from '@/ui';
 import { Rnd } from 'react-rnd';
 import type { LayoutTemplate, MediaItem, PersistentGuide, ResponsiveBreakpoint } from '@/types';
 import { assignMediaToSlots, resolveSlotForBreakpoint } from '@/utils/layoutSlotAssignment';
@@ -704,10 +704,10 @@ export function LayoutCanvas({
               gap: 6,
             }}
           >
-            <Text size="sm" c="dimmed" ta="center" style={{ opacity: 0.55 }}>
+            <Text size="sm" tone="muted" align="center" style={{ opacity: 0.55 }}>
               {t('lb_lc_dblclick', 'Double-click to add a slot')}
             </Text>
-            <Text size="xs" c="dimmed" ta="center" style={{ opacity: 0.35 }}>
+            <Text size="xs" tone="muted" align="center" style={{ opacity: 0.35 }}>
               {t('lb_lc_drag_media', 'or drag media from the panel')}
             </Text>
           </div>

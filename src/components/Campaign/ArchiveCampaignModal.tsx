@@ -1,5 +1,6 @@
-import { Button, Modal, Text } from '@mantine/core';
-import { Group, Stack } from '@/ui';
+
+import { Button, Modal } from '@mantine/core';
+import { Group, Stack, Text } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import type { Campaign } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';

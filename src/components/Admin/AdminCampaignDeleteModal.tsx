@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Button, Checkbox, Modal, Text, TextInput } from '@mantine/core';
-import { Group, Stack } from '@/ui';
+import { Button, Checkbox, Modal, TextInput } from '@mantine/core';
+import { Group, Stack, Text } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 
@@ -51,7 +51,7 @@ export function AdminCampaignDeleteModal({
         <Text>
           {t('admin_delete_campaign_msg', 'This permanently deletes "{{title}}", its media references, and pending access requests. This cannot be undone.', { title: campaign?.title ?? t('admin_delete_this_campaign', 'this campaign') })}
         </Text>
-        <Text size="sm" c="dimmed">
+        <Text size="sm" tone="muted">
           {t('admin_delete_type_confirm', 'Type {{token}} to confirm.', { token: CONFIRM_TOKEN })}
         </Text>
         <TextInput

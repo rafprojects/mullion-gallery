@@ -1,6 +1,6 @@
 import type { DrawerProps } from '@mantine/core';
-import { Accordion, Button, Drawer, Menu, NumberInput, Tabs, Text, TextInput } from '@mantine/core';
-import { Group, Stack } from '@/ui';
+import { Accordion, Button, Drawer, Menu, NumberInput, Tabs, TextInput } from '@mantine/core';
+import { Group, Stack, Text } from '@/ui';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useEffect, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -113,12 +113,12 @@ const GalleryConfigEditorIntro: NamedComponent<GalleryConfigEditorIntroProps> = 
   onClearDraft,
 }) => (
   <>
-    <Text size="sm" c="dimmed">
+    <Text size="sm" tone="muted">
       {i18n.t('set_ad_gce_intro', 'This shared editor owns the nested gallery selection model. Inline selectors remain available for quick scanning and small edits.', { ns: 'mullion' })}
     </Text>
 
     {contextSummary && (
-      <Text size="sm" fw={500} c="blue">
+      <Text size="sm" weight={500} tone="info">
         {contextSummary}
       </Text>
     )}
@@ -140,11 +140,11 @@ const GalleryConfigEditorIntro: NamedComponent<GalleryConfigEditorIntroProps> = 
 
     {resolvedDraft.mode === 'unified' ? (
       unifiedAdapterEnabled ? (
-        <Text size="sm" c="dimmed">
+        <Text size="sm" tone="muted">
           {unifiedAdapterHelpText}
         </Text>
       ) : (
-        <Text size="sm" c="dimmed">
+        <Text size="sm" tone="muted">
           {i18n.t('set_ad_gce_unified_inherit_note', 'Unified mode selection is supported here, but campaign-level unified adapter overrides still inherit the global unified adapter in this slice.', { ns: 'mullion' })}
         </Text>
       )
@@ -208,7 +208,7 @@ const GalleryConfigBreakpointAdaptersSection: NamedComponent<GalleryConfigBreakp
               return (
                 <Tabs.Panel key={breakpoint} value={breakpoint} style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
                   <Stack gap="md">
-                    <Text size="sm" c="dimmed">
+                    <Text size="sm" tone="muted">
                       {i18n.t('set_ad_gce_bp_editing_unified', 'Editing breakpoint-specific unified settings for the {{bp}} layout.', { bp: tBreakpointLabel(breakpoint), ns: 'mullion' })}
                     </Text>
                     {unifiedAdapterEnabled ? (
@@ -222,7 +222,7 @@ const GalleryConfigBreakpointAdaptersSection: NamedComponent<GalleryConfigBreakp
                         placeholder={i18n.t('set_ad_gce_default_adapter', 'Default adapter', { ns: 'mullion' })}
                       />
                     ) : (
-                      <Text size="sm" c="dimmed">
+                      <Text size="sm" tone="muted">
                         {i18n.t('set_ad_gce_unified_overrides_inherited', 'Unified adapter overrides remain inherited in this slice.', { ns: 'mullion' })}
                       </Text>
                     )}
@@ -263,7 +263,7 @@ const GalleryConfigBreakpointAdaptersSection: NamedComponent<GalleryConfigBreakp
           })}
         </Tabs>
 
-        <Text size="xs" c="dimmed">
+        <Text size="xs" tone="muted">
           {resolvedDraft.mode === 'unified'
             ? i18n.t('set_ad_gce_settings_apply_unified', 'Settings below apply to the {{bp}} breakpoint for the unified gallery surface.', { bp: tBreakpointLabel(activeBreakpoint), ns: 'mullion' })
             : i18n.t('set_ad_gce_settings_apply_pertype', 'Settings below apply to the {{bp}} breakpoint for the current per-type gallery surface.', { bp: tBreakpointLabel(activeBreakpoint), ns: 'mullion' })}
@@ -359,7 +359,7 @@ export function GalleryConfigEditorModal({
       {...drawerProps}
       title={
         <Group style={{ width: '100%' }} justify="space-between" wrap="nowrap" gap="sm">
-          <Text fw={600} size="sm" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</Text>
+          <Text weight={600} size="sm" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</Text>
           <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
             <Menu shadow="md" position="bottom-end">
               <Menu.Target>
@@ -708,7 +708,7 @@ export function GalleryConfigEditorModal({
 
                     return (
                       <Stack key={scope} gap="sm">
-                        <Text size="sm" fw={600}>{scopeLabel}</Text>
+                        <Text size="sm" weight={600}>{scopeLabel}</Text>
 
                         <Select
                           label={t('set_ad_gce_scope_bg', '{{scope}} Background', { scope: scopeLabel })}
@@ -781,7 +781,7 @@ export function GalleryConfigEditorModal({
                       <Accordion.Panel>
                         <Stack gap="sm">
                           {group.note && (
-                            <Text size="xs" c="dimmed">{i18n.t(`set_sg_note_${group.group}`, group.note, { ns: 'mullion' })}</Text>
+                            <Text size="xs" tone="muted">{i18n.t(`set_sg_note_${group.group}`, group.note, { ns: 'mullion' })}</Text>
                           )}
                           {group.fields.filter((field) => shouldRenderAdapterSettingField(resolvedDraft, activeBreakpoint, group, field)).map((field) => {
                             const representativeValue = getRepresentativeAdapterSettingValue(resolvedDraft, activeBreakpoint, group, field);
@@ -921,7 +921,7 @@ export function GalleryConfigEditorModal({
                   ))}
                 </Accordion>
               ) : (
-                <Text size="sm" c="dimmed">
+                <Text size="sm" tone="muted">
                   {t('set_ad_gce_inheriting_note', 'This breakpoint is currently inheriting its adapter choice. Pick an explicit adapter above to expose adapter-specific settings here.')}
                 </Text>
               )}

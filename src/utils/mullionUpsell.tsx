@@ -1,5 +1,6 @@
 import { notifications } from '@mantine/notifications';
-import { Anchor, Text } from '@mantine/core';
+import { Anchor } from '@mantine/core';
+import { Text } from '@/ui';
 import i18n from '@/i18n';
 
 /**

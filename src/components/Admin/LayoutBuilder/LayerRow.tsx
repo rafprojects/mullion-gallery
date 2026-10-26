@@ -1,7 +1,6 @@
 import { useRef, useState, type KeyboardEvent, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Text,
   ActionIcon,
   Tooltip,
   TextInput,
@@ -9,6 +8,7 @@ import {
 } from '@mantine/core';
 import {
   Group,
+  Text,
 } from '@/ui';
 import {
   IconPhoto,
@@ -205,7 +205,7 @@ export function LayerRow({
       ) : (
         <Text
           size="xs"
-          fw={isSelected ? 600 : 400}
+          weight={isSelected ? 600 : 400}
           onDoubleClick={startEdit}
           style={{
             flex: 1,

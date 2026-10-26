@@ -6,8 +6,8 @@
  * campaign names. A count of 0 is highlighted in red (orphaned media).
  */
 import { useState } from 'react';
-import { Badge, Popover, Text, Anchor, Loader, Alert } from '@mantine/core';
-import { Stack } from '@/ui';
+import { Badge, Popover, Anchor, Loader, Alert } from '@mantine/core';
+import { Stack, Text } from '@/ui';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
@@ -53,12 +53,12 @@ function MediaUsageBadgeContent({ loading, error, detail }: MediaUsageBadgeConte
   return (
     <Stack {...getMullionDebugProps('MediaUsageBadge', 'detail')} gap="xs">
       {detail.length === 0 ? (
-        <Text size="sm" c="dimmed">
+        <Text size="sm" tone="muted">
           {t('admin_usage_none', 'Not used in any campaign.')}
         </Text>
       ) : (
         <>
-          <Text size="xs" fw={600} c="dimmed">
+          <Text size="xs" weight={600} tone="muted">
             {t('admin_usage_used_in', 'Used in campaigns:')}
           </Text>
           {detail.map((campaign) => (

@@ -1,5 +1,6 @@
-import { Accordion, Button, Divider, Text } from '@mantine/core';
-import { Stack } from '@/ui';
+
+import { Accordion, Button, Divider } from '@mantine/core';
+import { Stack, Text } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { usePersistentAccordion } from '@/hooks/usePersistentAccordion';
 
@@ -53,7 +54,7 @@ export function TypographySettingsSection({
 
   return (
     <Stack gap="md">
-      <Text size="sm" c="dimmed">
+      <Text size="sm" tone="muted">
         {t('set_typo_intro', 'Customize fonts, sizes, colors, and effects for individual text elements. Empty fields use theme defaults.')}
       </Text>
       <FontLibraryManager

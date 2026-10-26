@@ -1,5 +1,6 @@
-import { Accordion, Box, NumberInput, Slider, Switch, Text, TextInput } from '@mantine/core';
-import { Stack } from '@/ui';
+
+import { Accordion, Box, NumberInput, Slider, Switch, TextInput } from '@mantine/core';
+import { Stack, Text } from '@/ui';
 import { useTranslation } from 'react-i18next';
 
 import { GradientEditor } from '@/components/Common/GradientEditor';
@@ -348,7 +349,7 @@ export function CampaignViewerSettingsSection({ settings, updateSetting }: Campa
         <Accordion.Panel>
           {mounted.has('cv-cover') ? (
             <Stack gap="md">
-              <Text size="sm" fw={500}>{t('set_viewer_cover_mobile_ratio', 'Cover Mobile Ratio')}</Text>
+              <Text size="sm" weight={500}>{t('set_viewer_cover_mobile_ratio', 'Cover Mobile Ratio')}</Text>
               <Slider
                 value={settings.modalCoverMobileRatio}
                 onChange={(value) => updateSetting('modalCoverMobileRatio', value)}
@@ -356,7 +357,7 @@ export function CampaignViewerSettingsSection({ settings, updateSetting }: Campa
                 max={1}
                 step={0.05}
               />
-              <Text size="sm" fw={500}>{t('set_viewer_cover_tablet_ratio', 'Cover Tablet Ratio')}</Text>
+              <Text size="sm" weight={500}>{t('set_viewer_cover_tablet_ratio', 'Cover Tablet Ratio')}</Text>
               <Slider
                 value={settings.modalCoverTabletRatio}
                 onChange={(value) => updateSetting('modalCoverTabletRatio', value)}
@@ -385,7 +386,7 @@ export function CampaignViewerSettingsSection({ settings, updateSetting }: Campa
                 min={320}
                 max={1280}
               />
-              <Text size="sm" fw={500}>{t('set_viewer_desc_lineheight', 'Description Line Height')}</Text>
+              <Text size="sm" weight={500}>{t('set_viewer_desc_lineheight', 'Description Line Height')}</Text>
               <Slider
                 value={settings.campaignDescriptionLineHeight}
                 onChange={(value) => updateSetting('campaignDescriptionLineHeight', value)}
