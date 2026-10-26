@@ -117,3 +117,17 @@ Three rungs join the spacing scale below `xs`: `4xs` 2px, `3xs` 4px, `2xs` 6px. 
 | 8 | 4 | `xs` | yes: 2px looser |
 
 130 of 136 move mechanically. A literal survives pass 2 only where the value is deliberately off-scale, and it is emitted in the tokens' basis.
+
+## Pass 2 progress
+
+`scripts/ui-codemod-pass2.mjs <Name,...>` applies the rows above for the names it has rules for, moves a direct `@mantine/core` import of those names to `@/ui`, and lists what it will not guess. The barrel line moves in the same commit.
+
+| Name | Flipped | Sites | Notes |
+|---|---|---|---|
+| `Stack`, `Group` | 2026-10-25 | 303 edits in 105 files | Every numeric gap but the nine zeros folded onto a rung; 6 listed for review (3px to `3xs` twice, 8px to `xs` four times). `packages/shared-ui`'s five files stay on Mantine until batch zero, with the last two numeric gaps (`AuthBarMinimal.tsx:74` and `:84`). |
+
+**Checks every flip carries**, both found on the first one:
+
+- **Per-instance custom properties inherit.** A component that reads `var(--mullion-x, default)` and was given no `x` reads its nearest ancestor's instead. The layout family now resets what it reads (`layout.css`); before a family flips, its sheet is checked for the same leak, keeping deliberate inheritance such as `Card.Section` reading its card's padding. `e2e/layout-nesting.spec.ts` is the pattern for the test.
+- **Behaviour the defaults do not show.** `Group grow` gives each child `flex: 1 1 0`, equal shares from zero; Mantine gave each its content width plus an equal share of the rest, capped at an equal share. They agree unless a child's content is wider than its share. 37 sites in 10 files; none is on a `theme-qa` surface, so they are listed for the designer rather than proved.
+
