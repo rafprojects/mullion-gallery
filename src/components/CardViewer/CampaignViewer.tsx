@@ -27,7 +27,7 @@ import {
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { UnifiedGallerySection } from './UnifiedGallerySection';
 import { PerTypeGallerySection } from './PerTypeGallerySection';
-import { uiRem, Group, Stack, Title, Text, SimpleGrid, Box, Center, Badge, Paper, Alert } from '@/ui';
+import { uiRem, Group, Stack, Title, Text, SimpleGrid, Box, Center, Badge, Paper, Alert, inkOn } from '@/ui';
 import styles from './CampaignViewer.module.scss';
 
 /** A settings length in the size basis: a number is pixels, as Mantine's `h` read it. */
@@ -123,7 +123,7 @@ function CampaignViewerCoverHeader({
 
       {settings.showCampaignCompanyName !== false && (
         <Badge tone="default" variant="filled"
-          style={{ position: 'absolute', top: uiRem(1), left: uiRem(1), backgroundColor: displayedCampaign.company.brandColor, color: '#fff' }}
+          style={{ position: 'absolute', top: uiRem(1), left: uiRem(1), backgroundColor: displayedCampaign.company.brandColor, color: inkOn(displayedCampaign.company.brandColor) }}
           size="lg"
         >
           <Group gap="2xs">

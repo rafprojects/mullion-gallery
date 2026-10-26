@@ -203,6 +203,11 @@ export { uiLayer, type UiLayer } from './styles/layers';
 // `uiRem` writes an inline length in that basis. See src/ui/styles/rootScale.ts.
 export { measureRootScale, uiRem, useRootScale } from './styles/rootScale';
 
+// ── Framework: ink on a colour the theme does not own (P81-A) ──────────────
+// Black or white against a user's colour, the better of two rather than a
+// guarantee. See packages/theme-engine/src/componentTokens.ts.
+export { inkOn } from '@mullion/theme-engine';
+
 // The presentational components (P79-C) live in `./components` and are
 // deliberately not re-exported here yet: this list is the migration ledger,
 // and moving `Text` onto the framework here would move all 92 files that

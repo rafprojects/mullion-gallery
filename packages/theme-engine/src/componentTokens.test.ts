@@ -12,6 +12,7 @@ import chroma from 'chroma-js';
 import {
   COMPONENT_TOKEN_DERIVATIONS,
   CONTROL_HEIGHTS,
+  inkOn,
   deriveComponentTokens,
   frameworkConstants,
   type ComponentTokenKey,
@@ -274,3 +275,24 @@ describe('framework constants', () => {
     expect(custom['layer-modal']).not.toContain('--mullion');
   });
 });
+
+// [P81-A] Ink on a colour the theme does not own, such as a company's brand colour.
+describe('inkOn', () => {
+  it('picks whichever of black and white contrasts more', () => {
+    expect(inkOn('#1d3557')).toBe('#ffffff');
+    expect(inkOn('#ffe066')).toBe('#000000');
+  });
+
+  it('is the better of two, not a guarantee: a mid grey clears 4.5:1 with neither', () => {
+    const grey = '#777777';
+    const ink = inkOn(grey);
+    expect(Math.max(chroma.contrast(ink, grey), chroma.contrast(ink === '#ffffff' ? '#000000' : '#ffffff', grey))).toBeLessThan(4.7);
+    expect(chroma.contrast(ink, grey)).toBeGreaterThanOrEqual(chroma.contrast(ink === '#ffffff' ? '#000000' : '#ffffff', grey));
+  });
+
+  it('falls back to white for a value it cannot read', () => {
+    expect(inkOn('not a colour')).toBe('#ffffff');
+    expect(inkOn('')).toBe('#ffffff');
+  });
+});
+

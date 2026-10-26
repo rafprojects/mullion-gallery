@@ -181,6 +181,18 @@ function captionScrim(text: string, background: string): number {
 
 /** Black or white, whichever reads better on `fill`. The same rule `primaryOnFill` uses. */
 function onColor(fill: string): string {
+  return inkOn(fill);
+}
+
+/**
+ * Black or white, whichever contrasts more with `fill` (P81-A, designer
+ * 2026-10-26). For a colour the theme does not own, such as a company's brand
+ * colour, this is the better of two, not a guarantee: a mid grey clears 4.5:1
+ * with neither, which is a property of painting on user data. An unreadable
+ * value falls back to white.
+ */
+export function inkOn(fill: string): '#ffffff' | '#000000' {
+  if (!chroma.valid(fill)) return '#ffffff';
   return chroma.contrast('#ffffff', fill) >= chroma.contrast('#000000', fill) ? '#ffffff' : '#000000';
 }
 

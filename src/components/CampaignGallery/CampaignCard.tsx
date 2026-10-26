@@ -12,7 +12,7 @@ import { RequestAccessForm } from './RequestAccessForm';
 import { CompanyLogo } from '@/components/Common/CompanyLogo';
 import styles from './CampaignCard.module.scss';
 
-import { uiRem, Group, Stack, Text, Box, Badge, Card } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Badge, Card, inkOn } from '@/ui';
 
 /** A settings length in the size basis: a number is pixels, as Mantine's `h` read it. */
 const thumbLength = (value: string | number): string => (typeof value === 'number' ? uiRem(value / 16) : value);
@@ -186,7 +186,7 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
             {/* Company badge */}
             {settings?.showCardCompanyName !== false && (
               <Badge tone="default" variant="filled" size="md"
-                style={{ position: 'absolute', top: uiRem(badgeOffsetY / 16), left: uiRem(0.75), maxWidth: uiRem(companyBadgeMaxWidth / 16), backgroundColor: campaign.company.brandColor, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                style={{ position: 'absolute', top: uiRem(badgeOffsetY / 16), left: uiRem(0.75), maxWidth: uiRem(companyBadgeMaxWidth / 16), backgroundColor: campaign.company.brandColor, color: inkOn(campaign.company.brandColor), overflow: 'hidden', textOverflow: 'ellipsis' }}
               >
                 <Group gap="2xs">
                   <CompanyLogo logo={campaign.company.logo} companyName={campaign.company.name} />

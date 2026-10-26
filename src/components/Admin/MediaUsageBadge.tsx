@@ -107,8 +107,8 @@ export function MediaUsageBadge({ count, mediaId, apiClient, size = 'sm' }: Medi
     }
   }
 
-  // Unused is a state; a count of campaigns is information (designer, 2026-10-26).
-  const tone = count === 0 ? 'danger' : 'default';
+  // Unused is a nudge, not an error; a count of campaigns is information (designer, 2026-10-26).
+  const tone = count === 0 ? 'warning' : 'default';
   const label = count === 0 ? t('admin_usage_unused', 'Unused') : t('admin_usage_count', '{{count}} campaign', { count });
 
   return (
