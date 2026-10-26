@@ -244,19 +244,19 @@ function CampaignViewerStatsSection({
       <Title order={3} size={6} style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }} id="campaign-stats-heading" className="mullion-sr-only">{t('cv_stats_heading', 'Campaign Statistics')}</Title>
       <SimpleGrid cols={{ base: 2, sm: 4 }} spacing={{ base: 'sm', md: 'md' }} py="sm" style={{ borderTopWidth: 1, borderTopColor: 'var(--mullion-color-border)' }}>
         <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
-          <Text size="xl" weight={700} style={campaignStatsValueStyle}>{displayedCampaign.videos.length}</Text>
+          <Text size="xl" weight={600} style={campaignStatsValueStyle}>{displayedCampaign.videos.length}</Text>
           <Text size="sm" tone="muted" style={campaignStatsLabelStyle}>{t('cv_videos', 'Videos')}</Text>
         </Paper>
         <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
-          <Text size="xl" weight={700} style={campaignStatsValueStyle}>{displayedCampaign.images.length}</Text>
+          <Text size="xl" weight={600} style={campaignStatsValueStyle}>{displayedCampaign.images.length}</Text>
           <Text size="sm" tone="muted" style={campaignStatsLabelStyle}>{t('cv_images', 'Images')}</Text>
         </Paper>
         <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
-          <Text size="xl" weight={700} style={campaignStatsValueStyle}>{displayedCampaign.tags.length}</Text>
+          <Text size="xl" weight={600} style={campaignStatsValueStyle}>{displayedCampaign.tags.length}</Text>
           <Text size="sm" tone="muted" style={campaignStatsLabelStyle}>{t('cv_tags', 'Tags')}</Text>
         </Paper>
         <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
-          <Text size="xl" weight={700} style={campaignStatsValueStyle}>
+          <Text size="xl" weight={600} style={campaignStatsValueStyle}>
             {displayedCampaign.visibility === 'public' ? '🌐' : '🔒'}
           </Text>
           <Text size="sm" tone="muted" style={campaignStatsLabelStyle}>

@@ -89,7 +89,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
           <Table.Td>
             <Box>
               <Group gap="2xs">
-                <Text weight={700}>{c.title}</Text>
+                <Text weight={600}>{c.title}</Text>
                 {hasCampaignGalleryOverrides(c) && (
                   <Tooltip label={t('admin_custom_gallery', 'Custom gallery: {{summary}}', { summary: overrideText })} withArrow>
                     <Box

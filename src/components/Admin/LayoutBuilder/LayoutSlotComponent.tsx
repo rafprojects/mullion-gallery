@@ -209,7 +209,7 @@ function SlotIndexBadge({ index, isSelected, badgeBg }: { index: number; isSelec
         background: isSelected ? 'var(--mantine-color-blue-6)' : badgeBg,
         color: '#fff',
         fontSize: 10,
-        fontWeight: 700,
+        fontWeight: 600,
         width: 18,
         height: 18,
         borderRadius: '50%',

@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { bundledThemeDefinitions } from './bundledThemes';
-import { auditThemeContrast, AA_NORMAL_TEXT } from './contrastAudit';
+import { auditThemeContrast, intendedContrastChecks, AA_NORMAL_TEXT } from './contrastAudit';
 import type { ThemeColors } from './types';
 
 describe('theme contrast — WCAG AA (P62-H)', () => {
@@ -23,4 +23,29 @@ describe('theme contrast — WCAG AA (P62-H)', () => {
       ).toHaveLength(0);
     });
   }
+});
+
+// [P81-A] The caption scrim's ground is the background over the photo that
+// weakens the theme's text most: a white one under light text, a black one
+// under dark text.
+describe('caption scrim (P81-A)', () => {
+  const lum = (hex: string) => {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+    return r! + g! + b!;
+  };
+  const scrim = (id: string) => {
+    const def = bundledThemeDefinitions.find((d) => d.id === id)!;
+    const checks = intendedContrastChecks(def.colors as ThemeColors, def.colorScheme);
+    return {
+      ground: checks.find((c) => c.label.startsWith('text on a caption scrim'))!.bg,
+      background: checks.find((c) => c.label === 'text on background')!.bg,
+    };
+  };
+
+  it('measures a dark theme over a white photo and a light theme over a black one', () => {
+    const dark = scrim('default-dark');
+    const light = scrim('default-light');
+    expect(lum(dark.ground)).toBeGreaterThan(lum(dark.background));
+    expect(lum(light.ground)).toBeLessThan(lum(light.background));
+  });
 });

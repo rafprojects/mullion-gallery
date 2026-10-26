@@ -80,7 +80,7 @@ export function RequestAccessForm({ campaignId, campaignTitle, apiClient }: Requ
           <Trans
             i18nKey="raf_request_to"
             values={{ title: campaignTitle }}
-            components={{ strong: <Text render={<span />} weight={700} /> }}
+            components={{ strong: <Text render={<span />} weight={600} /> }}
             defaults="Request access to <strong>{{title}}</strong>"
           />
         </Text>

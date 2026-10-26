@@ -101,7 +101,7 @@ export function CampaignsMobileList({
                   aria-label={t('admin_select_item', 'Select {{title}}', { title: c.title })}
                   size="xs"
                 />
-                <Text weight={700} size="sm" truncate style={{ flex: 1 }}>{c.title}</Text>
+                <Text weight={600} size="sm" truncate style={{ flex: 1 }}>{c.title}</Text>
                 {hasCampaignGalleryOverrides(c) && (
                   <Tooltip label={t('admin_custom_gallery', 'Custom gallery: {{summary}}', { summary: galleryOverrideSummary.join(', ') || t('admin_nested_overrides', 'Nested overrides') })} withArrow>
                     <Box component="span" role="img" aria-label={t('admin_custom_gallery_aria', 'Custom gallery overrides')} style={{ display: 'inline-flex' }}>

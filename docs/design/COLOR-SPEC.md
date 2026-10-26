@@ -171,6 +171,7 @@ drops below the bar fails CI rather than shipping.
 | textMuted on surface / surface3 | 7.31 / 6.37 |
 | textMuted2 on surface / surface2 | 9.45 / 8.89 |
 | white button label on primaryFill `#007870` | 5.36 |
+| text on a caption scrim (background at 0.85 over a white photo, the worst case here) | 11.28 |
 
 **`auditUiContrast` — WCAG 1.4.11 non-text, 3:1.** Measured on `default-dark`:
 
@@ -227,7 +228,9 @@ Added 2026-10-02. Rules 1 to 12 are the designer's own text, verbatim from
 [`designer-standing-rules-2026-09-14.md`](correspondences/designer-standing-rules-2026-09-14.md),
 which wrote them as an addendum for this file. They are what survived a week in which nine
 documents were exchanged and five of them reversed something. Rule 13 is from
-[`designer-answers-catching-up-2026-10-02.md`](correspondences/designer-answers-catching-up-2026-10-02.md).
+[`designer-answers-catching-up-2026-10-02.md`](correspondences/designer-answers-catching-up-2026-10-02.md),
+and rule 14 from
+[`designer-answers-text-title-2026-10-26.md`](correspondences/designer-answers-text-title-2026-10-26.md).
 
 ### Grounds and inks
 
@@ -244,6 +247,15 @@ then found already shipped, 2026-09-13.)*
 stop at the first rung clearing 4.5:1, which is why the tightest theme sits 0.03 above the floor and
 why any new derived ground breaks immediately. This is a property to remember, not a defect to fix —
 raising the target globally was priced and rejected.
+
+**14. A caption over an image sits on a scrim that reaches the audited opacity at the caption
+line, with the fade complete before the first glyph.** The scrim is black with white text where the
+surface is not themed (the media picker: 0.60, 5.74:1 over a white image), and the theme's
+`background` with the theme's `text` where it is (the lightbox). *(Designer, 2026-10-26, who
+proposed 0.60 for both. Measured over the worst photo, theme text needs up to 0.81 on the bundled
+themes, Catppuccin Latte the tightest, and 13 of 23 fail at 0.60; the themed scrim therefore
+reaches `CAPTION_SCRIM_OPACITY`, 0.85, which the text audit reads. Muted ink needs up to 0.99 and is
+never used on a scrim.)*
 
 ### Signals
 

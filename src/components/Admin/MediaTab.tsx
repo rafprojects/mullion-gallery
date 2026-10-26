@@ -311,7 +311,7 @@ export default function MediaTab({ campaignId, apiClient, onCampaignsUpdated }: 
     <div ref={scrollContainerRef} style={{ overflowY: 'auto', maxHeight: '70vh' }}>
       <Group justify="space-between" style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} wrap="wrap" gap="sm">
         <Group gap="md" wrap="wrap">
-          <Text weight={700}>{t('admin_media_heading', 'Media')}</Text>
+          <Text weight={600}>{t('admin_media_heading', 'Media')}</Text>
           <Text size="sm" tone="muted">({displayedMedia.length}{orphanFilter ? ` / ${media.length}` : ''} {t('admin_media_items', 'items')})</Text>
         </Group>
         <Group gap="sm" wrap="wrap" style={{ flex: '1 1 auto', justifyContent: 'flex-end' }}>

@@ -555,7 +555,7 @@ export function LayoutBuilderModal({
                   size="lg"
                   styles={{
                     input: {
-                      fontWeight: 700,
+                      fontWeight: 600,
                       fontSize: 'var(--mantine-font-size-lg)',
                       padding: '0 4px',
                       height: 'auto',

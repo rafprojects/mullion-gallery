@@ -249,6 +249,15 @@ const LAYER_STEPS = {
  * break every layer for a consumer that picked its own, and importing the
  * default from `cssVariables` would make the two modules a runtime cycle.
  */
+/**
+ * The opacity a caption's scrim reaches at the caption line, as a fraction of
+ * the theme's background (P81-A, designer 2026-10-26). 0.60 was the proposal;
+ * measured over the worst photo, theme text needs up to 0.81 (Catppuccin
+ * Latte), so 0.85 is the one value that clears every bundled theme. The text
+ * audit reads this constant, so it checks what is painted.
+ */
+export const CAPTION_SCRIM_OPACITY = 0.85;
+
 export function frameworkConstants(prefix: string): Record<string, string> {
   return {
     // P77-F: the ring is a pair, a 2px core with a 6px halo spread so 2px
@@ -273,6 +282,9 @@ export function frameworkConstants(prefix: string): Record<string, string> {
     'line-height-md': '1.55',
     'line-height-lg': '1.6',
     'line-height-xl': '1.65',
+
+    // A caption over an image sits on the theme's background at this opacity.
+    'caption-scrim-opacity': `${CAPTION_SCRIM_OPACITY * 100}%`,
 
     // `layer-host-offset` is deliberately NOT declared here. Every step reads
     // it through `var(..., 0)`, so a host that sets it above the gallery (the

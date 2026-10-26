@@ -364,9 +364,10 @@ Canvas, Halloween, and Reverse Halloween.
 Three faces across three layers, deliberately kept apart so each reads as what it is:
 
 - **Product interface:** **Inter** for everything — body and headings — with a system-font
-  fallback stack. **JetBrains Mono** for code. Weights in use: 400 regular, 500 medium, 600
-  semibold, 700 bold. Buttons and badges are 600; badges are uppercase with `0.02em`
-  letter-spacing. Unchanged by any of the below.
+  fallback stack. **JetBrains Mono** for code. The interface uses three weights: 400 body, 500
+  labels and rest states, 600 emphasis (headings, the active tab, buttons, badges, anything that
+  has to sit above a label). 700 appears in one place in the product, the wordmark, in Archivo.
+  Badges are uppercase with `0.02em` letter-spacing. Unchanged by any of the below.
 - **Mullion brand layer:** **Archivo** 700, `-0.028em`, for the wordmark and marketing
   headlines. See [Wordmark](#wordmark-closed). Archivo is not Inter because the brand layer
   and the interface layer should be legibly separate.

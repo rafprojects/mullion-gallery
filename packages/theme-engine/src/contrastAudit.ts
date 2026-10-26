@@ -15,7 +15,9 @@
  * and Shadow-DOM screen-reader exposure are a separate (human) part of AA — see
  * docs/guides/PRO_FEATURES.md / the P62-H track.
  */
+import chroma from 'chroma-js';
 import { resolveColors } from './colorGen';
+import { CAPTION_SCRIM_OPACITY } from './componentTokens';
 import { contrastRatio } from './validation';
 import type { ThemeColors } from './types';
 
@@ -74,6 +76,12 @@ export function intendedContrastChecks(
     // (on surface). Placeholder text is subject to AA.
     { label: 'textMuted2 on surface', fg: rc.textMuted2, bg: rc.surface, minRatio },
     { label: 'textMuted2 on surface2', fg: rc.textMuted2, bg: rc.surface2, minRatio },
+
+    // [P81-A] A caption over an image sits on the background at the scrim's
+    // opacity over whatever photo is behind it. Browsers blend each sRGB channel
+    // linearly and luminance rises with every channel, so an all-white or an
+    // all-black photo is the worst case; the check takes the weaker of the two.
+    captionScrimCheck(rc.text, rc.background, minRatio),
   ];
 
   // Primary filled Button label (Mantine autoContrast → black/white) on the
@@ -90,6 +98,17 @@ export function intendedContrastChecks(
   });
 
   return checks;
+}
+
+function captionScrimCheck(text: string, background: string, minRatio: number): ContrastCheck {
+  const grounds = ['#ffffff', '#000000'].map((photo) => chroma.mix(photo, background, CAPTION_SCRIM_OPACITY, 'rgb').hex());
+  const worst = grounds.reduce((a, b) => ((contrastRatio(text, a) ?? 0) <= (contrastRatio(text, b) ?? 0) ? a : b));
+  return {
+    label: `text on a caption scrim (background at ${CAPTION_SCRIM_OPACITY} over the worst photo)`,
+    fg: text,
+    bg: worst,
+    minRatio,
+  };
 }
 
 /**

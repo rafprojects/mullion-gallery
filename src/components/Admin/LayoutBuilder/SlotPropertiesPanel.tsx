@@ -151,7 +151,7 @@ function SectionHeader({ label }: { label: string }) {
         borderBottom: '1px solid var(--mantine-color-default-border)',
       }}
     >
-      <Text size="xs" weight={700} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>
+      <Text size="xs" weight={600} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>
         {label}
       </Text>
     </Box>
@@ -595,7 +595,7 @@ export function SlotPropertiesPanel({
               onPointerUp={() => { rotScrubRef.current = null; }}
               onPointerCancel={() => { rotScrubRef.current = null; }}
             >
-              <Text size="xs" weight={700} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_rotation', 'Rotation')}</Text>
+              <Text size="xs" weight={600} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_rotation', 'Rotation')}</Text>
             </div>
             <Group gap="2xs" align="center" wrap="nowrap">
               <NumberInput

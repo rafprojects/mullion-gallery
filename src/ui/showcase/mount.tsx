@@ -318,7 +318,7 @@ function Nesting({ prefix }: { prefix: string }) {
         </Group>
         <span>end</span>
       </Group>
-      <Text size="lg" weight={700} transform="uppercase" data-testid={`${prefix}-nest-outer-text`}>
+      <Text size="lg" weight={600} transform="uppercase" data-testid={`${prefix}-nest-outer-text`}>
         outer{' '}
         <Text span data-testid={`${prefix}-nest-inner-text`}>
           inner

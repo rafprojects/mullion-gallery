@@ -63,7 +63,7 @@ function SectionHeader({ label }: { label: string }) {
     <Box
       style={{ marginTop: uiRem(0.375), marginBottom: uiRem(0.125), paddingBottom: uiRem(0.1875), borderBottom: '1px solid var(--mantine-color-default-border)' }}
     >
-      <Text size="xs" weight={700} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>
+      <Text size="xs" weight={600} transform="uppercase" tone="muted" style={{ letterSpacing: uiRem(0.05) }}>
         {label}
       </Text>
     </Box>

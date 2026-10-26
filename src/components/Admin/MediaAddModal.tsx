@@ -366,7 +366,7 @@ export function MediaAddModal({
                     />
                   )}
                   <div>
-                    <Text weight={700}>{externalPreview.title}</Text>
+                    <Text weight={600}>{externalPreview.title}</Text>
                     <Text size="sm" tone="muted">{externalPreview.provider_name}</Text>
                   </div>
                 </Group>

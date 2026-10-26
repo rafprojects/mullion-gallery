@@ -61,9 +61,9 @@
   .mullion-title {
     margin: 0;
     font-family: var(--mullion-heading-font-family, var(--mullion-font-family));
-    /* 700, Mantine's heading weight, which every title has rendered at; open
-       with the designer (P81-A, pass 2 on Text and Title). */
-    font-weight: 700;
+    /* Interface type uses three weights: 400 body, 500 labels, 600 emphasis,
+       headings among it. 700 is the wordmark's alone (designer, 2026-10-26). */
+    font-weight: 600;
     text-align: var(--mullion-text-align, inherit);
   }
 

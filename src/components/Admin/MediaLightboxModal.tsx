@@ -79,10 +79,21 @@ export function MediaLightboxModal({
           )}
           <Box
             p="md"
-            style={{ position: 'absolute', bottom: '0', left: '0', right: '0', background: 'linear-gradient(transparent, color-mix(in srgb, var(--mullion-color-background) 80%, transparent))' }}
+            // Theme text on a scrim of the theme's background that reaches the audited
+            // opacity at the caption line (contrastAudit.ts). Muted ink cannot clear on
+            // a scrim over an arbitrary photo, so the counter takes text too.
+            style={{
+              position: 'absolute',
+              bottom: '0',
+              left: '0',
+              right: '0',
+              color: 'var(--mullion-color-text)',
+              background:
+                'linear-gradient(transparent, color-mix(in srgb, var(--mullion-color-background) var(--mullion-caption-scrim-opacity), transparent) var(--mullion-spacing-md))',
+            }}
           >
             <Text size="sm">{currentItem.caption || t('admin_untitled', 'Untitled')}</Text>
-            <Text tone="muted" size="xs">{lightboxIndex + 1} / {imageItems.length}</Text>
+            <Text size="xs">{lightboxIndex + 1} / {imageItems.length}</Text>
           </Box>
         </Box>
       )}
