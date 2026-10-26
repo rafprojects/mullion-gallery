@@ -74,6 +74,13 @@ describe('layout primitives', () => {
     expect(vars(raw!)['--mullion-gap']).toBe('0.5em');
   });
 
+  it('resolve the spacing rungs below xs as spacing tokens, and only for spacing (P81-A)', () => {
+    const { container } = render(<Stack gap="2xs" padding="4xs" data-testid="tight" />);
+    const v = vars(container.querySelector('.mullion-stack')!);
+    expect(v['--mullion-gap']).toBe('var(--mullion-spacing-2xs)');
+    expect(v['--mullion-pad']).toBe('var(--mullion-spacing-4xs)');
+  });
+
   it('put alignment on the element rather than in a rule per combination', () => {
     const { container } = render(<Group align="center" justify="space-between" wrap="nowrap" grow />);
     const group = container.querySelector('.mullion-group')!;

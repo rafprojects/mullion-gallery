@@ -19,7 +19,11 @@ export type UiScaleStep = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 const STEPS: readonly string[] = ['xs', 'sm', 'md', 'lg', 'xl'];
 
-export type UiSpacing = UiScaleStep | number | string;
+/** Spacing alone has rungs below `xs` (P81-A): 2px, 4px and 6px. */
+export type UiSpacingStep = '4xs' | '3xs' | '2xs' | UiScaleStep;
+const SPACING_STEPS: readonly string[] = ['4xs', '3xs', '2xs', ...STEPS];
+
+export type UiSpacing = UiSpacingStep | number | string;
 export type UiRadius = UiScaleStep | number | string;
 export type UiFontSize = UiScaleStep | number | string;
 
@@ -28,7 +32,7 @@ function scaled(group: string, value: UiSpacing | undefined): string | undefined
   // [P81-F] A number is read as Mantine reads it, in sixteenths of a rem, and
   // in the tokens' basis, so a number and a token scale together on any host.
   if (typeof value === 'number') return uiRem(value / 16);
-  if (STEPS.includes(value)) return `var(--mullion-${group}-${value})`;
+  if ((group === 'spacing' ? SPACING_STEPS : STEPS).includes(value)) return `var(--mullion-${group}-${value})`;
   return scaledLength(value);
 }
 

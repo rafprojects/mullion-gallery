@@ -29,6 +29,13 @@ export const DEFAULT_CSS_VAR_PREFIX = '--mullion';
 /** The five rungs every `SizeScale` in a theme definition carries. */
 const SIZE_STEPS = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
 
+/** The spacing rungs below `xs` and their base values (P81-A). */
+const TIGHT_SPACING = [
+  ['4xs', '0.125rem'],
+  ['3xs', '0.25rem'],
+  ['2xs', '0.375rem'],
+] as const;
+
 /** The six heading levels `HeadingsConfig.sizes` carries. */
 const HEADING_LEVELS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as const;
 
@@ -92,6 +99,12 @@ export function generateCssVariables(
   }
 
   // --- Spacing ---
+  // [P81-A] Three rungs below `xs` for the tight gaps the product uses: 2px
+  // between controls that read as one, 4px inside a control, 6px between
+  // related controls. Optional in a definition; the base values fill in.
+  for (const [step, fallback] of TIGHT_SPACING) {
+    vars.push(`${PREFIX}-spacing-${step}: ${def.spacing[step] ?? fallback};`);
+  }
   vars.push(`${PREFIX}-spacing-xs: ${def.spacing.xs};`);
   vars.push(`${PREFIX}-spacing-sm: ${def.spacing.sm};`);
   vars.push(`${PREFIX}-spacing-md: ${def.spacing.md};`);

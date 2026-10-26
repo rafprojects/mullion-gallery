@@ -34,6 +34,17 @@ export interface SizeScale {
   xl: string;
 }
 
+/**
+ * The spacing scale: the five shared rungs plus three below `xs` (P81-A,
+ * designer 2026-10-25). Optional so a theme written before them still
+ * validates; the generator falls back to the base values.
+ */
+export interface SpacingScale extends SizeScale {
+  '4xs'?: string;
+  '3xs'?: string;
+  '2xs'?: string;
+}
+
 /** Heading size definition */
 export interface HeadingSize {
   fontSize: string;
@@ -154,7 +165,7 @@ export interface ThemeDefinition {
   typography: ThemeTypography;
 
   /** Spacing scale */
-  spacing: SizeScale;
+  spacing: SpacingScale;
 
   /** Border radius scale */
   radius: SizeScale;
@@ -198,7 +209,7 @@ export interface ThemeExtension {
   colorScheme: 'light' | 'dark';
   colors?: Partial<ThemeColors>;
   typography?: Partial<ThemeTypography>;
-  spacing?: Partial<SizeScale>;
+  spacing?: Partial<SpacingScale>;
   radius?: Partial<SizeScale>;
   shadows?: Partial<SizeScale>;
   breakpoints?: Partial<SizeScale>;

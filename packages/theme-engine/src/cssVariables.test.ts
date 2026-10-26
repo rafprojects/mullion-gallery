@@ -141,6 +141,18 @@ describe('generateCssVariables', () => {
     expect(result).toContain('--mullion-color-accent:');
   });
 
+  // [P81-A] Three spacing rungs below `xs`, optional in a definition.
+  it('emits the tight spacing rungs, falling back to the base values', () => {
+    const rc = makeResolvedColors();
+    const def = makeThemeDef();
+    const result = generateCssVariables(rc, def);
+    expect(result).toContain('--mullion-spacing-4xs: calc(0.125rem * var(--mullion-scale, 1));');
+    expect(result).toContain('--mullion-spacing-3xs: calc(0.25rem * var(--mullion-scale, 1));');
+    expect(result).toContain('--mullion-spacing-2xs: calc(0.375rem * var(--mullion-scale, 1));');
+    const own = { ...def, spacing: { ...def.spacing, '2xs': '0.5rem' } };
+    expect(generateCssVariables(rc, own)).toContain('--mullion-spacing-2xs: calc(0.5rem * var(--mullion-scale, 1));');
+  });
+
   // [P79-C] The framework's Text and Title read the type scale as tokens.
   // Every theme has carried `typography.fontSizes` and `typography.headings`
   // since the engine was written, and until now only the Mantine adapter

@@ -104,6 +104,7 @@ export {
   type UiRadius,
   type UiScaleStep,
   type UiSpacing,
+  type UiSpacingStep,
 } from './scale';
 
 export {
