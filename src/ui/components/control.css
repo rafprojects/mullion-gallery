@@ -345,9 +345,9 @@
 
   /*
    * Mantine's geometry (P81-A): a fixed height, and a checked chip trades half
-   * its side padding for the check mark so its width does not change. Its
-   * look is the designer's (2026-10-26): `surface`, `border` and `text` at
-   * rest; hover moves only the edge, to `borderStrong`.
+   * its side padding for the check mark so its width does not change. Its look
+   * is the designer's (2026-10-26), and hover always adds: an unchecked edge
+   * goes to `borderStrong`, a checked wash to wash-strong with its edge kept.
    */
   .mullion-chip {
     display: inline-flex;
@@ -412,7 +412,9 @@
     font-size: var(--mullion-chip-fz);
     line-height: 1;
     white-space: nowrap;
-    transition: border-color var(--mullion-duration-fast) ease;
+    transition:
+      background-color var(--mullion-duration-fast) ease,
+      border-color var(--mullion-duration-fast) ease;
   }
 
   .mullion-chip-check {
@@ -441,7 +443,8 @@
   }
 
   .mullion-chip:not([data-disabled]):hover .mullion-chip-input:checked + .mullion-chip-label {
-    border-color: var(--mullion-color-border-strong);
+    border-color: var(--mullion-color-primary-stroke);
+    background-color: var(--mullion-tone-wash-strong);
   }
 
   .mullion-chip-input:checked + .mullion-chip-label .mullion-chip-check {

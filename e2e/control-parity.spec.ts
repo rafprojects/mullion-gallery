@@ -106,8 +106,9 @@ for (const theme of ['default-light', 'default-dark'] as const) {
 
 // [P81-A] The chip, by the designer's table (2026-10-26): one look, `light`.
 // Unchecked: surface, border, text. Checked: the primary wash, primaryStroke,
-// text, and a check mark. Hover moves the edge to borderStrong. Mantine's 28px
-// at sm, and checking a chip trades padding for the check so its width holds.
+// text, and a 2px check mark. Hover adds: an unchecked edge goes to
+// borderStrong, a checked wash to wash-strong with its edge kept (sign-off,
+// 2026-10-26). Mantine's 28px at sm, and the width holds when checked.
 for (const theme of ['default-light', 'default-dark'] as const) {
   test(`chips follow the designer's table (${theme})`, async ({ page }) => {
     test.setTimeout(90_000);
@@ -134,6 +135,15 @@ for (const theme of ['default-light', 'default-dark'] as const) {
           height: label.getBoundingClientRect().height,
           width: label.getBoundingClientRect().width,
           checkShown: check !== null && getComputedStyle(check).display !== 'none',
+          checkStroke: check?.querySelector('path')?.getAttribute('stroke-width') ?? null,
+          washStrong: (() => {
+            const probe = document.createElement('div');
+            probe.style.backgroundColor = 'var(--mullion-tone-wash-strong)';
+            chip.querySelector('.mullion-chip-label')!.appendChild(probe);
+            const value = getComputedStyle(probe).backgroundColor;
+            probe.remove();
+            return value;
+          })(),
           surface: token('--mullion-color-surface'),
           border: token('--mullion-color-border'),
           text: token('--mullion-color-text'),
@@ -153,6 +163,7 @@ for (const theme of ['default-light', 'default-dark'] as const) {
     expect.soft(on.edge).toBe(on.stroke);
     expect.soft(on.ink).toBe(on.text);
     expect.soft(on.checkShown, 'a check mark when checked').toBe(true);
+    expect.soft(on.checkStroke, 'stroke 4 on the 24 grid: 2px at 12px').toBe('4');
     expect.soft(on.width, 'same width checked and unchecked').toBeCloseTo(off.width, 0);
 
     // Keyboard focus draws the inset ring on the label, as on every flush control.
@@ -168,6 +179,14 @@ for (const theme of ['default-light', 'default-dark'] as const) {
     // The edge eases over the fast duration, so wait for it to settle.
     await page.getByTestId('inline-chip-off').hover();
     await expect.poll(async () => (await read('inline-chip-off')).edge, { message: 'hover edge' }).toBe(off.strong);
+
+    await page.getByTestId('inline-chip-on').hover();
+    await expect
+      .poll(async () => (await read('inline-chip-on')).ground, { message: 'checked hover ground' })
+      .toBe(on.washStrong);
+    const onHover = await read('inline-chip-on');
+    expect.soft(onHover.edge, 'checked hover keeps its edge').toBe(on.stroke);
+    expect.soft(onHover.ink).toBe(on.text);
   });
 }
 

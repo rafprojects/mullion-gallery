@@ -47,31 +47,38 @@ const SHARED = {
   className: 'mullion-role-glyph',
 } as const;
 
-/** The check's stroke, shared by the success glyph and the chip's check mark. */
-const CHECK_PATH = (
-  <path
-    d="M4.8 12.6 L9.8 17.6 L19.2 6.2"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />
-);
+/** The check's path, shared by the success glyph and the chip's check mark. */
+function CheckPath({ strokeWidth }: { strokeWidth: number }) {
+  return (
+    <path
+      d="M4.8 12.6 L9.8 17.6 L19.2 6.2"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  );
+}
 
 /** A stroked check. */
 function SuccessGlyph() {
-  return <svg {...SHARED}>{CHECK_PATH}</svg>;
+  return (
+    <svg {...SHARED}>
+      <CheckPath strokeWidth={3} />
+    </svg>
+  );
 }
 
 /**
- * The same check as a plain selection mark, which carries no tone: it draws
- * in the ink of whatever holds it (designer, 2026-10-26).
+ * The same check as a plain selection mark, which carries no tone: it draws in
+ * the ink of whatever holds it. Heavier than the success glyph, 2px at the
+ * chip's 12px, because on a chip the check is the word (designer, 2026-10-26).
  */
 export function CheckMark({ className }: { className?: string | undefined }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden focusable={false} {...(className ? { className } : {})}>
-      {CHECK_PATH}
+      <CheckPath strokeWidth={4} />
     </svg>
   );
 }

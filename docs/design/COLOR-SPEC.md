@@ -235,7 +235,9 @@ as revised in [`designer-answers-badges-scrim-2026-10-26.md`](correspondences/de
 Rule 13's last two paragraphs are from
 [`designer-answers-surfaces-classified-2026-10-26.md`](correspondences/designer-answers-surfaces-classified-2026-10-26.md).
 Rules 16 and 17 are from
-[`designer-answers-controls-2026-10-26.md`](correspondences/designer-answers-controls-2026-10-26.md).
+[`designer-answers-controls-2026-10-26.md`](correspondences/designer-answers-controls-2026-10-26.md),
+with rule 17's check weight and checked hover from
+[`designer-signoff-disabled-chips-2026-10-26.md`](correspondences/designer-signoff-disabled-chips-2026-10-26.md).
 
 ### Grounds and inks
 
@@ -356,12 +358,17 @@ colour-only state (rule 5). The filter chip has one look, whatever variant a cal
 | state | ground | edge | ink | leading |
 |---|---|---|---|---|
 | unchecked | `surface` | `border` | `text` | none |
+| unchecked, hover | `surface` | `borderStrong` | `text` | none |
 | checked | the primary tone-wash | `primaryStroke` | `text` | check |
-| hover, either | unchanged | `borderStrong` | `text` | as above |
+| checked, hover | wash-strong | `primaryStroke`, kept | `text` | check |
 | keyboard focus | the inset ring (rule 8) | | | |
 
-The checked ink is `text`, not the primary text rung, because the ground already carries the tone
-(rule 2). The check uses the success glyph's stroke. *(2026-10-26.)*
+Hover adds and never subtracts: a checked chip's edge is its strongest signal, so hover deepens its
+wash, as the `light` button's hover does, rather than swapping the edge for a neutral. The checked
+ink is `text`, not the primary text rung, because the ground already carries the tone (rule 2),
+and P79-C holds on wash-strong. The check is the success glyph's path at a 2px stroke on the chip's
+12px icon (4 on the 24 grid), heavier than the success glyph's, because it has to carry the state
+alone for a reader who cannot see the edge's colour. *(2026-10-26.)*
 
 ---
 
