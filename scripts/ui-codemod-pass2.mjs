@@ -183,7 +183,12 @@ const RULES = {
     props: { color: controlColour, c: (attr) => (literal(attr) === 'dimmed' ? { replace: 'tone="muted"' } : { blocked: 'icon colour' }) },
   },
   UnstyledButton: { rename: {}, unsupported: ['mod', 'classNames', 'styles', 'unstyled'] },
-  Chip: { rename: {}, unsupported: ['color', 'radius', 'icon', 'classNames', 'styles', 'unstyled'] },
+  // One look whatever the variant (designer, 2026-10-26), so a literal variant is dropped.
+  Chip: {
+    rename: {},
+    unsupported: ['color', 'radius', 'icon', 'classNames', 'styles', 'unstyled'],
+    props: { variant: (attr) => (typeof literal(attr) === 'string' ? { replace: '' } : { blocked: 'variant is an expression' }) },
+  },
   'Chip.Group': { rename: {}, unsupported: [] },
   CopyButton: { rename: {}, unsupported: [] },
   FileButton: { rename: {}, unsupported: ['capture', 'form', 'name', 'inputProps'] },

@@ -36,6 +36,7 @@ export {
   Button,
   Card,
   Center,
+  Chip,
   Container,
   CopyButton,
   FileButton,
@@ -67,7 +68,6 @@ export {
 // ── Inputs and controls ────────────────────────────────────────────────────
 export {
   Checkbox,
-  Chip,
   ColorInput,
   Combobox,
   MultiSelect,

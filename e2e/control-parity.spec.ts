@@ -104,3 +104,70 @@ for (const theme of ['default-light', 'default-dark'] as const) {
   });
 }
 
+// [P81-A] The chip, by the designer's table (2026-10-26): one look, `light`.
+// Unchecked: surface, border, text. Checked: the primary wash, primaryStroke,
+// text, and a check mark. Hover moves the edge to borderStrong. Mantine's 28px
+// at sm, and checking a chip trades padding for the check so its width holds.
+for (const theme of ['default-light', 'default-dark'] as const) {
+  test(`chips follow the designer's table (${theme})`, async ({ page }) => {
+    test.setTimeout(90_000);
+    await serveShowcase(page);
+    await page.goto(`/ui-showcase?mount=shadow&controls=1&theme=${theme}&chrome=follow`);
+    await page.getByTestId('inline-chip-on').waitFor();
+    const read = (id: string) =>
+      page.getByTestId(id).evaluate((chip) => {
+        const label = chip.querySelector('.mullion-chip-label') as HTMLElement;
+        const check = chip.querySelector('.mullion-chip-check') as HTMLElement | null;
+        const cs = getComputedStyle(label);
+        const token = (name: string) => {
+          const probe = document.createElement('div');
+          probe.style.color = `var(${name})`;
+          chip.appendChild(probe);
+          const value = getComputedStyle(probe).color;
+          probe.remove();
+          return value;
+        };
+        return {
+          ground: cs.backgroundColor,
+          edge: cs.borderTopColor,
+          ink: cs.color,
+          height: label.getBoundingClientRect().height,
+          width: label.getBoundingClientRect().width,
+          checkShown: check !== null && getComputedStyle(check).display !== 'none',
+          surface: token('--mullion-color-surface'),
+          border: token('--mullion-color-border'),
+          text: token('--mullion-color-text'),
+          stroke: token('--mullion-color-primary-stroke'),
+          strong: token('--mullion-color-border-strong'),
+        };
+      });
+    const off = await read('inline-chip-off');
+    expect.soft(off.ground).toBe(off.surface);
+    expect.soft(off.edge).toBe(off.border);
+    expect.soft(off.ink).toBe(off.text);
+    expect.soft(off.checkShown, 'no check when unchecked').toBe(false);
+    expect.soft(off.height, 'Mantine sm height').toBeCloseTo(28, 1);
+
+    const on = await read('inline-chip-on');
+    expect.soft(on.ground, 'checked ground is a wash, not the surface').not.toBe(on.surface);
+    expect.soft(on.edge).toBe(on.stroke);
+    expect.soft(on.ink).toBe(on.text);
+    expect.soft(on.checkShown, 'a check mark when checked').toBe(true);
+    expect.soft(on.width, 'same width checked and unchecked').toBeCloseTo(off.width, 0);
+
+    // Keyboard focus draws the inset ring on the label, as on every flush control.
+    await page.getByTestId('inline-chip-off').locator('input').focus();
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Tab');
+    const ring = await page
+      .getByTestId('inline-chip-off')
+      .locator('.mullion-chip-label')
+      .evaluate((el) => getComputedStyle(el).boxShadow);
+    expect.soft(ring, 'inset ring on the label').toContain('inset');
+
+    // The edge eases over the fast duration, so wait for it to settle.
+    await page.getByTestId('inline-chip-off').hover();
+    await expect.poll(async () => (await read('inline-chip-off')).edge, { message: 'hover edge' }).toBe(off.strong);
+  });
+}
+

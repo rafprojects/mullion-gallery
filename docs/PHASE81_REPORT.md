@@ -210,6 +210,16 @@ The designer answered `pass-two-begins` the same night (`designer-answers-pass-t
 
 **What the captures show.** The admin's in-context settings gear went from Mantine's literal blue to the brand primary, by the rule. The Settings drawer's Cancel draws the framework's `default` variant border. **A disabled button changed character:** Mantine gave it a grey ground and a muted label; the framework draws its fill at 55% opacity, which on a light theme reads as an enabled button, faded. That went to the designer rather than being decided here. Seven unit tests asserted Mantine's `data-loading="true"` and now assert the attribute; one pinned `FileButton`'s old array-only callback. Lint, vitest and the full Playwright suite (213) pass.
 
+### Pass 2: disabled controls and the chips (2026-10-26)
+
+**Disabled is recessed.** The designer chose a neutral disabled state over the faded one: `background` ground, `border` edge, `borderStrong` ink, in every variant and tone, with no opacity (`COLOR-SPEC.md` rule 16). A loading button keeps its look, since it is busy rather than unavailable. `e2e/control-parity.spec.ts` reads the three colours off a disabled filled button and a disabled subtle danger icon button on both defaults; it failed on all of them first.
+
+**The chips moved, in one look.** The designer kept the check mark as the signal that is not colour and chose one look, Mantine's `light`, for every chip (rule 17): `surface`, `border` and `text` at rest; the primary wash, a `primaryStroke` edge and the check when checked; hover moves only the edge; keyboard focus takes the inset ring, through a new `sibling-inset` focus mode for a clipped input. The framework chip took Mantine's geometry from its stylesheet (28px at `sm`, and a checked chip trades half its side padding for the check, so its width holds), lost its `tone` prop, and the codemod dropped the eight literal `variant` props across four files. The check shares the success glyph's path and stroke and takes no tone.
+
+**Chip.Group defaulted the wrong way.** The framework group defaulted to `multiple`; Mantine's defaults to single choice, and the isotope filter relies on that without saying so. The default is now single choice, which kept that filter a radio group; one framework test that relied on the old default now says `multiple`.
+
+**Two specs were measuring the old components.** The size-basis spec's gallery check measured `.mantine-Button-root` and `.mantine-Chip-label`, so after the button flip it measured only the chips, and after this one nothing past its own guard of five readings; it measures the framework's classes now. The showcase ring spec asserted the outset ring on the chip and asserts the inset one. The captures change in two places: the gallery's filter row (sent to the designer across six themes) and the settings drawer's disabled Save. Lint and vitest (4490) pass; the full Playwright run failed only on those two specs, and both pass after the fix.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.
@@ -432,6 +442,7 @@ The user's partial pass of `ACCESSIBILITY_MANUAL_AUDIT.md` on 2026-10-25, and th
 | Publishing `@mullion/ui` | A product decision, and it converts an internal API into a public commitment. Worth deciding after the framework has shipped in the product, not before. |
 | Dropping `@mantine/dates` | Listed in Phase 80's follow-ons; confirm it is genuinely unused before removing. |
 | The visitor lightbox, reviewed whole | The designer's request, 2026-10-26: the one surface a site's visitors see, built from `Select` and the dialogs, so it is reviewed once their flips land rather than twice. |
+| The media picker's "already added" tile | `MediaLibraryPicker.tsx` fades a tile that is already in the campaign to 50% opacity. It is out of the tab order, so it is not the focus bug rule 16 names, but it is a disabled state drawn with opacity. Rule 16 is written for controls and this is a photo tile, so it goes to the designer with the media picker's batch rather than taking the control treatment by default. |
 | User-entered rem lengths and the size basis | P81-F put every rem the product owns on one basis, but a value a user picks in rem in the Settings panel goes out through `toCss()` in `shared-utils` as plain rem and still shrinks with a host's 62.5% root. Whether a user's `1rem` means a design rem is the designer's call; if it does, `toCss()` emits it through the same multiplier. |
 | ~~Row-selection keyboard support in `Table`~~ | **Moved into P81-B 2026-10-02.** The gap is `SpaceManagementView`'s `<tr onClick>`, and migrating that screen while keeping it would fail this phase's own per-batch keyboard pass. Only the keyboard fix moved; the screen's wider UX pass stays in FUTURE_TASKS. |
 

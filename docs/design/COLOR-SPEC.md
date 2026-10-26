@@ -234,6 +234,8 @@ rule 14 is the designer's decision of 2026-10-07 (above), and rule 15 is from
 as revised in [`designer-answers-badges-scrim-2026-10-26.md`](correspondences/designer-answers-badges-scrim-2026-10-26.md).
 Rule 13's last two paragraphs are from
 [`designer-answers-surfaces-classified-2026-10-26.md`](correspondences/designer-answers-surfaces-classified-2026-10-26.md).
+Rules 16 and 17 are from
+[`designer-answers-controls-2026-10-26.md`](correspondences/designer-answers-controls-2026-10-26.md).
 
 ### Grounds and inks
 
@@ -337,6 +339,29 @@ themes ship (default-dark, 3.84 on `surfaceRaised`). The step moves `border`'s l
 the grounds, lighter on dark themes and darker on light, holding hue, and stops before it reaches
 `borderStrong`. If there is no room, CI fails and names the theme. Move `border`, never the
 ladder. *(2026-10-06.)*
+
+### Controls
+
+**16. A disabled control is recessed one rung, the same in every variant and every tone:
+`background` ground, `border` edge, `borderStrong` ink.** No opacity: a faded control is a composite
+of itself and whatever is behind it, and on a light theme a faded primary still reads as live. The
+ink sits in the band between readable and live text (the designer's figures: 4.50:1 on default-dark,
+3.12 on default-light); `textMuted` is ordinary secondary text and does not read as disabled. A
+disabled control takes no focus, so it has no ring to style; one still in the tab order is the bug.
+A loading control is not disabled in this sense and keeps its look. *(2026-10-26.)*
+
+**17. A checked selection control carries a check mark, which takes no tone.** The wash alone is a
+colour-only state (rule 5). The filter chip has one look, whatever variant a call site asked for:
+
+| state | ground | edge | ink | leading |
+|---|---|---|---|---|
+| unchecked | `surface` | `border` | `text` | none |
+| checked | the primary tone-wash | `primaryStroke` | `text` | check |
+| hover, either | unchanged | `borderStrong` | `text` | as above |
+| keyboard focus | the inset ring (rule 8) | | | |
+
+The checked ink is `text`, not the primary text rung, because the ground already carries the tone
+(rule 2). The check uses the success glyph's stroke. *(2026-10-26.)*
 
 ---
 

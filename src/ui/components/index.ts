@@ -82,6 +82,7 @@ export {
   cx,
   focusable,
   focusableSibling,
+  focusableSiblingInset,
   focusableWithin,
   focusableInset,
   renderElement,

@@ -320,11 +320,11 @@ describe('controls', () => {
     expect(screen.getByRole('button', { name: 'Close' }).className).toContain('mullion-close-button');
   });
 
-  it('keep the chip input real, in the tab order, and drawing its ring on the label', () => {
+  it('keep the chip input real, in the tab order, and drawing its inset ring on the label', () => {
     const onChange = vi.fn();
     render(<Chip onChange={onChange}>Draft</Chip>);
     const input = screen.getByRole('checkbox');
-    expect(input.getAttribute(FOCUS_ATTR)).toBe('sibling');
+    expect(input.getAttribute(FOCUS_ATTR)).toBe('sibling-inset');
     expect(input.nextElementSibling!.className).toBe('mullion-chip-label');
     fireEvent.click(input);
     expect(onChange).toHaveBeenCalledWith(true);
@@ -747,6 +747,7 @@ describe('the component sheets on the framework list', () => {
     const text = uiStylesText();
     expect(text).toContain("[data-mullion-focus='']:focus-visible");
     expect(text).toContain("[data-mullion-focus='sibling']:focus-visible + *");
+    expect(text).toContain("[data-mullion-focus='sibling-inset']:focus-visible + *");
     expect(text).toContain('outline: var(--mullion-focus-ring-width) solid var(--mullion-color-primary-stroke);');
     expect(text).toContain('outline-offset: var(--mullion-focus-ring-offset);');
     expect(text).toContain('box-shadow: 0 0 0 var(--mullion-focus-halo-width) var(--mullion-color-focus-halo);');

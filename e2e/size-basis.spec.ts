@@ -116,7 +116,7 @@ test.describe('size basis (P81-F)', () => {
         [...document.querySelectorAll('*')].some((el) => el.shadowRoot?.querySelector('.mullion-group')),
       );
       expect(await rootPx(page)).toBe(root === null ? 16 : 10);
-      sizes.push(await measure(page, '.mullion-group, .mullion-stack', '.mantine-Button-root, .mantine-Chip-label'));
+      sizes.push(await measure(page, '.mullion-group, .mullion-stack', '.mullion-button, .mullion-action-icon, .mullion-chip-label'));
       await page.close();
     }
     expectSameSize(sizes[0]!, sizes[1]!);

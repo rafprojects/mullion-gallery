@@ -366,10 +366,10 @@ export function CardGallery({
                   // emit here, and matches the admin-panel filter pattern.
                   <Chip.Group multiple={false} value={filter} onChange={(v) => setFilter((v as string) || 'all')}>
                     <Group gap="xs" wrap="wrap" role="group" aria-label={t('cardgal_filters_aria', 'Campaign filters')} style={{ flex: '1 1 auto', minWidth: 0 }}>
-                      <Chip value="all" variant="light" size="sm">{t('cardgal_filter_all', 'All')}</Chip>
-                      <Chip value="accessible" variant="light" size="sm">{t('cardgal_filter_my_access', 'My Access')}</Chip>
+                      <Chip value="all" size="sm">{t('cardgal_filter_all', 'All')}</Chip>
+                      <Chip value="accessible" size="sm">{t('cardgal_filter_my_access', 'My Access')}</Chip>
                       {companies.map((company) => (
-                        <Chip key={company} value={company} variant="light" size="sm">
+                        <Chip key={company} value={company} size="sm">
                           {company}
                         </Chip>
                       ))}

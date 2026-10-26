@@ -325,24 +325,7 @@
     transform: rotate(-45deg);
   }
 
-  .mullion-chip {
-    display: inline-flex;
-    position: relative;
-    align-items: center;
-    cursor: pointer;
-  }
 
-  /* Recessed, as every disabled control is. */
-  .mullion-chip[data-disabled] {
-    cursor: not-allowed;
-  }
-
-  .mullion-chip[data-disabled] .mullion-chip-label,
-  .mullion-chip[data-disabled] .mullion-chip-input:checked + .mullion-chip-label {
-    border-color: var(--mullion-color-border);
-    background-color: var(--mullion-color-background);
-    color: var(--mullion-color-border-strong);
-  }
 
   /*
    * The input stays in the layout and in the tab order: `display: none` would
@@ -360,49 +343,120 @@
     pointer-events: none;
   }
 
+  /*
+   * Mantine's geometry (P81-A): a fixed height, and a checked chip trades half
+   * its side padding for the check mark so its width does not change. Its
+   * look is the designer's (2026-10-26): `surface`, `border` and `text` at
+   * rest; hover moves only the edge, to `borderStrong`.
+   */
+  .mullion-chip {
+    display: inline-flex;
+    position: relative;
+    align-items: center;
+    cursor: pointer;
+    --mullion-chip-size: 1.75rem;
+    --mullion-chip-pad: 1.25rem;
+    --mullion-chip-checked-pad: 0.625rem;
+    --mullion-chip-icon: 0.75rem;
+    --mullion-chip-spacing: 0.75rem;
+    --mullion-chip-fz: var(--mullion-font-size-sm);
+  }
+
+  .mullion-chip[data-size='xs'] {
+    --mullion-chip-size: 1.4375rem;
+    --mullion-chip-pad: 1rem;
+    --mullion-chip-checked-pad: 0.5125rem;
+    --mullion-chip-icon: 0.5625rem;
+    --mullion-chip-spacing: 0.625rem;
+    --mullion-chip-fz: var(--mullion-font-size-xs);
+  }
+
+  .mullion-chip[data-size='md'] {
+    --mullion-chip-size: 2rem;
+    --mullion-chip-pad: 1.5rem;
+    --mullion-chip-checked-pad: 0.73125rem;
+    --mullion-chip-icon: 0.875rem;
+    --mullion-chip-spacing: 1rem;
+    --mullion-chip-fz: var(--mullion-font-size-md);
+  }
+
+  .mullion-chip[data-size='lg'] {
+    --mullion-chip-size: 2.25rem;
+    --mullion-chip-pad: 1.75rem;
+    --mullion-chip-checked-pad: 0.84375rem;
+    --mullion-chip-icon: 1rem;
+    --mullion-chip-spacing: 1.25rem;
+    --mullion-chip-fz: var(--mullion-font-size-lg);
+  }
+
+  .mullion-chip[data-size='xl'] {
+    --mullion-chip-size: 2.5rem;
+    --mullion-chip-pad: 2rem;
+    --mullion-chip-checked-pad: 0.98125rem;
+    --mullion-chip-icon: 1.125rem;
+    --mullion-chip-spacing: 1.375rem;
+    --mullion-chip-fz: var(--mullion-font-size-xl);
+  }
+
   .mullion-chip-label {
     display: inline-flex;
+    box-sizing: border-box;
     align-items: center;
-    gap: 0.3em;
-    border: 1px solid var(--mullion-color-border-strong);
+    block-size: var(--mullion-chip-size);
+    padding-inline: var(--mullion-chip-pad);
+    border: 1px solid var(--mullion-color-border);
     border-radius: var(--mullion-radius-xl);
-    background-color: var(--mullion-color-surface2);
+    background-color: var(--mullion-color-surface);
     color: var(--mullion-color-text);
     font-family: var(--mullion-font-family);
+    font-size: var(--mullion-chip-fz);
     line-height: 1;
-    transition:
-      background-color var(--mullion-duration-fast) ease,
-      border-color var(--mullion-duration-fast) ease;
+    white-space: nowrap;
+    transition: border-color var(--mullion-duration-fast) ease;
   }
 
-  .mullion-chip[data-size='xs'] .mullion-chip-label {
-    padding: 0.3rem 0.6rem;
-    font-size: var(--mullion-font-size-xs);
+  .mullion-chip-check {
+    display: none;
+    align-items: center;
+    inline-size: calc(var(--mullion-chip-icon) + var(--mullion-chip-spacing) / 1.5);
+    block-size: var(--mullion-chip-icon);
   }
 
-  .mullion-chip[data-size='sm'] .mullion-chip-label {
-    padding: 0.4rem 0.75rem;
-    font-size: var(--mullion-font-size-sm);
+  .mullion-chip-check svg {
+    display: block;
+    inline-size: var(--mullion-chip-icon);
+    block-size: var(--mullion-chip-icon);
   }
 
-  .mullion-chip[data-size='md'] .mullion-chip-label {
-    padding: 0.5rem 0.9rem;
-    font-size: var(--mullion-font-size-md);
+  .mullion-chip:not([data-disabled]):hover .mullion-chip-label {
+    border-color: var(--mullion-color-border-strong);
   }
 
-  .mullion-chip[data-size='lg'] .mullion-chip-label {
-    padding: 0.6rem 1.05rem;
-    font-size: var(--mullion-font-size-lg);
-  }
-
-  .mullion-chip[data-size='xl'] .mullion-chip-label {
-    padding: 0.7rem 1.2rem;
-    font-size: var(--mullion-font-size-xl);
-  }
-
+  /* The wash is the tone's own ground, so the ink stays `text` (P79-C). */
   .mullion-chip-input:checked + .mullion-chip-label {
-    border-color: var(--mullion-tone);
+    padding-inline: var(--mullion-chip-checked-pad);
+    border-color: var(--mullion-color-primary-stroke);
     background-color: var(--mullion-tone-wash);
     color: var(--mullion-color-text);
+  }
+
+  .mullion-chip:not([data-disabled]):hover .mullion-chip-input:checked + .mullion-chip-label {
+    border-color: var(--mullion-color-border-strong);
+  }
+
+  .mullion-chip-input:checked + .mullion-chip-label .mullion-chip-check {
+    display: flex;
+  }
+
+  /* Recessed, as every disabled control is. */
+  .mullion-chip[data-disabled] {
+    cursor: not-allowed;
+  }
+
+  .mullion-chip[data-disabled] .mullion-chip-label,
+  .mullion-chip[data-disabled] .mullion-chip-input:checked + .mullion-chip-label {
+    border-color: var(--mullion-color-border);
+    background-color: var(--mullion-color-background);
+    color: var(--mullion-color-border-strong);
   }
 }

@@ -517,7 +517,8 @@ test.describe('focus ring on framework components', () => {
     expect(rings[0]!.strokeVar).not.toBe(darkStroke);
   });
 
-  test('the chip draws its ring on the label, not on its clipped input', async ({ page }) => {
+  // [P81-A] The inset ring, as every flush control takes (designer, 2026-10-26).
+  test('the chip draws its inset ring on the label, not on its clipped input', async ({ page }) => {
     await open(page, 'shadow', 'lock');
     const reading = await page.evaluate(() => {
       const root = document.getElementById('showcase')!.shadowRoot!;
@@ -527,12 +528,12 @@ test.describe('focus ring on framework components', () => {
       return {
         inputOutline: getComputedStyle(input).outlineStyle,
         labelOutline: getComputedStyle(label).outlineStyle,
-        labelWidth: getComputedStyle(label).outlineWidth,
+        labelShadow: getComputedStyle(label).boxShadow,
       };
     });
     expect(reading.inputOutline).toBe('none');
-    expect(reading.labelOutline).toBe('solid');
-    expect(reading.labelWidth).toBe('2px');
+    expect(reading.labelOutline).toBe('none');
+    expect(reading.labelShadow.match(/inset/g)).toHaveLength(3);
   });
 });
 

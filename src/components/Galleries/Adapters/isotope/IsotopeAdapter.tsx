@@ -177,9 +177,9 @@ export function IsotopeAdapter({ media, settings, runtime }: IsotopeAdapterProps
         {showFilter && (
           <Chip.Group value={activeFilter} onChange={handleFilterChange}>
             <Group gap="2xs">
-              <Chip value="all" size="xs" variant="filled">{t('filter_all', 'All')}</Chip>
+              <Chip value="all" size="xs">{t('filter_all', 'All')}</Chip>
               {filterValues.map((type) => (
-                <Chip key={type} value={type} size="xs" variant="filled">
+                <Chip key={type} value={type} size="xs">
                   {TYPE_LABELS[type] ?? type}
                 </Chip>
               ))}

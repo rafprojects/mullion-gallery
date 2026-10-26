@@ -174,7 +174,7 @@ describe('Chip.Group', () => {
 
     rerender(
       <MullionProvider>
-        <Chip.Group value={['a']} onChange={many}>
+        <Chip.Group multiple value={['a']} onChange={many}>
           <Chip value="a">A</Chip>
           <Chip value="b">B</Chip>
         </Chip.Group>

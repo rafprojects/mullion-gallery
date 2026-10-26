@@ -368,9 +368,9 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
                   {campaignCategories.length > 0 && (
                     <Chip.Group multiple={false} value={categoryFilter ?? ''} onChange={(v) => setCategoryFilter(v || null)}>
                       <Group gap="xs" wrap="wrap">
-                        <Chip value="" variant="light" size="sm">{t('admin_filter_all', 'All')}</Chip>
+                        <Chip value="" size="sm">{t('admin_filter_all', 'All')}</Chip>
                         {campaignCategories.map((cat) => (
-                          <Chip key={cat.id} value={cat.slug} variant="light" size="sm">{cat.name}</Chip>
+                          <Chip key={cat.id} value={cat.slug} size="sm">{cat.name}</Chip>
                         ))}
                       </Group>
                     </Chip.Group>

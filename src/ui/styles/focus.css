@@ -39,7 +39,8 @@
    * ringing and its sibling carries one, so a second outline would show as a
    * 2px smudge at the label's leading edge.
    */
-  [data-mullion-focus='sibling']:focus-visible {
+  [data-mullion-focus='sibling']:focus-visible,
+  [data-mullion-focus='sibling-inset']:focus-visible {
     outline: none;
   }
 
@@ -67,7 +68,8 @@
    * a filled control keeps the outset ring and is given clearance instead.
    */
   [data-mullion-focus='inset']:focus-visible,
-  [data-mullion-focus='inset'][data-focus-visible] {
+  [data-mullion-focus='inset'][data-focus-visible],
+  [data-mullion-focus='sibling-inset']:focus-visible + * {
     outline: none;
     box-shadow:
       inset 0 0 0 var(--mullion-focus-ring-width) var(--mullion-color-focus-halo),

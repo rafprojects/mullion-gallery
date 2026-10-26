@@ -415,6 +415,17 @@ function ControlSizes({ prefix }: { prefix: string }) {
           loading
         </Button>
       </Group>
+      <Group gap="xs">
+        <Chip size="sm" data-testid={`${prefix}-chip-off`}>
+          Filter
+        </Chip>
+        <Chip size="sm" defaultChecked data-testid={`${prefix}-chip-on`}>
+          Filter
+        </Chip>
+        <Chip size="sm" disabled data-testid={`${prefix}-chip-disabled`}>
+          disabled
+        </Chip>
+      </Group>
     </Stack>
   );
 }

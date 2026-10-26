@@ -27,13 +27,13 @@ import {
   renderElement,
   cx,
   focusable,
-  focusableSibling,
+  focusableSiblingInset,
   type UiAttributes, type UiElementProps,
   type UiTone,
 } from './element';
 import { Loader } from './feedback';
 import { uiRem } from '../styles/rootScale';
-import { resolveRoleGlyph } from './roleGlyph';
+import { CheckMark, resolveRoleGlyph } from './roleGlyph';
 import { customProperties, radiusValue, type UiRadius, type UiScaleStep } from './scale';
 
 export type UiControlVariant = 'filled' | 'light' | 'outline' | 'subtle' | 'default' | 'transparent';
@@ -235,7 +235,7 @@ export interface ChipGroupProps {
   defaultValue?: string | string[] | undefined;
   /** Handed the new selection: a string (or `''`) for single, an array for multiple. */
   onChange?: ((value: never) => void) | undefined;
-  /** More than one chip at a time. Two of the four call sites set it false explicitly. */
+  /** More than one chip at a time. Off by default, as Mantine's was (P81-A): the isotope filter relies on it. */
   multiple?: boolean | undefined;
 }
 
@@ -250,7 +250,7 @@ export interface ChipGroupProps {
  * UI's `RadioGroup` or `CheckboxGroup` would mean replacing the chip's own
  * element, which nothing here needs.
  */
-export function ChipGroup({ children, value, defaultValue, onChange, multiple = true }: ChipGroupProps) {
+export function ChipGroup({ children, value, defaultValue, onChange, multiple = false }: ChipGroupProps) {
   const name = useId();
   const [internal, setInternal] = useState<string[]>(() => toValues(defaultValue));
   const controlled = value !== undefined;
@@ -296,15 +296,18 @@ export interface ChipProps extends Omit<UiElementProps, 'render'> {
   value?: string | undefined;
   name?: string | undefined;
   size?: UiScaleStep | undefined;
-  tone?: UiTone | undefined;
   disabled?: boolean | undefined;
   children?: ReactNode;
 }
 
 /**
- * A checkbox wearing a pill. The input is real and visually hidden rather than
- * `display: none`, so it stays in the tab order and keeps its native
- * semantics; the ring is drawn on the label, which is the element with a box.
+ * A checkbox wearing a pill, in one look whatever Mantine variant the call site
+ * used: the primary wash, a `primaryStroke` edge and a check mark when checked
+ * (designer, 2026-10-26). The check is the signal that is not colour.
+ *
+ * The input is real and visually hidden rather than `display: none`, so it
+ * stays in the tab order and keeps its native semantics; the inset ring is
+ * drawn on the label, which is the element with a box.
  */
 export function Chip({
   className,
@@ -315,7 +318,6 @@ export function Chip({
   value,
   name,
   size = 'sm',
-  tone = 'primary',
   disabled,
   children,
   ...rest
@@ -334,7 +336,7 @@ export function Chip({
     <label
       className={cx('mullion-chip', className)}
       data-size={size}
-      data-mullion-tone={tone}
+      data-mullion-tone="primary"
       {...(disabled ? { 'data-disabled': '' } : {})}
       {...(style ? { style } : {})}
       {...rest}
@@ -342,7 +344,7 @@ export function Chip({
       <input
         className="mullion-chip-input"
         type={grouped && !group.multiple ? 'radio' : 'checkbox'}
-        {...focusableSibling}
+        {...focusableSiblingInset}
         {...(isChecked !== undefined ? { checked: isChecked } : {})}
         {...(!grouped && defaultChecked !== undefined ? { defaultChecked } : {})}
         {...(value !== undefined ? { value } : {})}
@@ -353,7 +355,12 @@ export function Chip({
           onChange?.(event.currentTarget.checked);
         }}
       />
-      <span className="mullion-chip-label">{children}</span>
+      <span className="mullion-chip-label">
+        <span className="mullion-chip-check">
+          <CheckMark />
+        </span>
+        {children}
+      </span>
     </label>
   );
 }

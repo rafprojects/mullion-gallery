@@ -121,6 +121,9 @@ export const focusable = { [FOCUS_ATTR]: '' } as const;
  */
 export const focusableSibling = { [FOCUS_ATTR]: 'sibling' } as const;
 
+/** The same, with the inset ring on the sibling, for a flush control such as the chip. */
+export const focusableSiblingInset = { [FOCUS_ATTR]: 'sibling-inset' } as const;
+
 /**
  * Spread onto a visible part whose focus target is a hidden input inside it,
  * which is how a slider thumb works. Neither element matches `:focus-visible`

@@ -109,7 +109,7 @@ export function SpaceAssetLibrary({
         <Chip.Group multiple value={activeTags} onChange={setActiveTags}>
           <Group gap="3xs" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} wrap="wrap">
             {allTags.map((tag) => (
-              <Chip key={tag} value={tag} size="xs" variant="outline">{tag}</Chip>
+              <Chip key={tag} value={tag} size="xs">{tag}</Chip>
             ))}
           </Group>
         </Chip.Group>
