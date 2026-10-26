@@ -284,6 +284,18 @@ The designer approved the fields and the slider. Two follow-ups, each failing `e
 
 **The fix** is the framework's own mechanism: a nested `MullionProvider` with `mode` from the chrome setting, inside each Mantine container's title and body (it renders `display: contents`, so no layout moves). The config editor takes it through a `chromeMode` prop and a top-level `ChromeScope`, so the subtree never remounts. `theme-qa.spec.ts` gained an exact test: with a tokyo-night gallery and locked chrome, the drawer's Cancel button, its switch and its number field must resolve the brand's `surface`, and it failed on the button first. When these containers move to the framework themselves, the nested provider is how their own popups take the chrome's palette, and `AdminChromeProvider` goes with the last Mantine part inside them.
 
+### The overlays, before they move (2026-10-26)
+
+A research pass compared the overlay family with Mantine's stylesheet and the theme adapter. Its findings split in two. Differences of size, spacing and motion were fixed in the framework now. Differences of look went to the designer (`overlays-before-they-move-2026-10-26.md`), because some contradict what Phase 80 assumed: the framework's `overlay-bg` comment says the shipped scrim is black at 0.6 on every theme, which holds for the two drawers, but the adapter gives all 26 modals the theme's `background` at 0.75, a 1px border and a header divider. The menus' full-bleed rows with the rail are the designer's from 14 September and stay.
+
+Fixed in the framework, each failing `e2e/control-parity.spec.ts` or `overlays.test.tsx` first:
+
+- **A named size was a spacing step.** `Modal` and `Drawer` passed `size` through `spacingValue`, so `size="md"` was a 16px-wide dialog; 17 modals pass a name. A name is now one of Mantine's dialog widths, 320 to 780px, with 440 the default for both, where the framework had 416 and 352.
+- **Placement.** A modal sits 5dvh from the top and at least 5vw from each side, and is not centred unless asked, as Mantine's was; 18 of the 26 modals relied on that. The header is at least 60px tall with the close button 5px nearer the edge.
+- **Transitions users choose.** The Settings panel's animation (slide, fade, scale from the corner, none) and the campaign viewer's (pop, fade, slide up, with a duration) are user settings. A dialog now takes `transition` and `transitionDuration`, applied to its backdrop too, honours reduced motion, and calls `onExitTransitionEnd` once it has closed, through Base UI's `onOpenChangeComplete`.
+
+The parity spec's `settle` now waits two frames and then for every shadow root's animations, since a dialog portals into the overlay root and a transition starts a frame after its starting style goes; without both, the widths read 97% of their value, mid-scale.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.

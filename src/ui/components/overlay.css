@@ -63,8 +63,10 @@
     gap: var(--mullion-spacing-sm);
     padding-block: var(--mullion-pad-block, var(--mullion-pad, var(--mullion-spacing-md)));
     padding-inline: var(--mullion-pad-inline, var(--mullion-pad, var(--mullion-spacing-md)));
-    padding-block-end: var(--mullion-spacing-sm);
     flex: none;
+    /* Mantine's header: at least 60px, with the close button 5px nearer the edge. */
+    min-block-size: 3.75rem;
+    padding-inline-end: calc(var(--mullion-pad-inline, var(--mullion-pad, var(--mullion-spacing-md))) - 5px);
   }
 
   .mullion-overlay-title {
@@ -93,12 +95,25 @@
 
   /* ── Modal ───────────────────────────────────────────────────────────── */
 
+  /*
+   * Mantine's dialog widths and placement (P81-A): named sizes 320 to 780px
+   * with 440 the default, 5dvh from the top and at least 5vw from each side.
+   */
+  .mullion-modal,
+  .mullion-drawer {
+    --mullion-dialog-xs: 20rem;
+    --mullion-dialog-sm: 23.75rem;
+    --mullion-dialog-md: 27.5rem;
+    --mullion-dialog-lg: 38.75rem;
+    --mullion-dialog-xl: 48.75rem;
+  }
+
   .mullion-modal {
-    inset-block-start: var(--mullion-spacing-xl);
+    inset-block-start: 5dvh;
     inset-inline: 0;
     margin-inline: auto;
-    inline-size: min(var(--mullion-modal-size, 26rem), calc(100vw - 2 * var(--mullion-spacing-md)));
-    max-block-size: calc(100vh - 2 * var(--mullion-spacing-xl));
+    inline-size: min(var(--mullion-modal-size, var(--mullion-dialog-md)), 90vw);
+    max-block-size: 90dvh;
     border-radius: var(--mullion-radius, var(--mullion-radius-md));
     transition:
       opacity var(--mullion-duration-base) ease,
@@ -127,13 +142,15 @@
   /* ── Drawer ──────────────────────────────────────────────────────────── */
 
   .mullion-drawer {
-    transition: transform var(--mullion-duration-base) ease;
+    transition:
+      opacity var(--mullion-duration-base) ease,
+      transform var(--mullion-duration-base) ease;
   }
 
   .mullion-drawer[data-position='left'],
   .mullion-drawer[data-position='right'] {
     inset-block: 0;
-    inline-size: min(var(--mullion-drawer-size, 22rem), 100vw);
+    inline-size: min(var(--mullion-drawer-size, var(--mullion-dialog-md)), 100vw);
     max-block-size: 100vh;
   }
 
@@ -393,5 +410,54 @@
     flex-wrap: wrap;
     gap: var(--mullion-spacing-sm);
     justify-content: flex-end;
+  }
+
+  /*
+   * [P81-A] A chosen transition. The kinds are the motions the two animation
+   * settings name; the duration arrives as `--mullion-dialog-duration` on the
+   * popup and its backdrop. Later in the sheet than the per-dialog defaults,
+   * so a chosen kind wins.
+   */
+  .mullion-overlay-backdrop,
+  .mullion-modal,
+  .mullion-drawer {
+    transition-duration: var(--mullion-dialog-duration, var(--mullion-duration-base));
+  }
+
+  .mullion-overlay-popup[data-transition='fade'][data-starting-style],
+  .mullion-overlay-popup[data-transition='fade'][data-ending-style] {
+    opacity: 0;
+    transform: none;
+  }
+
+  .mullion-overlay-popup[data-transition='pop'][data-starting-style],
+  .mullion-overlay-popup[data-transition='pop'][data-ending-style] {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+
+  .mullion-overlay-popup[data-transition='slide-up'][data-starting-style],
+  .mullion-overlay-popup[data-transition='slide-up'][data-ending-style] {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  /* Grows out of the corner the floating admin menu sits in. */
+  .mullion-overlay-popup[data-transition='scale-corner'] {
+    transform-origin: bottom right;
+  }
+
+  .mullion-overlay-popup[data-transition='scale-corner'][data-starting-style],
+  .mullion-overlay-popup[data-transition='scale-corner'][data-ending-style] {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mullion-overlay-backdrop,
+    .mullion-modal,
+    .mullion-drawer {
+      transition-duration: 0s;
+    }
   }
 }

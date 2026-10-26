@@ -161,8 +161,31 @@ interface DialogCommonProps extends OverlayStyleProps, PortalProps {
    */
   overlayBlur?: number | undefined;
   zIndex?: string | number | undefined;
+  /**
+   * How the dialog enters and leaves (P81-A). Users choose the Settings panel's
+   * and the campaign viewer's today, so a dialog takes a kind and a duration
+   * rather than one fixed motion. Omitted, each dialog keeps its own.
+   */
+  transition?: UiDialogTransition | undefined;
+  /** Milliseconds; 0 opens and closes at once. */
+  transitionDuration?: number | undefined;
+  /** Called once the dialog has finished closing, as Mantine's was. */
+  onExitTransitionEnd?: (() => void) | undefined;
   children?: ReactNode;
 }
+
+/** The motions the product's two animation settings name, plus a drawer's slide from its edge. */
+export type UiDialogTransition = 'pop' | 'fade' | 'slide-up' | 'slide' | 'scale-corner';
+
+const DIALOG_STEPS: readonly string[] = ['xs', 'sm', 'md', 'lg', 'xl'];
+
+/**
+ * A dialog's width: a named step is one of Mantine's dialog widths (320 to
+ * 780px, set in `overlay.css`), not a spacing step, which made `size="md"` a
+ * 16px dialog. A number or any other length passes through.
+ */
+const dialogSize = (size: UiSpacing | undefined): string | undefined =>
+  typeof size === 'string' && DIALOG_STEPS.includes(size) ? `var(--mullion-dialog-${size})` : spacingValue(size);
 
 export interface ModalProps extends DialogCommonProps {
   /** A scale step, a number of pixels, or any CSS length. */
@@ -189,6 +212,9 @@ function DialogShell({
   modal = true,
   overlayBlur,
   zIndex,
+  transition,
+  transitionDuration,
+  onExitTransitionEnd,
   container,
   className,
   style,
@@ -205,6 +231,9 @@ function DialogShell({
   dataAttrs?: Record<string, string | boolean | undefined>;
 }) {
   const target = usePortalContainer(container);
+  const duration = customProperties({
+    '--mullion-dialog-duration': transitionDuration !== undefined ? `${transitionDuration}ms` : undefined,
+  });
   const vars = customProperties({
     ...sizeVars,
     '--mullion-pad': spacingValue(padding),
@@ -236,6 +265,7 @@ function DialogShell({
         onClose();
       }}
       modal={modal}
+      {...(onExitTransitionEnd ? { onOpenChangeComplete: (open: boolean) => { if (!open) onExitTransitionEnd(); } } : {})}
     >
       <Dialog.Portal container={target}>
         <Dialog.Backdrop
@@ -245,12 +275,14 @@ function DialogShell({
             ...customProperties({
               '--mullion-overlay-blur': overlayBlur !== undefined ? `${overlayBlur}px` : undefined,
             }),
+            ...duration,
           }}
         />
         <Dialog.Popup
           ref={stackRef}
           className={cx('mullion-overlay-popup', popupClassName, className)}
-          style={{ ...layerStyle(layer, zIndex), ...vars, ...style }}
+          style={{ ...layerStyle(layer, zIndex), ...vars, ...duration, ...style }}
+          {...(transition ? { 'data-transition': transition } : {})}
           {...dataAttrs}
           {...rest}
         >
@@ -287,12 +319,13 @@ function DialogShell({
  * and focus returns to the trigger on close even when the trigger is inside
  * the gallery shadow root, which is the defect the product has today.
  */
-export function Modal({ size, centered = true, fullScreen, ...rest }: ModalProps) {
+/* Not centred by default, as Mantine's was: 18 of the 26 product modals sit 5dvh from the top. */
+export function Modal({ size, centered = false, fullScreen, ...rest }: ModalProps) {
   return (
     <DialogShell
       popupClassName="mullion-modal"
       layer="modal"
-      sizeVars={{ '--mullion-modal-size': spacingValue(size) }}
+      sizeVars={{ '--mullion-modal-size': dialogSize(size) }}
       dataAttrs={{
         ...(centered ? { 'data-centered': true } : {}),
         ...(fullScreen ? { 'data-full-screen': true } : {}),
@@ -320,7 +353,7 @@ export function Drawer({ position = 'right', size, ...rest }: DrawerProps) {
     <DialogShell
       popupClassName="mullion-drawer"
       layer="modal"
-      sizeVars={{ '--mullion-drawer-size': spacingValue(size) }}
+      sizeVars={{ '--mullion-drawer-size': dialogSize(size) }}
       dataAttrs={{ 'data-position': position }}
       {...rest}
     />

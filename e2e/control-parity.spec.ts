@@ -26,13 +26,16 @@ async function serveShowcase(page: Page) {
 /**
  * Colours ease in from their initial values when the component sheet is
  * adopted, so a reading taken straight after load can land mid-transition.
- * Wait for the showcase's transitions to finish first.
+ * Wait for the page's transitions to finish first.
  */
 async function settle(page: Page) {
   await page.evaluate(async () => {
-    const root = document.getElementById('showcase')?.shadowRoot;
+    // A transition starts a frame after its starting style goes, so let two frames pass first.
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    // Every shadow root, since dialogs portal into the overlay root rather than the showcase's.
+    const roots = [...document.querySelectorAll('*')].flatMap((el) => (el.shadowRoot ? [el.shadowRoot] : []));
     // Loaders and skeletons loop for ever, so only finite animations are waited on.
-    const animations = [...document.getAnimations(), ...(root?.getAnimations() ?? [])].filter(
+    const animations = [...document.getAnimations(), ...roots.flatMap((r) => r.getAnimations())].filter(
       (a) => a.effect?.getTiming().iterations !== Infinity,
     );
     await Promise.all(animations.map((a) => a.finished.catch(() => undefined)));
@@ -691,3 +694,54 @@ for (const theme of ['default-light', 'default-dark'] as const) {
     expect.soft(got.size, 'the same size as when on').toBeCloseTo(14, 1);
   });
 }
+
+// [P81-A] Dialogs at Mantine's geometry, read off its stylesheet: named widths
+// 320, 380, 440, 620 and 780 with 440 the default for a modal and a drawer; a
+// modal 5dvh from the top unless centred; a header at least 60px tall. And the
+// two animations users choose today: a kind and a duration, with Mantine's
+// `onExitTransitionEnd` once a dialog has finished closing.
+test('dialogs take Mantine widths and placement', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await serveShowcase(page);
+  await page.goto('/ui-showcase?mount=shadow&dialogs=1&theme=default-light&chrome=follow');
+  const widths: Record<string, number> = { xs: 320, sm: 380, md: 440, lg: 620, xl: 780, default: 440, drawer: 440, 'drawer-lg': 620 };
+  for (const [key, width] of Object.entries(widths)) {
+    await page.getByTestId(`inline-open-${key}`).click();
+    const dialog = page.getByTestId(`inline-dialog-${key}`);
+    await dialog.waitFor();
+    await settle(page);
+    const got = await dialog.evaluate((el) => ({
+      box: el.getBoundingClientRect(),
+      header: el.querySelector('.mullion-overlay-header')!.getBoundingClientRect().height,
+    }));
+    expect.soft(got.box.width, `${key} width`).toBeCloseTo(width, 0);
+    expect.soft(got.header, `${key} header`).toBeGreaterThanOrEqual(60);
+    if (key === 'default') expect.soft(got.box.top, 'a modal sits 5dvh from the top').toBeCloseTo(45, 0);
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+  }
+  await page.getByTestId('inline-open-centered').click();
+  const centred = await page.getByTestId('inline-dialog-centered').evaluate((el) => {
+    const b = el.getBoundingClientRect();
+    return b.top + b.height / 2;
+  });
+  expect.soft(centred, 'centred when asked').toBeCloseTo(450, 0);
+});
+
+test('a dialog takes a transition kind and duration, and reports its exit', async ({ page }) => {
+  await serveShowcase(page);
+  await page.goto('/ui-showcase?mount=shadow&dialogs=1&theme=default-light&chrome=follow');
+  await page.getByTestId('inline-open-fade').click();
+  const dialog = page.getByTestId('inline-dialog-fade');
+  await dialog.waitFor();
+  const got = await dialog.evaluate((el) => ({
+    kind: el.getAttribute('data-transition'),
+    duration: getComputedStyle(el).transitionDuration,
+  }));
+  expect.soft(got.kind).toBe('fade');
+  expect.soft(got.duration.split(',')[0]!.trim()).toBe('0.12s');
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(page.getByTestId('inline-dialogs')).toHaveAttribute('data-exits', '1');
+});

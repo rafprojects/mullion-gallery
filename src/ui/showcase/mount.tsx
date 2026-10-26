@@ -118,6 +118,8 @@ const withNesting = params.get('nesting') === '1';
 const withElevation = params.get('elevation') === '1';
 /** P81-A: control geometry at Mantine's sizes, for the parity spec. */
 const withControls = params.get('controls') === '1';
+/** Dialogs at each size and transition, for `e2e/control-parity.spec.ts` (P81-A). */
+const withDialogs = params.get('dialogs') === '1';
 /** `?host=hostile` reproduces the P77-B probe around the whole fixture. */
 const hostileHost = params.get('host') === 'hostile';
 
@@ -249,6 +251,7 @@ function Gallery({ prefix }: { prefix: string }) {
       {withNesting && <Nesting prefix={prefix} />}
       {withElevation && <Elevation prefix={prefix} />}
       {withControls && <ControlSizes prefix={prefix} />}
+      {withDialogs && <DialogSizes prefix={prefix} />}
       {withKeyboard && <KeyboardExtras prefix={prefix} />}
     </Stack>
   );
@@ -677,6 +680,51 @@ function Selects({ prefix }: { prefix: string }) {
  * opened from inside the gallery shadow root has to return focus across that
  * boundary, which is the defect Mantine has today.
  */
+function DialogSizes({ prefix }: { prefix: string }) {
+  const [open, setOpen] = useState<string | null>(null);
+  const [exits, setExits] = useState(0);
+  const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
+  return (
+    <Stack gap="sm" data-testid={`${prefix}-dialogs`} data-exits={exits}>
+      <Group gap="xs">
+        {[...sizes, 'default', 'centered', 'drawer', 'drawer-lg', 'fade'].map((key) => (
+          <Button key={key} size="xs" variant="default" data-testid={`${prefix}-open-${key}`} onClick={() => setOpen(key)}>
+            {key}
+          </Button>
+        ))}
+      </Group>
+      {sizes.map((size) => (
+        <Modal key={size} opened={open === size} onClose={() => setOpen(null)} size={size} title={`size ${size}`} data-testid={`${prefix}-dialog-${size}`}>
+          <Text size="sm">body</Text>
+        </Modal>
+      ))}
+      <Modal opened={open === 'default'} onClose={() => setOpen(null)} title="default" data-testid={`${prefix}-dialog-default`}>
+        <Text size="sm">body</Text>
+      </Modal>
+      <Modal opened={open === 'centered'} onClose={() => setOpen(null)} centered title="centred" data-testid={`${prefix}-dialog-centered`}>
+        <Text size="sm">body</Text>
+      </Modal>
+      <Drawer opened={open === 'drawer'} onClose={() => setOpen(null)} title="drawer" data-testid={`${prefix}-dialog-drawer`}>
+        <Text size="sm">body</Text>
+      </Drawer>
+      <Drawer opened={open === 'drawer-lg'} onClose={() => setOpen(null)} size="lg" title="drawer lg" data-testid={`${prefix}-dialog-drawer-lg`}>
+        <Text size="sm">body</Text>
+      </Drawer>
+      <Modal
+        opened={open === 'fade'}
+        onClose={() => setOpen(null)}
+        transition="fade"
+        transitionDuration={120}
+        onExitTransitionEnd={() => setExits((n) => n + 1)}
+        title="fade"
+        data-testid={`${prefix}-dialog-fade`}
+      >
+        <Text size="sm">body</Text>
+      </Modal>
+    </Stack>
+  );
+}
+
 function Overlays({ prefix }: { prefix: string }) {
   const [modal, setModal] = useState(false);
   const [drawer, setDrawer] = useState(false);

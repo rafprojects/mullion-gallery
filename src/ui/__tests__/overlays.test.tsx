@@ -263,7 +263,8 @@ describe('the dialog shell', () => {
       </Modal>,
     );
     const v = vars(screen.getByRole('dialog'));
-    expect(v['--mullion-modal-size']).toBe('var(--mullion-spacing-lg)');
+    // [P81-A] A named size is a dialog width, not a spacing step: `lg` is 620px, not 20px.
+    expect(v['--mullion-modal-size']).toBe('var(--mullion-dialog-lg)');
     expect(v['--mullion-pad']).toBe('var(--mullion-spacing-sm)');
     expect(v['--mullion-radius']).toBe('calc(0.25rem * var(--mullion-scale, 1))');
   });
@@ -300,23 +301,24 @@ describe('the dialog shell', () => {
     expect(vars(popup)['--mullion-drawer-size']).toBe('calc(20rem * var(--mullion-scale, 1))');
   });
 
-  it('a modal is centred by default and full-screen on request', () => {
+  // [P81-A] Not centred by default, as Mantine's was: 18 of the 26 product modals sit near the top.
+  it('a modal sits near the top by default, centred or full-screen on request', () => {
     const { rerender } = mount(
       <Modal opened onClose={() => {}} title="M">
         b
       </Modal>,
     );
-    expect(screen.getByRole('dialog').hasAttribute('data-centered')).toBe(true);
+    expect(screen.getByRole('dialog').hasAttribute('data-centered')).toBe(false);
 
     rerender(
       <MullionProvider>
-        <Modal opened onClose={() => {}} title="M" centered={false} fullScreen>
+        <Modal opened onClose={() => {}} title="M" centered fullScreen>
           b
         </Modal>
       </MullionProvider>,
     );
     const popup = screen.getByRole('dialog');
-    expect(popup.hasAttribute('data-centered')).toBe(false);
+    expect(popup.hasAttribute('data-centered')).toBe(true);
     expect(popup.hasAttribute('data-full-screen')).toBe(true);
   });
 });
