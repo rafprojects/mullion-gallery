@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ASSET_MIME } from './DesignAssetsGrid';
 import {
   NumberInput,
-  SegmentedControl,
   Loader,
-  Slider,
   Tooltip,
 } from '@mantine/core';
 import {
@@ -18,7 +16,7 @@ import { DEFAULT_MASK_LAYER } from '@/types';
 import type { AssetLibraryItem } from './BuilderDockContext';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box, FileButton, Button, ActionIcon } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, FileButton, Button, ActionIcon, SegmentedControl, Slider } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 

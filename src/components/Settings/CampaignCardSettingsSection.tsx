@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Accordion, Divider, NumberInput, Slider, Switch, TextInput } from '@mantine/core';
-import { Stack, Text } from '@/ui';
+import { Accordion, Divider, NumberInput, TextInput } from '@mantine/core';
+import { Stack, Text, Slider, Switch } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { ModalSelect } from '@/components/Common/ModalSelect';
@@ -238,56 +238,56 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
               label={t('set_card_show_company', 'Show company name badge')}
               description={desc(t('set_card_show_company_desc', 'Company badge overlay on card thumbnail'), 'showCardCompanyName')}
               checked={resolved.showCardCompanyName ?? true}
-              onChange={(event) => writeField('showCardCompanyName', event.currentTarget.checked)}
+              onChange={(checked) => writeField('showCardCompanyName', checked)}
             />
             <ResetLink fieldKey="showCardCompanyName" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
             <Switch
               label={t('set_card_show_access', 'Show access badge')}
               description={desc(t('set_card_show_access_desc', "Green 'Access' badge on accessible cards"), 'showCardAccessBadge')}
               checked={resolved.showCardAccessBadge ?? true}
-              onChange={(event) => writeField('showCardAccessBadge', event.currentTarget.checked)}
+              onChange={(checked) => writeField('showCardAccessBadge', checked)}
             />
             <ResetLink fieldKey="showCardAccessBadge" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
             <Switch
               label={t('set_card_show_title', 'Show card title')}
               description={desc(t('set_card_show_title_desc', 'Show the campaign title in the card info panel'), 'showCardTitle')}
               checked={resolved.showCardTitle ?? true}
-              onChange={(event) => writeField('showCardTitle', event.currentTarget.checked)}
+              onChange={(checked) => writeField('showCardTitle', checked)}
             />
             <ResetLink fieldKey="showCardTitle" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
             <Switch
               label={t('set_card_show_desc', 'Show card description')}
               description={desc(t('set_card_show_desc_desc', 'Show the campaign description in the card info panel'), 'showCardDescription')}
               checked={resolved.showCardDescription ?? true}
-              onChange={(event) => writeField('showCardDescription', event.currentTarget.checked)}
+              onChange={(checked) => writeField('showCardDescription', checked)}
             />
             <ResetLink fieldKey="showCardDescription" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
             <Switch
               label={t('set_card_show_counts', 'Show media counts')}
               description={desc(t('set_card_show_counts_desc', 'Video and image count below description'), 'showCardMediaCounts')}
               checked={resolved.showCardMediaCounts ?? true}
-              onChange={(event) => writeField('showCardMediaCounts', event.currentTarget.checked)}
+              onChange={(checked) => writeField('showCardMediaCounts', checked)}
             />
             <ResetLink fieldKey="showCardMediaCounts" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
             <Switch
               label={t('set_card_show_border', 'Show card border')}
               description={desc(t('set_card_show_border_desc', 'Accent border and hover border effect'), 'showCardBorder')}
               checked={resolved.showCardBorder ?? true}
-              onChange={(event) => writeField('showCardBorder', event.currentTarget.checked)}
+              onChange={(checked) => writeField('showCardBorder', checked)}
             />
             <ResetLink fieldKey="showCardBorder" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
             <Switch
               label={t('set_card_show_fade', 'Show thumbnail fade')}
               description={desc(t('set_card_show_fade_desc', 'Gradient overlay at bottom of thumbnail'), 'showCardThumbnailFade')}
               checked={resolved.showCardThumbnailFade ?? true}
-              onChange={(event) => writeField('showCardThumbnailFade', event.currentTarget.checked)}
+              onChange={(checked) => writeField('showCardThumbnailFade', checked)}
             />
             <ResetLink fieldKey="showCardThumbnailFade" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
             <Switch
               label={t('set_card_show_info', 'Show card info panel')}
               description={desc(t('set_card_show_info_desc', 'Show title, description, tags & media counts below thumbnail'), 'showCardInfoPanel')}
               checked={resolved.showCardInfoPanel ?? true}
-              onChange={(event) => writeField('showCardInfoPanel', event.currentTarget.checked)}
+              onChange={(checked) => writeField('showCardInfoPanel', checked)}
             />
             <ResetLink fieldKey="showCardInfoPanel" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
           </Stack>
@@ -526,7 +526,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
                   label={t('set_card_dot_nav', 'Dot Navigator')}
                   description={desc(t('set_card_dot_nav_desc', 'Show dot navigator below the card grid'), 'cardPageDotNav')}
                   checked={resolved.cardPageDotNav}
-                  onChange={(event) => writeField('cardPageDotNav', event.currentTarget.checked)}
+                  onChange={(checked) => writeField('cardPageDotNav', checked)}
                 />
                 <ResetLink fieldKey="cardPageDotNav" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
                 <NumberInput

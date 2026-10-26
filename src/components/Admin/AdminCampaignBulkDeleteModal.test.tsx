@@ -36,7 +36,7 @@ describe('AdminCampaignBulkDeleteModal', () => {
   it('calls onConfirm with purgeAnalytics true when checkbox is checked', () => {
     const onConfirm = vi.fn();
     render(<AdminCampaignBulkDeleteModal {...defaults} onConfirm={onConfirm} />);
-    fireEvent.click(screen.getByLabelText(/purge all analytics/i));
+    fireEvent.click(screen.getByRole('checkbox', { name: /purge all analytics/i }));
     fireEvent.click(screen.getByRole('button', { name: /delete 3 campaigns/i }));
     expect(onConfirm).toHaveBeenCalledWith({ purgeAnalytics: true });
   });

@@ -2,13 +2,11 @@ import { useState, useCallback, useEffect } from 'react';
 import {
   Tabs,
   TextInput,
-  Switch,
   Loader,
   Table,
   Tooltip,
   Select,
   Divider,
-  Checkbox,
 } from '@mantine/core';
 import {
   IconPlus, IconTrash, IconAlertCircle, IconUserPlus, IconSettings, IconInfoCircle,
@@ -22,7 +20,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { SpaceAssetLibrary } from './SpaceAssetLibrary';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import type { FontLibraryEntry } from '@mullion/shared-utils';
-import { uiRem, Stack, Group, Text, Alert, Center, Badge, Button, ActionIcon } from '@/ui';
+import { uiRem, Stack, Group, Text, Alert, Center, Badge, Button, ActionIcon, Switch, Checkbox } from '@/ui';
 
 interface SpaceGrant {
   userId: number;
@@ -387,7 +385,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                 label={t('admin_space_delegated_label', 'Delegated isolation mode')}
                 description={t('admin_space_delegated_desc', 'Only explicit grantees can access this space. Admins without a grant are denied.')}
                 checked={createIsolation}
-                onChange={(e) => setCreateIsolation(e.currentTarget.checked)}
+                onChange={(checked) => setCreateIsolation(checked)}
                 size="sm"
               />
               {createIsolation && (
@@ -577,7 +575,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                     key={font.id}
                     label={font.name}
                     checked={spaceLibrary?.font?.includes(font.id) ?? false}
-                    onChange={(e) => void handleLibraryToggle('font', font.id, e.currentTarget.checked)}
+                    onChange={(checked) => void handleLibraryToggle('font', font.id, checked)}
                     size="sm"
                   />
                 ))

@@ -1,5 +1,6 @@
-import { Accordion, Divider, NumberInput, Switch } from '@mantine/core';
-import { Stack } from '@/ui';
+
+import { Accordion, Divider, NumberInput } from '@mantine/core';
+import { Stack, Switch } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { ModalSelect } from '@/components/Common/ModalSelect';
 import { DimensionInput } from '@/components/Settings/DimensionInput';
@@ -103,20 +104,20 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
                 label={t('set_ld_loop_label', 'Loop')}
                 description={t('set_ld_loop_desc', 'Continuously loop slides when reaching the end.')}
                 checked={getAdapterSettingValue('carouselLoop')}
-                onChange={(e) => updateAdapterSetting('carouselLoop', e.currentTarget.checked)}
+                onChange={(checked) => updateAdapterSetting('carouselLoop', checked)}
               />
               <Switch
                 label={t('set_ld_drag_enabled_label', 'Drag Enabled')}
                 description={t('set_ld_drag_enabled_desc', 'Allow dragging/swiping to navigate slides.')}
                 checked={getAdapterSettingValue('carouselDragEnabled')}
-                onChange={(e) => updateAdapterSetting('carouselDragEnabled', e.currentTarget.checked)}
+                onChange={(checked) => updateAdapterSetting('carouselDragEnabled', checked)}
               />
               <Divider label={t('set_ld_autoplay_divider', 'Autoplay')} labelPosition="center" />
               <Switch
                 label={t('set_ld_autoplay_label', 'Autoplay')}
                 description={t('set_ld_autoplay_desc', 'Automatically advance slides.')}
                 checked={getAdapterSettingValue('carouselAutoplay')}
-                onChange={(e) => updateAdapterSetting('carouselAutoplay', e.currentTarget.checked)}
+                onChange={(checked) => updateAdapterSetting('carouselAutoplay', checked)}
               />
               {getAdapterSettingValue('carouselAutoplay') && (
                 <>
@@ -133,7 +134,7 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
                     label={t('set_ld_pause_hover_label', 'Pause on Hover')}
                     description={t('set_ld_pause_hover_desc', 'Pause autoplay when the mouse hovers over the carousel.')}
                     checked={getAdapterSettingValue('carouselAutoplayPauseOnHover')}
-                    onChange={(e) => updateAdapterSetting('carouselAutoplayPauseOnHover', e.currentTarget.checked)}
+                    onChange={(checked) => updateAdapterSetting('carouselAutoplayPauseOnHover', checked)}
                   />
                   <ModalSelect
                     label={t('set_ld_autoplay_dir_label', 'Autoplay Direction')}
@@ -152,7 +153,7 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
                 label={t('set_ld_darken_label', 'Darken Unfocused Slides')}
                 description={t('set_ld_darken_desc', 'Apply a dark overlay on slides that are not currently selected.')}
                 checked={getAdapterSettingValue('carouselDarkenUnfocused')}
-                onChange={(e) => updateAdapterSetting('carouselDarkenUnfocused', e.currentTarget.checked)}
+                onChange={(checked) => updateAdapterSetting('carouselDarkenUnfocused', checked)}
               />
               {getAdapterSettingValue('carouselDarkenUnfocused') && (
                 <NumberInput
@@ -170,7 +171,7 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
                 label={t('set_ld_edge_fade_label', 'Edge Fade')}
                 description={t('set_ld_edge_fade_desc', 'Fade slides at the edges of the carousel viewport.')}
                 checked={getAdapterSettingValue('carouselEdgeFade')}
-                onChange={(e) => updateAdapterSetting('carouselEdgeFade', e.currentTarget.checked)}
+                onChange={(checked) => updateAdapterSetting('carouselEdgeFade', checked)}
               />
             </Stack>}
           </Accordion.Panel>
@@ -299,7 +300,7 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
               label={t('set_ld_equal_height_label', 'Equal Height Sections (Per-Type)')}
               description={t('set_ld_equal_height_desc', 'When using per-type galleries, display image and video sections side-by-side at equal height on tablet+ viewports.')}
               checked={perTypeSectionEqualHeight ?? false}
-              onChange={(e) => updateRepresentativeCommonSetting('perTypeSectionEqualHeight', e.currentTarget.checked)}
+              onChange={(checked) => updateRepresentativeCommonSetting('perTypeSectionEqualHeight', checked)}
             />
             <DimensionInput
               label={t('set_ld_section_padding_label', 'Gallery Section Padding')}

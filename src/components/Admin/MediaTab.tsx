@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, useRef, memo } from 'react';
-import { Select, Table, Tooltip, Pagination, Skeleton, Switch, type Primitive } from '@mantine/core';
-import { SegmentedControl } from '@mantine/core';
+import { Select, Table, Tooltip, Pagination, Skeleton, type Primitive } from '@mantine/core';
 
 // Mantine's SegmentedControl calls setState inside its ref callbacks, which triggers
 // React's "maximum update depth" error when the component re-renders rapidly.
@@ -52,7 +51,7 @@ import { useMediaExternal } from '@/hooks/useMediaExternal';
 import { useMediaCrud } from '@/hooks/useMediaCrud';
 import { useMediaDisplay } from '@/hooks/useMediaDisplay';
 import styles from './MediaTab.module.scss';
-import { uiRem, Group, Text, Grid, Box, Button } from '@/ui';
+import { uiRem, Group, Text, Grid, Box, Button, Switch, SegmentedControl } from '@/ui';
 
 // Position the DragOverlay so its top-center sits just below the cursor.
 // The overlay is 140 px wide; placing the cursor at (width/2, 12) gives a natural
@@ -348,7 +347,7 @@ export default function MediaTab({ campaignId, apiClient, onCampaignsUpdated }: 
               size="xs"
               label={t('admin_media_exclusive', 'Exclusive only')}
               checked={orphanFilter}
-              onChange={(e) => setOrphanFilter(e.currentTarget.checked)}
+              onChange={(checked) => setOrphanFilter(checked)}
               aria-label={t('admin_media_exclusive_aria', 'Show only media exclusive to this campaign')}
             />
           </Tooltip>

@@ -1,6 +1,6 @@
 
-import { Checkbox, ScrollArea } from '@mantine/core';
-import { Stack, Text, Alert, Box } from '@/ui';
+import { ScrollArea } from '@mantine/core';
+import { Stack, Text, Alert, Box, Checkbox } from '@/ui';
 import { Trans, useTranslation } from 'react-i18next';
 import { ConfirmModal } from '@/components/Common/ConfirmModal';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
@@ -76,7 +76,7 @@ export function ArchiveCompanyModal({
         {...getMullionDebugProps('ArchiveCompanyModal', 'revoke-access')}
         label={t('admin_archco_revoke', 'Also revoke all company-level access grants')}
         checked={archiveRevokeAccess}
-        onChange={(e) => onArchiveRevokeAccessChange(e.currentTarget.checked)}
+        onChange={(checked) => onArchiveRevokeAccessChange(checked)}
       />
 
       <Alert {...getMullionDebugProps('ArchiveCompanyModal', 'warning')} tone="warning" variant="light">

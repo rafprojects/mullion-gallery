@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import {
   Modal,
   TextInput,
-  Switch,
   Divider,
 } from '@mantine/core';
 import { IconCopy } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { AdminCampaign } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Button } from '@/ui';
+import { uiRem, Group, Stack, Text, Button, Switch } from '@/ui';
 
 export interface CampaignDuplicateModalProps {
   /** Source campaign to duplicate; null when modal is closed. */
@@ -70,7 +69,7 @@ function CampaignDuplicateModalOptions({
           label={t('admin_dup_copy_media', 'Copy media associations')}
           description={t('admin_dup_copy_media_desc', 'Media items will appear in both campaigns')}
           checked={copyMedia}
-          onChange={(e) => setCopyMedia(e.currentTarget.checked)}
+          onChange={(checked) => setCopyMedia(checked)}
         />
         {!copyMedia && (
           <Text size="xs" tone="muted">
@@ -83,7 +82,7 @@ function CampaignDuplicateModalOptions({
               label={t('admin_dup_layout', 'Duplicate linked layout template')}
               description={t('admin_dup_layout_desc', 'The copied campaign gets its own editable layout instead of sharing the original template.')}
               checked={duplicateLayoutTemplate}
-              onChange={(e) => setDuplicateLayoutTemplate(e.currentTarget.checked)}
+              onChange={(checked) => setDuplicateLayoutTemplate(checked)}
             />
             {!duplicateLayoutTemplate && (
               <Text size="xs" tone="muted">

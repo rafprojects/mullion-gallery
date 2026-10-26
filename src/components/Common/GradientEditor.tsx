@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import {
   Select,
-  Slider,
   NumberInput,
-  SegmentedControl,
   Tooltip,
 } from '@mantine/core';
 import {
@@ -12,6 +10,8 @@ import {
   Text,
   Box,
   ActionIcon,
+  Slider,
+  SegmentedControl,
 } from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import type { GradientStop, GradientDirection, GradientType, RadialShape, RadialSize } from '@/types';

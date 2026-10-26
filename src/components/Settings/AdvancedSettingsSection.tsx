@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Accordion, Divider, Loader, NumberInput, Select, Slider, Switch, TextInput } from '@mantine/core';
-import { Group, Stack, Text, Alert, Badge } from '@/ui';
+import { Accordion, Divider, Loader, NumberInput, Select, TextInput } from '@mantine/core';
+import { Group, Stack, Text, Alert, Badge, Slider, Switch } from '@/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
@@ -64,7 +64,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
                   label={tooltipLabel(t('set_adv_drawer_blur', 'Settings Drawer Backdrop Blur'), 'settingsDrawerBlurEnabled')}
                   description={t('set_adv_drawer_blur_desc', 'When enabled, content behind open settings drawers is blurred.')}
                   checked={settings.settingsDrawerBlurEnabled ?? true}
-                  onChange={(event) => updateSetting('settingsDrawerBlurEnabled', event.currentTarget.checked)}
+                  onChange={(checked) => updateSetting('settingsDrawerBlurEnabled', checked)}
                 />
                 <Select
                   label={tooltipLabel(t('set_adv_panel_anim', 'Settings Panel Animation'), 'settingsPanelAnimation')}
@@ -196,7 +196,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
                   label={tooltipLabel(t('set_adv_optimize', 'Optimize on Upload'), 'optimizeOnUpload')}
                   description={t('set_adv_optimize_desc', 'Automatically resize and compress images on upload.')}
                   checked={settings.optimizeOnUpload}
-                  onChange={(event) => updateSetting('optimizeOnUpload', event.currentTarget.checked)}
+                  onChange={(checked) => updateSetting('optimizeOnUpload', checked)}
                 />
                 <NumberInput
                   label={tooltipLabel(t('set_adv_opt_maxw', 'Max Width (px)'), 'optimizeMaxWidth')}
@@ -223,7 +223,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
                   label={tooltipLabel(t('set_adv_webp', 'WebP Conversion'), 'optimizeWebpEnabled')}
                   description={t('set_adv_webp_desc', 'Generate WebP copies alongside originals.')}
                   checked={settings.optimizeWebpEnabled}
-                  onChange={(event) => updateSetting('optimizeWebpEnabled', event.currentTarget.checked)}
+                  onChange={(checked) => updateSetting('optimizeWebpEnabled', checked)}
                 />
                 <NumberInput
                   label={tooltipLabel(t('set_adv_thumb_ttl', 'Thumbnail Cache TTL (s)'), 'thumbnailCacheTtl')}
@@ -331,7 +331,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
                   label={tooltipLabel(t('set_adv_debug_markers', 'Enable Component Debug Names & Markers'), 'debugComponentMarkers')}
                   description={t('set_adv_debug_markers_desc', 'When enabled, deployed builds keep explicit React DevTools component names and inject data-mullion-component/data-mullion-slot attributes into the DOM for Elements inspection and QA selectors. Local dev may still show source component names even when this is off.')}
                   checked={settings.debugComponentMarkers}
-                  onChange={(event) => updateSetting('debugComponentMarkers', event.currentTarget.checked)}
+                  onChange={(checked) => updateSetting('debugComponentMarkers', checked)}
                 />
               </Stack>
             ) : null}
@@ -459,7 +459,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
                   label={tooltipLabel(t('set_adv_preserve', 'Preserve data on plugin removal'), 'preserveDataOnUninstall')}
                   description={t('set_adv_preserve_desc', 'When enabled (recommended), all plugin data is kept if you remove the plugin. Disable only if you intend to wipe all gallery data on uninstall.')}
                   checked={settings.preserveDataOnUninstall ?? true}
-                  onChange={(event) => updateSetting('preserveDataOnUninstall', event.currentTarget.checked)}
+                  onChange={(checked) => updateSetting('preserveDataOnUninstall', checked)}
                 />
               </Stack>
             ) : null}

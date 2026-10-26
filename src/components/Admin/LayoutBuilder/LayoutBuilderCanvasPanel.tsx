@@ -3,11 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { getHotkeyHandler, useElementSize, useMergedRef } from '@mantine/hooks';
 import {
   NumberInput,
-  Switch,
-  Slider,
   Divider,
   Tooltip,
-  SegmentedControl,
 } from '@mantine/core';
 import type { ResponsiveBreakpoint } from '@/types';
 import { IconHandGrab, IconArrowsMaximize, IconSeparatorVertical, IconSeparatorHorizontal } from '@tabler/icons-react';
@@ -22,7 +19,7 @@ import { safeLocalStorage, fitRectsIntoBand } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group, Text, Box, Alert, Button, ActionIcon } from '@/ui';
+import { uiRem, Group, Text, Box, Alert, Button, ActionIcon, Switch, Slider, SegmentedControl } from '@/ui';
 
 // ── P30-C: Device preview presets ────────────────────────────────────────────
 
@@ -580,7 +577,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                   label={tr('lb_canvas_grid', 'Grid')}
                   size="xs"
                   checked={showGrid}
-                  onChange={(e) => setShowGrid(e.currentTarget.checked)}
+                  onChange={(checked) => setShowGrid(checked)}
                   aria-label={tr('lb_canvas_grid_aria', 'Toggle grid overlay')}
                 />
                 {showGrid && (
@@ -605,14 +602,14 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                   label={tr('lb_canvas_rulers', 'Rulers')}
                   size="xs"
                   checked={showRulers}
-                  onChange={(e) => setShowRulers(e.currentTarget.checked)}
+                  onChange={(checked) => setShowRulers(checked)}
                   aria-label={tr('lb_canvas_rulers_aria', 'Toggle canvas rulers')}
                 />
                 <Switch
                   label={tr('lb_canvas_measure', 'Measure')}
                   size="xs"
                   checked={showMeasurements}
-                  onChange={(e) => setShowMeasurements(e.currentTarget.checked)}
+                  onChange={(checked) => setShowMeasurements(checked)}
                   aria-label={tr('lb_canvas_measure_aria', 'Toggle measurement overlay')}
                 />
               </Group>
@@ -693,7 +690,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                 label={tr('lb_canvas_indices', 'Indices')}
                 size="xs"
                 checked={showSlotIndices}
-                onChange={(e) => setShowSlotIndices(e.currentTarget.checked)}
+                onChange={(checked) => setShowSlotIndices(checked)}
                 aria-label={tr('lb_canvas_indices_aria', 'Toggle slot index badges')}
               />
               <Divider orientation="vertical" />
@@ -779,7 +776,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                     label={tr('lb_canvas_device_frame', 'Device frame')}
                     size="xs"
                     checked={showPreviewFrame}
-                    onChange={(e) => setShowPreviewFrame(e.currentTarget.checked)}
+                    onChange={(checked) => setShowPreviewFrame(checked)}
                     aria-label={tr('lb_canvas_device_frame_aria', 'Toggle device frame chrome')}
                     data-testid="preview-frame-toggle"
                   />

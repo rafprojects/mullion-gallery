@@ -104,6 +104,58 @@ const controlColour = (attr) => {
   return { blocked: 'no role for this colour' };
 };
 
+/**
+ * Mantine hands a toggle's `onChange` the change event; the framework hands it
+ * the boolean (P80). An inline arrow that only reads `e.currentTarget.checked`
+ * is rewritten to take the boolean; anything else is listed for a hand check.
+ */
+const toggleOnChange = (attr) => {
+  const fn = attr.initializer && ts.isJsxExpression(attr.initializer) ? attr.initializer.expression : undefined;
+  if (!fn || !ts.isArrowFunction(fn)) return { blocked: 'handler is not an inline arrow; check its signature' };
+  if (fn.parameters.length === 0) return null;
+  const param = fn.parameters[0];
+  if (fn.parameters.length > 1 || !ts.isIdentifier(param.name)) return { blocked: 'unexpected handler parameters' };
+  const name = param.name.text;
+  const reads = [];
+  let other = false;
+  let usesChecked = false;
+  const visit = (node) => {
+    if (ts.isIdentifier(node) && node.text === name && node !== param.name) {
+      const access = node.parent;
+      const outer = access?.parent;
+      if (
+        ts.isPropertyAccessExpression(access) && access.expression === node &&
+        ['currentTarget', 'target'].includes(access.name.text) &&
+        ts.isPropertyAccessExpression(outer) && outer.expression === access && outer.name.text === 'checked'
+      ) reads.push(outer);
+      else other = true;
+    }
+    if (ts.isIdentifier(node) && node.text === 'checked') {
+      const parent = node.parent;
+      const isMember = ts.isPropertyAccessExpression(parent) && parent.name === node;
+      const isKey = ts.isPropertyAssignment(parent) && parent.name === node;
+      if (!isMember && !isKey) usesChecked = true;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(fn.body);
+  if (other || reads.length === 0) return { blocked: 'handler uses the event for more than `checked`' };
+  const next = usesChecked ? 'nextChecked' : 'checked';
+  const start = attr.initializer.getStart();
+  let text = attr.initializer.getText();
+  const cuts = [[param.getStart() - start, param.getEnd() - start, next], ...reads.map((r) => [r.getStart() - start, r.getEnd() - start, next])];
+  cuts.sort((a, b) => b[0] - a[0]);
+  for (const [a, b, t] of cuts) text = text.slice(0, a) + t + text.slice(b);
+  return { replace: `onChange=${text}` };
+};
+
+/** Mantine's `suffix=" px"` is text after the value; the framework draws it in the unit slot. */
+const numberSuffix = (attr) => {
+  const v = literal(attr);
+  if (typeof v !== 'string') return { blocked: 'suffix is an expression' };
+  return { replace: `unit="${v.trim()}"` };
+};
+
 /** `size="compact-xs"` is the xs step with the compact flag. */
 const buttonSize = (attr) => {
   const v = literal(attr);
@@ -149,6 +201,13 @@ const textSize = (attr) => {
 };
 
 /** Per component: renames, props handled specially, and Mantine props with no framework meaning. */
+const FIELD_UNSUPPORTED = [
+  'variant', 'classNames', 'styles', 'unstyled', 'inputWrapperOrder', 'withAsterisk', 'labelProps', 'descriptionProps',
+  'errorProps', 'wrapperProps', 'inputContainer', 'pointer', 'rightSectionPointerEvents', 'rightSectionWidth',
+  'leftSectionPointerEvents', 'leftSectionWidth',
+];
+const TOGGLE_UNSUPPORTED = ['color', 'radius', 'labelPosition', 'icon', 'iconColor', 'variant', 'classNames', 'styles', 'unstyled', 'wrapperProps'];
+
 const RULES = {
   Stack: { gapProp: 'gap', rename: PADDING, unsupported: ['variant', 'classNames', 'styles', 'unstyled', 'mod', 'vars'] },
   Group: {
@@ -192,6 +251,34 @@ const RULES = {
   'Chip.Group': { rename: {}, unsupported: [] },
   CopyButton: { rename: {}, unsupported: [] },
   FileButton: { rename: {}, unsupported: ['capture', 'form', 'name', 'inputProps'] },
+  // [P81-A] The input family. `variant` stays unsupported until the designer
+  // answers on Mantine's `filled` and `unstyled` fields.
+  TextInput: { rename: {}, unsupported: FIELD_UNSUPPORTED },
+  PasswordInput: { rename: {}, unsupported: FIELD_UNSUPPORTED },
+  Textarea: {
+    rename: {},
+    unsupported: [...FIELD_UNSUPPORTED, 'resize'],
+    // The framework textarea always grows with its content between minRows and maxRows.
+    props: { autosize: (attr) => (literal(attr) === true ? { replace: '' } : { blocked: 'autosize is an expression' }) },
+  },
+  NumberInput: {
+    rename: {},
+    unsupported: [...FIELD_UNSUPPORTED, 'prefix', 'thousandSeparator', 'hideControls', 'allowNegative', 'clampBehavior'],
+    props: {
+      suffix: numberSuffix,
+      allowDecimal: (attr) => (literal(attr) === false ? { replace: 'decimalScale={0}' } : { blocked: 'allowDecimal is not false' }),
+    },
+  },
+  Checkbox: { rename: {}, unsupported: TOGGLE_UNSUPPORTED, props: { onChange: toggleOnChange } },
+  Switch: { rename: {}, unsupported: [...TOGGLE_UNSUPPORTED, 'onLabel', 'offLabel', 'thumbIcon'], props: { onChange: toggleOnChange } },
+  Slider: {
+    rename: {},
+    unsupported: ['color', 'radius', 'thumbSize', 'thumbChildren', 'showLabelOnHover', 'labelTransitionProps', 'inverted', 'restrictToMarks', 'scale', 'classNames', 'styles', 'unstyled'],
+  },
+  SegmentedControl: {
+    rename: {},
+    unsupported: ['color', 'radius', 'transitionDuration', 'transitionTimingFunction', 'orientation', 'withItemsBorders', 'autoContrast', 'readOnly', 'classNames', 'styles', 'unstyled'],
+  },
   Badge: {
     rename: { leftSection: 'icon' },
     unsupported: ['rightSection', 'circle', 'gradient', 'autoContrast', 'fullWidth', 'classNames', 'styles', 'unstyled'],

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, NumberInput, Switch } from '@mantine/core';
+import { Modal, NumberInput } from '@mantine/core';
 import { computeGridSlots } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Button } from '@/ui';
+import { uiRem, Stack, Group, Text, Button, Switch } from '@/ui';
 
 export interface AutoGridDialogProps {
   opened: boolean;
@@ -56,7 +56,7 @@ export function AutoGridDialog({ opened, onClose, onGenerate, hasExistingSlots =
           <Switch
             label={t('lb_grid_replace', 'Replace existing slots')}
             checked={replace}
-            onChange={(e) => setReplace(e.currentTarget.checked)}
+            onChange={(checked) => setReplace(checked)}
           />
         )}
 

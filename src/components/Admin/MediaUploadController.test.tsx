@@ -83,7 +83,7 @@ describe('MediaUploadController', () => {
     );
 
     // Opt the asset into universal visibility, then queue a file and upload.
-    fireEvent.click(screen.getByLabelText(/Make available to all spaces/i));
+    fireEvent.click(screen.getByRole('checkbox', { name: /Make available to all spaces/i }));
     selectFile();
     fireEvent.click(screen.getByRole('button', { name: /^Upload$/i }));
 

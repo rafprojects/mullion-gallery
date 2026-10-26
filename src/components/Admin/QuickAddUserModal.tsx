@@ -1,6 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
 import {
-  Checkbox,
   Modal,
   Select,
   TextInput,
@@ -13,6 +12,7 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
 } from '@/ui';
 import { IconAlertCircle, IconUserPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -199,7 +199,7 @@ function QuickAddUserFormState({
       <Checkbox
         label={t('admin_qau_test_mode', '🧪 Test mode: Simulate email failure')}
         checked={quickAddTestMode}
-        onChange={(e) => setQuickAddTestMode(e.currentTarget.checked)}
+        onChange={(checked) => setQuickAddTestMode(checked)}
         description={t('admin_qau_test_mode_desc', 'Enable to test the password reset link UI without actually sending email')}
       />
 

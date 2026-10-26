@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, Tooltip, Checkbox, Select, Menu } from '@mantine/core';
+import { Table, Tooltip, Select, Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconEdit, IconCopy, IconDownload, IconFileZip, IconArchive, IconArchiveOff, IconLayoutGrid, IconTrash, IconChevronDown, IconArrowsExchange, IconPhotoPlus } from '@tabler/icons-react';
 import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
@@ -10,7 +10,7 @@ import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { CompanyCombobox } from '@/components/Common/CompanyCombobox';
 import type { ApiClient } from '@/services/apiClient';
-import { uiRem, Group, Text, Box, Badge, Button } from '@/ui';
+import { uiRem, Group, Text, Box, Badge, Button, Checkbox } from '@/ui';
 
 function toSlug(name: string): string {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');

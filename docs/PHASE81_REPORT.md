@@ -220,6 +220,22 @@ The designer answered `pass-two-begins` the same night (`designer-answers-pass-t
 
 **Two specs were measuring the old components.** The size-basis spec's gallery check measured `.mantine-Button-root` and `.mantine-Chip-label`, so after the button flip it measured only the chips, and after this one nothing past its own guard of five readings; it measures the framework's classes now. The showcase ring spec asserted the outset ring on the chip and asserts the inset one. The captures change in two places: the gallery's filter row (sent to the designer across six themes) and the settings drawer's disabled Save. Lint and vitest (4490) pass; the full Playwright run failed only on those two specs, and both pass after the fix.
 
+### Pass 2: checkboxes, switches and segmented controls (2026-10-26)
+
+**Geometry first, again.** A research pass compared Mantine's stylesheet with the framework's for the whole input family, and each claim used here was checked against Mantine's sheet before it was acted on. One was wrong: Mantine's segmented items are equal width only under `fullWidth`, not always, so that change was not made. What was fixed, all measured in `e2e/control-parity.spec.ts`, which failed on each first:
+
+- **Checkbox and switch sizes.** The framework sized both in `em` off one font size, so every size step drew the same 18px box and the same 31.5 by 17.5 track. They now take Mantine's sizes per step (box 16 and 20px at `xs` and `sm`; track 32 by 16 and 38 by 20 with a 12 and 14px thumb). The switch keeps its audited border inside that outer size, and the thumb is centred in what is left, at the same inset either side.
+- **The label row.** 12px from control to label, not 10, and a description now sits on the label's column as Mantine's did, where it had started under the control.
+- **Segmented control.** 4px of track around the items rather than 2, an 8px radius with items and indicator 4px less, and item padding per step (6px at `xs`, 10px at `sm`) rather than 12px at every step. The 400 and 600 weights for resting and checked segments are kept: they are the framework's non-colour signal for the checked segment, where Mantine held 500 throughout.
+
+**API.** A framework toggle hands `onChange` the boolean, where Mantine's handed it the event. The codemod rewrote 84 inline handlers that read only `e.currentTarget.checked` and lists anything else; one site passed a no-argument handler and needed nothing. 155 edits in 35 files. Three unit tests found a checkbox by label and now find it by role, because Base UI's checkbox and its hidden input share the label.
+
+**The slider stays on Mantine for now.** Mantine's `xs` slider, 38 of the 56, is a 4px track with an 8px thumb that is all border; its default is an 8px track with a 16px thumb. The framework draws a 14px ringed thumb on a 4px track at every size. Matching Mantine would put an 8px drag target in the builder's property panels, which is a trade the designer makes, so it went to them with the fields' questions.
+
+**What the captures showed.** Mantine's checked switch was close to invisible on both default themes in the settings drawer: a near-white track with a dot on light, a hollow ring on dark. The framework's is a filled primary track. The captures also caught a defect the parity spec had not: Base UI renders a field's description as a `<p>`, and neither the toggle nor the text field reset its margins, so each description sat 12px lower than it should and pushed the next field down. Both are reset, the spec measures the gap under a toggle's row and the text field description's margin, and it failed on both first. The described switch is still about 5px taller than Mantine's, because its description keeps the type scale's 1.4 line height where Mantine used 1.2.
+
+**A test-harness lesson.** Readings taken straight after load landed mid-transition once the fixture grew: colours ease in from their initial values when the component sheet is adopted. The parity spec now waits for the showcase's finite animations to finish before it reads anything.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.

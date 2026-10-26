@@ -1,12 +1,10 @@
 import { useCallback, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  Checkbox,
   Divider,
   Loader,
   Modal,
   MultiSelect,
-  Switch,
   TextInput,
   Tooltip,
 } from '@mantine/core';
@@ -20,6 +18,8 @@ import {
   ActionIcon,
   Button,
   CopyButton,
+  Checkbox,
+  Switch,
 } from '@/ui';
 import { IconCopy, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -135,7 +135,7 @@ function EndpointRow({
             <Switch
               size="sm"
               checked={endpoint.enabled}
-              onChange={(e) => onToggleEnabled(endpoint.index, e.currentTarget.checked)}
+              onChange={(checked) => onToggleEnabled(endpoint.index, checked)}
               disabled={isUpdating}
               label={endpoint.enabled ? t('set_wh_on', 'On') : t('set_wh_off', 'Off')}
             />
@@ -330,7 +330,7 @@ export function WebhookSettingsSection({ apiClient }: Props) {
             <Checkbox
               label={t('set_wh_enabled', 'Enabled')}
               checked={addForm.enabled}
-              onChange={(e) => setAddForm((s) => ({ ...s, enabled: e.currentTarget.checked }))}
+              onChange={(checked) => setAddForm((s) => ({ ...s, enabled: checked }))}
               size="sm"
             />
             <Box>

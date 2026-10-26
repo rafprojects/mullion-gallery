@@ -13,8 +13,8 @@
  */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SegmentedControl, Loader, TextInput, Switch, Select } from '@mantine/core';
-import { Group, Stack, Title, Text, Alert, Box, Center, Container, Chip } from '@/ui';
+import { Loader, TextInput, Select } from '@mantine/core';
+import { Group, Stack, Title, Text, Alert, Box, Center, Container, Chip, SegmentedControl, Switch } from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { IconSearch } from '@tabler/icons-react';
 import { CampaignCard } from './CampaignCard';
@@ -275,13 +275,13 @@ export function CardGallery({
             <Switch
               label={t('cardgal_show_title', 'Show Title')}
               checked={galleryBehaviorSettings.showGalleryTitle}
-              onChange={(e) => inContextSave('showGalleryTitle', e.currentTarget.checked)}
+              onChange={(checked) => inContextSave('showGalleryTitle', checked)}
               size="xs"
             />
             <Switch
               label={t('cardgal_show_subtitle', 'Show Subtitle')}
               checked={galleryBehaviorSettings.showGallerySubtitle}
-              onChange={(e) => inContextSave('showGallerySubtitle', e.currentTarget.checked)}
+              onChange={(checked) => inContextSave('showGallerySubtitle', checked)}
               size="xs"
             />
             <TextInput

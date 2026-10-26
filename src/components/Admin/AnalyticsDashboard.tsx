@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Loader,
   ScrollArea,
-  SegmentedControl,
   Select,
   Table,
   Tooltip,
@@ -19,6 +18,7 @@ import {
   Badge,
   Paper,
   ActionIcon,
+  SegmentedControl,
 } from '@/ui';
 import {
   CartesianGrid,

@@ -1,9 +1,7 @@
 import type { ReactNode } from 'react';
 import {
-  Checkbox,
   Combobox,
   ScrollArea,
-  SegmentedControl,
   Select,
   Skeleton,
   Table,
@@ -18,7 +16,7 @@ import { PendingRequestsPanel } from './PendingRequestsPanel';
 import type { ApiClient } from '@/services/apiClient';
 import type { AdminAccessState } from '@/hooks/useAdminAccessState';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Alert, Box, Center, Badge, Card, useMediaQuery, Button } from '@/ui';
+import { uiRem, Group, Stack, Text, Alert, Box, Center, Badge, Card, useMediaQuery, Button, Checkbox, SegmentedControl } from '@/ui';
 
 type AccessViewMode = 'campaign' | 'company' | 'all';
 
@@ -236,7 +234,7 @@ export function AccessTab({
                   label={t('admin_access_show_expired', 'Show expired')}
                   size="xs"
                   checked={showExpiredGrants}
-                  onChange={(e) => onShowExpiredGrantsChange(e.currentTarget.checked)}
+                  onChange={(checked) => onShowExpiredGrantsChange(checked)}
                 />
                 <Badge tone="default" size="md" variant="light">{t('admin_access_n_users', '{{count}} users', { count: accessEntriesCount })}</Badge>
               </Group>

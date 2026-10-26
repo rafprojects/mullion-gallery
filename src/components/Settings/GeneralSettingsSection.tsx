@@ -1,5 +1,6 @@
-import { Accordion, NumberInput, Switch, TextInput } from '@mantine/core';
-import { Stack } from '@/ui';
+
+import { Accordion, NumberInput, TextInput } from '@mantine/core';
+import { Stack, Switch } from '@/ui';
 import { useTranslation } from 'react-i18next';
 
 import { GradientEditor } from '@/components/Common/GradientEditor';
@@ -52,7 +53,7 @@ export function GeneralSettingsSection({ settings, updateSetting, onThemeChange,
                   'When off, the Settings panel and Layout Builder stay on the Mullion brand palette. Turn on to restyle those editor surfaces with the selected gallery theme.',
                 )}
                 checked={settings.applyThemeEverywhere === true}
-                onChange={(event) => updateSetting('applyThemeEverywhere', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('applyThemeEverywhere', checked)}
               />
 
               <ModalSelect
@@ -116,19 +117,19 @@ export function GeneralSettingsSection({ settings, updateSetting, onThemeChange,
                 label={t('set_fullbleed_desktop', 'WP Full Bleed — Desktop (≥ 1024px)')}
                 description={t('set_fullbleed_desktop_desc', 'Break out of the WordPress page container padding on desktop viewports. Requires page refresh.')}
                 checked={settings.wpFullBleedDesktop}
-                onChange={(event) => updateSetting('wpFullBleedDesktop', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('wpFullBleedDesktop', checked)}
               />
               <Switch
                 label={t('set_fullbleed_tablet', 'WP Full Bleed — Tablet (768-1023px)')}
                 description={t('set_fullbleed_tablet_desc', 'Break out of the WordPress page container padding on tablet viewports. Requires page refresh.')}
                 checked={settings.wpFullBleedTablet}
-                onChange={(event) => updateSetting('wpFullBleedTablet', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('wpFullBleedTablet', checked)}
               />
               <Switch
                 label={t('set_fullbleed_mobile', 'WP Full Bleed — Mobile (< 768px)')}
                 description={t('set_fullbleed_mobile_desc', 'Break out of the WordPress page container padding on mobile viewports. Requires page refresh.')}
                 checked={settings.wpFullBleedMobile}
-                onChange={(event) => updateSetting('wpFullBleedMobile', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('wpFullBleedMobile', checked)}
               />
             </Stack>
           ) : null}
@@ -144,7 +145,7 @@ export function GeneralSettingsSection({ settings, updateSetting, onThemeChange,
                 label={t('set_show_gallery_title', 'Show Gallery Title')}
                 description={t('set_show_gallery_title_desc', 'Show the "Campaign Gallery" heading.')}
                 checked={settings.showGalleryTitle}
-                onChange={(event) => updateSetting('showGalleryTitle', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('showGalleryTitle', checked)}
               />
               <TextInput
                 label={t('set_gallery_title_text', 'Gallery Title Text')}
@@ -156,7 +157,7 @@ export function GeneralSettingsSection({ settings, updateSetting, onThemeChange,
                 label={t('set_show_gallery_subtitle', 'Show Gallery Subtitle')}
                 description={t('set_show_gallery_subtitle_desc', 'Show the subtitle text beneath the title.')}
                 checked={settings.showGallerySubtitle}
-                onChange={(event) => updateSetting('showGallerySubtitle', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('showGallerySubtitle', checked)}
               />
               <TextInput
                 label={t('set_gallery_subtitle_text', 'Gallery Subtitle Text')}
@@ -168,19 +169,19 @@ export function GeneralSettingsSection({ settings, updateSetting, onThemeChange,
                 label={t('set_show_access_mode', 'Show Access Mode')}
                 description={t('set_show_access_mode_desc', 'Show the Lock / Hide access-mode toggle (admin only).')}
                 checked={settings.showAccessMode}
-                onChange={(event) => updateSetting('showAccessMode', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('showAccessMode', checked)}
               />
               <Switch
                 label={t('set_show_filter_tabs', 'Show Filter Tabs')}
                 description={t('set_show_filter_tabs_desc', 'Show the campaign filter tab strip.')}
                 checked={settings.showFilterTabs}
-                onChange={(event) => updateSetting('showFilterTabs', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('showFilterTabs', checked)}
               />
               <Switch
                 label={t('set_show_search_box', 'Show Search Box')}
                 description={t('set_show_search_box_desc', 'Show the campaign search input.')}
                 checked={settings.showSearchBox}
-                onChange={(event) => updateSetting('showSearchBox', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('showSearchBox', checked)}
               />
             </Stack>
           ) : null}
@@ -222,7 +223,7 @@ export function GeneralSettingsSection({ settings, updateSetting, onThemeChange,
                 label={t('set_show_header_border', 'Show Header Border')}
                 description={t('set_show_header_border_desc', 'Show border, shadow, and backdrop blur on the sticky gallery header.')}
                 checked={settings.showViewerBorder ?? true}
-                onChange={(event) => updateSetting('showViewerBorder', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('showViewerBorder', checked)}
               />
             </Stack>
           ) : null}
@@ -286,14 +287,14 @@ export function GeneralSettingsSection({ settings, updateSetting, onThemeChange,
                   label={t('set_enable_advanced', 'Enable Advanced Settings')}
                   description={t('set_enable_advanced_desc', 'Unlock the System & Admin tab with granular control over panel behavior, cache, drawer settings, and more.')}
                   checked={settings.advancedSettingsEnabled}
-                  onChange={(event) => updateSetting('advancedSettingsEnabled', event.currentTarget.checked)}
+                  onChange={(checked) => updateSetting('advancedSettingsEnabled', checked)}
                 />
               )}
               <Switch
                 label={t('set_show_tooltips', 'Show Settings Tooltips')}
                 description={t('set_show_tooltips_desc', 'Display info icons next to Advanced-tab labels that explain each setting on hover.')}
                 checked={settings.showSettingsTooltips}
-                onChange={(event) => updateSetting('showSettingsTooltips', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('showSettingsTooltips', checked)}
               />
             </Stack>
           ) : null}

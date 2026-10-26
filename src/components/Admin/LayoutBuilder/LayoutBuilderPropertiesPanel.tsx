@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Divider, SegmentedControl, NumberInput } from '@mantine/core';
+import { Divider, NumberInput } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { IDockviewPanelProps } from 'dockview';
@@ -10,7 +10,7 @@ import { MaskPropertiesPanel } from './MaskPropertiesPanel';
 import { BackgroundPropertiesPanel } from './BackgroundPropertiesPanel';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
-import { uiRem, Stack, Group, Text, Box, Button } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, Button, SegmentedControl } from '@/ui';
 
 // P62-G: gate the Pro text editor behind the build flag so the free WP.org build
 // dead-code-eliminates TextPropertiesPanel (and its heavyweight TypographyEditor).

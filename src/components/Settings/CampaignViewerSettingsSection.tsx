@@ -1,6 +1,6 @@
 
-import { Accordion, NumberInput, Slider, Switch, TextInput } from '@mantine/core';
-import { Stack, Text, Box } from '@/ui';
+import { Accordion, NumberInput, TextInput } from '@mantine/core';
+import { Stack, Text, Box, Slider, Switch } from '@/ui';
 import { useTranslation } from 'react-i18next';
 
 import { GradientEditor } from '@/components/Common/GradientEditor';
@@ -58,7 +58,7 @@ export function CampaignViewerSettingsSection({ settings, updateSetting }: Campa
                 label={t('set_viewer_fullscreen_label', 'Fullscreen Campaign Modal')}
                 description={t('set_viewer_fullscreen_desc', 'Open campaign viewer in fullscreen mode instead of the default modal.')}
                 checked={settings.campaignModalFullscreen ?? false}
-                onChange={(event) => updateSetting('campaignModalFullscreen', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('campaignModalFullscreen', checked)}
               />
               <ModalSelect
                 label={t('set_viewer_openmode_label', 'Campaign Open Mode')}
@@ -191,21 +191,21 @@ export function CampaignViewerSettingsSection({ settings, updateSetting }: Campa
                     label={t('set_viewer_show_company_label', 'Show Company Name')}
                     description={t('set_viewer_show_company_desc', 'Show the company badge on the campaign cover image.')}
                     checked={settings.showCampaignCompanyName ?? true}
-                    onChange={(event) => updateSetting('showCampaignCompanyName', event.currentTarget.checked)}
+                    onChange={(checked) => updateSetting('showCampaignCompanyName', checked)}
                     disabled={settings.campaignOpenMode === 'galleries-only'}
                   />
                   <Switch
                     label={t('set_viewer_show_date_label', 'Show Date')}
                     description={t('set_viewer_show_date_desc', 'Show the creation date under the campaign title.')}
                     checked={settings.showCampaignDate ?? true}
-                    onChange={(event) => updateSetting('showCampaignDate', event.currentTarget.checked)}
+                    onChange={(checked) => updateSetting('showCampaignDate', checked)}
                     disabled={settings.campaignOpenMode === 'galleries-only'}
                   />
                   <Switch
                     label={t('set_viewer_show_about_label', 'Show About Section')}
                     description={t('set_viewer_show_about_desc', 'Show the "About this Campaign" heading and description.')}
                     checked={settings.showCampaignAbout ?? true}
-                    onChange={(event) => updateSetting('showCampaignAbout', event.currentTarget.checked)}
+                    onChange={(checked) => updateSetting('showCampaignAbout', checked)}
                     disabled={settings.campaignOpenMode === 'galleries-only'}
                   />
                   <TextInput
@@ -219,35 +219,35 @@ export function CampaignViewerSettingsSection({ settings, updateSetting }: Campa
                     label={t('set_viewer_show_desc_label', 'Show Description')}
                     description={t('set_viewer_show_desc_desc', 'Show the campaign description text within the About section.')}
                     checked={settings.showCampaignDescription ?? true}
-                    onChange={(event) => updateSetting('showCampaignDescription', event.currentTarget.checked)}
+                    onChange={(checked) => updateSetting('showCampaignDescription', checked)}
                     disabled={settings.campaignOpenMode === 'galleries-only'}
                   />
                   <Switch
                     label={t('set_viewer_show_stats_label', 'Show Campaign Stats')}
                     description={t('set_viewer_show_stats_desc', 'Show the statistics block (video count, image count, tags, visibility).')}
                     checked={settings.showCampaignStats ?? true}
-                    onChange={(event) => updateSetting('showCampaignStats', event.currentTarget.checked)}
+                    onChange={(checked) => updateSetting('showCampaignStats', checked)}
                     disabled={settings.campaignOpenMode === 'galleries-only'}
                   />
                   <Switch
                     label={t('set_viewer_stats_admin_label', 'Stats Admin-Only')}
                     description={t('set_viewer_stats_admin_desc', 'When enabled, only admins can see the statistics block.')}
                     checked={settings.campaignStatsAdminOnly ?? true}
-                    onChange={(event) => updateSetting('campaignStatsAdminOnly', event.currentTarget.checked)}
+                    onChange={(checked) => updateSetting('campaignStatsAdminOnly', checked)}
                     disabled={settings.campaignOpenMode === 'galleries-only'}
                   />
                   <Switch
                     label={t('set_viewer_show_cover_label', 'Show Cover Image')}
                     description={t('set_viewer_show_cover_desc', 'Show the campaign cover image at the top of the viewer.')}
                     checked={settings.showCampaignCoverImage ?? true}
-                    onChange={(event) => updateSetting('showCampaignCoverImage', event.currentTarget.checked)}
+                    onChange={(checked) => updateSetting('showCampaignCoverImage', checked)}
                     disabled={settings.campaignOpenMode === 'galleries-only'}
                   />
                   <Switch
                     label={t('set_viewer_show_tags_label', 'Show Tags')}
                     description={t('set_viewer_show_tags_desc', 'Show tags section in the campaign viewer.')}
                     checked={settings.showCampaignTags ?? true}
-                    onChange={(event) => updateSetting('showCampaignTags', event.currentTarget.checked)}
+                    onChange={(checked) => updateSetting('showCampaignTags', checked)}
                     disabled={settings.campaignOpenMode === 'galleries-only'}
                   />
                 </Stack>
@@ -256,13 +256,13 @@ export function CampaignViewerSettingsSection({ settings, updateSetting }: Campa
                 label={t('set_viewer_show_admin_actions_label', 'Show Admin Actions')}
                 description={t('set_viewer_show_admin_actions_desc', 'Show admin action buttons (edit, archive, etc.) in the campaign viewer.')}
                 checked={settings.showCampaignAdminActions ?? true}
-                onChange={(event) => updateSetting('showCampaignAdminActions', event.currentTarget.checked)}
+                onChange={(checked) => updateSetting('showCampaignAdminActions', checked)}
               />
               <Switch
                 label={t('set_viewer_show_gallery_labels_label', 'Show Gallery Labels')}
                 description={t('set_viewer_show_gallery_labels_desc', "Show 'Images' and 'Videos' heading labels above galleries in the viewer.")}
                 checked={showCampaignGalleryLabels ?? true}
-                onChange={(event) => updateViewerCommonSetting('showCampaignGalleryLabels', event.currentTarget.checked)}
+                onChange={(checked) => updateViewerCommonSetting('showCampaignGalleryLabels', checked)}
               />
             </Stack>
           ) : null}
@@ -301,7 +301,7 @@ export function CampaignViewerSettingsSection({ settings, updateSetting }: Campa
                 label={t('set_viewer_label_icon_label', 'Show Gallery Label Icon')}
                 description={t('set_viewer_label_icon_desc', 'Display an icon prefix before each gallery section label')}
                 checked={showGalleryLabelIcon ?? false}
-                onChange={(event) => updateViewerCommonSetting('showGalleryLabelIcon', event.currentTarget.checked)}
+                onChange={(checked) => updateViewerCommonSetting('showGalleryLabelIcon', checked)}
               />
             </Stack>
           ) : null}

@@ -38,7 +38,7 @@ describe('AdminCampaignDeleteModal', () => {
     fireEvent.change(input, { target: { value: 'DELETE' } });
     expect(confirmBtn).not.toBeDisabled();
 
-    const purgeCheckbox = screen.getByLabelText(/purge analytics events/i);
+    const purgeCheckbox = screen.getByRole('checkbox', { name: /purge analytics events/i });
     fireEvent.click(purgeCheckbox);
 
     fireEvent.click(confirmBtn);

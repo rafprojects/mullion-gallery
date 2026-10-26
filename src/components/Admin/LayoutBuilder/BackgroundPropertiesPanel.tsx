@@ -2,9 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Select,
-  Slider,
   NumberInput,
-  SegmentedControl,
   Tooltip,
 } from '@mantine/core';
 import { BuilderColorInput as ColorInput } from './BuilderColorInput';
@@ -22,7 +20,7 @@ import { useBuilderDock } from './BuilderDockContext';
 import { AssetUploader } from './AssetUploader';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box, Button, ActionIcon } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, Button, ActionIcon, Slider, SegmentedControl } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────
 

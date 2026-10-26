@@ -426,6 +426,20 @@ function ControlSizes({ prefix }: { prefix: string }) {
           disabled
         </Chip>
       </Group>
+      {(['xs', 'sm'] as const).map((size) => (
+        <Group key={size} gap="md" align="flex-start">
+          <Checkbox size={size} label="Checkbox" description="Its description" data-testid={`${prefix}-checkbox-${size}`} />
+          <Switch size={size} label="Switch" description="Its description" data-testid={`${prefix}-switch-${size}`} />
+          <TextInput size={size} label="Field" description="Its description" data-testid={`${prefix}-field-${size}`} />
+          <SegmentedControl
+            size={size}
+            data={['One', 'Two']}
+            defaultValue="One"
+            aria-label={`segments ${size}`}
+            data-testid={`${prefix}-segmented-${size}`}
+          />
+        </Group>
+      ))}
     </Stack>
   );
 }

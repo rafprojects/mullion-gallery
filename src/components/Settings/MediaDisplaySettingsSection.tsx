@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Accordion, Divider, NumberInput, Slider, Switch, TextInput } from '@mantine/core';
-import { Group, Stack, Text } from '@/ui';
+import { Accordion, Divider, NumberInput, TextInput } from '@mantine/core';
+import { Group, Stack, Text, Slider, Switch } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { usePersistentAccordion } from '@/hooks/usePersistentAccordion';
@@ -90,14 +90,14 @@ export function GalleryStyleAccordion({ settings, updateSetting, tooltipLabel }:
               label={t('set_md_lightbox_label', 'Enable Lightbox')}
               description={t('set_md_lightbox_desc', 'Enable fullscreen lightbox when clicking gallery items.')}
               checked={settings.enableLightbox}
-              onChange={(event) => updateSetting('enableLightbox', event.currentTarget.checked)}
+              onChange={(checked) => updateSetting('enableLightbox', checked)}
             />
 
             <Switch
               label={t('set_md_animations_label', 'Enable Animations')}
               description={t('set_md_animations_desc', 'Enable smooth animations and transitions. Disable for better performance on low-end devices.')}
               checked={settings.enableAnimations}
-              onChange={(event) => updateSetting('enableAnimations', event.currentTarget.checked)}
+              onChange={(checked) => updateSetting('enableAnimations', checked)}
             />
 
             <Divider label={t('set_md_viewport_dimensions', 'Viewport Dimensions')} labelPosition="center" />
@@ -254,14 +254,14 @@ export function GalleryStyleAccordion({ settings, updateSetting, tooltipLabel }:
               label={t('set_md_hover_bounce_label', 'Hover Bounce')}
               description={t('set_md_hover_bounce_desc', 'Scale-up spring animation when hovering over a tile.')}
               checked={getAdapterSettingValue('tileHoverBounce')}
-              onChange={(event) => updateAdapterSetting('tileHoverBounce', event.currentTarget.checked)}
+              onChange={(checked) => updateAdapterSetting('tileHoverBounce', checked)}
             />
 
             <Switch
               label={t('set_md_hover_glow_label', 'Hover Glow')}
               description={t('set_md_hover_glow_desc', 'Drop-shadow glow on hover (works with clip-path shapes).')}
               checked={getAdapterSettingValue('tileGlowEnabled')}
-              onChange={(event) => updateAdapterSetting('tileGlowEnabled', event.currentTarget.checked)}
+              onChange={(checked) => updateAdapterSetting('tileGlowEnabled', checked)}
             />
             {getAdapterSettingValue('tileGlowEnabled') && (
               <Group grow>
@@ -294,7 +294,7 @@ export function GalleryStyleAccordion({ settings, updateSetting, tooltipLabel }:
               label={t('set_md_transition_fade_label', 'Transition Fade')}
               description={t('set_md_transition_fade_desc', 'Apply an opacity fade when cards enter and exit during transitions, softening abrupt edges.')}
               checked={getAdapterSettingValue('transitionFadeEnabled')}
-              onChange={(event) => updateAdapterSetting('transitionFadeEnabled', event.currentTarget.checked)}
+              onChange={(checked) => updateAdapterSetting('transitionFadeEnabled', checked)}
             />
 
             <ModalSelect
@@ -418,21 +418,21 @@ export function GalleryNavigationAccordion({ settings, updateSetting, tooltipLab
               label={t('set_md_wheel_scroll_label', 'Wheel Scroll')}
               description={t('set_md_wheel_scroll_desc', 'Allow mouse wheel to scroll the thumbnail strip horizontally.')}
               checked={getAdapterSettingValue('thumbnailWheelScrollEnabled')}
-              onChange={(event) => updateAdapterSetting('thumbnailWheelScrollEnabled', event.currentTarget.checked)}
+              onChange={(checked) => updateAdapterSetting('thumbnailWheelScrollEnabled', checked)}
             />
 
             <Switch
               label={t('set_md_drag_scroll_label', 'Drag Scroll')}
               description={t('set_md_drag_scroll_desc', 'Allow click-and-drag to scroll the thumbnail strip.')}
               checked={getAdapterSettingValue('thumbnailDragScrollEnabled')}
-              onChange={(event) => updateAdapterSetting('thumbnailDragScrollEnabled', event.currentTarget.checked)}
+              onChange={(checked) => updateAdapterSetting('thumbnailDragScrollEnabled', checked)}
             />
 
             <Switch
               label={t('set_md_strip_buttons_label', 'Strip Scroll Buttons')}
               description={t('set_md_strip_buttons_desc', 'Show left/right scroll buttons on the thumbnail strip edges.')}
               checked={getAdapterSettingValue('thumbnailScrollButtonsVisible')}
-              onChange={(event) => updateAdapterSetting('thumbnailScrollButtonsVisible', event.currentTarget.checked)}
+              onChange={(checked) => updateAdapterSetting('thumbnailScrollButtonsVisible', checked)}
             />
           </Stack>}
         </Accordion.Panel>
@@ -532,7 +532,7 @@ export function GalleryNavigationAccordion({ settings, updateSetting, tooltipLab
               label={t('set_md_dot_enable_label', 'Enable Dot Navigator')}
               description={t('set_md_dot_enable_desc', 'Show a dot-style page indicator.')}
               checked={getAdapterSettingValue('dotNavEnabled')}
-              onChange={(event) => updateAdapterSetting('dotNavEnabled', event.currentTarget.checked)}
+              onChange={(checked) => updateAdapterSetting('dotNavEnabled', checked)}
             />
 
             {getAdapterSettingValue('dotNavEnabled') && (

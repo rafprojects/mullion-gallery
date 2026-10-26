@@ -14,17 +14,54 @@
 @layer mullion.components {
   /* ── The shared label row ────────────────────────────────────────────── */
 
+  /*
+   * Mantine's geometry (P81-A), read off its stylesheet: the box, track and
+   * thumb per size, 12px from control to label, and the description on the
+   * label's column. Set on every field so a nested one does not inherit them.
+   */
   .mullion-toggle {
+    --mullion-checkbox-size: 1.25rem;
+    --mullion-switch-w: 2.375rem;
+    --mullion-switch-h: 1.25rem;
+    --mullion-switch-thumb: 0.875rem;
     display: flex;
     flex-direction: column;
     gap: calc(var(--mullion-spacing-xs) / 2);
     min-inline-size: 0;
   }
 
+  .mullion-toggle[data-size='xs'] {
+    --mullion-checkbox-size: 1rem;
+    --mullion-switch-w: 2rem;
+    --mullion-switch-h: 1rem;
+    --mullion-switch-thumb: 0.75rem;
+  }
+
+  .mullion-toggle[data-size='md'] {
+    --mullion-checkbox-size: 1.5rem;
+    --mullion-switch-w: 2.875rem;
+    --mullion-switch-h: 1.5rem;
+    --mullion-switch-thumb: 1.125rem;
+  }
+
+  .mullion-toggle[data-size='lg'] {
+    --mullion-checkbox-size: 1.875rem;
+    --mullion-switch-w: 3.5rem;
+    --mullion-switch-h: 1.875rem;
+    --mullion-switch-thumb: 1.375rem;
+  }
+
+  .mullion-toggle[data-size='xl'] {
+    --mullion-checkbox-size: 2.25rem;
+    --mullion-switch-w: 4.5rem;
+    --mullion-switch-h: 2.25rem;
+    --mullion-switch-thumb: 1.75rem;
+  }
+
   .mullion-toggle-row {
     display: inline-flex;
     align-items: center;
-    gap: var(--mullion-spacing-xs);
+    gap: var(--mullion-spacing-sm);
     cursor: pointer;
   }
 
@@ -53,10 +90,20 @@
    * it lines up with the label's text on one column. Base UI's `Field` carries
    * it to the control's `aria-describedby`; nothing here writes that id.
    */
+  /* Base UI renders the description as a `<p>`, so its margins are the browser's unless reset. */
   .mullion-toggle-description {
+    margin: 0;
     font-size: var(--mullion-font-size-xs);
     line-height: 1.4;
     color: var(--mullion-color-text-muted);
+  }
+
+  .mullion-toggle-checkbox .mullion-toggle-description {
+    padding-inline-start: calc(var(--mullion-checkbox-size) + var(--mullion-spacing-sm));
+  }
+
+  .mullion-toggle-switch .mullion-toggle-description {
+    padding-inline-start: calc(var(--mullion-switch-w) + var(--mullion-spacing-sm));
   }
 
   /* ── Checkbox ────────────────────────────────────────────────────────── */
@@ -66,14 +113,13 @@
     flex: none;
     align-items: center;
     justify-content: center;
-    inline-size: 1.125em;
-    block-size: 1.125em;
+    inline-size: var(--mullion-checkbox-size);
+    block-size: var(--mullion-checkbox-size);
     padding: 0;
     border: 1px solid var(--mullion-checkbox-bd);
     border-radius: var(--mullion-radius-sm);
     background-color: var(--mullion-input-bg);
     color: var(--mullion-color-primary-on);
-    font-size: var(--mullion-font-size-md);
     cursor: inherit;
     transition:
       background-color var(--mullion-duration-fast) ease,
@@ -113,18 +159,19 @@
 
   /* ── Switch ──────────────────────────────────────────────────────────── */
 
+  /* The track keeps its audited border inside Mantine's outer size, and the thumb is centred in what is left. */
   .mullion-switch {
+    --mullion-switch-pad: calc((var(--mullion-switch-h) - 2px - var(--mullion-switch-thumb)) / 2);
     position: relative;
     display: inline-flex;
     flex: none;
     align-items: center;
-    inline-size: 2.25em;
-    block-size: 1.25em;
-    padding: 2px;
+    inline-size: var(--mullion-switch-w);
+    block-size: var(--mullion-switch-h);
+    padding: var(--mullion-switch-pad);
     border: 1px solid var(--mullion-switch-track-bd);
     border-radius: 999px;
     background-color: var(--mullion-switch-track-bg);
-    font-size: var(--mullion-font-size-sm);
     cursor: inherit;
     transition:
       background-color var(--mullion-duration-fast) ease,
@@ -138,8 +185,8 @@
 
   .mullion-switch-thumb {
     display: block;
-    inline-size: 1em;
-    block-size: 1em;
+    inline-size: var(--mullion-switch-thumb);
+    block-size: var(--mullion-switch-thumb);
     border-radius: 999px;
     background-color: var(--mullion-color-surface);
     translate: 0;
@@ -153,7 +200,7 @@
    */
   .mullion-switch[data-checked] .mullion-switch-thumb {
     background-color: var(--mullion-color-primary-on);
-    translate: calc(2.25em - 1em - 8px) 0;
+    translate: calc(var(--mullion-switch-w) - var(--mullion-switch-thumb) - 2 * var(--mullion-switch-pad) - 2px) 0;
   }
 
   @media (prefers-reduced-motion: reduce) {

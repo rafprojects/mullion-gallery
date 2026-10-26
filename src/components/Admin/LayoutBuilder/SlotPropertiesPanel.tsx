@@ -3,10 +3,8 @@ import { useTranslation } from 'react-i18next';
 import {
   NumberInput,
   Select,
-  SegmentedControl,
   TextInput,
   Tooltip,
-  Slider,
   Accordion,
 } from '@mantine/core';
 import { BuilderColorInput as ColorInput } from './BuilderColorInput';
@@ -36,7 +34,7 @@ import type {
 } from '@/types';
 import { buildSlotEntranceCss, REVEAL_CLASS } from '@/utils/slotEntrance';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box, ActionIcon, Button } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, ActionIcon, Button, SegmentedControl, Slider } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 

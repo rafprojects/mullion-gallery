@@ -154,8 +154,9 @@
      */
     inline-size: fit-content;
     gap: 0;
-    padding: 2px;
-    border-radius: var(--mullion-radius, var(--mullion-radius-sm));
+    /* Mantine's geometry (P81-A): 4px of track around the items, an 8px radius and items 4px less. */
+    padding: 4px;
+    border-radius: var(--mullion-radius, var(--mullion-radius-md));
     background-color: var(--mullion-color-surface);
     block-size: var(--mullion-control-height-sm);
   }
@@ -195,12 +196,15 @@
     position: absolute;
     /* The measurement is of a border box, so the indicator has to be one. */
     box-sizing: border-box;
-    inset-block: 2px;
+    inset-block: 4px;
     inset-inline-start: 0;
     inline-size: var(--mullion-segment-width, 0);
     translate: var(--mullion-segment-left, 0) 0;
     border: 1px solid var(--mullion-raised-bd);
-    border-radius: calc(var(--mullion-radius, var(--mullion-radius-sm)) - 1px);
+    border-radius: max(
+      calc(var(--mullion-radius, var(--mullion-radius-md)) - 4px),
+      calc(var(--mullion-radius, var(--mullion-radius-md)) / 4)
+    );
     background-color: var(--mullion-color-surface-raised);
     pointer-events: none;
   }
@@ -228,9 +232,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding-inline: var(--mullion-spacing-sm);
+    padding-inline: 0.625rem;
     border: 0;
-    border-radius: calc(var(--mullion-radius, var(--mullion-radius-sm)) - 1px);
+    border-radius: max(
+      calc(var(--mullion-radius, var(--mullion-radius-md)) - 4px),
+      calc(var(--mullion-radius, var(--mullion-radius-md)) / 4)
+    );
     background: none;
     color: var(--mullion-color-text-muted);
     font: inherit;
@@ -241,7 +248,20 @@
   }
 
   .mullion-segmented[data-size='xs'] .mullion-segmented-item {
+    padding-inline: 0.375rem;
     font-size: var(--mullion-font-size-xs);
+  }
+
+  .mullion-segmented[data-size='md'] .mullion-segmented-item {
+    padding-inline: 0.875rem;
+  }
+
+  .mullion-segmented[data-size='lg'] .mullion-segmented-item {
+    padding-inline: 1rem;
+  }
+
+  .mullion-segmented[data-size='xl'] .mullion-segmented-item {
+    padding-inline: 1.25rem;
   }
 
   .mullion-segmented-item:hover:not([data-disabled]):not([data-checked]) {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Checkbox, Modal, TextInput } from '@mantine/core';
-import { Group, Stack, Text, Button } from '@/ui';
+import { Modal, TextInput } from '@mantine/core';
+import { Group, Stack, Text, Button, Checkbox } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 
@@ -63,7 +63,7 @@ export function AdminCampaignDeleteModal({
         />
         <Checkbox
           checked={purgeAnalytics}
-          onChange={(e) => setPurgeAnalytics(e.currentTarget.checked)}
+          onChange={(checked) => setPurgeAnalytics(checked)}
           label={t('admin_delete_purge_analytics', 'Also purge analytics events for this campaign')}
         />
         <Group justify="flex-end" style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>

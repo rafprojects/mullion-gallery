@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { NumberInput, Switch, TextInput, Tooltip, type SelectProps } from '@mantine/core';
+import { NumberInput, TextInput, Tooltip, type SelectProps } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { useGalleryAdapterSettingsIO } from '@/hooks/useGalleryAdapterSettingsIO';
@@ -12,7 +12,7 @@ import { tFieldLabel, tFieldDescription, tFieldPlaceholder, tFieldOptions } from
 import { ModalSelect } from '@/components/Common/ModalSelect';
 import { cloneGalleryConfig, collectGalleryAdapterSettingValues, GALLERY_BREAKPOINTS, getGalleryConfigScopeAdapterIds, resolveGalleryConfig, setGalleryAdapterSetting } from '@/utils/galleryConfig';
 import { DimensionInput } from './DimensionInput';
-import { uiRem, Group, Stack, Text, Box, SimpleGrid, ActionIcon, Button } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, SimpleGrid, ActionIcon, Button, Switch } from '@/ui';
 
 export type UpdateGallerySetting = <K extends keyof GalleryBehaviorSettings>(
   key: K,
@@ -386,9 +386,9 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
         label={t('set_ad_unified_mode_label', 'Unified Gallery Mode')}
         description={t('set_ad_unified_mode_desc', 'When enabled, images and videos are combined in a single gallery view. When disabled, each media type uses its own layout independently.')}
         checked={isUnifiedMode}
-        onChange={(e) => updateSetting('galleryConfig', {
+        onChange={(checked) => updateSetting('galleryConfig', {
           ...resolvedGalleryConfig,
-          mode: e.currentTarget.checked ? 'unified' : 'per-type',
+          mode: checked ? 'unified' : 'per-type',
         })}
       />
 

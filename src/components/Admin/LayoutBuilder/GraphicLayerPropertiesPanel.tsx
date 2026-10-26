@@ -17,9 +17,6 @@ import {
   Divider,
   NumberInput,
   Select,
-  SegmentedControl,
-  Slider,
-  Switch,
   TextInput,
   Tooltip,
 } from '@mantine/core';
@@ -30,6 +27,9 @@ import {
   Box,
   ActionIcon,
   Button,
+  SegmentedControl,
+  Slider,
+  Switch,
 } from '@/ui';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -355,7 +355,7 @@ export function GraphicLayerPropertiesPanel({
         label={t('lb_gl_click_through', 'Click-through')}
         description={t('lb_gl_click_through_desc', 'Pointer events pass through to layers below')}
         checked={!overlay.pointerEvents}
-        onChange={(e) => set({ pointerEvents: !e.currentTarget.checked })}
+        onChange={(checked) => set({ pointerEvents: !checked })}
       />
 
       {/* ── Shape / Border / Mask / Effects (collapsible) ── */}

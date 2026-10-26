@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import {
-  Checkbox,
   Loader,
   Menu,
   Pagination,
@@ -15,7 +14,7 @@ import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Box, Center, Badge, Card, Button } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, Badge, Card, Button, Checkbox } from '@/ui';
 
 // Returns an i18next key + English default so the caller can translate in render.
 function scheduleLabel(publishAt?: string, unpublishAt?: string): { key: string; text: string; tone: 'info' | 'warning' | 'danger' } | null {

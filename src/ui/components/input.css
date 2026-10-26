@@ -208,7 +208,9 @@
 
   /* ── Description and error ───────────────────────────────────────────── */
 
+  /* Base UI renders the description as a `<p>`, so its margins are the browser's unless reset. */
   .mullion-field-description {
+    margin: 0;
     font-size: var(--mullion-font-size-xs);
     line-height: 1.4;
     color: var(--mullion-color-text-muted);

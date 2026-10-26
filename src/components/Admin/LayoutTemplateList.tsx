@@ -11,7 +11,6 @@ import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Menu,
-  SegmentedControl,
   Skeleton,
   Table,
   TextInput,
@@ -56,7 +55,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useBuilderDeepLink } from '@mullion/shared-utils';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group, Stack, Text, Box, Center, Badge, Card, ActionIcon, Button, FileButton, UnstyledButton } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, Badge, Card, ActionIcon, Button, FileButton, UnstyledButton, SegmentedControl } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

@@ -22,6 +22,23 @@ async function serveShowcase(page: Page) {
   });
 }
 
+
+/**
+ * Colours ease in from their initial values when the component sheet is
+ * adopted, so a reading taken straight after load can land mid-transition.
+ * Wait for the showcase's transitions to finish first.
+ */
+async function settle(page: Page) {
+  await page.evaluate(async () => {
+    const root = document.getElementById('showcase')?.shadowRoot;
+    // Loaders and skeletons loop for ever, so only finite animations are waited on.
+    const animations = [...document.getAnimations(), ...(root?.getAnimations() ?? [])].filter(
+      (a) => a.effect?.getTiming().iterations !== Infinity,
+    );
+    await Promise.all(animations.map((a) => a.finished.catch(() => undefined)));
+  });
+}
+
 test('controls keep Mantine geometry', async ({ page }) => {
   test.setTimeout(90_000);
   await serveShowcase(page);
@@ -68,6 +85,7 @@ for (const theme of ['default-light', 'default-dark'] as const) {
     await serveShowcase(page);
     await page.goto(`/ui-showcase?mount=shadow&controls=1&theme=${theme}&chrome=follow`);
     await page.getByTestId('inline-btn-disabled').waitFor();
+    await settle(page);
     const read = (id: string) =>
       page.getByTestId(id).evaluate((el) => {
         const cs = getComputedStyle(el);
@@ -115,6 +133,7 @@ for (const theme of ['default-light', 'default-dark'] as const) {
     await serveShowcase(page);
     await page.goto(`/ui-showcase?mount=shadow&controls=1&theme=${theme}&chrome=follow`);
     await page.getByTestId('inline-chip-on').waitFor();
+    await settle(page);
     const read = (id: string) =>
       page.getByTestId(id).evaluate((chip) => {
         const label = chip.querySelector('.mullion-chip-label') as HTMLElement;
@@ -189,4 +208,90 @@ for (const theme of ['default-light', 'default-dark'] as const) {
     expect.soft(onHover.ink).toBe(on.text);
   });
 }
+
+// [P81-A] The toggles and the segmented control at Mantine's geometry, read off
+// its stylesheet at a 16px root: checkbox 16/20, switch track 32x16 and 38x20
+// with a 12/14 thumb, 12px from control to label, the description on the
+// label's column, and a segmented track with 4px padding, an 8px radius and
+// items padded 6/10. The framework keeps its own colours and the switch's border.
+const TOGGLES = {
+  xs: { box: 16, track: [32, 16], thumb: 12, segPad: 6 },
+  sm: { box: 20, track: [38, 20], thumb: 14, segPad: 10 },
+} as const;
+
+test('toggles and the segmented control take Mantine geometry', async ({ page }) => {
+  test.setTimeout(90_000);
+  await serveShowcase(page);
+  await page.goto('/ui-showcase?mount=shadow&controls=1&theme=default-light&chrome=follow');
+  await page.getByTestId('inline-switch-sm').waitFor();
+    await settle(page);
+  for (const [size, want] of Object.entries(TOGGLES)) {
+    const got = await page.evaluate((size) => {
+      const root = document.getElementById('showcase')!.shadowRoot!;
+      // A toggle puts its attributes on the control; the field is its ancestor.
+      const cb = root.querySelector(`[data-testid="inline-checkbox-${size}"]`)!.closest('.mullion-toggle')!;
+      const sw = root.querySelector(`[data-testid="inline-switch-${size}"]`)!.closest('.mullion-toggle')!;
+      const seg = root.querySelector(`[data-testid="inline-segmented-${size}"]`) as HTMLElement;
+      const r = (el: Element, sel: string) => el.querySelector(sel)!.getBoundingClientRect();
+      // Where the text starts, which padding moves and the element's box does not.
+      const text = (el: Element, sel: string) => {
+        const range = document.createRange();
+        range.selectNodeContents(el.querySelector(sel)!);
+        return range.getBoundingClientRect();
+      };
+      const item = seg.querySelector('.mullion-segmented-item') as HTMLElement;
+      return {
+        box: r(cb, '.mullion-checkbox'),
+        cbLabel: text(cb, '.mullion-toggle-label'),
+        cbDesc: text(cb, '.mullion-toggle-description'),
+        track: r(sw, '.mullion-switch'),
+        thumb: r(sw, '.mullion-switch-thumb'),
+        swLabel: text(sw, '.mullion-toggle-label'),
+        swDesc: text(sw, '.mullion-toggle-description'),
+        cbRow: r(cb, '.mullion-toggle-row'),
+        fieldDescMargin: getComputedStyle(
+          root.querySelector(`[data-testid="inline-field-${size}"]`)!.closest('.mullion-field')!.querySelector('.mullion-field-description')!,
+        ).marginBlockStart,
+        cbDescBox: r(cb, '.mullion-toggle-description'),
+        seg: seg.getBoundingClientRect(),
+        segRadius: getComputedStyle(seg).borderTopLeftRadius,
+        indicator: r(seg, '.mullion-segmented-indicator'),
+        itemPad: parseFloat(getComputedStyle(item).paddingInlineStart),
+      };
+    }, size);
+    const at = `(${size})`;
+    expect.soft(got.box.width, `checkbox ${at}`).toBeCloseTo(want.box, 1);
+    expect.soft(got.box.height, `checkbox ${at}`).toBeCloseTo(want.box, 1);
+    expect.soft(got.cbLabel.left - got.box.right, `checkbox to label ${at}`).toBeCloseTo(12, 1);
+    expect.soft(got.cbDesc.left, `checkbox description on the label column ${at}`).toBeCloseTo(got.cbLabel.left, 1);
+    // Half the xs spacing under the row, as Mantine's description margin; a paragraph's own margin would add 12px.
+    expect.soft(got.cbDescBox.top - got.cbRow.bottom, `description gap ${at}`).toBeCloseTo(5, 1);
+    expect.soft(got.fieldDescMargin, `field description has no paragraph margin ${at}`).toBe('0px');
+    expect.soft(got.track.width, `switch track width ${at}`).toBeCloseTo(want.track[0], 1);
+    expect.soft(got.track.height, `switch track height ${at}`).toBeCloseTo(want.track[1], 1);
+    expect.soft(got.thumb.width, `switch thumb ${at}`).toBeCloseTo(want.thumb, 1);
+    expect.soft(got.thumb.top - got.track.top, `switch thumb centred ${at}`).toBeCloseTo((want.track[1] - want.thumb) / 2, 1);
+    expect.soft(got.swLabel.left - got.track.right, `switch to label ${at}`).toBeCloseTo(12, 1);
+    expect.soft(got.swDesc.left, `switch description on the label column ${at}`).toBeCloseTo(got.swLabel.left, 1);
+    expect.soft(got.segRadius, `segmented radius ${at}`).toBe('8px');
+    expect.soft(got.indicator.top - got.seg.top, `segmented padding ${at}`).toBeCloseTo(4, 1);
+    expect.soft(got.itemPad, `segmented item padding ${at}`).toBeCloseTo(want.segPad, 1);
+  }
+});
+
+// The checked thumb sits at the far end with the same inset as at rest.
+test('a checked switch thumb mirrors its resting inset', async ({ page }) => {
+  await serveShowcase(page);
+  await page.goto('/ui-showcase?mount=shadow&controls=1&theme=default-light&chrome=follow');
+  const sw = page.getByTestId('inline-switch-sm');
+  const read = () =>
+    sw.evaluate((el) => {
+      const t = el.getBoundingClientRect();
+      const th = el.querySelector('.mullion-switch-thumb')!.getBoundingClientRect();
+      return { start: th.left - t.left, end: t.right - th.right };
+    });
+  const rest = await read();
+  await sw.click();
+  await expect.poll(async () => (await read()).end).toBeCloseTo(rest.start, 1);
+});
 
