@@ -152,7 +152,7 @@ The designer answered `pass-two-begins` the same night (`designer-answers-pass-t
 
 **Verified.** Against the previous capture, the only change is the theme selector's checked-option description, from the ink fix made after that capture, plus the known flaky corners. Lint, the allow-list check (175 to 163), vitest (one snapshot updated, its diff five empty `class=""` attributes the framework `Box` does not print) and the full Playwright suite (210) pass.
 
-**Waiting on the designer.** `Container` is the visitor-facing page container: with no width setting Mantine's default is 960px with 16px inline padding, the framework's 1024px with none, so moving it would widen every site using the default. `Paper` and `Card` carry the elevation refresh (rule 13). `Badge` waits for its rule.
+**Not in this batch.** `Paper` and `Card` carry the elevation refresh (rule 13). `Badge` waits for the designer's rule. `Container` follows separately: it looked like a visitor-facing width change (Mantine's default is 960px with 16px inline padding, the framework's 1024px with none), but every gallery call site passes either an explicit width from `appMaxWidth` (default 1200px) or `fluid` when it is 0, and its inline padding from `appPadding`, so the defaults reach no visitor page. It flipped the same day: the one fall-through to Mantine's 960px default, the admin panel with both widths at 0, is pinned to 960, the gallery's two responsive `py` values moved into `CardGallery.module.scss`, and the photographed gallery shell, which these containers lay out, moved zero pixels. Lint, vitest (4,481) and the full Playwright suite (210) pass.
 
 ### Acceptance criteria
 

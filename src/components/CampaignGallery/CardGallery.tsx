@@ -13,8 +13,8 @@
  */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Container, Chip, SegmentedControl, Loader, TextInput, Switch, Select } from '@mantine/core';
-import { Group, Stack, Title, Text, Alert, Box, Center } from '@/ui';
+import { Chip, SegmentedControl, Loader, TextInput, Switch, Select } from '@mantine/core';
+import { Group, Stack, Title, Text, Alert, Box, Center, Container } from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { IconSearch } from '@tabler/icons-react';
 import { CampaignCard } from './CampaignCard';
@@ -328,7 +328,7 @@ export function CardGallery({
             />
           </Stack>
         </InContextEditor>
-        <Container {...getMullionDebugProps('CardGallery', 'header-shell')} {...(containerSize !== undefined ? { size: containerSize } : {})} fluid={containerFluid} py={{ base: 'sm', md: 'md' }} style={containerPaddingStyle}>
+        <Container {...getMullionDebugProps('CardGallery', 'header-shell')} {...(containerSize !== undefined ? { size: containerSize } : {})} fluid={containerFluid} className={styles.headerShell} style={containerPaddingStyle}>
           <Stack {...getMullionDebugProps('CardGallery', 'header-stack')} gap="lg">
             {/* Title and subtitle */}
             {(galleryBehaviorSettings.showGalleryTitle || galleryBehaviorSettings.showGallerySubtitle || (isAdmin && galleryBehaviorSettings.showAccessMode)) && (
@@ -401,7 +401,7 @@ export function CardGallery({
       </Box>
 
       {/* Gallery main area */}
-      <Container {...getMullionDebugProps('CardGallery')} {...(containerSize !== undefined ? { size: containerSize } : {})} fluid={containerFluid} component="main" py={{ base: 'lg', md: 'xl' }} style={containerPaddingStyle}>
+      <Container {...getMullionDebugProps('CardGallery')} {...(containerSize !== undefined ? { size: containerSize } : {})} fluid={containerFluid} render={<main />} className={styles.main} style={containerPaddingStyle}>
         {adapterPaginated ? (
           // Adapter-owned pagination (e.g. classic carousel): host hides all
           // display-mode controls; the adapter manages its own slide state.

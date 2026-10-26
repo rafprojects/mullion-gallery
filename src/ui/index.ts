@@ -23,7 +23,6 @@
 export {
   Anchor,
   Card,
-  Container,
   Divider,
   Paper,
 } from '@mantine/core';
@@ -35,6 +34,7 @@ export {
   Alert,
   Box,
   Center,
+  Container,
   Grid,
   Group,
   SimpleGrid,
@@ -44,6 +44,7 @@ export {
   type AlertProps,
   type BoxProps,
   type CenterProps,
+  type ContainerProps,
   type GridProps,
   type GroupProps,
   type SimpleGridProps,

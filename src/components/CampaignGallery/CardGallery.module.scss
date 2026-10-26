@@ -24,3 +24,20 @@
   }
 }
 
+// The header shell's and the listing's block padding, which Mantine set with a
+// responsive `py` (sm then md, lg then xl, from its md breakpoint).
+.headerShell {
+  padding-block: var(--mullion-spacing-sm);
+
+  @media (min-width: 62em) {
+    padding-block: var(--mullion-spacing-md);
+  }
+}
+
+.main {
+  padding-block: var(--mullion-spacing-lg);
+
+  @media (min-width: 62em) {
+    padding-block: var(--mullion-spacing-xl);
+  }
+}

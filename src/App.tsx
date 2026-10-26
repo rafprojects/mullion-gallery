@@ -1,7 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Container, Loader, Modal, Button } from '@mantine/core';
-import { Stack, Alert, Center } from '@/ui';
+import { Loader, Modal, Button } from '@mantine/core';
+import { Stack, Alert, Center, Container } from '@/ui';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { CardGallery } from './components/CampaignGallery/CardGallery';
@@ -338,6 +338,9 @@ function AppContent({
     (resolvedSettings.adminPanelMaxWidth ?? 0) > 0
       ? toCss(resolvedSettings.adminPanelMaxWidth, resolvedSettings.adminPanelMaxWidthUnit ?? 'px')
       : undefined;
+  // With both widths at 0 the admin panel fell to Mantine's default container,
+  // 960px; kept, since the framework's default is wider (P81-A).
+  const adminPanelWidth = adminPanelContainerSize ?? appContainerSize ?? 960;
 
   // [P20-K] Auto-logout after configurable period of inactivity.
   // The ref breaks the circular dependency between the returned reset fn and the onWarning callback.
@@ -412,7 +415,7 @@ function AppContent({
           />
         )}
         {actionMessage && (
-          <Container {...(appContainerSize !== undefined ? { size: appContainerSize } : {})} fluid={appContainerFluid} py="sm" style={appContainerPaddingStyle}>
+          <Container {...(appContainerSize !== undefined ? { size: appContainerSize } : {})} fluid={appContainerFluid} paddingBlock="sm" style={appContainerPaddingStyle}>
             <Alert tone={actionMessage.type === 'error' ? 'danger' : 'success'}
               role={actionMessage.type === 'error' ? 'alert' : 'status'}
               aria-live={actionMessage.type === 'error' ? 'assertive' : 'polite'}>
@@ -421,12 +424,12 @@ function AppContent({
           </Container>
         )}
         {!isOnline && (
-          <Container {...(appContainerSize !== undefined ? { size: appContainerSize } : {})} fluid={appContainerFluid} py="sm" style={appContainerPaddingStyle}>
+          <Container {...(appContainerSize !== undefined ? { size: appContainerSize } : {})} fluid={appContainerFluid} paddingBlock="sm" style={appContainerPaddingStyle}>
             <Alert tone="warning" role="alert" aria-live="assertive">{t('app_offline', 'You appear to be offline. Some features are unavailable.')}</Alert>
           </Container>
         )}
         {error && (
-          <Container {...(appContainerSize !== undefined ? { size: appContainerSize } : {})} fluid={appContainerFluid} py="sm" style={appContainerPaddingStyle}>
+          <Container {...(appContainerSize !== undefined ? { size: appContainerSize } : {})} fluid={appContainerFluid} paddingBlock="sm" style={appContainerPaddingStyle}>
             <Alert tone="danger" role="alert" aria-live="assertive">{error}</Alert>
           </Container>
         )}
@@ -449,7 +452,7 @@ function AppContent({
           </ErrorBoundary>
         )}
         {isAdminPanelOpen ? (
-          <Container {...(adminPanelContainerSize !== undefined ? { size: adminPanelContainerSize } : appContainerSize !== undefined ? { size: appContainerSize } : {})} py="xl" style={appContainerPaddingStyle}>
+          <Container size={adminPanelWidth} paddingBlock="xl" style={appContainerPaddingStyle}>
             <ErrorBoundary onReset={closeAdminPanel} isAdmin={isAdmin}>
               <Suspense fallback={<Center paddingBlock={120}><Loader /></Center>}>
                 <AdminPanel
@@ -470,7 +473,7 @@ function AppContent({
             <Stack align="center">
               <Loader />
               <Stack gap="4xs" align="center">
-                <Container size="sm" px={0}>
+                <Container size="sm" paddingInline={0}>
                   <Alert tone="info" variant="light" role="status" aria-live="polite">
                     {/* [P68-D] Only show the page counter when the listing
                         actually spans multiple pages; single-page loads (the

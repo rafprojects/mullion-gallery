@@ -112,6 +112,7 @@ const RULES = {
       truncate: (attr) => (literal(attr) === 'end' ? { replace: 'truncate' } : null),
     },
   },
+  Container: { rename: PADDING, unsupported: ['strategy', 'mod', 'classNames', 'styles', 'unstyled'] },
   Box: { rename: PADDING, unsupported: ['variant', 'mod', 'classNames', 'styles', 'unstyled'] },
   Center: { rename: PADDING, unsupported: ['mod', 'classNames', 'styles', 'unstyled'] },
   Grid: { gapProp: 'gap', rename: PADDING, unsupported: ['gutter', 'grow', 'columns', 'overflow', 'breakpoints', 'type', 'rowGap', 'columnGap'] },

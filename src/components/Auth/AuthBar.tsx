@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Container, Button, Tooltip, ActionIcon, Menu } from '@mantine/core';
-import { Group, Text, Box } from '@/ui';
+import { Button, Tooltip, ActionIcon, Menu } from '@mantine/core';
+import { Group, Text, Box, Container } from '@/ui';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconSettings, IconLogout, IconDashboard, IconDotsVertical } from '@tabler/icons-react';
 import type { GalleryBehaviorSettings } from '@/types';
@@ -224,7 +224,7 @@ function AuthBarFull({
         transition: 'transform 0.3s ease',
       }}
     >
-      <Container {...getMullionDebugProps('AuthBar', 'container')} {...(containerSize !== undefined ? { size: containerSize } : {})} fluid={containerFluid} py="sm" style={containerPaddingStyle}>
+      <Container {...getMullionDebugProps('AuthBar', 'container')} {...(containerSize !== undefined ? { size: containerSize } : {})} fluid={containerFluid} paddingBlock="sm" style={containerPaddingStyle}>
         <Group {...getMullionDebugProps('AuthBar', 'content')} justify="space-between" wrap="nowrap" gap="sm">
           {!isAuthenticated ? (
             <>
