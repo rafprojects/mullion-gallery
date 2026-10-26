@@ -72,5 +72,15 @@ for (const mount of ['shadow', 'light'] as const) {
       ),
     );
     expect(innerText).toEqual({ size: outer!.size, lineHeight: outer!.lineHeight, weight: '400', transform: 'uppercase' });
+
+    // A Box paints the padding it is given, and an Alert keeps its own default
+    // (sm block, md inline) inside a column that sets one.
+    const pad = (id: string) =>
+      page.getByTestId(id).evaluate((el) => {
+        const cs = getComputedStyle(el);
+        return { block: cs.paddingTop, inline: cs.paddingLeft };
+      });
+    expect(await pad('inline-nest-box')).toEqual({ block: '20px', inline: '20px' });
+    expect(await pad('inline-nest-alert')).toEqual({ block: '12px', inline: '16px' });
   });
 }

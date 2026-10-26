@@ -26,6 +26,7 @@ import { useMullionPortal, useMullionScope } from '../provider/hooks';
 import {
   ActionIcon,
   Alert,
+  Box,
   Anchor,
   Badge,
   Button,
@@ -324,6 +325,14 @@ function Nesting({ prefix }: { prefix: string }) {
           inner
         </Text>
       </Text>
+      <Box padding="lg" data-testid={`${prefix}-nest-box`}>
+        <span>padded</span>
+      </Box>
+      <Stack padding="xl" gap="xl">
+        <Alert tone="info" data-testid={`${prefix}-nest-alert`}>
+          an alert inside a padded stack
+        </Alert>
+      </Stack>
       <Group grow gap="sm" data-testid={`${prefix}-nest-grow`} style={{ width: '20rem' }}>
         <span style={{ whiteSpace: 'nowrap' }}>a label far wider than its equal share of the row</span>
         <span>short</span>

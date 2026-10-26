@@ -51,8 +51,10 @@ export function Alert({
   return renderElement(
     'div',
     {
-      ...rest,
+      // [P81-A] A default, not an override: an alert that asks for `status`
+      // is a polite announcement and must stay one.
       role: 'alert',
+      ...rest,
       className: cx('mullion-alert', className),
       'data-mullion-tone': tone,
       'data-variant': variant,

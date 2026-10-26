@@ -6,7 +6,15 @@
  * twenty-one treatments.
  */
 @layer mullion.components {
+  /*
+   * [P81-A] Each component resets the per-instance properties it reads, as the
+   * layout family does (layout.css): they arrive inline and inherit, so an
+   * Alert inside a padded Stack used to take the Stack's padding.
+   */
   .mullion-alert {
+    --mullion-pad: initial;
+    --mullion-pad-block: initial;
+    --mullion-pad-inline: initial;
     display: flex;
     gap: var(--mullion-spacing-sm);
     padding-block: var(--mullion-pad-block, var(--mullion-pad, var(--mullion-spacing-sm)));
@@ -79,6 +87,7 @@
   }
 
   .mullion-badge {
+    --mullion-radius: initial;
     display: inline-flex;
     align-items: center;
     gap: 0.25em;
@@ -133,6 +142,7 @@
   }
 
   .mullion-loader {
+    --mullion-loader-size: initial;
     display: inline-block;
     box-sizing: border-box;
     inline-size: var(--mullion-loader-size, 1.5rem);
@@ -175,6 +185,9 @@
   }
 
   .mullion-skeleton {
+    --mullion-skeleton-width: initial;
+    --mullion-skeleton-height: initial;
+    --mullion-radius: initial;
     inline-size: var(--mullion-skeleton-width, 100%);
     block-size: var(--mullion-skeleton-height, 1rem);
     border-radius: var(--mullion-radius, var(--mullion-radius-sm));

@@ -65,15 +65,25 @@ export interface BoxProps extends UiElementProps, UiPaddingProps, UiDivAttribute
  * hatch. It carries no class of its own: there is nothing to style, and a
  * class with no rule behind it is a selector waiting to be given meaning
  * somewhere it should not have any.
+ *
+ * [P81-A] So its padding is written as declarations, not as the custom
+ * properties the classed primitives read: with no rule to read them they
+ * painted nothing, and they leaked into every descendant that does read them.
  */
-export function Box({ className, style, render, children, ...props }: BoxProps) {
-  const [pad, rest] = splitPadding(props);
+export function Box({ className, style, render, children, padding, paddingBlock, paddingInline, ...rest }: BoxProps) {
+  const all = spacingValue(padding);
+  const block = spacingValue(paddingBlock) ?? all;
+  const inline = spacingValue(paddingInline) ?? all;
   return renderElement(
     'div',
     {
       ...rest,
       ...(className !== undefined ? { className } : {}),
-      style: { ...customProperties(pad), ...style },
+      style: {
+        ...(block !== undefined ? { paddingBlock: block } : {}),
+        ...(inline !== undefined ? { paddingInline: inline } : {}),
+        ...style,
+      },
       children,
     },
     render,
@@ -185,7 +195,7 @@ export function Container({
     size === undefined
       ? undefined
       : typeof size === 'number'
-        ? `${size}px`
+        ? uiRem(size / 16)
         : (CONTAINER_SIZES[size] ?? scaledLength(size));
   return renderElement(
     'div',

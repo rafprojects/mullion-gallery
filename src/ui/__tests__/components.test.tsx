@@ -106,11 +106,13 @@ describe('layout primitives', () => {
     expect(container.querySelector('.mullion-stack')!.hasAttribute('style')).toBe(false);
   });
 
-  it('give Box no class, because it has no rule', () => {
-    const { container } = render(<Box padding="md">content</Box>);
-    const box = container.firstElementChild!;
+  it('give Box no class, and so write its padding as declarations rather than properties no rule reads (P81-A)', () => {
+    const { container } = render(<Box padding="md" paddingInline={4}>content</Box>);
+    const box = container.firstElementChild as HTMLElement;
     expect(box.className).toBe('');
-    expect(vars(box)['--mullion-pad']).toBe('var(--mullion-spacing-md)');
+    expect(box.style.paddingBlock).toBe('var(--mullion-spacing-md)');
+    expect(box.style.paddingInline).toBe('calc(0.25rem * var(--mullion-scale, 1))');
+    expect(vars(box)['--mullion-pad']).toBeUndefined();
   });
 
   it('map Container sizes through their own scale, not the spacing one', () => {
@@ -123,7 +125,7 @@ describe('layout primitives', () => {
     );
     const [step, px, fluid] = Array.from(container.querySelectorAll('.mullion-container'));
     expect(vars(step!)['--mullion-container-size']).toBe('calc(48rem * var(--mullion-scale, 1))');
-    expect(vars(px!)['--mullion-container-size']).toBe('800px');
+    expect(vars(px!)['--mullion-container-size']).toBe('calc(50rem * var(--mullion-scale, 1))');
     expect(fluid!.hasAttribute('data-fluid')).toBe(true);
   });
 
@@ -546,8 +548,10 @@ describe('props the framework does not own', () => {
       const el = container.querySelector(`[data-testid="${id}"]`);
       expect(el, `${id} dropped the caller's data-testid`).not.toBeNull();
       expect(el!.hasAttribute('padding'), `${id} leaked padding as an attribute`).toBe(false);
+      // Box has no class to read a property with, so it writes the declaration (P81-A).
+      const style = (el as HTMLElement).style;
       expect(
-        (el as HTMLElement).style.getPropertyValue('--mullion-pad'),
+        id === 'box' ? style.paddingBlock : style.getPropertyValue('--mullion-pad'),
         `${id} did not read the padding prop`,
       ).toBe('var(--mullion-spacing-sm)');
     }
