@@ -25,7 +25,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useGetSettings } from '@/services/settingsQuery';
 import { AdminChromeProvider } from '@/components/Admin/AdminChromeProvider';
 import { adminChromeAttributes, adminChromeClassNames, adminChromeStyles, resolveChromeThemeId } from '@/themes/chromeTheme';
-import { getThemeEntry, Group, Text, Box, Button, ActionIcon, TextInput } from '@/ui';
+import { getThemeEntry, Group, Text, Box, Button, ActionIcon, TextInput, MullionProvider } from '@/ui';
 import { useLatestRef } from '@mullion/shared-utils';
 import { DockviewReact, DockviewDefaultTab } from 'dockview';
 import { debugGroup, debugLog, debugGroupEnd } from '@/utils/debug';
@@ -484,6 +484,8 @@ export function LayoutBuilderModal({
       })()}
       aria-label={tr('lb_mod_aria', 'Layout Builder')}
     >
+      {/* [P81-A] The framework controls inside read the framework's tokens, so they take the chrome's palette here. */}
+      <MullionProvider mode={applyThemeEverywhere ? 'follow' : 'lock'}>
       <ErrorBoundary
         fallback={
           <Box
@@ -709,6 +711,7 @@ export function LayoutBuilderModal({
         </div>
       </div>
       </ErrorBoundary>
+      </MullionProvider>
       </Modal>
     </AdminChromeProvider>
   );

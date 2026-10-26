@@ -416,6 +416,24 @@ test.describe('phase-1 visual snapshots', () => {
     await expect(page).toHaveScreenshot('theme-selector-open-default-dark.png', { maxDiffPixelRatio: 0.1 });
   });
 
+  // [P81-A] Framework controls inside locked chrome must take the brand
+  // palette too. The capture below compares at 10% and missed it: after the
+  // controls moved, the drawer's buttons, switches and fields painted the
+  // gallery's tokyo-night while the Mantine parts around them painted the brand.
+  test('framework controls in locked chrome take the brand palette', async ({ page }) => {
+    await installThemeSession(page, { themeId: 'tokyo-night', applyThemeEverywhere: false });
+    await page.goto('/');
+    await waitForShadowMount(page);
+    await expect(page.getByRole('button', { name: 'Admin menu' })).toBeVisible();
+    const dialog = await openDisplaySettings(page);
+    const surface = (locator: ReturnType<typeof dialog.getByRole>) =>
+      locator.evaluate((el) => getComputedStyle(el).getPropertyValue('--mullion-color-surface').trim().toLowerCase());
+    // default-dark is the brand palette; tokyo-night's surface is #24283b.
+    expect(await surface(dialog.getByRole('button', { name: 'Cancel' }))).toBe('#102530');
+    expect(await surface(dialog.getByRole('switch', { name: /Apply gallery theme/ }))).toBe('#102530');
+    expect(await surface(dialog.getByRole('textbox', { name: 'Items Per Page' }))).toBe('#102530');
+  });
+
   // P76-D: every snapshot above is a toggle-ON capture, so the *shipped default*
   // (applyThemeEverywhere false — chrome locked to the Mullion brand while the
   // gallery stays on its own theme) had no visual coverage at all. Tokyo Night

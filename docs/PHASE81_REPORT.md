@@ -278,6 +278,12 @@ Eight unit tests found a number field by its displayed value and now skip Base U
 
 The designer approved the fields and the slider. Two follow-ups, each failing `e2e/control-parity.spec.ts` first: an off switch's thumb is `textMuted`, so its position shows (5.27:1 on default-light, 6.88 on default-dark, and distinct from the `borderStrong` disabled thumb by ΔE00 11.4 and 17.8 in the designer's measurement); and the password reveal is the eye and eye-off in a 24px target, named "Show password" with `aria-pressed`. Rule 18 now specifies the switch's three states.
 
+### A regression in locked chrome, found before the dialogs moved (2026-10-26)
+
+**Moved controls painted the gallery's theme inside locked chrome.** The Settings drawer, the responsive config editor and the Layout Builder take the brand palette when chrome is locked, through `AdminChromeProvider`, which is a Mantine provider plus Mantine-only class and attribute plumbing. The framework controls moved in this track read the framework's tokens, which none of that sets, so from the buttons batch on, the drawer's Cancel and Save, its switches and its number fields painted the gallery's tokyo-night while the Mantine parts around them painted the brand. The `display settings dialog, chrome locked` capture compares at 10% and passed throughout. Found while planning the dialogs, by reading that capture rather than its result.
+
+**The fix** is the framework's own mechanism: a nested `MullionProvider` with `mode` from the chrome setting, inside each Mantine container's title and body (it renders `display: contents`, so no layout moves). The config editor takes it through a `chromeMode` prop and a top-level `ChromeScope`, so the subtree never remounts. `theme-qa.spec.ts` gained an exact test: with a tokyo-night gallery and locked chrome, the drawer's Cancel button, its switch and its number field must resolve the brand's `surface`, and it failed on the button first. When these containers move to the framework themselves, the nested provider is how their own popups take the chrome's palette, and `AdminChromeProvider` goes with the last Mantine part inside them.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.

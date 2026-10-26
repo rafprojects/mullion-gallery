@@ -1,8 +1,8 @@
 import type { DrawerProps } from '@mantine/core';
 import { Accordion, Drawer, Menu, Tabs } from '@mantine/core';
-import { Group, Stack, Text, Button, NumberInput, TextInput } from '@/ui';
+import { Group, Stack, Text, Button, NumberInput, TextInput, MullionProvider } from '@/ui';
 import { IconChevronDown } from '@tabler/icons-react';
-import { useEffect, useState, type ReactElement } from 'react';
+import { useEffect, useState, type ReactElement, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { tFieldLabel, tFieldDescription, tFieldPlaceholder, tFieldOptions } from '@/utils/adapterSchemaI18n';
@@ -77,6 +77,17 @@ interface GalleryConfigEditorModalProps {
   withinPortal?: boolean | undefined;
   /** Mantine Drawer props the caller needs on a portaled editor (admin chrome scoping). */
   drawerProps?: Pick<DrawerProps, 'classNames' | 'attributes' | 'styles' | 'portalProps'> | undefined;
+  /** The admin chrome's mode, so the framework controls inside take its palette (P81-A). */
+  chromeMode?: 'lock' | 'follow' | undefined;
+}
+
+/**
+ * The editor's framework controls read the framework's tokens, which the
+ * Mantine chrome scoping above never sets, so a nested provider carries the
+ * chrome's palette into the portaled drawer. Top level so it never remounts.
+ */
+function ChromeScope({ mode, children }: { mode: 'lock' | 'follow' | undefined; children: ReactNode }) {
+  return mode ? <MullionProvider mode={mode}>{children}</MullionProvider> : <>{children}</>;
 }
 
 type NamedComponent<Props = Record<string, never>> = ((props: Props) => ReactElement) & {
@@ -294,6 +305,7 @@ export function GalleryConfigEditorModal({
   withinPortal = false,
   drawerProps,
   blurEnabled,
+  chromeMode,
 }: GalleryConfigEditorModalProps) {
   const { t } = useTranslation('mullion');
   const resolvedSaveLabel = saveLabel ?? t('set_ad_gce_save', 'Apply Gallery Config');
@@ -358,6 +370,7 @@ export function GalleryConfigEditorModal({
       withinPortal={withinPortal}
       {...drawerProps}
       title={
+        <ChromeScope mode={chromeMode}>
         <Group style={{ width: '100%' }} justify="space-between" wrap="nowrap" gap="sm">
           <Text weight={600} size="sm" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</Text>
           <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
@@ -386,6 +399,7 @@ export function GalleryConfigEditorModal({
             <Button size="sm" onClick={handleSaveDraft}>{resolvedSaveLabel}</Button>
           </Group>
         </Group>
+        </ChromeScope>
       }
       position="right"
       size="lg"
@@ -398,6 +412,7 @@ export function GalleryConfigEditorModal({
       }}
       closeButtonProps={getMullionDebugProps('GalleryConfigEditorModal', 'close')}
     >
+      <ChromeScope mode={chromeMode}>
       <Stack gap="md">
         <GalleryConfigEditorIntro
           contextSummary={contextSummary}
@@ -930,6 +945,7 @@ export function GalleryConfigEditorModal({
         </Accordion>
 
       </Stack>
+      </ChromeScope>
     </Drawer>
   );
 }

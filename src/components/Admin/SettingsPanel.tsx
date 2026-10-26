@@ -32,7 +32,7 @@ import {
   type SettingsData,
   type SettingsDataInput,
 } from '@/contexts/SettingsStore';
-import { uiLayer, Group, Stack, Text, Title, Box, Center, Badge, Button } from '@/ui';
+import { uiLayer, Group, Stack, Text, Title, Box, Center, Badge, Button, MullionProvider } from '@/ui';
 import { SettingTooltip } from './SettingTooltip';
 import type { CustomFontEntry } from '../Common/TypographyEditor';
 import type { UpdateGallerySetting } from '../Settings/GalleryAdapterSettingsSection';
@@ -586,6 +586,13 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
   const handleClose = () => { revertThemePreview(); setInternalOpened(false); };
 
   const applyThemeEverywhere = settings.applyThemeEverywhere === true;
+  /*
+   * [P81-A] The framework controls in this drawer read the framework's tokens,
+   * which `AdminChromeProvider` (a Mantine provider) never sets, so they painted
+   * the gallery's theme inside locked chrome. A nested provider in the title and
+   * the body gives them the chrome's palette; it renders `display: contents`.
+   */
+  const chromeMode = applyThemeEverywhere ? 'follow' : 'lock';
 
   return (
     <AdminChromeProvider applyThemeEverywhere={applyThemeEverywhere}>
@@ -598,6 +605,7 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
       classNames={adminChromeClassNames(applyThemeEverywhere)}
       attributes={adminChromeAttributes(applyThemeEverywhere, themeId)}
       title={
+        <MullionProvider mode={chromeMode}>
         <Group style={{ width: '100%' }} justify="space-between" wrap="nowrap" gap="sm">
           <Group gap="sm">
             <IconSettings size={22} />
@@ -622,6 +630,7 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
             </Button>
           </Group>
         </Group>
+        </MullionProvider>
       }
       position="right"
       size={isSmallScreen ? '100%' : toCss(settings.settingsPanelWidth ?? 600, settings.settingsPanelWidthUnit ?? 'px')}
@@ -657,6 +666,7 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
         };
       })()}
     >
+      <MullionProvider mode={chromeMode}>
       {isLoading ? (
         <Center paddingBlock="xl">
           <Loader size="lg" />
@@ -705,12 +715,14 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
                   attributes: adminChromeAttributes(applyThemeEverywhere, themeId),
                   styles: adminChromeStyles(applyThemeEverywhere, themeId),
                 }}
+                chromeMode={chromeMode}
               />
             </Suspense>
           )}
 
         </>
       )}
+      </MullionProvider>
       </Drawer>
     </AdminChromeProvider>
   );
