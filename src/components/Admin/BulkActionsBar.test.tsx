@@ -85,14 +85,14 @@ describe('BulkActionsBar', () => {
       b.textContent?.match(/^archive$|^restore$/i),
     );
     archiveRestoreButtons.forEach((btn) => {
-      expect(btn).toHaveAttribute('data-loading', 'true');
+      expect(btn).toHaveAttribute('data-loading');
     });
   });
 
   it('export zip button shows loading state when isExporting', () => {
     render(<BulkActionsBar {...defaults} isExporting={true} />);
     const exportBtn = screen.getByRole('button', { name: /export zip/i });
-    expect(exportBtn).toHaveAttribute('data-loading', 'true');
+    expect(exportBtn).toHaveAttribute('data-loading');
   });
 
   it('Delete button is always visible and calls onDelete', () => {
@@ -104,6 +104,6 @@ describe('BulkActionsBar', () => {
 
   it('Delete button shows loading state when isLoading', () => {
     render(<BulkActionsBar {...defaults} isLoading={true} />);
-    expect(screen.getByRole('button', { name: /^delete$/i })).toHaveAttribute('data-loading', 'true');
+    expect(screen.getByRole('button', { name: /^delete$/i })).toHaveAttribute('data-loading');
   });
 });

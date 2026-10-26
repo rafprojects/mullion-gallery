@@ -1,6 +1,6 @@
 
-import { ActionIcon, Tooltip, Popover, TagsInput } from '@mantine/core';
-import { Text, Box, Badge } from '@/ui';
+import { Tooltip, Popover, TagsInput } from '@mantine/core';
+import { Text, Box, Badge, ActionIcon } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { IconX, IconWorld, IconWorldOff, IconTag } from '@tabler/icons-react';
 import type { AssetLibraryItem } from './BuilderDockContext';
@@ -125,7 +125,7 @@ export function DesignAssetsGrid({
                   <ActionIcon
                     size={16}
                     variant={item.isUniversal ? 'filled' : 'light'}
-                    color={item.isUniversal ? 'blue' : 'gray'}
+                    tone={item.isUniversal ? 'primary' : 'default'}
                     radius="xl"
                     style={{
                       position: 'absolute',
@@ -158,7 +158,7 @@ export function DesignAssetsGrid({
                       <ActionIcon
                         size={16}
                         variant={item.tags?.length ? 'filled' : 'light'}
-                        color={item.tags?.length ? 'grape' : 'gray'}
+                        tone={item.tags?.length ? 'primary' : 'default'}
                         radius="xl"
                         style={{ position: 'absolute', top: 2, left: 2, zIndex: 1, opacity: item.tags?.length ? 1 : 0.7 }}
                         onClick={(e: React.MouseEvent) => e.stopPropagation()}
@@ -187,7 +187,7 @@ export function DesignAssetsGrid({
                   <ActionIcon
                     size={16}
                     variant="filled"
-                    color="dark"
+                    tone="default"
                     radius="xl"
                     style={{
                       position: 'absolute',

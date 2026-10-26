@@ -92,6 +92,32 @@ function badgeElement(open, file, elementText) {
 }
 
 /**
+ * Mantine colour names on a control (designer, 2026-10-25): blue is the brand
+ * action, gray and dark the quiet neutral control, the rest their roles.
+ */
+const CONTROL_TONES = { red: 'danger', blue: 'primary', green: 'success', orange: 'warning', yellow: 'warning', gray: 'default', dark: 'default' };
+const controlColour = (attr) => {
+  const v = literal(attr);
+  if (typeof v !== 'string') return { blocked: 'colour is an expression' };
+  if (CONTROL_TONES[v]) return { replace: `tone="${CONTROL_TONES[v]}"` };
+  if (v === 'teal') return { replace: 'tone="primary"', review: 'teal on a control: primary unless it reports an outcome' };
+  return { blocked: 'no role for this colour' };
+};
+
+/** `size="compact-xs"` is the xs step with the compact flag. */
+const buttonSize = (attr) => {
+  const v = literal(attr);
+  if (typeof v === 'string' && v.startsWith('compact-')) return { replace: `size="${v.slice(8)}" compact` };
+  return null;
+};
+
+/** Mantine's ActionIcon is filled by default; the framework's is subtle, so a site that relied on the default says so. */
+function actionIconElement(open) {
+  const has = open.attributes.properties.some((a) => ts.isJsxAttribute(a) && a.name.getText() === 'variant');
+  return { inserts: has ? [] : ['variant="filled"'] };
+}
+
+/**
  * Mantine style props pass 1 left for pass 2. Any still on a flipped element
  * after its rules ran would reach the DOM as a stray attribute, so it is
  * reported rather than left (P81-A).
@@ -145,6 +171,22 @@ const RULES = {
       truncate: (attr) => (literal(attr) === 'end' ? { replace: 'truncate' } : null),
     },
   },
+  Button: {
+    rename: {},
+    unsupported: ['justify', 'gradient', 'autoContrast', 'styles', 'classNames', 'unstyled'],
+    props: { color: controlColour, size: buttonSize },
+  },
+  ActionIcon: {
+    rename: {},
+    unsupported: ['gradient', 'autoContrast', 'styles', 'classNames', 'unstyled'],
+    element: actionIconElement,
+    props: { color: controlColour, c: (attr) => (literal(attr) === 'dimmed' ? { replace: 'tone="muted"' } : { blocked: 'icon colour' }) },
+  },
+  UnstyledButton: { rename: {}, unsupported: ['mod', 'classNames', 'styles', 'unstyled'] },
+  Chip: { rename: {}, unsupported: ['color', 'radius', 'icon', 'classNames', 'styles', 'unstyled'] },
+  'Chip.Group': { rename: {}, unsupported: [] },
+  CopyButton: { rename: {}, unsupported: [] },
+  FileButton: { rename: {}, unsupported: ['capture', 'form', 'name', 'inputProps'] },
   Badge: {
     rename: { leftSection: 'icon' },
     unsupported: ['rightSection', 'circle', 'gradient', 'autoContrast', 'fullWidth', 'classNames', 'styles', 'unstyled'],
@@ -294,7 +336,7 @@ for (const file of [...walk('src'), ...walk('packages')]) {
           return;
         }
         const at = node.tagName.getEnd();
-        edits.push([at, at, ` ${outcome.inserts.join(' ')}`]);
+        if (outcome.inserts.length > 0) edits.push([at, at, ` ${outcome.inserts.join(' ')}`]);
         if (outcome.review) report.review.push(`${where}  tone ${outcome.review}`);
       }
       for (const attr of node.attributes.properties) {

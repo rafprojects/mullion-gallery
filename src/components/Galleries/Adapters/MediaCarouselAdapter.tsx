@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconPhoto, IconPlayerPlay, IconZoomIn } from '@tabler/icons-react';
-import { ActionIcon, Image } from '@mantine/core';
+import { Image } from '@mantine/core';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import type { GalleryAdapterProps, ListingItem } from './GalleryAdapter';
@@ -36,7 +36,7 @@ import {
   shouldLoopCarousel,
   shouldUseSyntheticCarouselLoop,
 } from './carouselBehavior';
-import { uiRem, Stack, Text, Box } from '@/ui';
+import { uiRem, Stack, Text, Box, ActionIcon } from '@/ui';
 
 type GalleryRuntimeCommonSettings = ReturnType<typeof resolveGalleryComponentCommonSettings>;
 
@@ -558,7 +558,7 @@ export function MediaCarouselInner({ media, settings, commonSettings, breakpoint
                 h="100%"
                 fit="contain"
               />
-              <ActionIcon
+              <ActionIcon variant="filled"
                 style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                 size="xl"
                 radius="xl"

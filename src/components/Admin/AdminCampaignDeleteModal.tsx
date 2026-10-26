@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Button, Checkbox, Modal, TextInput } from '@mantine/core';
-import { Group, Stack, Text } from '@/ui';
+import { Checkbox, Modal, TextInput } from '@mantine/core';
+import { Group, Stack, Text, Button } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 
@@ -69,7 +69,7 @@ export function AdminCampaignDeleteModal({
         <Group justify="flex-end" style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           <Button variant="default" onClick={onClose} disabled={loading}>{t('admin_cancel', 'Cancel')}</Button>
           <Button
-            color="red"
+            tone="danger"
             disabled={!canDelete}
             loading={loading}
             onClick={() => onConfirm({ purgeAnalytics })}

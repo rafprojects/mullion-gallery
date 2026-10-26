@@ -29,12 +29,16 @@ export {
 // scripts/ui-codemod-pass2.mjs in the same commit. Importing the module also
 // registers the component sheets into the style list (P79-B).
 export {
+  ActionIcon,
   Alert,
   Badge,
   Box,
+  Button,
   Card,
   Center,
   Container,
+  CopyButton,
+  FileButton,
   Grid,
   Group,
   Paper,
@@ -42,9 +46,12 @@ export {
   Stack,
   Text,
   Title,
+  UnstyledButton,
+  type ActionIconProps,
   type AlertProps,
   type BadgeProps,
   type BoxProps,
+  type ButtonProps,
   type CardProps,
   type CenterProps,
   type ContainerProps,
@@ -59,14 +66,10 @@ export {
 
 // ── Inputs and controls ────────────────────────────────────────────────────
 export {
-  ActionIcon,
-  Button,
   Checkbox,
   Chip,
   ColorInput,
   Combobox,
-  CopyButton,
-  FileButton,
   MultiSelect,
   NumberInput,
   PasswordInput,
@@ -77,7 +80,6 @@ export {
   TagsInput,
   Textarea,
   TextInput,
-  UnstyledButton,
   useCombobox,
 } from '@mantine/core';
 

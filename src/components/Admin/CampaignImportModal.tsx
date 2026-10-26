@@ -1,14 +1,14 @@
 import { useState, useRef } from 'react';
 import {
   Modal,
-  Button,
-  FileButton,
 } from '@mantine/core';
 import {
   Group,
   Stack,
   Text,
   Alert,
+  Button,
+  FileButton,
 } from '@/ui';
 import { IconUpload, IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';

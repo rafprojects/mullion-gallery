@@ -1,5 +1,6 @@
-import { Button, Modal, TextInput, Textarea } from '@mantine/core';
-import { Group, Stack } from '@/ui';
+
+import { Modal, TextInput, Textarea } from '@mantine/core';
+import { Group, Stack, Button } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { useDirtyGuard } from '@mullion/shared-utils';
 import { ConfirmModal } from '@/components/Common/ConfirmModal';
@@ -123,7 +124,7 @@ export function MediaEditModal({
         title={t('admin_discard_title', 'Discard changes?')}
         message={t('admin_discard_msg', 'You have unsaved changes. Are you sure you want to discard them?')}
         confirmLabel={t('admin_discard', 'Discard')}
-        confirmColor="red"
+        confirmTone="danger"
       />
     </>
   );

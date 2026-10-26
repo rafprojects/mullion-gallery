@@ -1,5 +1,5 @@
 import { type CSSProperties, type KeyboardEventHandler } from 'react';
-import { Image, Table, ActionIcon, Skeleton } from '@mantine/core';
+import { Image, Table, Skeleton } from '@mantine/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { IconGripVertical, IconPhoto, IconTrash } from '@tabler/icons-react';
@@ -9,7 +9,7 @@ import { MediaUsageBadge } from './MediaUsageBadge';
 import { FALLBACK_IMAGE_SRC } from '@/utils/fallback';
 import type { ApiClient } from '@/services/apiClient';
 import type { MediaItem } from '@/types';
-import { uiRem, Group, Text, Grid, Box, Badge } from '@/ui';
+import { uiRem, Group, Text, Grid, Box, Badge, ActionIcon } from '@/ui';
 
 export type SharedSortableProps = {
   item: MediaItem;
@@ -111,7 +111,7 @@ export function SortableListRow({
             </ActionIcon>
           )}
           <ActionIcon variant="subtle" onClick={() => openEdit(item)} aria-label={t('admin_media_edit_aria', 'Edit')}><IconPhoto size={16} /></ActionIcon>
-          <ActionIcon variant="subtle" color="red" onClick={() => handleDelete(item)} aria-label={t('admin_media_delete_aria', 'Delete media')}><IconTrash size={16} /></ActionIcon>
+          <ActionIcon variant="subtle" tone="danger" onClick={() => handleDelete(item)} aria-label={t('admin_media_delete_aria', 'Delete media')}><IconTrash size={16} /></ActionIcon>
         </Group>
       </Table.Td>
     </Table.Tr>

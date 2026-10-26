@@ -8,8 +8,6 @@ import {
   Divider,
   NumberInput,
   Slider,
-  Button,
-  ActionIcon,
   Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -20,7 +18,7 @@ import {
 import type { LayoutTextLayer, LayoutTextSemanticTag, LayoutTextAlign, TypographyOverride } from '@/types';
 import { TypographyEditor } from '@/components/Common/TypographyEditor';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text } from '@/ui';
+import { uiRem, Stack, Group, Text, Button, ActionIcon } from '@/ui';
 
 export interface TextPropertiesPanelProps {
   text: LayoutTextLayer;
@@ -166,11 +164,11 @@ export function TextPropertiesPanel({
           <Text size="xs" tone="muted">{t('lb_text_remove_confirm', 'Remove this text layer?')}</Text>
           <Group gap="3xs">
             <Button size="xs" variant="subtle" onClick={closeConfirm} style={{ flex: 1 }}>{t('lb_gl_cancel', 'Cancel')}</Button>
-            <Button size="xs" color="red" onClick={() => { closeConfirm(); onRemove(text.id); }} leftSection={<IconTrash size={12} />} style={{ flex: 1 }} aria-label={t('lb_gl_confirm_remove', 'Confirm remove')}>{t('lb_gl_remove', 'Remove')}</Button>
+            <Button size="xs" tone="danger" onClick={() => { closeConfirm(); onRemove(text.id); }} leftSection={<IconTrash size={12} />} style={{ flex: 1 }} aria-label={t('lb_gl_confirm_remove', 'Confirm remove')}>{t('lb_gl_remove', 'Remove')}</Button>
           </Group>
         </Stack>
       ) : (
-        <Button size="xs" variant="light" color="red" fullWidth leftSection={<IconTrash size={12} />} onClick={openConfirm} aria-label={t('lb_text_remove_aria', 'Remove text layer')}>{t('lb_text_remove_layer', 'Remove text layer')}</Button>
+        <Button size="xs" variant="light" tone="danger" fullWidth leftSection={<IconTrash size={12} />} onClick={openConfirm} aria-label={t('lb_text_remove_aria', 'Remove text layer')}>{t('lb_text_remove_layer', 'Remove text layer')}</Button>
       )}
     </Stack>
   );

@@ -1,6 +1,6 @@
 
-import { Button, ActionIcon, Tooltip } from '@mantine/core';
-import { Group, Text, Paper } from '@/ui';
+import { Tooltip } from '@mantine/core';
+import { Group, Text, Paper, Button, ActionIcon } from '@/ui';
 import { IconX, IconArchive, IconArchiveOff, IconFileZip, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
@@ -69,7 +69,7 @@ export function BulkActionsBar({
         <Group gap="xs" wrap="nowrap">
           <Button
             size="xs"
-            color="blue"
+            tone="primary"
             variant="light"
             leftSection={<IconFileZip size={14} />}
             loading={isExporting}
@@ -80,7 +80,7 @@ export function BulkActionsBar({
           {hasActiveSelected && (
             <Button
               size="xs"
-              color="orange"
+              tone="warning"
               variant="light"
               leftSection={<IconArchive size={14} />}
               loading={isLoading}
@@ -92,7 +92,7 @@ export function BulkActionsBar({
           {hasArchivedSelected && (
             <Button
               size="xs"
-              color="teal"
+              tone="primary"
               variant={hasActiveSelected ? 'subtle' : 'light'}
               leftSection={<IconArchiveOff size={14} />}
               loading={isLoading}
@@ -103,7 +103,7 @@ export function BulkActionsBar({
           )}
           <Button
             size="xs"
-            color="red"
+            tone="danger"
             variant="light"
             leftSection={<IconTrash size={14} />}
             loading={isLoading}

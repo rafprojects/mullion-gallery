@@ -28,7 +28,7 @@ import {
   cx,
   focusable,
   focusableSibling,
-  type UiElementProps,
+  type UiAttributes, type UiElementProps,
   type UiTone,
 } from './element';
 import { Loader } from './feedback';
@@ -38,7 +38,7 @@ import { customProperties, radiusValue, type UiRadius, type UiScaleStep } from '
 
 export type UiControlVariant = 'filled' | 'light' | 'outline' | 'subtle' | 'default' | 'transparent';
 
-interface ControlBaseProps extends UiElementProps {
+interface ControlBaseProps extends UiElementProps, Omit<UiAttributes<HTMLButtonElement>, 'onClick'> {
   type?: 'button' | 'submit' | 'reset' | undefined;
   disabled?: boolean | undefined;
   onClick?: MouseEventHandler<HTMLElement> | undefined;
@@ -364,10 +364,8 @@ export function Chip({
  */
 Chip.Group = ChipGroup;
 
-export interface FileButtonProps {
-  onChange: (files: File[]) => void;
+interface FileButtonBaseProps {
   accept?: string | undefined;
-  multiple?: boolean | undefined;
   disabled?: boolean | undefined;
   /**
    * Given a function that clears the picker, as Mantine's was. The input
@@ -375,9 +373,19 @@ export interface FileButtonProps {
    * reset it explicitly after handling a file (P81-A).
    */
   resetRef?: { current: (() => void) | null } | undefined;
-  /** Handed the props to spread onto whatever opens the picker. */
-  children: (props: { onClick: () => void; disabled: boolean }) => ReactNode;
+  /** Handed the opener to spread onto whatever opens the picker, as Mantine's was. */
+  children: (props: { onClick: () => void }) => ReactNode;
 }
+
+/**
+ * Mantine's shape (P81-A): one file or null unless `multiple`, then a list.
+ * The call sites were written against it, so the framework keeps it.
+ */
+export type FileButtonProps = FileButtonBaseProps &
+  (
+    | { multiple: true; onChange: (files: File[]) => void }
+    | { multiple?: false | undefined; onChange: (file: File | null) => void }
+  );
 
 /**
  * A hidden `<input type="file">` and a way to open it. The render prop mirrors
@@ -390,7 +398,8 @@ export interface FileButtonProps {
  * what `react-hooks/refs` forbids. State costs one extra render on mount and
  * makes the dependency honest.
  */
-export function FileButton({ onChange, accept, multiple, disabled, resetRef, children }: FileButtonProps) {
+export function FileButton(props: FileButtonProps) {
+  const { accept, multiple, disabled, resetRef, children } = props;
   const [input, setInput] = useState<HTMLInputElement | null>(null);
   const open = useCallback(() => input?.click(), [input]);
   useEffect(() => {
@@ -404,7 +413,7 @@ export function FileButton({ onChange, accept, multiple, disabled, resetRef, chi
   }, [resetRef, input]);
   return (
     <>
-      {children({ onClick: open, disabled: disabled === true })}
+      {children({ onClick: open })}
       {/* Out of the tab order and the accessibility tree: the caller's button is the control. */}
       <input
         ref={setInput}
@@ -416,7 +425,9 @@ export function FileButton({ onChange, accept, multiple, disabled, resetRef, chi
         {...(multiple ? { multiple: true } : {})}
         {...(disabled ? { disabled: true } : {})}
         onChange={(event) => {
-          onChange(Array.from(event.currentTarget.files ?? []));
+          const files = Array.from(event.currentTarget.files ?? []);
+          if (props.multiple) props.onChange(files);
+          else props.onChange(files[0] ?? null);
           event.currentTarget.value = '';
         }}
       />

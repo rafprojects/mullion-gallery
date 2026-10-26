@@ -1,6 +1,6 @@
 
-import { Button, Modal } from '@mantine/core';
-import { Group, Stack, Text } from '@/ui';
+import { Modal } from '@mantine/core';
+import { Group, Stack, Text, Button } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import type { Campaign } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
@@ -30,7 +30,7 @@ function ArchiveCampaignModalContent({ campaign, onClose, onConfirm }: ArchiveCa
           {t('admin_cancel', 'Cancel')}
         </Button>
         <Button
-          color="red"
+          tone="danger"
           onClick={() => void onConfirm()}
           aria-label={t('admin_archive_campaign_aria', 'Archive campaign {{title}}', { title: campaign?.title ?? '' }).trim()}
         >

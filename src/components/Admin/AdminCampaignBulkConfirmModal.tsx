@@ -41,7 +41,7 @@ export function AdminCampaignBulkConfirmModal({
       title={title}
       message={message}
       confirmLabel={confirmLabel}
-      confirmColor={action === 'archive' ? 'orange' : 'teal'}
+      confirmTone={action === 'archive' ? 'warning' : 'primary'}
       loading={loading}
     />
   );

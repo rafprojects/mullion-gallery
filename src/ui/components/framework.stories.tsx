@@ -394,7 +394,7 @@ export const Controls: Story = {
             <Chip checked={checked} onChange={setChecked}>
               Selected: {String(checked)}
             </Chip>
-            <FileButton onChange={(files) => setPicked(files.map((f) => f.name).join(', ') || 'none')}>
+            <FileButton multiple onChange={(files) => setPicked(files.map((f) => f.name).join(', ') || 'none')}>
               {(props) => (
                 <Button variant="default" {...props}>
                   Choose a file

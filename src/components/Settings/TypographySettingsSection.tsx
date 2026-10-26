@@ -1,6 +1,6 @@
 
-import { Accordion, Button, Divider } from '@mantine/core';
-import { Stack, Text } from '@/ui';
+import { Accordion, Divider } from '@mantine/core';
+import { Stack, Text, Button } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { usePersistentAccordion } from '@/hooks/usePersistentAccordion';
 
@@ -70,7 +70,7 @@ export function TypographySettingsSection({
 
       <Button
         variant="subtle"
-        color="red"
+        tone="danger"
         size="xs"
         disabled={Object.keys(typographyOverrides).length === 0}
         onClick={onResetAll}

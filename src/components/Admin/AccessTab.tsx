@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import {
-  Button,
   Checkbox,
   Combobox,
   ScrollArea,
@@ -19,7 +18,7 @@ import { PendingRequestsPanel } from './PendingRequestsPanel';
 import type { ApiClient } from '@/services/apiClient';
 import type { AdminAccessState } from '@/hooks/useAdminAccessState';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Alert, Box, Center, Badge, Card, useMediaQuery } from '@/ui';
+import { uiRem, Group, Stack, Text, Alert, Box, Center, Badge, Card, useMediaQuery, Button } from '@/ui';
 
 type AccessViewMode = 'campaign' | 'company' | 'all';
 
@@ -191,7 +190,7 @@ export function AccessTab({
                 {selectedCompany.activeCampaigns > 0 && (
                   <Button
                     variant="light"
-                    color="red"
+                    tone="danger"
                     size="xs"
                     leftSection={<IconArchive size={14} />}
                     onClick={() => onArchiveCompanyClick(selectedCompany)}

@@ -5,9 +5,7 @@ import {
   NumberInput,
   Switch,
   Slider,
-  Button,
   Divider,
-  ActionIcon,
   Tooltip,
   SegmentedControl,
 } from '@mantine/core';
@@ -24,7 +22,7 @@ import { safeLocalStorage, fitRectsIntoBand } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group, Text, Box, Alert } from '@/ui';
+import { uiRem, Group, Text, Box, Alert, Button, ActionIcon } from '@/ui';
 
 // ── P30-C: Device preview presets ────────────────────────────────────────────
 

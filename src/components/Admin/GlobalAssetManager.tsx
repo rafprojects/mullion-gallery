@@ -159,7 +159,7 @@ export function GlobalAssetManager({ apiClient, onNotify }: GlobalAssetManagerPr
         title={t('admin_asset_inuse_title', 'Asset is in use')}
         message={t('admin_asset_inuse_msg', '"{{name}}" is associated with {{count}} space. Removing it will unlink it from all spaces. Delete anyway?', { name: forceDelete?.item.name ?? '', count: forceDelete?.inUse ?? 0 })}
         confirmLabel={t('admin_asset_delete_anyway', 'Delete anyway')}
-        confirmColor="red"
+        confirmTone="danger"
         loading={forceDeleting}
       />
     </>

@@ -1,10 +1,10 @@
 
-import { Button, Pagination, Skeleton, Table, Checkbox } from '@mantine/core';
+import { Pagination, Skeleton, Table, Checkbox } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Text } from '@/ui';
+import { uiRem, Group, Text, Button } from '@/ui';
 
 /** P13-C: Skeleton rows displayed while campaign list loads. */
 function CampaignSkeletonRows({ withCheckbox }: { withCheckbox: boolean }) {

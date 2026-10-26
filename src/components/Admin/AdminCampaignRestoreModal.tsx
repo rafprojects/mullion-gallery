@@ -29,7 +29,7 @@ export function AdminCampaignRestoreModal({
       title={t('admin_restore_campaign_title', 'Restore campaign')}
       message={t('admin_restore_campaign_msg', 'Restore this campaign? This will make it active again and enable any associated access grants.')}
       confirmLabel={t('admin_restore', 'Restore')}
-      confirmColor="teal"
+      confirmTone="primary"
       confirmAriaLabel={t('admin_restore_campaign_aria', 'Restore campaign {{title}}', { title: campaign?.title ?? '' }).trim()}
     />
   );

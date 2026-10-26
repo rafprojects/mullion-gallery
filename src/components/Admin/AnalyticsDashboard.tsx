@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  ActionIcon,
   Loader,
   ScrollArea,
   SegmentedControl,
@@ -19,6 +18,7 @@ import {
   SimpleGrid,
   Badge,
   Paper,
+  ActionIcon,
 } from '@/ui';
 import {
   CartesianGrid,

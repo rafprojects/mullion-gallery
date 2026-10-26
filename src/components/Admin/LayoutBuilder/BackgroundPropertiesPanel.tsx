@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
   Select,
   Slider,
   NumberInput,
   SegmentedControl,
-  ActionIcon,
   Tooltip,
 } from '@mantine/core';
 import { BuilderColorInput as ColorInput } from './BuilderColorInput';
@@ -24,7 +22,7 @@ import { useBuilderDock } from './BuilderDockContext';
 import { AssetUploader } from './AssetUploader';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, Button, ActionIcon } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -217,7 +215,7 @@ function BackgroundModeControls({
                     <ActionIcon
                       size="sm"
                       variant={dir === d.value && builder.template.backgroundGradientAngle == null ? 'filled' : 'subtle'}
-                      color={dir === d.value && builder.template.backgroundGradientAngle == null ? 'blue' : 'gray'}
+                      tone={dir === d.value && builder.template.backgroundGradientAngle == null ? 'primary' : 'default'}
                       onClick={() => { builder.setTemplateField('backgroundGradientDirection', d.value); builder.setTemplateField('backgroundGradientAngle', undefined); }}
                       aria-label={t(`lb_bg_dir_${d.value}`, d.label)}
                     >
@@ -310,7 +308,7 @@ function BackgroundModeControls({
           <div style={{ background: 'var(--mantine-color-default)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4, overflow: 'hidden', marginBottom: 4 }}>
             <img src={builder.template.backgroundImage} alt={t('lb_bg_preview_alt', 'Background preview')} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
           </div>
-          <Button size="xs" color="red" variant="light" fullWidth leftSection={<IconTrash size={12} />} onClick={() => builder.setBackgroundImage('')} style={{ marginBottom: uiRem(0.125) }}>
+          <Button size="xs" tone="danger" variant="light" fullWidth leftSection={<IconTrash size={12} />} onClick={() => builder.setBackgroundImage('')} style={{ marginBottom: uiRem(0.125) }}>
             {t('lb_bg_remove_image', 'Remove image')}
           </Button>
         </Box>

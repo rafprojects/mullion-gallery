@@ -200,6 +200,16 @@ The designer answered `pass-two-begins` the same night (`designer-answers-pass-t
 
 **A numbering slip, corrected.** The caption-scrim rule was added as rule 14 of `COLOR-SPEC.md`, but rule 14 already existed (the `border` floor, 2026-10-07). It is rule 15 now, with the spec's header attribution, the phase notes and the visitor lightbox's comment corrected; the letters that called it rule 14 stand as sent, and the next one says so.
 
+### Pass 2: the controls (2026-10-26)
+
+**The framework's controls had drifted from Mantine's geometry.** Read off Mantine's stylesheet, an icon button is 18, 22, 28, 34 or 44px (28 by default), but the framework sized it at the input heights, 30 to 60px, which would have grown most icon buttons by 14px or more. Button side padding grows 14/18/22/26/32px with the size where the framework used 12/16/16/20/32; compact sizes have fixed heights and padding (xs is 22px with 7px) where the framework had an auto height; the default radius is `md`, not `sm`; and the label weight is 600, which the brief also asks of buttons, not 500. All are fixed in `control.css`, the icon button's default is `md`, and a numeric icon size reads in the size basis. `e2e/control-parity.spec.ts` measures every size and failed on each gap first. The controls also reset what they read, so a button in a rounded `Paper` no longer takes the paper's radius.
+
+**API parity.** Control props admit HTML attributes (`title`, drag handlers). `FileButton` calls `onChange` with one file or null unless `multiple`, as Mantine's does, hands its render prop only the opener, and accepts `resetRef`.
+
+**The batch.** `ui-codemod-pass2.mjs` made 240 edits in 76 files: control colours by the control table, `compact-*` to the step plus `compact`, and Mantine's `filled` default spelled out on icon buttons that relied on it. By hand: eight conditional icon-button colours (a toggled state is `primary`, its rest the neutral `default`, a lock is `warning`), `ConfirmModal`'s `confirmColor` became a typed `confirmTone` across its eleven callers, two `styles` objects became `style`, and the reset-link button's link attributes moved onto the `<a>` it renders. `Chip` stays on Mantine: the framework chip is one designed look and Mantine's had variants and a check mark, on the gallery's visitor-facing filter row, so it is the designer's review on its own. The allow-list fell from 163 to 161.
+
+**What the captures show.** The admin's in-context settings gear went from Mantine's literal blue to the brand primary, by the rule. The Settings drawer's Cancel draws the framework's `default` variant border. **A disabled button changed character:** Mantine gave it a grey ground and a muted label; the framework draws its fill at 55% opacity, which on a light theme reads as an enabled button, faded. That went to the designer rather than being decided here. Seven unit tests asserted Mantine's `data-loading="true"` and now assert the attribute; one pinned `FileButton`'s old array-only callback. Lint, vitest and the full Playwright suite (213) pass.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.

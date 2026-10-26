@@ -5,10 +5,8 @@ import {
   Select,
   SegmentedControl,
   TextInput,
-  ActionIcon,
   Tooltip,
   Slider,
-  Button,
   Accordion,
 } from '@mantine/core';
 import { BuilderColorInput as ColorInput } from './BuilderColorInput';
@@ -38,7 +36,7 @@ import type {
 } from '@/types';
 import { buildSlotEntranceCss, REVEAL_CLASS } from '@/utils/slotEntrance';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, ActionIcon, Button } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -130,7 +128,7 @@ function PropRow({ label, children, tooltip }: { label: string; children: React.
         <Text size="xs" tone="muted" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
         {tooltip && (
           <Tooltip label={tooltip} multiline style={{ width: uiRem(15) }} position="left" withArrow>
-            <ActionIcon size={14} variant="transparent" c="dimmed" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })}>
+            <ActionIcon size={14} variant="transparent" tone="muted" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })}>
               <IconInfoCircle size={12} />
             </ActionIcon>
           </Tooltip>
@@ -415,7 +413,7 @@ function EntranceSection({ slot, onUpdate }: EffectSectionProps) {
               />
             </Box>
             <Button
-              size="compact-xs"
+              size="xs" compact
               variant="light"
               leftSection={<IconPlayerPlay size={12} />}
               onClick={() => setPlayNonce((n) => n + 1)}
@@ -545,7 +543,7 @@ export function SlotPropertiesPanel({
                 <ActionIcon
                   size="sm"
                   variant={lockSizeRatio ? 'filled' : 'subtle'}
-                  color={lockSizeRatio ? 'blue' : 'gray'}
+                  tone={lockSizeRatio ? 'primary' : 'default'}
                   onClick={() => onUpdate({ lockAspectRatio: !lockSizeRatio })}
                   aria-label={lockSizeRatio ? t('lb_slot_unlock', 'Unlock aspect ratio') : t('lb_slot_lock', 'Lock aspect ratio')}
                   style={{ flexShrink: 0 }}

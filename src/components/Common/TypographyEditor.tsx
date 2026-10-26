@@ -3,13 +3,13 @@ import {
   Accordion,
   NumberInput,
   Select,
-  ActionIcon,
 } from '@mantine/core';
 import {
   Group,
   Stack,
   Text,
   Badge,
+  ActionIcon,
 } from '@/ui';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -234,7 +234,7 @@ export function TypographyEditor({ value, onChange, customFonts }: TypographyEdi
         <Group justify="flex-end">
           <ActionIcon
             variant="subtle"
-            color="red"
+            tone="danger"
             size="sm"
             title={t('typo_reset', 'Reset all overrides')}
             aria-label={t('typo_reset', 'Reset all overrides')}

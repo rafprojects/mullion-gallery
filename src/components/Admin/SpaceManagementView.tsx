@@ -1,12 +1,10 @@
 import { useState, useCallback, useEffect } from 'react';
 import {
   Tabs,
-  Button,
   TextInput,
   Switch,
   Loader,
   Table,
-  ActionIcon,
   Tooltip,
   Select,
   Divider,
@@ -24,7 +22,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { SpaceAssetLibrary } from './SpaceAssetLibrary';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import type { FontLibraryEntry } from '@mullion/shared-utils';
-import { uiRem, Stack, Group, Text, Alert, Center, Badge } from '@/ui';
+import { uiRem, Stack, Group, Text, Alert, Center, Badge, Button, ActionIcon } from '@/ui';
 
 interface SpaceGrant {
   userId: number;
@@ -346,7 +344,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                         <Tooltip label={t('admin_space_archive_tt', 'Archive space')}>
                           <ActionIcon
                             variant="subtle"
-                            color="red"
+                            tone="danger"
                             size="sm"
                             onClick={(e) => { e.stopPropagation(); void handleArchiveSpace(space.id, space.name); }}
                             aria-label={t('admin_space_archive_aria', 'Archive {{name}}', { name: space.name })}
@@ -487,7 +485,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                         <Tooltip label={t('admin_space_revoke_tt', 'Revoke access')}>
                           <ActionIcon
                             variant="subtle"
-                            color="red"
+                            tone="danger"
                             size="sm"
                             onClick={() => requestRevokeAccess(grant)}
                             aria-label={t('admin_space_revoke_aria', 'Revoke access')}

@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  ActionIcon,
-  FileButton,
-  Button,
   Loader,
 } from '@mantine/core';
 import {
@@ -10,6 +7,9 @@ import {
   Stack,
   Text,
   Badge,
+  ActionIcon,
+  FileButton,
+  Button,
 } from '@/ui';
 import { IconTrash, IconUpload, IconWorld, IconWorldOff } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -117,7 +117,7 @@ export function FontLibraryManager({ apiClient, onFontsChange, isSystemAdmin = f
               <Group gap="4xs" wrap="nowrap">
                 <ActionIcon
                   variant="subtle"
-                  color={f.isUniversal ? 'blue' : 'gray'}
+                  tone={f.isUniversal ? 'primary' : 'default'}
                   size="sm"
                   onClick={() => handleToggleUniversal(f.id, !f.isUniversal)}
                   title={f.isUniversal ? t('admin_font_make_specific', 'Make {{name}} space-specific', { name: f.name }) : t('admin_font_make_universal', 'Make {{name}} available to all spaces', { name: f.name })}
@@ -128,7 +128,7 @@ export function FontLibraryManager({ apiClient, onFontsChange, isSystemAdmin = f
                 {isSystemAdmin && (
                   <ActionIcon
                     variant="subtle"
-                    color="red"
+                    tone="danger"
                     size="sm"
                     onClick={() => handleDelete(f.id)}
                     title={t('admin_font_delete', 'Delete {{name}}', { name: f.name })}

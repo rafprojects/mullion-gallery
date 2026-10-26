@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { IconLock, IconEye } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Image, UnstyledButton } from '@mantine/core';
+import { Image } from '@mantine/core';
 import type { Campaign, GalleryBehaviorSettings } from '@/types';
 import { DEFAULT_GALLERY_BEHAVIOR_SETTINGS } from '@/types';
 import type { ApiClient } from '@/services/apiClient';
@@ -12,7 +12,7 @@ import { RequestAccessForm } from './RequestAccessForm';
 import { CompanyLogo } from '@/components/Common/CompanyLogo';
 import styles from './CampaignCard.module.scss';
 
-import { uiRem, Group, Stack, Text, Box, Badge, Card, inkOn } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Badge, Card, inkOn, UnstyledButton } from '@/ui';
 
 /** A settings length in the size basis: a number is pixels, as Mantine's `h` read it. */
 const thumbLength = (value: string | number): string => (typeof value === 'number' ? uiRem(value / 16) : value);

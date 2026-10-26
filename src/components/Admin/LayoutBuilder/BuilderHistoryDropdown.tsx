@@ -8,15 +8,13 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  ActionIcon,
   Popover,
   ScrollArea,
   Tooltip,
-  UnstyledButton,
 } from '@mantine/core';
 import { IconClockHour4, IconTrash } from '@tabler/icons-react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Text, Box } from '@/ui';
+import { uiRem, Stack, Text, Box, ActionIcon, UnstyledButton } from '@/ui';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

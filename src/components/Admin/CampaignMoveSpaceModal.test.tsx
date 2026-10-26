@@ -102,6 +102,6 @@ describe('CampaignMoveSpaceModal', () => {
 
   it('shows loading state on the Move button while saving', () => {
     render(<CampaignMoveSpaceModal {...defaults} isSaving={true} />);
-    expect(screen.getByRole('button', { name: /move/i })).toHaveAttribute('data-loading', 'true');
+    expect(screen.getByRole('button', { name: /move/i })).toHaveAttribute('data-loading');
   });
 });

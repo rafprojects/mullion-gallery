@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActionIcon, Tooltip, ScrollArea, UnstyledButton } from '@mantine/core';
-import { Stack, Group, Text, Box } from '@/ui';
+import { Tooltip, ScrollArea } from '@mantine/core';
+import { Stack, Group, Text, Box, ActionIcon, UnstyledButton } from '@/ui';
 import { IconClockHour4, IconTrash } from '@tabler/icons-react';
 import type { IDockviewPanelProps } from 'dockview';
 import { useBuilderDock } from './BuilderDockContext';

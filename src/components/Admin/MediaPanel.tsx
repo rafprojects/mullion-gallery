@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Button, FileButton, Loader } from '@mantine/core';
-import { Group, Center } from '@/ui';
+import { Loader } from '@mantine/core';
+import { Group, Center, Button, FileButton } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { ApiClient } from '@/services/apiClient';

@@ -14,8 +14,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Accordion,
-  ActionIcon,
-  Button,
   Divider,
   NumberInput,
   Select,
@@ -30,6 +28,8 @@ import {
   Stack,
   Text,
   Box,
+  ActionIcon,
+  Button,
 } from '@/ui';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -469,7 +469,7 @@ export function GraphicLayerPropertiesPanel({
                   <Text size="xs" tone="muted">{t('lb_gl_feather', 'Feather')}</Text>
                   <Slider value={mask.feather} onChange={(v) => set({ maskLayer: { ...mask, feather: v } })}
                     min={0} max={50} step={1} size="xs" label={(v) => `${v}px`} aria-label={t('lb_gl_mask_feather', 'Mask feather')} />
-                  <Button size="xs" variant="subtle" color="red" onClick={() => set({ maskLayer: undefined })}>
+                  <Button size="xs" variant="subtle" tone="danger" onClick={() => set({ maskLayer: undefined })}>
                     {t('lb_gl_clear_mask', 'Clear mask')}
                   </Button>
                 </>
@@ -569,7 +569,7 @@ export function GraphicLayerPropertiesPanel({
             </Button>
             <Button
               size="xs"
-              color="red"
+              tone="danger"
               onClick={() => { closeConfirm(); onRemove(overlay.id); }}
               leftSection={<IconTrash size={12} />}
               style={{ flex: 1 }}
@@ -583,7 +583,7 @@ export function GraphicLayerPropertiesPanel({
         <Button
           size="xs"
           variant="light"
-          color="red"
+          tone="danger"
           fullWidth
           leftSection={<IconTrash size={12} />}
           onClick={openConfirm}

@@ -10,16 +10,12 @@ import { useTranslation } from 'react-i18next';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-  ActionIcon,
-  Button,
-  FileButton,
   Menu,
   SegmentedControl,
   Skeleton,
   Table,
   TextInput,
   Tooltip,
-  UnstyledButton,
   VisuallyHidden,
 } from '@mantine/core';
 import {
@@ -60,7 +56,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useBuilderDeepLink } from '@mullion/shared-utils';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group, Stack, Text, Box, Center, Badge, Card } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, Badge, Card, ActionIcon, Button, FileButton, UnstyledButton } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -522,7 +518,7 @@ export function LayoutTemplateList({ apiClient, onNotify, initialTemplateId, spa
                         </ActionIcon>
                       </Tooltip>
                       <Tooltip label={tr('admin_lt_delete', 'Delete')}>
-                        <ActionIcon variant="subtle" color="red" size="sm" onClick={() => setConfirmDelete(t)} aria-label={tr('admin_lt_delete_name', 'Delete {{name}}', { name: t.name })}>
+                        <ActionIcon variant="subtle" tone="danger" size="sm" onClick={() => setConfirmDelete(t)} aria-label={tr('admin_lt_delete_name', 'Delete {{name}}', { name: t.name })}>
                           <IconTrash size={16} />
                         </ActionIcon>
                       </Tooltip>
@@ -559,7 +555,7 @@ export function LayoutTemplateList({ apiClient, onNotify, initialTemplateId, spa
         title={tr('admin_lt_delete_title', 'Delete layout template?')}
         message={tr('admin_lt_delete_msg', 'Are you sure you want to delete "{{name}}"? This cannot be undone.', { name: confirmDelete?.name ?? '' })}
         confirmLabel={tr('admin_lt_delete', 'Delete')}
-        confirmColor="red"
+        confirmTone="danger"
       />
 
       {/* P53-A: in-use (409) escalation — confirm a forced delete. */}
@@ -570,7 +566,7 @@ export function LayoutTemplateList({ apiClient, onNotify, initialTemplateId, spa
         title={tr('admin_lt_inuse_title', 'Template in use')}
         message={tr('admin_lt_inuse_msg', '"{{name}}" is in use by {{count}} campaign. Deleting it will unbind those campaigns. Delete anyway?', { name: forceDelete?.template.name ?? '', count: forceDelete?.inUse ?? 0 })}
         confirmLabel={tr('admin_lt_delete_anyway', 'Delete anyway')}
-        confirmColor="red"
+        confirmTone="danger"
         loading={forceDeleting}
       />
 

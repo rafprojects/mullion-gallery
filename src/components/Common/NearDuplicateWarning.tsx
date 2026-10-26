@@ -1,6 +1,6 @@
 
-import { Button, Image, Modal } from '@mantine/core';
-import { Group, Stack, Text, Badge } from '@/ui';
+import { Image, Modal } from '@mantine/core';
+import { Group, Stack, Text, Badge, Button } from '@/ui';
 import { Trans, useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import type { UploadDuplicateCampaign } from '@/types';

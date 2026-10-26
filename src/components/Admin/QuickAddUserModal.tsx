@@ -1,6 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
 import {
-  Button,
   Checkbox,
   Modal,
   Select,
@@ -13,6 +12,7 @@ import {
   Text,
   Alert,
   Box,
+  Button,
 } from '@/ui';
 import { IconAlertCircle, IconUserPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -86,10 +86,7 @@ function QuickAddUserSuccessState({ quickAddResult, onClose, onNotify }: QuickAd
               <Button
                 size="xs"
                 variant="light"
-                component="a"
-                href={quickAddResult.resetUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                render={<a href={quickAddResult.resetUrl} target="_blank" rel="noopener noreferrer" />}
               >
                 {t('admin_qau_open_reset', 'Open Reset Link')}
               </Button>

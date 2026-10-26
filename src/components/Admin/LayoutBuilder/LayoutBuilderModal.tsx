@@ -2,9 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { useTranslation } from 'react-i18next';
 import {
   Modal,
-  Button,
   TextInput,
-  ActionIcon,
   Tooltip,
   Divider,
 } from '@mantine/core';
@@ -28,7 +26,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useGetSettings } from '@/services/settingsQuery';
 import { AdminChromeProvider } from '@/components/Admin/AdminChromeProvider';
 import { adminChromeAttributes, adminChromeClassNames, adminChromeStyles, resolveChromeThemeId } from '@/themes/chromeTheme';
-import { getThemeEntry, Group, Text, Box } from '@/ui';
+import { getThemeEntry, Group, Text, Box, Button, ActionIcon } from '@/ui';
 import { useLatestRef } from '@mullion/shared-utils';
 import { DockviewReact, DockviewDefaultTab } from 'dockview';
 import { debugGroup, debugLog, debugGroupEnd } from '@/utils/debug';
@@ -504,7 +502,7 @@ export function LayoutBuilderModal({
             <Text size="sm" tone="muted" align="center">
               {tr('lb_mod_err_body', 'An unexpected error occurred. Close the editor and try again.')}
             </Text>
-            <Button variant="light" color="red" onClick={onClose}>
+            <Button variant="light" tone="danger" onClick={onClose}>
               {tr('lb_mod_close_editor', 'Close Editor')}
             </Button>
           </Box>

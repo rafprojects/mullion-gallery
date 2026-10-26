@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Button, TextInput } from '@mantine/core';
+import { TextInput } from '@mantine/core';
 import { IconMail, IconCheck, IconAlertCircle } from '@tabler/icons-react';
 import { Trans, useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Text, Box, Alert } from '@/ui';
+import { uiRem, Stack, Text, Box, Alert, Button } from '@/ui';
 
 interface RequestAccessFormProps {
   campaignId: string;

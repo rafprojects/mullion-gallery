@@ -1,10 +1,10 @@
 
-import { ActionIcon, Image, Modal } from '@mantine/core';
+import { Image, Modal } from '@mantine/core';
 import { IconChevronLeft, IconChevronRight, IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Text, Box } from '@/ui';
+import { uiRem, Text, Box, ActionIcon } from '@/ui';
 
 interface MediaLightboxModalProps {
   opened: boolean;
@@ -48,7 +48,7 @@ export function MediaLightboxModal({
           />
           <ActionIcon
             variant="filled"
-            color="dark"
+            tone="default"
             style={{ position: 'absolute', top: uiRem(0.625), right: uiRem(0.625) }}
             onClick={onClose}
             aria-label={t('admin_media_lb_close', 'Close lightbox')}
@@ -59,7 +59,7 @@ export function MediaLightboxModal({
             <>
               <ActionIcon
                 variant="filled"
-                color="dark"
+                tone="default"
                 style={{ position: 'absolute', left: uiRem(0.625), top: '50%', transform: 'translateY(-50%)' }}
                 onClick={onPrev}
                 aria-label={t('admin_media_lb_prev', 'Previous image')}
@@ -68,7 +68,7 @@ export function MediaLightboxModal({
               </ActionIcon>
               <ActionIcon
                 variant="filled"
-                color="dark"
+                tone="default"
                 style={{ position: 'absolute', right: uiRem(0.625), top: '50%', transform: 'translateY(-50%)' }}
                 onClick={onNext}
                 aria-label={t('admin_media_lb_next', 'Next image')}

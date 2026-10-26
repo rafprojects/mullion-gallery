@@ -1,6 +1,6 @@
 import type { DrawerProps } from '@mantine/core';
-import { Accordion, Button, Drawer, Menu, NumberInput, Tabs, TextInput } from '@mantine/core';
-import { Group, Stack, Text } from '@/ui';
+import { Accordion, Drawer, Menu, NumberInput, Tabs, TextInput } from '@mantine/core';
+import { Group, Stack, Text, Button } from '@/ui';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useEffect, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -153,7 +153,7 @@ const GalleryConfigEditorIntro: NamedComponent<GalleryConfigEditorIntroProps> = 
     {(clearMode === 'draft' || onClear) && clearLabel && (
       <Button
         variant="subtle"
-        color="red"
+        tone="danger"
         size="sm"
         onClick={() => {
           if (clearMode === 'draft') {

@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip, ActionIcon, Divider, TextInput } from '@mantine/core';
-import { Group } from '@/ui';
+import { Tooltip, Divider, TextInput } from '@mantine/core';
+import { Group, ActionIcon } from '@/ui';
 import { IconSearch, IconX } from '@tabler/icons-react';
 import {
   IconPlus, IconTrash, IconCopy, IconMask, IconLetterT,
@@ -273,7 +273,7 @@ export function LayoutBuilderLayersPanel(_props: IDockviewPanelProps) {
             <ActionIcon
               size="sm"
               variant="light"
-              color="red"
+              tone="danger"
               onClick={handleDeleteSelected}
               disabled={builder.selectedSlotIds.size === 0}
               aria-label={tr('lb_layers_delete_sel_aria', 'Delete selected slots')}

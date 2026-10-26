@@ -1,6 +1,6 @@
 
-import { Button, Modal } from '@mantine/core';
-import { Group, Stack, Text } from '@/ui';
+import { Modal } from '@mantine/core';
+import { Group, Stack, Text, Button } from '@/ui';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
@@ -12,7 +12,8 @@ interface ConfirmModalProps {
   title: string;
   message: ReactNode;
   confirmLabel: string;
-  confirmColor?: string | undefined;
+  /** The confirm button's role: `danger` for something destructive, `warning`, `success` or `primary`. */
+  confirmTone?: 'danger' | 'warning' | 'success' | 'primary' | undefined;
   confirmAriaLabel?: string | undefined;
   loading?: boolean | undefined;
   /** Optional extra content rendered between the message and action buttons. */
@@ -25,7 +26,7 @@ interface ConfirmModalContentProps {
   onClose: () => void;
   onConfirm: () => void;
   confirmLabel: string;
-  confirmColor: string;
+  confirmTone: 'danger' | 'warning' | 'success' | 'primary';
   confirmAriaLabel?: string | undefined;
   loading: boolean;
 }
@@ -36,7 +37,7 @@ function ConfirmModalContent({
   onClose,
   onConfirm,
   confirmLabel,
-  confirmColor,
+  confirmTone,
   confirmAriaLabel,
   loading,
 }: ConfirmModalContentProps) {
@@ -48,7 +49,7 @@ function ConfirmModalContent({
       <Group {...getMullionDebugProps('ConfirmModal', 'actions')} justify="flex-end">
         <Button variant="default" onClick={onClose}>{t('common_cancel', 'Cancel')}</Button>
         <Button
-          color={confirmColor}
+          tone={confirmTone}
           onClick={onConfirm}
           loading={loading}
           aria-label={confirmAriaLabel}
@@ -67,7 +68,7 @@ export function ConfirmModal({
   title,
   message,
   confirmLabel,
-  confirmColor = 'red',
+  confirmTone = 'danger',
   confirmAriaLabel,
   loading = false,
   children,
@@ -89,7 +90,7 @@ export function ConfirmModal({
         onClose={onClose}
         onConfirm={onConfirm}
         confirmLabel={confirmLabel}
-        confirmColor={confirmColor}
+        confirmTone={confirmTone}
         confirmAriaLabel={confirmAriaLabel}
         loading={loading}
       />

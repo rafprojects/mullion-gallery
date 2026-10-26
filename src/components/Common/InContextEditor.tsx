@@ -1,9 +1,9 @@
 import { forwardRef, useCallback, type ReactNode } from 'react';
-import { ActionIcon, Popover, ScrollArea } from '@mantine/core';
+import { Popover, ScrollArea } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Box } from '@/ui';
+import { uiRem, Box, ActionIcon } from '@/ui';
 
 interface InContextEditorProps {
   /** Position relative to the nearest positioned parent. */
@@ -34,7 +34,7 @@ const InContextEditorToggle = forwardRef<HTMLButtonElement, InContextEditorToggl
         {...(actionIconProps as any)}
         ref={ref}
         variant="filled"
-        color="blue"
+        tone="primary"
         size="sm"
         radius="xl"
         onClick={handleClick}

@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
-import { Modal, Table, Button, ActionIcon, Tooltip, TextInput } from '@mantine/core';
+import { Modal, Table, Tooltip, TextInput } from '@mantine/core';
 import { IconEdit, IconCheck, IconX, IconRotateClockwise } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { ACTION_IDS, ACTION_DEFAULTS, type ShortcutActionId, type ShortcutConfigHandle } from '@/hooks/useShortcutConfig';
-import { uiRem, Stack, Group, Text, Badge } from '@/ui';
+import { uiRem, Stack, Group, Text, Badge, Button, ActionIcon } from '@/ui';
 
 // ── Key display helpers ───────────────────────────────────────────────────────
 
@@ -134,11 +134,11 @@ function EditRow({ id, currentKey, defaultKey, config }: EditRowProps) {
               onBlur={cancelRecording}
               rightSection={
                 pendingKey ? (
-                  <ActionIcon size="xs" variant="subtle" color="green" aria-label={t('admin_ksc_confirm_aria', 'Confirm key binding')} onMouseDown={(e) => { e.preventDefault(); commitKey(pendingKey); }}>
+                  <ActionIcon size="xs" variant="subtle" tone="success" aria-label={t('admin_ksc_confirm_aria', 'Confirm key binding')} onMouseDown={(e) => { e.preventDefault(); commitKey(pendingKey); }}>
                     <IconCheck size={12} />
                   </ActionIcon>
                 ) : (
-                  <ActionIcon size="xs" variant="subtle" color="gray" aria-label={t('admin_ksc_cancel_aria', 'Cancel key recording')} onMouseDown={(e) => { e.preventDefault(); cancelRecording(); }}>
+                  <ActionIcon size="xs" variant="subtle" tone="default" aria-label={t('admin_ksc_cancel_aria', 'Cancel key recording')} onMouseDown={(e) => { e.preventDefault(); cancelRecording(); }}>
                     <IconX size={12} />
                   </ActionIcon>
                 )
@@ -170,7 +170,7 @@ function EditRow({ id, currentKey, defaultKey, config }: EditRowProps) {
           )}
           {isCustomized && !recording && (
             <Tooltip label={t('admin_ksc_reset_default', 'Reset to default')} withArrow>
-              <ActionIcon size="xs" variant="subtle" color="orange" onClick={resetRow} aria-label={t('admin_ksc_reset_name', 'Reset {{name}} to default', { name: ACTION_DEFAULTS[id].label })}>
+              <ActionIcon size="xs" variant="subtle" tone="warning" onClick={resetRow} aria-label={t('admin_ksc_reset_name', 'Reset {{name}} to default', { name: ACTION_DEFAULTS[id].label })}>
                 <IconRotateClockwise size={13} />
               </ActionIcon>
             </Tooltip>
@@ -217,7 +217,7 @@ export function KeyboardShortcutsModal({ opened, onClose, config }: KeyboardShor
           <Text weight={500}>{t('admin_ksc_title', 'Keyboard Shortcuts')}</Text>
           {config && (
             <Button
-              size="compact-xs"
+              size="xs" compact
               variant={editMode ? 'filled' : 'light'}
               onClick={() => setEditMode((v) => !v)}
             >
@@ -294,7 +294,7 @@ export function KeyboardShortcutsModal({ opened, onClose, config }: KeyboardShor
             <Button
               size="xs"
               variant="subtle"
-              color="orange"
+              tone="warning"
               leftSection={<IconRotateClockwise size={13} />}
               onClick={() => config.resetToDefaults()}
             >

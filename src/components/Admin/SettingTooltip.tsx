@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
-import { Tooltip, ActionIcon } from '@mantine/core';
+import { Tooltip } from '@mantine/core';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, ActionIcon } from '@/ui';
 
 interface SettingTooltipProps {
   label: ReactNode;

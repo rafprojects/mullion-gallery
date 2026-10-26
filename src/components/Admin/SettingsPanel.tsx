@@ -3,7 +3,6 @@ import { useMediaQuery } from '@mantine/hooks';
 import { useStore } from 'zustand';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-  Button,
   Drawer,
   Loader,
   NativeScrollArea,
@@ -33,7 +32,7 @@ import {
   type SettingsData,
   type SettingsDataInput,
 } from '@/contexts/SettingsStore';
-import { uiLayer, Group, Stack, Text, Title, Box, Center, Badge } from '@/ui';
+import { uiLayer, Group, Stack, Text, Title, Box, Center, Badge, Button } from '@/ui';
 import { SettingTooltip } from './SettingTooltip';
 import type { CustomFontEntry } from '../Common/TypographyEditor';
 import type { UpdateGallerySetting } from '../Settings/GalleryAdapterSettingsSection';

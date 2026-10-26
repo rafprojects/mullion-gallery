@@ -1,10 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  ActionIcon,
-  Button,
   Checkbox,
-  CopyButton,
   Divider,
   Loader,
   Modal,
@@ -20,6 +17,9 @@ import {
   Box,
   Center,
   Badge,
+  ActionIcon,
+  Button,
+  CopyButton,
 } from '@/ui';
 import { IconCopy, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -152,7 +152,7 @@ function EndpointRow({
             <Tooltip label={t('set_wh_delete', 'Delete endpoint')}>
               <ActionIcon
                 variant="subtle"
-                color="red"
+                tone="danger"
                 loading={isDeleting}
                 onClick={() => onDelete(endpoint.index)}
                 aria-label={t('set_wh_delete_ep', 'Delete endpoint {{url}}', { url: endpoint.url })}
@@ -177,7 +177,7 @@ function EndpointRow({
           )}
           <Button
             variant="subtle"
-            size="compact-xs"
+            size="xs" compact
             onClick={() => setShowEvents((v) => !v)}
             disabled={isUpdating}
           >

@@ -13,8 +13,8 @@
  */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Chip, SegmentedControl, Loader, TextInput, Switch, Select } from '@mantine/core';
-import { Group, Stack, Title, Text, Alert, Box, Center, Container } from '@/ui';
+import { SegmentedControl, Loader, TextInput, Switch, Select } from '@mantine/core';
+import { Group, Stack, Title, Text, Alert, Box, Center, Container, Chip } from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { IconSearch } from '@tabler/icons-react';
 import { CampaignCard } from './CampaignCard';

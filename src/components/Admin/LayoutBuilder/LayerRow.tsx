@@ -1,7 +1,6 @@
 import { useRef, useState, type KeyboardEvent, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  ActionIcon,
   Tooltip,
   TextInput,
   Menu,
@@ -9,6 +8,7 @@ import {
 import {
   Group,
   Text,
+  ActionIcon,
 } from '@/ui';
 import {
   IconPhoto,
@@ -227,7 +227,7 @@ export function LayerRow({
           <ActionIcon
             size="xs"
             variant="subtle"
-            color={visible ? 'gray' : 'blue'}
+            tone={visible ? 'default' : 'primary'}
             aria-label={visible ? t('lb_row_hide', 'Hide layer') : t('lb_row_show', 'Show layer')}
             onClick={(e) => { e.stopPropagation(); onToggleVisible(item.id); }}
           >
@@ -242,7 +242,7 @@ export function LayerRow({
           <ActionIcon
             size="xs"
             variant="subtle"
-            color={locked ? 'orange' : 'gray'}
+            tone={locked ? 'warning' : 'default'}
             aria-label={locked ? t('lb_row_unlock', 'Unlock layer') : t('lb_row_lock', 'Lock layer')}
             onClick={(e) => { e.stopPropagation(); onToggleLocked(item.id); }}
           >
@@ -258,7 +258,7 @@ export function LayerRow({
             <ActionIcon
               size="xs"
               variant="subtle"
-              color="gray"
+              tone="default"
               aria-label={t('lb_row_options', 'Layer options')}
               onClick={(e) => e.stopPropagation()}
             >
@@ -315,7 +315,7 @@ export function LayerRow({
           <ActionIcon
             size="xs"
             variant="subtle"
-            color="red"
+            tone="danger"
             style={{ marginLeft: 4 }}
             onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
             aria-label={t('lb_row_delete', 'Delete layer')}

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Button,
   Loader,
   Table,
 } from '@mantine/core';
@@ -12,6 +11,7 @@ import {
   Alert,
   Box,
   Badge,
+  Button,
 } from '@/ui';
 import { IconAlertCircle, IconCheck, IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -135,7 +135,7 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
                         <Group gap="xs" wrap="nowrap">
                           <Button
                             size="xs"
-                            color="green"
+                            tone="success"
                             variant="filled"
                             leftSection={<IconCheck size={12} />}
                             loading={actionLoading === req.token}
@@ -146,7 +146,7 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
                           </Button>
                           <Button
                             size="xs"
-                            color="red"
+                            tone="danger"
                             variant="light"
                             leftSection={<IconX size={12} />}
                             loading={actionLoading === req.token}

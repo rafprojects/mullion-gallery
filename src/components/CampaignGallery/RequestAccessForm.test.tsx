@@ -79,10 +79,7 @@ describe('RequestAccessForm', () => {
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'user@example.com' } });
     fireEvent.click(screen.getByRole('button', { name: /request access/i }));
     await waitFor(() =>
-      expect(screen.getByRole('button', { name: /request access/i })).toHaveAttribute(
-        'data-loading',
-        'true',
-      ),
+      expect(screen.getByRole('button', { name: /request access/i })).toHaveAttribute('data-loading'),
     );
     resolveFn();
   });

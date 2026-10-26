@@ -11,13 +11,10 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
   ScrollArea,
-  UnstyledButton,
   Image,
   Tooltip,
   TextInput,
-  ActionIcon,
   Menu,
 } from '@mantine/core';
 import {
@@ -34,7 +31,7 @@ import {
 } from '@tabler/icons-react';
 import type { LayoutSlot, LayoutTemplate, MediaItem } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Badge } from '@/ui';
+import { uiRem, Stack, Group, Text, Badge, Button, UnstyledButton, ActionIcon } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 

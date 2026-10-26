@@ -129,10 +129,7 @@ describe('QuickAddUserModal', () => {
         quickAddSaving={true}
       />,
     );
-    expect(screen.getByRole('button', { name: /create user/i })).toHaveAttribute(
-      'data-loading',
-      'true',
-    );
+    expect(screen.getByRole('button', { name: /create user/i })).toHaveAttribute('data-loading');
   });
 
   it('only shows active campaigns in campaign dropdown data', () => {

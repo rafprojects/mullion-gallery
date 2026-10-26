@@ -15,8 +15,7 @@
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@mantine/core';
-import { Stack, Text, Center, Box } from '@/ui';
+import { Stack, Text, Center, Box, Button } from '@/ui';
 import { OverlayArrows } from '@/components/Galleries/Shared/OverlayArrows';
 import { DotNavigator } from '@/components/Galleries/Shared/DotNavigator';
 import type { Campaign, GalleryBehaviorSettings } from '@/types';

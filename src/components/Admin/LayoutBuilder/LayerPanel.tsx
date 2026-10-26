@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollArea, ActionIcon, Tooltip } from '@mantine/core';
+import { ScrollArea, Tooltip } from '@mantine/core';
 import { IconChevronDown, IconChevronRight, IconLayersLinked, IconLayersOff } from '@tabler/icons-react';
 import { buildLayerList, getLayerName, type GroupLayerItem } from '@/utils/layerList';
 import { LayerRow } from './LayerRow';
 import type { LayoutTemplate } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Text } from '@/ui';
+import { uiRem, Stack, Text, ActionIcon } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -372,7 +372,7 @@ export function LayerPanel({
                       <ActionIcon
                         size="xs"
                         variant="transparent"
-                        c="dimmed"
+                        tone="muted"
                         onClick={(e) => {
                           e.stopPropagation();
                           onDissolveGroup(groupItem.id);

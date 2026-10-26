@@ -1,8 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useState, type ReactElement } from 'react';
 import {
-  ActionIcon,
-  Button,
-  FileButton,
   Image,
   Loader,
   Modal,
@@ -41,7 +38,7 @@ import {
   setCampaignBreakpointScopeAdapterOverride,
   syncCampaignGalleryOverrideMode,
 } from '@/utils/campaignGalleryOverrides';
-import { uiRem, Group, Stack, Text, Box, Center, SimpleGrid, Badge, Card } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, SimpleGrid, Badge, Card, ActionIcon, Button, FileButton } from '@/ui';
 
 
 const LazyGalleryConfigEditorModal = lazy(() =>
@@ -484,7 +481,7 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
                 </Text>
                 <Button
                   variant="subtle"
-                  color="gray"
+                  tone="default"
                   size="xs"
                   onClick={() => updateForm({
                     ...formState,
@@ -737,7 +734,7 @@ export function UnifiedCampaignModal({
         title={t('admin_discard_title', 'Discard changes?')}
         message={t('admin_discard_msg', 'You have unsaved changes. Are you sure you want to discard them?')}
         confirmLabel={t('admin_discard', 'Discard')}
-        confirmColor="red"
+        confirmTone="danger"
       />
 
       {galleryConfigEditorOpen && (
@@ -842,7 +839,7 @@ function MediaTabContent({
               <Group justify="space-between" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
                 <Badge tone="default" size="xs" variant="light">{media.type}</Badge>
                 <Tooltip label={t('admin_camp_remove_media', 'Remove from campaign')}>
-                  <ActionIcon color="red" variant="light" size="sm" onClick={() => void onRemoveMedia(media)} aria-label={t('admin_camp_remove_media', 'Remove from campaign')}>
+                  <ActionIcon tone="danger" variant="light" size="sm" onClick={() => void onRemoveMedia(media)} aria-label={t('admin_camp_remove_media', 'Remove from campaign')}>
                     <IconTrash size={14} />
                   </ActionIcon>
                 </Tooltip>

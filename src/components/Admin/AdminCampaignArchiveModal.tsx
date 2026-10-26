@@ -29,7 +29,7 @@ export function AdminCampaignArchiveModal({
       title={t('admin_archive_campaign_title', 'Archive campaign')}
       message={t('admin_archive_campaign_msg', 'Archive this campaign? This action will mark it archived.')}
       confirmLabel={t('admin_archive', 'Archive')}
-      confirmColor="red"
+      confirmTone="danger"
       confirmAriaLabel={t('admin_archive_campaign_aria', 'Archive campaign {{title}}', { title: campaign?.title ?? '' }).trim()}
     />
   );

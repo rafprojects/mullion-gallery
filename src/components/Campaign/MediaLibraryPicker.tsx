@@ -1,6 +1,6 @@
 
-import { Button, Image, Loader, TextInput } from '@mantine/core';
-import { Group, Stack, Text, Center, SimpleGrid, Badge, Card } from '@/ui';
+import { Image, Loader, TextInput } from '@mantine/core';
+import { Group, Stack, Text, Center, SimpleGrid, Badge, Card, Button } from '@/ui';
 import { IconPhoto } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';

@@ -4,7 +4,6 @@ import {
   Slider,
   NumberInput,
   SegmentedControl,
-  ActionIcon,
   Tooltip,
 } from '@mantine/core';
 import {
@@ -12,6 +11,7 @@ import {
   Group,
   Text,
   Box,
+  ActionIcon,
 } from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import type { GradientStop, GradientDirection, GradientType, RadialShape, RadialSize } from '@/types';
@@ -99,7 +99,7 @@ export function GradientEditor({ value, onChange }: GradientEditorProps) {
                   <ActionIcon
                     size="sm"
                     variant={dir === d.value && value.angle == null ? 'filled' : 'subtle'}
-                    color={dir === d.value && value.angle == null ? 'blue' : 'gray'}
+                    tone={dir === d.value && value.angle == null ? 'primary' : 'default'}
                     onClick={() => update({ direction: d.value, angle: undefined })}
                     aria-label={d.label}
                   >

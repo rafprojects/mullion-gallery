@@ -1,7 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Loader, Modal, Button } from '@mantine/core';
-import { Stack, Alert, Center, Container } from '@/ui';
+import { Loader, Modal } from '@mantine/core';
+import { Stack, Alert, Center, Container, Button } from '@/ui';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { CardGallery } from './components/CampaignGallery/CardGallery';

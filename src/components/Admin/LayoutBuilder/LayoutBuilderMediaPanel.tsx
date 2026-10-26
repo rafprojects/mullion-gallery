@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Select,
   Accordion,
-  Button,
 } from '@mantine/core';
 import { IconUpload } from '@tabler/icons-react';
 import type { IDockviewPanelProps } from 'dockview';
@@ -13,7 +12,7 @@ import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { MediaUploadController, GENERAL_LIBRARY_TARGET } from '../MediaUploadController';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useRootId } from '@mullion/shared-ui';
-import { uiRem, Group, Text, Box } from '@/ui';
+import { uiRem, Group, Text, Box, Button } from '@/ui';
 
 export function LayoutBuilderMediaPanel(_props: IDockviewPanelProps) {
   const { t } = useTranslation('mullion');

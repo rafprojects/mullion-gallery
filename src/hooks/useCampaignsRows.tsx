@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, Tooltip, Button, Checkbox, Select, Menu } from '@mantine/core';
+import { Table, Tooltip, Checkbox, Select, Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconEdit, IconCopy, IconDownload, IconFileZip, IconArchive, IconArchiveOff, IconLayoutGrid, IconTrash, IconChevronDown, IconArrowsExchange, IconPhotoPlus } from '@tabler/icons-react';
 import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
@@ -10,7 +10,7 @@ import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { CompanyCombobox } from '@/components/Common/CompanyCombobox';
 import type { ApiClient } from '@/services/apiClient';
-import { uiRem, Group, Text, Box, Badge } from '@/ui';
+import { uiRem, Group, Text, Box, Badge, Button } from '@/ui';
 
 function toSlug(name: string): string {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -243,12 +243,12 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                 </Menu.Dropdown>
               </Menu>
               {c.status === 'archived' ? (
-                <Button color="teal" size="xs" leftSection={<IconArchiveOff size={14} />} loading={restoringIds.has(cid)} onClick={() => setConfirmRestore(c)}>{t('admin_restore', 'Restore')}</Button>
+                <Button tone="primary" size="xs" leftSection={<IconArchiveOff size={14} />} loading={restoringIds.has(cid)} onClick={() => setConfirmRestore(c)}>{t('admin_restore', 'Restore')}</Button>
               ) : (
-                <Button color="orange" variant="light" size="xs" leftSection={<IconArchive size={14} />} loading={archivingIds.has(cid)} onClick={() => setConfirmArchive(c)}>{t('admin_archive', 'Archive')}</Button>
+                <Button tone="warning" variant="light" size="xs" leftSection={<IconArchive size={14} />} loading={archivingIds.has(cid)} onClick={() => setConfirmArchive(c)}>{t('admin_archive', 'Archive')}</Button>
               )}
               <Tooltip label={t('admin_camprow_delete_tt', 'Permanently delete campaign')}>
-                <Button color="red" variant="subtle" size="xs" leftSection={<IconTrash size={14} />} loading={deletingIds.has(cid)} onClick={() => setConfirmDelete(c)} aria-label={t('admin_delete_item', 'Delete {{title}}', { title: c.title })}>{t('admin_delete', 'Delete')}</Button>
+                <Button tone="danger" variant="subtle" size="xs" leftSection={<IconTrash size={14} />} loading={deletingIds.has(cid)} onClick={() => setConfirmDelete(c)} aria-label={t('admin_delete_item', 'Delete {{title}}', { title: c.title })}>{t('admin_delete', 'Delete')}</Button>
               </Tooltip>
             </Group>
           </Table.Td>

@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import {
-  ActionIcon,
-  Button,
   Modal,
   Tabs,
   TextInput,
@@ -19,7 +17,7 @@ import {
   useMediaTags,
 } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Badge } from '@/ui';
+import { uiRem, Group, Stack, Text, Badge, ActionIcon, Button } from '@/ui';
 
 interface TaxonomyManagerModalProps {
   opened: boolean;
@@ -85,7 +83,7 @@ function CategoryRow({ cat, depth, parentName, apiClient, onNotify, onMutate }: 
           autoFocus
           aria-label={t('admin_tax_edit_cat_aria', 'Edit category name')}
         />
-        <ActionIcon size="sm" variant="filled" color="green" loading={saving} onClick={() => void handleSave()} aria-label={t('admin_tax_save', 'Save')}>
+        <ActionIcon size="sm" variant="filled" tone="success" loading={saving} onClick={() => void handleSave()} aria-label={t('admin_tax_save', 'Save')}>
           <IconCheck size={14} />
         </ActionIcon>
         <ActionIcon size="sm" variant="subtle" onClick={() => { setValue(cat.name); setEditing(false); }} aria-label={t('admin_tax_cancel', 'Cancel')}>
@@ -108,7 +106,7 @@ function CategoryRow({ cat, depth, parentName, apiClient, onNotify, onMutate }: 
         <ActionIcon size="sm" variant="subtle" onClick={() => setEditing(true)} aria-label={t('admin_tax_rename_name', 'Rename {{name}}', { name: cat.name })}>
           <IconPencil size={14} />
         </ActionIcon>
-        <ActionIcon size="sm" variant="subtle" color="red" loading={deleting} onClick={() => void handleDelete()} aria-label={t('admin_tax_delete_name', 'Delete {{name}}', { name: cat.name })}>
+        <ActionIcon size="sm" variant="subtle" tone="danger" loading={deleting} onClick={() => void handleDelete()} aria-label={t('admin_tax_delete_name', 'Delete {{name}}', { name: cat.name })}>
           <IconTrash size={14} />
         </ActionIcon>
       </Group>
@@ -132,7 +130,7 @@ function TagRow({ tag, onDelete, deleting }: TagRowProps) {
         <Text size="sm">{tag.name}</Text>
         {tag.count > 0 && <Badge tone="default" size="xs" variant="light">{tag.count}</Badge>}
       </Group>
-      <ActionIcon size="sm" variant="subtle" color="red" loading={deleting} onClick={() => void onDelete(String(tag.id))} aria-label={t('admin_tax_delete_name', 'Delete {{name}}', { name: tag.name })}>
+      <ActionIcon size="sm" variant="subtle" tone="danger" loading={deleting} onClick={() => void onDelete(String(tag.id))} aria-label={t('admin_tax_delete_name', 'Delete {{name}}', { name: tag.name })}>
         <IconTrash size={14} />
       </ActionIcon>
     </Group>

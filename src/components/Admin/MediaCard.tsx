@@ -1,12 +1,12 @@
 import { forwardRef, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react';
-import { Image, ActionIcon } from '@mantine/core';
+import { Image } from '@mantine/core';
 import { IconPhoto, IconTrash, IconGripVertical } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
 import { FALLBACK_IMAGE_SRC } from '@/utils/fallback';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import styles from './MediaCard.module.scss';
-import { uiRem, Group, Text, Box, Badge, Card } from '@/ui';
+import { uiRem, Group, Text, Box, Badge, Card, ActionIcon } from '@/ui';
 
 interface MediaCardProps {
   item: MediaItem;
@@ -145,7 +145,7 @@ export const MediaCard = forwardRef<HTMLDivElement, MediaCardProps>(
                   </ActionIcon>
                 )}
                 <ActionIcon variant="subtle" onClick={onEdit} aria-label={t('admin_media_edit_aria', 'Edit')}><IconPhoto size={16} /></ActionIcon>
-                <ActionIcon variant="subtle" color="red" onClick={onDelete} aria-label={t('admin_media_delete_aria', 'Delete media')}><IconTrash size={16} /></ActionIcon>
+                <ActionIcon variant="subtle" tone="danger" onClick={onDelete} aria-label={t('admin_media_delete_aria', 'Delete media')}><IconTrash size={16} /></ActionIcon>
               </Group>
             </Group>
           ) : (
@@ -163,7 +163,7 @@ export const MediaCard = forwardRef<HTMLDivElement, MediaCardProps>(
                 </ActionIcon>
               )}
               <ActionIcon size="sm" variant="subtle" onClick={onEdit} aria-label={t('admin_media_edit_aria', 'Edit')}><IconPhoto size={14} /></ActionIcon>
-              <ActionIcon size="sm" variant="subtle" color="red" onClick={onDelete} aria-label={t('admin_media_delete_aria', 'Delete media')}><IconTrash size={14} /></ActionIcon>
+              <ActionIcon size="sm" variant="subtle" tone="danger" onClick={onDelete} aria-label={t('admin_media_delete_aria', 'Delete media')}><IconTrash size={14} /></ActionIcon>
             </Group>
           )}
         </Card>

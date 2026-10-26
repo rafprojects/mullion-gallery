@@ -1,9 +1,6 @@
 import { useState, useCallback, useRef, useEffect, type RefObject } from 'react';
 import DOMPurify from 'dompurify';
 import {
-  ActionIcon,
-  Button,
-  FileButton,
   Modal,
   Progress,
   Select,
@@ -14,7 +11,7 @@ import { IconUpload, IconX, IconFile, IconVideo } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { OEmbedResponse } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Card, Paper } from '@/ui';
+import { uiRem, Group, Stack, Text, Card, Paper, ActionIcon, Button, FileButton } from '@/ui';
 
 interface MediaAddModalProps {
   opened: boolean;
@@ -205,7 +202,7 @@ export function MediaAddModal({
                     {t('admin_media_queued', '{{count}} file queued', { count: selectedFiles.length })}
                   </Text>
                   {onClearFiles && (
-                    <Button variant="subtle" color="red" size="xs" onClick={onClearFiles} disabled={uploading}>
+                    <Button variant="subtle" tone="danger" size="xs" onClick={onClearFiles} disabled={uploading}>
                       {t('admin_media_clear_all', 'Clear all')}
                     </Button>
                   )}
@@ -244,7 +241,7 @@ export function MediaAddModal({
                           <ActionIcon
                             size="xs"
                             variant="filled"
-                            color="red"
+                            tone="danger"
                             style={{ position: 'absolute', top: 2, right: 2 }}
                             onClick={() => onRemoveFile(index)}
                             disabled={uploading}
@@ -296,7 +293,7 @@ export function MediaAddModal({
                 loading={uploading}
                 disabled={!hasFiles}
                 variant="filled"
-                color="blue"
+                tone="primary"
                 leftSection={<IconUpload size={16} />}
               >
                 {isBatchSelection ? t('admin_media_upload_n', 'Upload {{count}} files', { count: selectedFiles.length }) : t('admin_media_upload', 'Upload')}

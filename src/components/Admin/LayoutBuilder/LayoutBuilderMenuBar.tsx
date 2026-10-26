@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Menu, Button, Divider } from '@mantine/core';
+import { Menu, Divider } from '@mantine/core';
 import {
   IconChevronDown,
   IconDeviceFloppy,
@@ -23,7 +23,7 @@ import {
 } from '@tabler/icons-react';
 import type { DockviewApi } from 'dockview';
 import type { LayoutScope } from '@/hooks/useBuilderWorkspacePrefs';
-import { uiRem, Group } from '@/ui';
+import { uiRem, Group, Button } from '@/ui';
 
 // The four panel ids used in the default layout.
 const SIDE_PANELS = ['layers', 'media', 'properties'] as const;
@@ -89,9 +89,9 @@ function MenuButton({ label, children }: { label: string; children: React.ReactN
       <Menu.Target>
         <Button
           variant="subtle"
-          size="compact-xs"
+          size="xs" compact
           rightSection={<IconChevronDown size={10} />}
-          styles={{ root: { fontWeight: 500, fontSize: 12, letterSpacing: 0 } }}
+          style={{ fontWeight: 500, fontSize: 12, letterSpacing: 0 }}
         >
           {label}
         </Button>
@@ -256,9 +256,9 @@ export function LayoutBuilderMenuBar({
         <Menu.Target>
           <Button
             variant="subtle"
-            size="compact-xs"
+            size="xs" compact
             rightSection={<IconChevronDown size={10} />}
-            styles={{ root: { fontWeight: 500, fontSize: 12, letterSpacing: 0 } }}
+            style={{ fontWeight: 500, fontSize: 12, letterSpacing: 0 }}
           >
             {t('lb_menu_view', 'View')}
           </Button>

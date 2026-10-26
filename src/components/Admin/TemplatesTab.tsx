@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Button,
-  ActionIcon,
   Tooltip,
   Modal,
   TextInput,
@@ -17,6 +15,8 @@ import {
   Title,
   Center,
   Badge,
+  Button,
+  ActionIcon,
 } from '@/ui';
 import { IconTrash, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -199,7 +199,7 @@ function TemplateRow({
         <Tooltip label={t('admin_tmpl_delete_tt', 'Delete template')}>
           <ActionIcon
             variant="subtle"
-            color="red"
+            tone="danger"
             size="sm"
             loading={deletingId === tpl.id}
             onClick={() => onDelete(tpl)}

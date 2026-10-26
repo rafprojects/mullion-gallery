@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Table, Tooltip, ActionIcon } from '@mantine/core';
-import { Stack, Group, Text, Badge } from '@/ui';
+import { Table, Tooltip } from '@mantine/core';
+import { Stack, Group, Text, Badge, ActionIcon } from '@/ui';
 import { modals } from '@mantine/modals';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -152,7 +152,7 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
           </Table.Td>
           <Table.Td>
             <Tooltip label={a.source === 'company' ? t('accessrow_revoke_company_tip', 'Revoke company-wide access') : t('accessrow_revoke_campaign_tip', 'Revoke campaign access')}>
-              <ActionIcon color="red" variant="light" size="lg" onClick={() => openRevokeConfirm(a)} aria-label={t('admin_space_revoke_aria', 'Revoke access')}>
+              <ActionIcon tone="danger" variant="light" size="lg" onClick={() => openRevokeConfirm(a)} aria-label={t('admin_space_revoke_aria', 'Revoke access')}>
                 <IconTrash size={16} />
               </ActionIcon>
             </Tooltip>

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, NumberInput, Switch, Button } from '@mantine/core';
+import { Modal, NumberInput, Switch } from '@mantine/core';
 import { computeGridSlots } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text } from '@/ui';
+import { uiRem, Stack, Group, Text, Button } from '@/ui';
 
 export interface AutoGridDialogProps {
   opened: boolean;

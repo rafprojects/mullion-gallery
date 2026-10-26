@@ -4,11 +4,8 @@ import { ASSET_MIME } from './DesignAssetsGrid';
 import {
   NumberInput,
   SegmentedControl,
-  FileButton,
-  Button,
   Loader,
   Slider,
-  ActionIcon,
   Tooltip,
 } from '@mantine/core';
 import {
@@ -21,7 +18,7 @@ import { DEFAULT_MASK_LAYER } from '@/types';
 import type { AssetLibraryItem } from './BuilderDockContext';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, FileButton, Button, ActionIcon } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -44,7 +41,7 @@ function PropRow({ label, children, tooltip }: { label: string; children: React.
         <Text size="xs" tone="muted" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
         {tooltip && (
           <Tooltip label={tooltip} multiline style={{ width: uiRem(15) }} position="left" withArrow>
-            <ActionIcon size={14} variant="transparent" c="dimmed" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })}>
+            <ActionIcon size={14} variant="transparent" tone="muted" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })}>
               <IconInfoCircle size={12} />
             </ActionIcon>
           </Tooltip>
@@ -303,7 +300,7 @@ export function MaskPropertiesPanel({
           <Button
             size="xs"
             variant="light"
-            color="red"
+            tone="danger"
             onClick={() => setMask({ url: '' })}
           >
             {t('lb_mask_clear_image', 'Clear image')}
@@ -313,7 +310,7 @@ export function MaskPropertiesPanel({
       <Button
         size="xs"
         variant="subtle"
-        color="red"
+        tone="danger"
         fullWidth
         style={{ marginTop: uiRem(0.25) }}
         onClick={() =>

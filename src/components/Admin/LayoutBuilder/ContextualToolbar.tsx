@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActionIcon, Button, TextInput, Tooltip } from '@mantine/core';
-import { Group } from '@/ui';
+import { TextInput, Tooltip } from '@mantine/core';
+import { Group, ActionIcon, Button } from '@/ui';
 import { modals } from '@mantine/modals';
 import {
   IconArrowDown,
@@ -207,7 +207,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="gray"
+              tone="default"
               onClick={handleRenameGroupClick}
               aria-label={t('lb_ctb_rename_group', 'Rename group')}
             >
@@ -218,7 +218,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="gray"
+              tone="default"
               onClick={() => callbacks.onUngroup(selectedGroup.id)}
               aria-label={t('lb_ctb_ungroup', 'Ungroup')}
             >
@@ -230,7 +230,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="gray"
+              tone="default"
               onClick={() => callbacks.onGroupLockToggle(selectedGroup.id, !isGroupLocked)}
               aria-label={isGroupLocked ? t('lb_ctb_unlock_group', 'Unlock group') : t('lb_ctb_lock_group', 'Lock group')}
             >
@@ -241,7 +241,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="gray"
+              tone="default"
               onClick={() => callbacks.onGroupVisibilityToggle(selectedGroup.id, isGroupHidden)}
               aria-label={isGroupHidden ? t('lb_ctb_show_group', 'Show group') : t('lb_ctb_hide_group', 'Hide group')}
             >
@@ -253,7 +253,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="gray"
+              tone="default"
               onClick={() => callbacks.onBringForward(ids)}
               aria-label={t('lb_ctb_bring_fwd', 'Bring forward')}
             >
@@ -264,7 +264,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="gray"
+              tone="default"
               onClick={() => callbacks.onSendBackward(ids)}
               aria-label={t('lb_ctb_send_bwd', 'Send backward')}
             >
@@ -280,7 +280,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="gray"
+              tone="default"
               onClick={callbacks.onCreateGroup}
               aria-label={t('lb_ctb_group_aria', 'Group selected slots')}
             >
@@ -291,7 +291,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="gray"
+              tone="default"
               onClick={callbacks.onDuplicate}
               aria-label={t('lb_ctb_dup_selected', 'Duplicate selected')}
             >
@@ -303,7 +303,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="red"
+              tone="danger"
               onClick={callbacks.onDelete}
               aria-label={t('lb_ctb_del_selected', 'Delete selected')}
             >
@@ -319,7 +319,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="gray"
+              tone="default"
               onClick={callbacks.onDuplicate}
               aria-label={t('lb_ctb_dup_slot', 'Duplicate slot')}
             >
@@ -330,7 +330,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="gray"
+              tone="default"
               onClick={() => callbacks.onBringForward(ids)}
               aria-label={t('lb_ctb_bring_fwd', 'Bring forward')}
             >
@@ -341,7 +341,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="gray"
+              tone="default"
               onClick={() => callbacks.onSendBackward(ids)}
               aria-label={t('lb_ctb_send_bwd', 'Send backward')}
             >
@@ -353,7 +353,7 @@ export function ContextualToolbar({
             <ActionIcon
               size="sm"
               variant="subtle"
-              color="red"
+              tone="danger"
               onClick={callbacks.onDelete}
               aria-label={t('lb_ctb_del_slot', 'Delete slot')}
             >

@@ -341,8 +341,9 @@ describe('controls', () => {
     const click = vi.spyOn(input, 'click');
     fireEvent.click(screen.getByRole('button', { name: 'Upload' }));
     expect(click).toHaveBeenCalledTimes(1);
+    // Mantine's shape (P81-A): one file or null unless `multiple`.
     fireEvent.change(input, { target: { files: [] } });
-    expect(onChange).toHaveBeenCalledWith([]);
+    expect(onChange).toHaveBeenCalledWith(null);
     expect(input.value).toBe('');
   });
 

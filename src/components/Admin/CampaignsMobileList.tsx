@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import {
-  Button,
   Checkbox,
   Loader,
   Menu,
@@ -16,7 +15,7 @@ import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Box, Center, Badge, Card } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, Badge, Card, Button } from '@/ui';
 
 // Returns an i18next key + English default so the caller can translate in render.
 function scheduleLabel(publishAt?: string, unpublishAt?: string): { key: string; text: string; tone: 'info' | 'warning' | 'danger' } | null {
@@ -161,16 +160,16 @@ export function CampaignsMobileList({
                 </Menu.Dropdown>
               </Menu>
               {c.status === 'archived' ? (
-                <Button size="xs" color="teal" leftSection={<IconArchiveOff size={12} />} loading={restoringIds.has(cid)} onClick={() => setConfirmRestore(c)}>
+                <Button size="xs" tone="primary" leftSection={<IconArchiveOff size={12} />} loading={restoringIds.has(cid)} onClick={() => setConfirmRestore(c)}>
                   {t('admin_restore', 'Restore')}
                 </Button>
               ) : (
-                <Button size="xs" color="orange" variant="light" leftSection={<IconArchive size={12} />} loading={archivingIds.has(cid)} onClick={() => setConfirmArchive(c)}>
+                <Button size="xs" tone="warning" variant="light" leftSection={<IconArchive size={12} />} loading={archivingIds.has(cid)} onClick={() => setConfirmArchive(c)}>
                   {t('admin_archive', 'Archive')}
                 </Button>
               )}
               <Tooltip label={t('admin_perm_delete', 'Permanently delete')}>
-                <Button size="xs" color="red" variant="subtle" leftSection={<IconTrash size={12} />} loading={deletingIds.has(cid)} onClick={() => setConfirmDelete(c)} aria-label={t('admin_delete_item', 'Delete {{title}}', { title: c.title })}>
+                <Button size="xs" tone="danger" variant="subtle" leftSection={<IconTrash size={12} />} loading={deletingIds.has(cid)} onClick={() => setConfirmDelete(c)} aria-label={t('admin_delete_item', 'Delete {{title}}', { title: c.title })}>
                   {t('admin_delete', 'Delete')}
                 </Button>
               </Tooltip>

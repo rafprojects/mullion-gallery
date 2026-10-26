@@ -1,5 +1,5 @@
 
-import { Accordion, Button } from '@mantine/core';
+import { Accordion } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { usePersistentAccordion } from '@/hooks/usePersistentAccordion';
 
@@ -8,7 +8,7 @@ import type { GalleryBehaviorSettings } from '@/types';
 import { GalleryAdapterSettingsSection, type UpdateGallerySetting } from './GalleryAdapterSettingsSection';
 import { GalleryLayoutDetailSections } from './GalleryLayoutDetailSections';
 import { GalleryPresentationSections } from './GalleryPresentationSections';
-import { uiRem, Group, Text } from '@/ui';
+import { uiRem, Group, Text, Button } from '@/ui';
 
 interface GalleryLayoutSettingsSectionProps {
   settings: GalleryBehaviorSettings;

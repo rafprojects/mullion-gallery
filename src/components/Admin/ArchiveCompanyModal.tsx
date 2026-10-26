@@ -55,7 +55,7 @@ export function ArchiveCompanyModal({
         </Text>
       }
       confirmLabel={t('admin_archco_confirm', 'Archive {{count}} Campaign', { count: activeCount })}
-      confirmColor="red"
+      confirmTone="danger"
       confirmAriaLabel={t('admin_archco_confirm_aria', 'Archive {{count}} campaign for {{name}}', { count: activeCount, name: company?.name ?? t('admin_archco_company', 'company') })}
       loading={accessSaving}
     >

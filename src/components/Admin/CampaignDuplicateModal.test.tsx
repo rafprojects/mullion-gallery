@@ -107,6 +107,6 @@ describe('CampaignDuplicateModal', () => {
   it('shows loading state on Duplicate button while saving', () => {
     render(<CampaignDuplicateModal {...defaults} isSaving={true} />);
     const btn = screen.getByRole('button', { name: /duplicate/i });
-    expect(btn).toHaveAttribute('data-loading', 'true');
+    expect(btn).toHaveAttribute('data-loading');
   });
 });

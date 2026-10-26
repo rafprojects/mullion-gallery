@@ -34,7 +34,7 @@ export function MediaDeleteModal({
       title={t('admin_media_del_title', 'Remove from Campaign')}
       message={baseMessage + usageWarning}
       confirmLabel={t('admin_media_remove', 'Remove')}
-      confirmColor="red"
+      confirmTone="danger"
       confirmAriaLabel={t('admin_media_remove_aria', 'Remove media {{label}}', { label: deleteItem?.caption || deleteItem?.url || '' }).trim()}
     />
   );
