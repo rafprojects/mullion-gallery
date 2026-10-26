@@ -1,12 +1,13 @@
-import { Badge, Table } from '@mantine/core';
-import { Text } from '@/ui';
+
+import { Table } from '@mantine/core';
+import { Text, Badge } from '@/ui';
 import type { AuditEntry } from '@/services/adminQuery';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 
-const SEVERITY_COLORS = {
-  info: 'blue',
-  warning: 'orange',
-  error: 'red',
+const SEVERITY_TONES = {
+  info: 'info',
+  warning: 'warning',
+  error: 'danger',
 } as const;
 
 interface AuditEventRowProps {
@@ -18,7 +19,7 @@ export function AuditEventRow({ entry, showCampaignCol = false }: AuditEventRowP
   const summary = entry.summary || entry.action;
   const resource = entry.resourceLabel || entry.resourceType || '';
   const actor = entry.actorLogin || (entry.userId ? String(entry.userId) : '—');
-  const severityColor = SEVERITY_COLORS[entry.severity ?? 'info'] ?? 'blue';
+  const severityTone = SEVERITY_TONES[entry.severity ?? 'info'] ?? 'info';
 
   return (
     <Table.Tr>
@@ -28,7 +29,7 @@ export function AuditEventRow({ entry, showCampaignCol = false }: AuditEventRowP
         {resource && <Text size="xs" tone="muted">{resource}</Text>}
       </Table.Td>
       <Table.Td>
-        <Badge color={severityColor} variant="light" size="xs">
+        <Badge tone={severityTone} variant="light" size="xs">
           {entry.severity ?? 'info'}
         </Badge>
       </Table.Td>

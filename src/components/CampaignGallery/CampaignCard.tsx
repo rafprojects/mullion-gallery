@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { IconLock, IconEye } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Card, Image, Badge, UnstyledButton } from '@mantine/core';
+import { Card, Image, UnstyledButton } from '@mantine/core';
 import type { Campaign, GalleryBehaviorSettings } from '@/types';
 import { DEFAULT_GALLERY_BEHAVIOR_SETTINGS } from '@/types';
 import type { ApiClient } from '@/services/apiClient';
@@ -11,7 +11,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { RequestAccessForm } from './RequestAccessForm';
 import { CompanyLogo } from '@/components/Common/CompanyLogo';
 import styles from './CampaignCard.module.scss';
-import { uiRem, Group, Stack, Text, Box } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Badge } from '@/ui';
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -163,10 +163,9 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
 
             {/* Access indicator badge */}
             {hasAccess && settings?.showCardAccessBadge !== false && (
-              <Badge
+              <Badge tone="success" variant="filled" size="md"
                 style={{ position: 'absolute', top: uiRem(badgeOffsetY / 16), right: uiRem(0.75) }}
-                color="green"
-                leftSection={<IconEye size={accessIconSize} />}
+                icon={<IconEye size={accessIconSize} />}
               >
                 {t('campcard_access', 'Access')}
               </Badge>
@@ -174,8 +173,8 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
 
             {/* Company badge */}
             {settings?.showCardCompanyName !== false && (
-              <Badge
-                style={{ position: 'absolute', top: uiRem(badgeOffsetY / 16), left: uiRem(0.75), maxWidth: uiRem(companyBadgeMaxWidth / 16), backgroundColor: campaign.company.brandColor, overflow: 'hidden', textOverflow: 'ellipsis' }}
+              <Badge tone="default" variant="filled" size="md"
+                style={{ position: 'absolute', top: uiRem(badgeOffsetY / 16), left: uiRem(0.75), maxWidth: uiRem(companyBadgeMaxWidth / 16), backgroundColor: campaign.company.brandColor, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis' }}
               >
                 <Group gap="2xs">
                   <CompanyLogo logo={campaign.company.logo} companyName={campaign.company.name} />
@@ -204,7 +203,7 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
                 {/* Tags */}
                 <Group gap="2xs">
                   {campaign.tags.map((tag) => (
-                    <Badge key={tag} variant="light" size="sm">
+                    <Badge tone="default" key={tag} variant="light" size="sm">
                       #{tag}
                     </Badge>
                   ))}

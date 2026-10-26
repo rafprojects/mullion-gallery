@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   Button,
-  Badge,
   ActionIcon,
   Tooltip,
   Modal,
@@ -17,6 +16,7 @@ import {
   Text,
   Title,
   Center,
+  Badge,
 } from '@/ui';
 import { IconTrash, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -189,7 +189,7 @@ function TemplateRow({
       <Stack gap="4xs" style={{ flex: 1, minWidth: 0 }}>
         <Group gap="xs" wrap="nowrap">
           <Text size="sm" weight={500} truncate>{tpl.name}</Text>
-          <Badge size="xs" variant="light" color={tpl.source === 'builtin' ? 'blue' : 'gray'}>
+          <Badge size="xs" variant="light" tone="default">
             {tpl.source === 'builtin' ? t('admin_tmpl_builtin', 'Built-in') : t('admin_tmpl_custom', 'Custom')}
           </Badge>
         </Group>

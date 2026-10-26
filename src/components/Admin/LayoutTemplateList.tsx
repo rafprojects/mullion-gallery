@@ -11,7 +11,6 @@ import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   ActionIcon,
-  Badge,
   Button,
   Card,
   FileButton,
@@ -62,7 +61,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useBuilderDeepLink } from '@mullion/shared-utils';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group, Stack, Text, Box, Center } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, Badge } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -491,7 +490,7 @@ export function LayoutTemplateList({ apiClient, onNotify, initialTemplateId, spa
                     <Text size="sm" weight={500}>{t.name}</Text>
                   </Table.Td>
                   <Table.Td>
-                    <Badge size="sm" variant="light">{tr('admin_lt_n_slots', '{{count}} slot', { count: t.slots.length })}</Badge>
+                    <Badge tone="default" size="sm" variant="light">{tr('admin_lt_n_slots', '{{count}} slot', { count: t.slots.length })}</Badge>
                   </Table.Td>
                   <Table.Td>
                     <Text size="sm">{aspectLabel(t.canvasAspectRatio)}</Text>
@@ -502,7 +501,7 @@ export function LayoutTemplateList({ apiClient, onNotify, initialTemplateId, spa
                   <Table.Td>
                     <Group gap="3xs">
                       {t.tags.slice(0, 3).map((tag) => (
-                        <Badge key={tag} size="xs" variant="outline">{tag}</Badge>
+                        <Badge tone="default" key={tag} size="xs" variant="outline">{tag}</Badge>
                       ))}
                     </Group>
                   </Table.Td>
@@ -648,10 +647,9 @@ function TemplateGridCard({ template, onEdit, onDuplicate, onDelete, onExport }:
               }}
             />
           ))}
-          <Badge
+          <Badge tone="default"
             size="xs"
             variant="filled"
-            color="dark"
             style={{ position: 'absolute', bottom: 4, right: 4 }}
           >
             {aspectLabel(t.canvasAspectRatio)}

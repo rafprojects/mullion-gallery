@@ -3,7 +3,6 @@ import { useMediaQuery } from '@mantine/hooks';
 import { useStore } from 'zustand';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-  Badge,
   Button,
   Drawer,
   Loader,
@@ -34,7 +33,7 @@ import {
   type SettingsData,
   type SettingsDataInput,
 } from '@/contexts/SettingsStore';
-import { uiLayer, Group, Stack, Text, Title, Box, Center } from '@/ui';
+import { uiLayer, Group, Stack, Text, Title, Box, Center, Badge } from '@/ui';
 import { SettingTooltip } from './SettingTooltip';
 import type { CustomFontEntry } from '../Common/TypographyEditor';
 import type { UpdateGallerySetting } from '../Settings/GalleryAdapterSettingsSection';
@@ -377,12 +376,6 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
   const colorHex = (color && shadowHost)
     ? (getComputedStyle(shadowHost).getPropertyValue(`--mantine-color-${color}-5`).trim() || undefined)
     : color ? `var(--mantine-color-${color}-5)` : undefined;
-  const badgeBg = (color && shadowHost)
-    ? (getComputedStyle(shadowHost).getPropertyValue(`--mantine-color-${color}-light`).trim() || undefined)
-    : undefined;
-  const badgeText = (color && shadowHost)
-    ? (getComputedStyle(shadowHost).getPropertyValue(`--mantine-color-${color}-light-color`).trim() || undefined)
-    : undefined;
   const { setPreviewTheme, setTheme, themeId } = useTheme();
   const rootId = useRootId();
   const queryClient = useQueryClient();
@@ -613,9 +606,8 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
             {spaceId != null && (
               <Badge
                 size="sm"
-                color={color ?? 'blue'}
+                tone="default"
                 variant="light"
-                {...(badgeBg ? { style: { backgroundColor: badgeBg, color: badgeText } } : {})}
               >
                 {spaceName ?? t('set_space_fallback', 'Space {{id}}', { id: spaceId })}
               </Badge>

@@ -59,6 +59,39 @@ const alertColour = (attr) => {
 };
 
 /**
+ * Badges by what they are (designer, 2026-10-26): a state takes its role tone
+ * and glyph, a count that annotates a control takes `primary`, an urgent count
+ * is a state, and everything else (categories, roles, names, tags, counts) is
+ * the neutral badge. Matched by file and by text inside the element, since a
+ * badge's meaning is not in its props.
+ */
+const BADGE_TONES = [
+  ['AnalyticsDashboard.tsx', 'admin_analytics_offline', 'danger'],
+  ['KeyboardShortcutsModal.tsx', "'admin_ksc_custom'", 'info'],
+  ['KeyboardShortcutsModal.tsx', "'admin_ksc_customized'", 'info'],
+  ['PendingRequestsPanel.tsx', 'admin_req_n_pending', 'warning'],
+  ['CampaignCard.tsx', 'campcard_access', 'success'],
+  ['NearDuplicateWarning.tsx', 'ndw_identical', 'warning'],
+  ['TypographyEditor.tsx', 'typo_font_failed', 'warning'],
+  ['AdvancedSettingsSection.tsx', 'set_adv_cache_active', 'success'],
+  ['AdminPanel.tsx', 'activeFilterCount', 'primary'],
+  ['useCampaignsRows.tsx', 'pendingRequestCount', 'warning'],
+];
+
+function badgeElement(open, file, elementText) {
+  const attr = (name) => open.attributes.properties.find((a) => ts.isJsxAttribute(a) && a.name.getText() === name);
+  const colour = attr('color');
+  const colourExpr = colour?.initializer && ts.isJsxExpression(colour.initializer) && !ts.isStringLiteral(colour.initializer.expression);
+  if (colourExpr) return { blocked: 'colour is an expression; classify by hand' };
+  const hit = BADGE_TONES.find(([f, text]) => file.endsWith(f) && elementText.includes(text));
+  const inserts = [`tone="${hit ? hit[2] : 'default'}"`];
+  // Mantine's defaults, spelled out so the flip keeps each badge's shape.
+  if (!attr('variant')) inserts.push('variant="filled"');
+  if (!attr('size')) inserts.push('size="md"');
+  return { inserts, review: hit ? `${hit[2]}` : null };
+}
+
+/**
  * Mantine style props pass 1 left for pass 2. Any still on a flipped element
  * after its rules ran would reach the DOM as a stray attribute, so it is
  * reported rather than left (P81-A).
@@ -110,6 +143,16 @@ const RULES = {
       fs: (attr) => (literal(attr) === 'italic' ? { replace: 'italic' } : { blocked: 'font style other than italic' }),
       ff: (attr) => (literal(attr) === 'monospace' ? { replace: 'font="mono"' } : { blocked: 'font family other than monospace' }),
       truncate: (attr) => (literal(attr) === 'end' ? { replace: 'truncate' } : null),
+    },
+  },
+  Badge: {
+    rename: { leftSection: 'icon' },
+    unsupported: ['rightSection', 'circle', 'gradient', 'autoContrast', 'fullWidth', 'classNames', 'styles', 'unstyled'],
+    element: badgeElement,
+    props: {
+      // The element hook sets the tone; the Mantine colour goes.
+      color: () => ({ replace: '' }),
+      variant: (attr) => (literal(attr) === 'dot' ? { replace: 'variant="outline"' } : null),
     },
   },
   Container: { rename: PADDING, unsupported: ['strategy', 'mod', 'classNames', 'styles', 'unstyled'] },
@@ -236,6 +279,19 @@ for (const file of [...walk('src'), ...walk('packages')]) {
     if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) && local.has(node.tagName.getText())) {
       const comp = local.get(node.tagName.getText());
       const rule = RULES[comp];
+      if (rule.element) {
+        const element = ts.isJsxOpeningElement(node) ? node.parent : node;
+        const outcome = rule.element(node, file, element.getText());
+        const where = `${file}:${line(node)}  ${comp}`;
+        if (outcome.blocked) {
+          report.blocked.push(`${where}  (${outcome.blocked})`);
+          ts.forEachChild(node, visit);
+          return;
+        }
+        const at = node.tagName.getEnd();
+        edits.push([at, at, ` ${outcome.inserts.join(' ')}`]);
+        if (outcome.review) report.review.push(`${where}  tone ${outcome.review}`);
+      }
       for (const attr of node.attributes.properties) {
         if (!ts.isJsxAttribute(attr)) continue;
         const name = attr.name.getText();
@@ -280,7 +336,10 @@ for (const file of [...walk('src'), ...walk('packages')]) {
   report.files.add(file);
   report.edits += edits.length;
   if (write) {
-    edits.sort((a, b) => b[0] - a[0]);
+    // From the end, so earlier offsets stay valid. At one offset the wider edit
+    // goes first: an insertion applied before a deletion that starts at the same
+    // place had its text eaten by the deletion.
+    edits.sort((a, b) => b[0] - a[0] || b[1] - a[1]);
     let out = text;
     for (const [start, end, replacement] of edits) out = out.slice(0, start) + replacement + out.slice(end);
     fs.writeFileSync(file, out);

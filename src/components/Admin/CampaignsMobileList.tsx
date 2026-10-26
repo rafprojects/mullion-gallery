@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import {
-  Badge,
   Button,
   Card,
   Checkbox,
@@ -18,16 +17,16 @@ import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Box, Center } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, Badge } from '@/ui';
 
 // Returns an i18next key + English default so the caller can translate in render.
-function scheduleLabel(publishAt?: string, unpublishAt?: string): { key: string; text: string; color: string } | null {
+function scheduleLabel(publishAt?: string, unpublishAt?: string): { key: string; text: string; tone: 'info' | 'warning' | 'danger' } | null {
   const now = Date.now();
-  if (publishAt && new Date(publishAt).getTime() > now) return { key: 'admin_sched_scheduled', text: 'Scheduled', color: 'blue' };
+  if (publishAt && new Date(publishAt).getTime() > now) return { key: 'admin_sched_scheduled', text: 'Scheduled', tone: 'info' };
   if (unpublishAt) {
     const end = new Date(unpublishAt).getTime();
-    if (end <= now) return { key: 'admin_sched_expired', text: 'Expired', color: 'red' };
-    if (end - now < 86_400_000) return { key: 'admin_sched_expiring', text: 'Expiring soon', color: 'orange' };
+    if (end <= now) return { key: 'admin_sched_expired', text: 'Expired', tone: 'danger' };
+    if (end - now < 86_400_000) return { key: 'admin_sched_expiring', text: 'Expiring soon', tone: 'warning' };
   }
   return null;
 }
@@ -117,15 +116,15 @@ export function CampaignsMobileList({
 
             {/* Badges */}
             <Group gap="3xs" wrap="wrap">
-              <Badge size="xs" color={c.status === 'active' ? 'teal' : c.status === 'archived' ? 'gray' : 'yellow'}>
+              <Badge size="xs" variant="filled" tone={c.status === 'active' ? 'success' : c.status === 'archived' ? 'default' : 'warning'}>
                 {c.status}
               </Badge>
-              <Badge size="xs" variant="light">{c.visibility}</Badge>
-              {sched && <Badge size="xs" variant="light" color={sched.color}>{t(sched.key, sched.text)}</Badge>}
-              {c.companyId && <Badge size="xs" variant="dot" color="gray">{c.companyId}</Badge>}
+              <Badge tone="default" size="xs" variant="light">{c.visibility}</Badge>
+              {sched && <Badge size="xs" variant="light" tone={sched.tone}>{t(sched.key, sched.text)}</Badge>}
+              {c.companyId && <Badge tone="default" size="xs" variant="outline">{c.companyId}</Badge>}
               {summary !== undefined && (
                 <Tooltip label={t('admin_grant_count', '{{count}} grant', { count: summary.grantCount })} withArrow>
-                  <Badge size="xs" variant="light" color="blue">{t('admin_grants_badge', '{{count}} grants', { count: summary.grantCount })}</Badge>
+                  <Badge tone="default" size="xs" variant="light">{t('admin_grants_badge', '{{count}} grants', { count: summary.grantCount })}</Badge>
                 </Tooltip>
               )}
             </Group>

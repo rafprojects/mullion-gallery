@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   ActionIcon,
-  Badge,
   Button,
   Modal,
   Tabs,
@@ -20,7 +19,7 @@ import {
   useMediaTags,
 } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text } from '@/ui';
+import { uiRem, Group, Stack, Text, Badge } from '@/ui';
 
 interface TaxonomyManagerModalProps {
   opened: boolean;
@@ -102,8 +101,8 @@ function CategoryRow({ cat, depth, parentName, apiClient, onNotify, onMutate }: 
         {/* eslint-disable-next-line i18next/no-literal-string -- tree-indent glyph, not translatable text */}
         {depth > 0 && <Text size="xs" tone="muted">↳</Text>}
         <Text size="sm">{cat.name}</Text>
-        {parentName && <Badge size="xs" variant="light" color="gray">{parentName}</Badge>}
-        {cat.count > 0 && <Badge size="xs" variant="light">{cat.count}</Badge>}
+        {parentName && <Badge tone="default" size="xs" variant="light">{parentName}</Badge>}
+        {cat.count > 0 && <Badge tone="default" size="xs" variant="light">{cat.count}</Badge>}
       </Group>
       <Group gap="3xs">
         <ActionIcon size="sm" variant="subtle" onClick={() => setEditing(true)} aria-label={t('admin_tax_rename_name', 'Rename {{name}}', { name: cat.name })}>
@@ -131,7 +130,7 @@ function TagRow({ tag, onDelete, deleting }: TagRowProps) {
     <Group gap="xs" justify="space-between">
       <Group gap="xs">
         <Text size="sm">{tag.name}</Text>
-        {tag.count > 0 && <Badge size="xs" variant="light">{tag.count}</Badge>}
+        {tag.count > 0 && <Badge tone="default" size="xs" variant="light">{tag.count}</Badge>}
       </Group>
       <ActionIcon size="sm" variant="subtle" color="red" loading={deleting} onClick={() => void onDelete(String(tag.id))} aria-label={t('admin_tax_delete_name', 'Delete {{name}}', { name: tag.name })}>
         <IconTrash size={14} />

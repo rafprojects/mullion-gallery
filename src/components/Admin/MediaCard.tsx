@@ -1,12 +1,12 @@
 import { forwardRef, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react';
-import { Card, Image, ActionIcon, Badge } from '@mantine/core';
+import { Card, Image, ActionIcon } from '@mantine/core';
 import { IconPhoto, IconTrash, IconGripVertical } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
 import { FALLBACK_IMAGE_SRC } from '@/utils/fallback';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import styles from './MediaCard.module.scss';
-import { uiRem, Group, Text, Box } from '@/ui';
+import { uiRem, Group, Text, Box, Badge } from '@/ui';
 
 interface MediaCardProps {
   item: MediaItem;
@@ -41,8 +41,6 @@ export const MediaCard = forwardRef<HTMLDivElement, MediaCardProps>(
     const isClickableImage = item.type === 'image' && onImageClick;
     const mediaTypeLabel = item.type === 'video' ? t('admin_media_type_video', 'Video') : t('admin_media_type_image', 'Image');
     const sourceLabel = item.source === 'external' ? t('admin_media_source_external', 'External') : t('admin_media_source_upload', 'Upload');
-    const mediaTypeColor = item.type === 'video' ? 'violet' : 'blue';
-    const sourceColor = item.source === 'external' ? 'grape' : 'teal';
 
     return (
       <div
@@ -97,8 +95,8 @@ export const MediaCard = forwardRef<HTMLDivElement, MediaCardProps>(
                 }}
               >
                 <Group gap="3xs" wrap="nowrap" align="center" style={{ pointerEvents: 'none' }}>
-                  <Badge size="xs" variant="filled" color={mediaTypeColor}>{mediaTypeLabel}</Badge>
-                  <Badge size="xs" variant="light" color={sourceColor}>{sourceLabel}</Badge>
+                  <Badge size="xs" variant="filled" tone="default">{mediaTypeLabel}</Badge>
+                  <Badge size="xs" variant="light" tone="default">{sourceLabel}</Badge>
                 </Group>
               </Box>
               {overlayBadge && (

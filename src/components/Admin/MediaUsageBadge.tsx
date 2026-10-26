@@ -6,8 +6,8 @@
  * campaign names. A count of 0 is highlighted in red (orphaned media).
  */
 import { useState } from 'react';
-import { Badge, Popover, Anchor, Loader } from '@mantine/core';
-import { Stack, Text, Alert } from '@/ui';
+import { Popover, Anchor, Loader } from '@mantine/core';
+import { Stack, Text, Alert, Badge } from '@/ui';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
@@ -107,7 +107,8 @@ export function MediaUsageBadge({ count, mediaId, apiClient, size = 'sm' }: Medi
     }
   }
 
-  const color = count === 0 ? 'red' : 'blue';
+  // Unused is a state; a count of campaigns is information (designer, 2026-10-26).
+  const tone = count === 0 ? 'danger' : 'default';
   const label = count === 0 ? t('admin_usage_unused', 'Unused') : t('admin_usage_count', '{{count}} campaign', { count });
 
   return (
@@ -123,7 +124,7 @@ export function MediaUsageBadge({ count, mediaId, apiClient, size = 'sm' }: Medi
       <Popover.Target>
         <Badge
           {...getMullionDebugProps('MediaUsageBadge', 'badge')}
-          color={color}
+          tone={tone}
           variant="light"
           size={size}
           style={{ cursor: 'pointer', pointerEvents: 'auto' }}

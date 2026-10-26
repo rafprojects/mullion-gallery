@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import {
   Tabs,
-  Badge,
   Button,
   TextInput,
   Switch,
@@ -25,7 +24,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { SpaceAssetLibrary } from './SpaceAssetLibrary';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import type { FontLibraryEntry } from '@mullion/shared-utils';
-import { uiRem, Stack, Group, Text, Alert, Center } from '@/ui';
+import { uiRem, Stack, Group, Text, Alert, Center, Badge } from '@/ui';
 
 interface SpaceGrant {
   userId: number;
@@ -333,12 +332,12 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                     <Table.Td>
                       <Group gap="xs">
                         <Text size="sm">{space.name}</Text>
-                        {space.isDefault && <Badge size="xs" variant="light">{t('admin_space_default', 'default')}</Badge>}
+                        {space.isDefault && <Badge tone="default" size="xs" variant="light">{t('admin_space_default', 'default')}</Badge>}
                       </Group>
                     </Table.Td>
                     <Table.Td><Text size="sm" tone="muted">{space.slug}</Text></Table.Td>
                     <Table.Td>
-                      <Badge size="xs" color={space.isolationMode === 'delegated' ? 'orange' : 'gray'} variant="outline">
+                      <Badge size="xs" tone="default" variant="outline">
                         {t(`admin_space_mode_${space.isolationMode}`, space.isolationMode)}
                       </Badge>
                     </Table.Td>
@@ -472,7 +471,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                         >
                           <Badge
                             variant="light"
-                            color={(grant.access_level ?? 'viewer') === 'viewer' ? 'gray' : 'yellow'}
+                            size="md" tone="default"
                             aria-label={t('admin_space_role_for', 'Role for {{name}}', { name: grant.user?.displayName ?? t('admin_space_user_lc', 'user {{id}}', { id: grant.userId }) })}
                           >
                             {spaceRoleLabel(grant.access_level ?? 'viewer')}

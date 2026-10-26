@@ -1,6 +1,6 @@
 
-import { Button, Image, Modal, Badge } from '@mantine/core';
-import { Group, Stack, Text } from '@/ui';
+import { Button, Image, Modal } from '@mantine/core';
+import { Group, Stack, Text, Badge } from '@/ui';
 import { Trans, useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import type { UploadDuplicateCampaign } from '@/types';
@@ -91,10 +91,9 @@ export function NearDuplicateWarning({
               >
                 {formatCampaignLine(campaigns)}
               </Text>
-              <Badge
+              <Badge tone="warning"
                 {...getMullionDebugProps('NearDuplicateWarning', 'distance-badge')}
                 variant="light"
-                color="orange"
                 size="sm"
               >
                 {distance === 0 ? t('ndw_identical', 'Identical content') : t('ndw_bits_diff', '{{count}}/64 bits different', { count: distance })}

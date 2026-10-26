@@ -1,5 +1,5 @@
 import { type CSSProperties, type KeyboardEventHandler } from 'react';
-import { Image, Badge, Table, ActionIcon, Skeleton } from '@mantine/core';
+import { Image, Table, ActionIcon, Skeleton } from '@mantine/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { IconGripVertical, IconPhoto, IconTrash } from '@tabler/icons-react';
@@ -9,7 +9,7 @@ import { MediaUsageBadge } from './MediaUsageBadge';
 import { FALLBACK_IMAGE_SRC } from '@/utils/fallback';
 import type { ApiClient } from '@/services/apiClient';
 import type { MediaItem } from '@/types';
-import { uiRem, Group, Text, Grid, Box } from '@/ui';
+import { uiRem, Group, Text, Grid, Box, Badge } from '@/ui';
 
 export type SharedSortableProps = {
   item: MediaItem;
@@ -50,8 +50,6 @@ export function SortableListRow({
   };
   const mediaTypeLabel = item.type === 'video' ? t('admin_media_type_video', 'Video') : t('admin_media_type_image', 'Image');
   const sourceLabel = item.source === 'external' ? t('admin_media_source_external', 'External') : t('admin_media_source_upload', 'Upload');
-  const mediaTypeColor = item.type === 'video' ? 'violet' : 'blue';
-  const sourceColor = item.source === 'external' ? 'grape' : 'teal';
 
   return (
     <Table.Tr ref={setNodeRef} data-testid={`media-draggable-${item.id}`} style={rowStyle}>
@@ -86,8 +84,8 @@ export function SortableListRow({
       <Table.Td>
         <Text size="sm" lineClamp={1}>{item.caption || '—'}</Text>
         <Group gap="3xs" style={{ marginTop: uiRem(0.25) }}>
-          <Badge size="xs" variant="filled" color={mediaTypeColor}>{mediaTypeLabel}</Badge>
-          <Badge size="xs" variant="light" color={sourceColor}>{sourceLabel}</Badge>
+          <Badge size="xs" variant="filled" tone="default">{mediaTypeLabel}</Badge>
+          <Badge size="xs" variant="light" tone="default">{sourceLabel}</Badge>
         </Group>
         <Text size="xs" tone="muted" lineClamp={1}>{item.url}</Text>
       </Table.Td>

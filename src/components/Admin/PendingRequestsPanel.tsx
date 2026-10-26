@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Badge,
   Button,
   Loader,
   Table,
@@ -12,6 +11,7 @@ import {
   Title,
   Alert,
   Box,
+  Badge,
 } from '@/ui';
 import { IconAlertCircle, IconCheck, IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -83,7 +83,7 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
           {t('admin_req_title', 'Access Requests')}
         </Title>
         {pendingRequests.length > 0 && (
-          <Badge color="orange" variant="filled" size="sm">
+          <Badge tone="warning" variant="filled" size="sm">
             {t('admin_req_n_pending', '{{count}} pending', { count: pendingRequests.length })}
           </Badge>
         )}
@@ -187,7 +187,7 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
                       </Table.Td>
                       <Table.Td>
                         <Badge
-                          color={req.status === 'approved' ? 'green' : 'red'}
+                          tone={req.status === 'approved' ? 'success' : 'danger'}
                           variant="light"
                           size="sm"
                         >

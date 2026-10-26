@@ -1,10 +1,10 @@
 
-import { Modal, Card, Badge } from '@mantine/core';
+import { Modal, Card } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { IconLayoutDashboard } from '@tabler/icons-react';
 import { LAYOUT_PRESETS, type LayoutPreset } from '@/data/layoutPresets';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Text, SimpleGrid, Box } from '@/ui';
+import { uiRem, Group, Text, SimpleGrid, Box, Badge } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -116,11 +116,11 @@ export function PresetGalleryModal({
               {preset.description}
             </Text>
             <Group gap="3xs" style={{ marginTop: uiRem(0.25) }} justify="center">
-              <Badge size="xs" variant="light">
+              <Badge tone="default" size="xs" variant="light">
                 {t('lb_preset_n_slots', '{{count}} slots', { count: preset.slots.length })}
               </Badge>
               {preset.tags.slice(0, 2).map((tag) => (
-                <Badge key={tag} size="xs" variant="outline">
+                <Badge tone="default" key={tag} size="xs" variant="outline">
                   {tag}
                 </Badge>
               ))}

@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
-import { Modal, Table, Badge, Button, ActionIcon, Tooltip, TextInput } from '@mantine/core';
+import { Modal, Table, Button, ActionIcon, Tooltip, TextInput } from '@mantine/core';
 import { IconEdit, IconCheck, IconX, IconRotateClockwise } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { ACTION_IDS, ACTION_DEFAULTS, type ShortcutActionId, type ShortcutConfigHandle } from '@/hooks/useShortcutConfig';
-import { uiRem, Stack, Group, Text } from '@/ui';
+import { uiRem, Stack, Group, Text, Badge } from '@/ui';
 
 // ── Key display helpers ───────────────────────────────────────────────────────
 
@@ -151,7 +151,7 @@ function EditRow({ id, currentKey, defaultKey, config }: EditRowProps) {
           <Group gap="2xs" wrap="nowrap">
             <Keys keys={formatKeyParts(currentKey)} />
             {isCustomized && (
-              <Badge size="xs" variant="dot" color="blue">{t('admin_ksc_custom', 'custom')}</Badge>
+              <Badge tone="info" size="xs" variant="outline">{t('admin_ksc_custom', 'custom')}</Badge>
             )}
           </Group>
         )}
@@ -233,7 +233,7 @@ export function KeyboardShortcutsModal({ opened, onClose, config }: KeyboardShor
         {/* Navigation section — static entries */}
         <Stack gap="xs">
           <Group gap="xs" align="center">
-            <Badge variant="light" size="sm">{t('admin_ksc_navigation', 'Navigation')}</Badge>
+            <Badge tone="default" variant="light" size="sm">{t('admin_ksc_navigation', 'Navigation')}</Badge>
           </Group>
           <Table striped withTableBorder style={{ fontSize: 'var(--mullion-font-size-sm, var(--mantine-font-size-sm))' }}>
             <Table.Tbody>
@@ -256,9 +256,9 @@ export function KeyboardShortcutsModal({ opened, onClose, config }: KeyboardShor
         {/* Campaigns section — configurable */}
         <Stack gap="xs">
           <Group gap="xs" align="center">
-            <Badge variant="light" size="sm">{t('admin_ksc_campaigns', 'Campaigns')}</Badge>
+            <Badge tone="default" variant="light" size="sm">{t('admin_ksc_campaigns', 'Campaigns')}</Badge>
             {config?.hasCustomizations && !editMode && (
-              <Badge size="xs" variant="dot" color="blue">{t('admin_ksc_customized', 'customized')}</Badge>
+              <Badge tone="info" size="xs" variant="outline">{t('admin_ksc_customized', 'customized')}</Badge>
             )}
           </Group>
           {editMode && config ? (

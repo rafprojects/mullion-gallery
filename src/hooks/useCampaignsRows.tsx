@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, Badge, Tooltip, Button, Checkbox, Select, Menu } from '@mantine/core';
+import { Table, Tooltip, Button, Checkbox, Select, Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconEdit, IconCopy, IconDownload, IconFileZip, IconArchive, IconArchiveOff, IconLayoutGrid, IconTrash, IconChevronDown, IconArrowsExchange, IconPhotoPlus } from '@tabler/icons-react';
 import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
@@ -10,7 +10,7 @@ import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { CompanyCombobox } from '@/components/Common/CompanyCombobox';
 import type { ApiClient } from '@/services/apiClient';
-import { uiRem, Group, Text, Box } from '@/ui';
+import { uiRem, Group, Text, Box, Badge } from '@/ui';
 
 function toSlug(name: string): string {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -68,13 +68,13 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
       // clock isn't needed here, so this doesn't need an effect/interval to be "pure".
       // eslint-disable-next-line react-hooks/purity
       const now = Date.now();
-      let sched: { text: string; color: string } | null = null;
+      let sched: { text: string; tone: 'info' | 'warning' | 'danger' } | null = null;
       if (c.publishAt && new Date(c.publishAt).getTime() > now) {
-        sched = { text: t('admin_sched_scheduled', 'Scheduled'), color: 'blue' };
+        sched = { text: t('admin_sched_scheduled', 'Scheduled'), tone: 'info' };
       } else if (c.unpublishAt) {
         const end = new Date(c.unpublishAt).getTime();
-        if (end <= now) sched = { text: t('admin_sched_expired', 'Expired'), color: 'red' };
-        else if (end - now < 86_400_000) sched = { text: t('admin_sched_expiring', 'Expiring soon'), color: 'orange' };
+        if (end <= now) sched = { text: t('admin_sched_expired', 'Expired'), tone: 'danger' };
+        else if (end - now < 86_400_000) sched = { text: t('admin_sched_expiring', 'Expiring soon'), tone: 'warning' };
       }
 
       return (
@@ -126,7 +126,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                 withCheckIcon={false}
                 aria-label={t('admin_camprow_status_aria', 'Status for {{title}}', { title: c.title })}
               />
-              {sched && <Badge variant="light" color={sched.color} size="xs">{sched.text}</Badge>}
+              {sched && <Badge variant="light" tone={sched.tone} size="xs">{sched.text}</Badge>}
             </Group>
           </Table.Td>
           <Table.Td>
@@ -170,11 +170,11 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
             {summary !== undefined ? (
               <Group gap="3xs" wrap="nowrap">
                 <Tooltip label={t('admin_camprow_grants_tt', '{{count}} active grant', { count: summary.grantCount })} withArrow>
-                  <Badge variant="light" color="blue" size="sm">{summary.grantCount}</Badge>
+                  <Badge tone="default" variant="light" size="sm">{summary.grantCount}</Badge>
                 </Tooltip>
                 {summary.pendingRequestCount > 0 && (
                   <Tooltip label={t('admin_camprow_pending_tt', '{{count}} pending request', { count: summary.pendingRequestCount })} withArrow>
-                    <Badge variant="dot" color="orange" size="sm">{summary.pendingRequestCount}</Badge>
+                    <Badge tone="warning" variant="outline" size="sm">{summary.pendingRequestCount}</Badge>
                   </Tooltip>
                 )}
               </Group>
@@ -186,7 +186,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
             {c.tags.length > 0 ? (
               <Group gap="3xs" wrap="wrap">
                 {c.tags.map((tag) => (
-                  <Badge key={tag} size="xs" variant="light">{tag}</Badge>
+                  <Badge tone="default" key={tag} size="xs" variant="light">{tag}</Badge>
                 ))}
               </Group>
             ) : (
@@ -197,7 +197,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
             {(c.categories ?? []).length > 0 ? (
               <Group gap="3xs" wrap="wrap">
                 {(c.categories ?? []).map((id) => (
-                  <Badge key={id} size="xs" variant="outline">{catMap.get(id) ?? id}</Badge>
+                  <Badge tone="default" key={id} size="xs" variant="outline">{catMap.get(id) ?? id}</Badge>
                 ))}
               </Group>
             ) : (

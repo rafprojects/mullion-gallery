@@ -463,7 +463,6 @@ function AppContent({
                   initialBuilderTemplateId={initialBuilderTemplateId ?? undefined}
                   {...(spaceId !== undefined && { initialSpaceId: String(spaceId) })}
                   {...(spaceName !== undefined && { spaceName })}
-                  {...(instanceId !== undefined && { instanceId })}
                 />
               </Suspense>
             </ErrorBoundary>

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Table, Tooltip, Badge, ActionIcon } from '@mantine/core';
-import { Stack, Group, Text } from '@/ui';
+import { Table, Tooltip, ActionIcon } from '@mantine/core';
+import { Stack, Group, Text, Badge } from '@/ui';
 import { modals } from '@mantine/modals';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -108,12 +108,12 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
           <Table.Td>
             <Stack gap="4xs">
               <Tooltip label={a.source === 'company' ? t('accessrow_src_company_tip', 'Company-wide access') : t('accessrow_src_campaign_tip', 'Direct campaign access')}>
-                <Badge variant="light" color={a.source === 'company' ? 'blue' : 'green'}>
+                <Badge variant="light" size="md" tone="default">
                   {a.source === 'company' ? t('accessrow_src_company', '🏢 Company') : t('accessrow_src_campaign', '📋 Campaign')}
                 </Badge>
               </Tooltip>
               {isExpired && (
-                <Badge variant="light" color="gray" size="xs">{t('admin_sched_expired', 'Expired')}</Badge>
+                <Badge tone="default" variant="light" size="xs">{t('admin_sched_expired', 'Expired')}</Badge>
               )}
               {accessViewMode === 'all' && a.source === 'campaign' && a.campaignTitle && (
                 <Text size="xs" tone="muted">{a.campaignTitle}</Text>
@@ -130,7 +130,7 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
               <Tooltip label={cfg.tip} withArrow>
                 <Badge
                   variant="light"
-                  color={level === 'viewer' ? 'gray' : 'yellow'}
+                  size="md" tone="default"
                   aria-label={t('admin_space_role_for', 'Role for {{name}}', { name: a.user?.displayName ?? t('accessrow_user_short', 'user {{id}}', { id: a.userId }) })}
                 >
                   {cfg.label}

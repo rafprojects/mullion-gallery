@@ -13,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   ScrollArea,
-  Badge,
   UnstyledButton,
   Image,
   Tooltip,
@@ -35,7 +34,7 @@ import {
 } from '@tabler/icons-react';
 import type { LayoutSlot, LayoutTemplate, MediaItem } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text } from '@/ui';
+import { uiRem, Stack, Group, Text, Badge } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -276,7 +275,7 @@ export function MediaPickerSidebar({
               const mediaItem = media.find((m) => m.id === slot.mediaId);
               return (
                 <Group key={slot.id} gap="3xs" wrap="nowrap">
-                  <Badge size="xs" variant="light" style={{ width: uiRem(3.125), flexShrink: 0 }}>
+                  <Badge tone="default" size="xs" variant="light" style={{ width: uiRem(3.125), flexShrink: 0 }}>
                     {t('lb_mps_slot_n', 'Slot {{n}}', { n: idx + 1 })}
                   </Badge>
                   <Text size="xs" truncate style={{ flex: 1 }}>
@@ -345,7 +344,7 @@ export function MediaPickerSidebar({
                     </Text>
                   </Stack>
                   {assignedToSlots && assignedToSlots.length > 0 && (
-                    <Badge size="xs" variant="filled" color="blue" style={assignedToSlots.length > 1 ? { borderRadius: 8, minWidth: 'auto', paddingInline: 6 } : undefined}>
+                    <Badge tone="default" size="xs" variant="filled" style={assignedToSlots.length > 1 ? { borderRadius: 8, minWidth: 'auto', paddingInline: 6 } : undefined}>
                       {assignedToSlots.join(',')}
                     </Badge>
                   )}
@@ -414,10 +413,9 @@ export function MediaPickerSidebar({
                     </Text>
                   </div>
                   {assignedToSlots && assignedToSlots.length > 0 && (
-                    <Badge
+                    <Badge tone="default"
                       size="xs"
                       variant="filled"
-                      color="blue"
                       style={{ position: 'absolute', top: 3, right: 3, minWidth: 'auto', paddingInline: 4 }}
                     >
                       {assignedToSlots.join(',')}

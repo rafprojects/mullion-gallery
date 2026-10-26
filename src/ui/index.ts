@@ -32,6 +32,7 @@ export {
 // registers the component sheets into the style list (P79-B).
 export {
   Alert,
+  Badge,
   Box,
   Center,
   Container,
@@ -42,6 +43,7 @@ export {
   Text,
   Title,
   type AlertProps,
+  type BadgeProps,
   type BoxProps,
   type CenterProps,
   type ContainerProps,
@@ -92,7 +94,6 @@ export {
 
 // ── Feedback and data display ──────────────────────────────────────────────
 export {
-  Badge,
   ColorSwatch,
   Image,
   Kbd,

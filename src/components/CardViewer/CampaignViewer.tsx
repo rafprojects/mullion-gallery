@@ -1,7 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconCalendar, IconTag } from '@tabler/icons-react';
-import { Modal, Image, Badge, Paper, Loader, Switch } from '@mantine/core';
+import { Modal, Image, Paper, Loader, Switch } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import type { Campaign, GalleryBehaviorSettings, GalleryConfig } from '@/types';
 import type { ApiClient } from '@/services/apiClient';
@@ -27,7 +27,7 @@ import {
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { UnifiedGallerySection } from './UnifiedGallerySection';
 import { PerTypeGallerySection } from './PerTypeGallerySection';
-import { uiRem, Group, Stack, Title, Text, SimpleGrid, Box, Center } from '@/ui';
+import { uiRem, Group, Stack, Title, Text, SimpleGrid, Box, Center, Badge } from '@/ui';
 import styles from './CampaignViewer.module.scss';
 
 /** A settings length in the size basis: a number is pixels, as Mantine's `h` read it. */
@@ -122,8 +122,8 @@ function CampaignViewerCoverHeader({
       />
 
       {settings.showCampaignCompanyName !== false && (
-        <Badge
-          style={{ position: 'absolute', top: uiRem(1), left: uiRem(1), backgroundColor: displayedCampaign.company.brandColor }}
+        <Badge tone="default" variant="filled"
+          style={{ position: 'absolute', top: uiRem(1), left: uiRem(1), backgroundColor: displayedCampaign.company.brandColor, color: '#fff' }}
           size="lg"
         >
           <Group gap="2xs">

@@ -1,7 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useState, type ReactElement } from 'react';
 import {
   ActionIcon,
-  Badge,
   Button,
   Card,
   FileButton,
@@ -43,7 +42,7 @@ import {
   setCampaignBreakpointScopeAdapterOverride,
   syncCampaignGalleryOverrideMode,
 } from '@/utils/campaignGalleryOverrides';
-import { uiRem, Group, Stack, Text, Box, Center, SimpleGrid } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, SimpleGrid, Badge } from '@/ui';
 
 
 const LazyGalleryConfigEditorModal = lazy(() =>
@@ -154,7 +153,7 @@ const UnifiedCampaignModalTabList: NamedComponent<UnifiedCampaignModalTabListPro
       <Tabs.Tab value="details">{t('admin_camp_tab_details', 'Details')}</Tabs.Tab>
       {isEdit && (
         <Tabs.Tab value="media">
-          {t('admin_camp_tab_media', 'Media')} {mediaCount > 0 && <Badge size="sm" style={{ marginLeft: uiRem(0.25) }}>{mediaCount}</Badge>}
+          {t('admin_camp_tab_media', 'Media')} {mediaCount > 0 && <Badge tone="default" variant="filled" size="sm" style={{ marginLeft: uiRem(0.25) }}>{mediaCount}</Badge>}
         </Tabs.Tab>
       )}
       <Tabs.Tab value="settings">{t('admin_camp_tab_settings', 'Settings')}</Tabs.Tab>
@@ -470,11 +469,11 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
           </Group>
           <Stack gap="2xs">
             <Group gap="xs" wrap="wrap">
-              <Badge color={hasCustomGalleryOverrides ? 'grape' : 'gray'} variant={hasCustomGalleryOverrides ? 'light' : 'outline'}>
+              <Badge tone="default" size="md" variant={hasCustomGalleryOverrides ? 'light' : 'outline'}>
                 {hasCustomGalleryOverrides ? t('admin_camp_custom_overrides', 'Custom gallery overrides') : t('admin_camp_inheriting', 'Inheriting global gallery settings')}
               </Badge>
               {galleryOverrideSummary.map((summary) => (
-                <Badge key={summary} color="violet" variant="light">
+                <Badge tone="default" size="md" key={summary} variant="light">
                   {summary}
                 </Badge>
               ))}
@@ -842,7 +841,7 @@ function MediaTabContent({
                 <Image src={media.thumbnail || media.url} height={100} alt={media.caption || t('admin_camp_media_alt', 'Media')} fallbackSrc={FALLBACK_IMAGE_SRC} />
               </Card.Section>
               <Group justify="space-between" style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
-                <Badge size="xs" variant="light">{media.type}</Badge>
+                <Badge tone="default" size="xs" variant="light">{media.type}</Badge>
                 <Tooltip label={t('admin_camp_remove_media', 'Remove from campaign')}>
                   <ActionIcon color="red" variant="light" size="sm" onClick={() => void onRemoveMedia(media)} aria-label={t('admin_camp_remove_media', 'Remove from campaign')}>
                     <IconTrash size={14} />

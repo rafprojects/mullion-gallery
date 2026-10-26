@@ -209,7 +209,7 @@ describe('SettingsPanel', () => {
     expect(screen.getByRole('tab', { name: /Gallery Layout/i })).toBeDefined();
   });
 
-  it('renders the space badge via the light variant; in shadow DOM exact CSS vars override color (P57-B)', async () => {
+  it('renders the space name as a neutral badge, since a name carries no state (P81-A)', async () => {
     render(
       <SettingsPanel
         opened={true}
@@ -225,15 +225,14 @@ describe('SettingsPanel', () => {
 
     await waitForTabs();
 
-    const badge = screen.getByText('Marketing').closest('[class*="Badge-root"]') as HTMLElement;
+    // P57-B painted this badge in a palette colour hashed from the instance id,
+    // read back from Mantine's variables; by the designer's badge rule
+    // (2026-10-26) a name is neutral, so no colour is resolved at all.
+    const badge = screen.getByText('Marketing').closest('.mullion-badge') as HTMLElement;
     expect(badge).not.toBeNull();
-    // P57-B: badge uses variant="light". In shadow DOM production, getComputedStyle
-    // on the shadow host resolves the exact :host CSS variables, which are applied as
-    // inline styles for color parity. In jsdom (no shadow host found), no inline
-    // style override is applied — guarding that we don't use hardcoded shade values.
+    expect(badge.getAttribute('data-mullion-tone')).toBe('default');
     expect(badge.getAttribute('data-variant')).toBe('light');
-    expect(badge.style.backgroundColor).toBe(''); // jsdom: shadow host not found, no override
-    expect(badge.style.color).toBe('');
+    expect(badge.style.backgroundColor).toBe('');
   });
 
   it('shows gallery style settings when Gallery Style tab is clicked', async () => {

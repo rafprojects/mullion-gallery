@@ -2,8 +2,8 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { ApiClient, CampaignTemplate } from '@/services/apiClient';
-import { Tabs, Button, Card, ActionIcon, Loader, Chip, Tooltip, Select, Switch, Menu, Collapse, Badge } from '@mantine/core';
-import { Group, Title, Center, Box } from '@/ui';
+import { Tabs, Button, Card, ActionIcon, Loader, Chip, Tooltip, Select, Switch, Menu, Collapse } from '@mantine/core';
+import { Group, Title, Center, Box, Badge } from '@/ui';
 import { useReloadSafeView } from '@/hooks/useReloadSafeView';
 import { IconPlus, IconArrowLeft, IconFileImport, IconKeyboard, IconSettings, IconDotsVertical, IconAdjustments, IconStack2 } from '@tabler/icons-react';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
@@ -34,7 +34,6 @@ import { UnifiedCampaignModal } from '@/components/Campaign/UnifiedCampaignModal
 import { useCampaignsRows } from '@/hooks/useCampaignsRows';
 import { useLayoutTemplates } from '@/services/layoutTemplateQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { spaceColor } from '@mullion/shared-utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 
@@ -68,12 +67,9 @@ interface AdminPanelProps {
   initialSpaceId?: string;
   /** P48-I: display name for the space (shown in header when a specific space is targeted). */
   spaceName?: string;
-  /** P48-I: stable instance ID used to derive the per-space accent color. */
-  instanceId?: string | undefined;
 }
 
-export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, initialBuilderTemplateId, initialSpaceId, spaceName, instanceId }: AdminPanelProps) {
-  const color = instanceId ? spaceColor(instanceId) : undefined;
+export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, initialBuilderTemplateId, initialSpaceId, spaceName }: AdminPanelProps) {
   const queryClient = useQueryClient();
   // P53-A: AdminPanel only mounts for editor-or-above (isAdmin); isSystemAdmin
   // gates the system-only surfaces (Import, ZIP/rescan, System Audit, etc.).
@@ -248,7 +244,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
             <IconArrowLeft />
           </ActionIcon>
           <Title order={2} size={3}>{t('admin_panel_title', 'Admin Panel')}</Title>
-          {spaceName && <Badge color={color ?? 'blue'} variant="light" size="sm">{spaceName}</Badge>}
+          {spaceName && <Badge tone="default" variant="light" size="sm">{spaceName}</Badge>}
         </Group>
         <Group gap="xs" wrap="wrap">
           {spaces.length > 0 && (
@@ -360,7 +356,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
                   size="xs"
                   style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}
                   leftSection={<IconAdjustments size={14} />}
-                  rightSection={activeFilterCount > 0 ? <Badge size="xs" circle color="blue">{activeFilterCount}</Badge> : null}
+                  rightSection={activeFilterCount > 0 ? <Badge tone="primary" variant="filled" size="xs">{activeFilterCount}</Badge> : null}
                   onClick={() => setFiltersOpen((o) => !o)}
                   aria-expanded={filtersOpen}
                 >

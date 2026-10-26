@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Accordion, Badge, Divider, Loader, NumberInput, Select, Slider, Switch, TextInput } from '@mantine/core';
-import { Group, Stack, Text, Alert } from '@/ui';
+import { Accordion, Divider, Loader, NumberInput, Select, Slider, Switch, TextInput } from '@mantine/core';
+import { Group, Stack, Text, Alert, Badge } from '@/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
@@ -404,12 +404,12 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
                     <Group gap="xs">
                       <Text size="sm" weight={500}>{t('set_adv_persistent_cache', 'Persistent cache')}</Text>
                       {healthData.objectCache.persistent ? (
-                        <Badge color="green" size="sm">{t('set_adv_cache_active', 'Active')}</Badge>
+                        <Badge tone="success" variant="filled" size="sm">{t('set_adv_cache_active', 'Active')}</Badge>
                       ) : (
-                        <Badge color="gray" size="sm">{t('set_adv_cache_not_detected', 'Not detected')}</Badge>
+                        <Badge tone="default" variant="filled" size="sm">{t('set_adv_cache_not_detected', 'Not detected')}</Badge>
                       )}
                       {healthData.objectCache.backend && (
-                        <Badge color="blue" size="sm" variant="outline">
+                        <Badge tone="default" size="sm" variant="outline">
                           {BACKEND_LABELS[healthData.objectCache.backend] ?? healthData.objectCache.backend}
                         </Badge>
                       )}

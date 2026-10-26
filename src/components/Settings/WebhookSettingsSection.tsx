@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ActionIcon,
-  Badge,
   Button,
   Checkbox,
   CopyButton,
@@ -20,6 +19,7 @@ import {
   Text,
   Box,
   Center,
+  Badge,
 } from '@/ui';
 import { IconCopy, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -165,12 +165,12 @@ function EndpointRow({
 
         <Group gap="xs">
           {endpoint.events.length === 0 ? (
-            <Badge size="xs" variant="outline">
+            <Badge tone="default" size="xs" variant="outline">
               {t('set_wh_all_events', 'All events')}
             </Badge>
           ) : (
             endpoint.events.map((ev) => (
-              <Badge key={ev} size="xs" variant="light">
+              <Badge tone="default" key={ev} size="xs" variant="light">
                 {ev}
               </Badge>
             ))

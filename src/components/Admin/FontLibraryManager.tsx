@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActionIcon,
-  Badge,
   FileButton,
   Button,
   Loader,
@@ -10,6 +9,7 @@ import {
   Group,
   Stack,
   Text,
+  Badge,
 } from '@/ui';
 import { IconTrash, IconUpload, IconWorld, IconWorldOff } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -109,9 +109,9 @@ export function FontLibraryManager({ apiClient, onFontsChange, isSystemAdmin = f
             <Group key={f.id} justify="space-between" wrap="nowrap" gap="xs">
               <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
                 <Text size="xs" truncate style={{ maxWidth: 150 }}>{f.name}</Text>
-                <Badge size="xs" variant="light" color="gray">{f.format}</Badge>
+                <Badge tone="default" size="xs" variant="light">{f.format}</Badge>
                 {f.isUniversal && (
-                  <Badge size="xs" variant="light" color="blue">{t('admin_font_all_spaces', 'All spaces')}</Badge>
+                  <Badge tone="default" size="xs" variant="light">{t('admin_font_all_spaces', 'All spaces')}</Badge>
                 )}
               </Group>
               <Group gap="4xs" wrap="nowrap">

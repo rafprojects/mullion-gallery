@@ -1,6 +1,6 @@
 
-import { Badge, Button, Card, Image, Loader, TextInput } from '@mantine/core';
-import { Group, Stack, Text, Center, SimpleGrid } from '@/ui';
+import { Button, Card, Image, Loader, TextInput } from '@mantine/core';
+import { Group, Stack, Text, Center, SimpleGrid, Badge } from '@/ui';
 import { IconPhoto } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
@@ -96,7 +96,7 @@ export function MediaLibraryPicker({
                     fallbackSrc={FALLBACK_IMAGE_SRC}
                   />
                   <Stack gap="4xs" padding={4}>
-                    <Badge size="xs" variant="light">
+                    <Badge tone="default" size="xs" variant="light">
                       {item.type}
                     </Badge>
                     {alreadyAdded && (

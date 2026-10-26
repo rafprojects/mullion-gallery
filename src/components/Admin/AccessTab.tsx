@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import {
-  Badge,
   Button,
   Card,
   Checkbox,
@@ -21,7 +20,7 @@ import { PendingRequestsPanel } from './PendingRequestsPanel';
 import type { ApiClient } from '@/services/apiClient';
 import type { AdminAccessState } from '@/hooks/useAdminAccessState';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Alert, Box, Center } from '@/ui';
+import { uiRem, Group, Stack, Text, Alert, Box, Center, Badge } from '@/ui';
 
 type AccessViewMode = 'campaign' | 'company' | 'all';
 
@@ -168,7 +167,7 @@ export function AccessTab({
               <Stack gap="4xs">
                 <Group gap="xs">
                   <Text size="sm" tone="muted">{t('admin_access_company_label', 'Company:')}</Text>
-                  <Badge variant="light">{selectedCampaign.companyId || t('admin_access_none', 'None')}</Badge>
+                  <Badge tone="default" size="md" variant="light">{selectedCampaign.companyId || t('admin_access_none', 'None')}</Badge>
                 </Group>
                 {selectedCampaign.status === 'archived' && (
                   <Alert tone="warning" variant="light" padding="xs" icon={<IconAlertCircle size={16} />}>
@@ -177,7 +176,7 @@ export function AccessTab({
                 )}
                 <Group gap="xs" style={{ marginTop: uiRem(0.125) }}>
                   <Text size="xs" tone="muted">{t('admin_access_total_users', 'Total users:')}</Text>
-                  <Badge variant="light" color="blue">{t('admin_access_badge_count', 'Access {{count}}', { count: accessEntriesCount })}</Badge>
+                  <Badge tone="default" size="md" variant="light">{t('admin_access_badge_count', 'Access {{count}}', { count: accessEntriesCount })}</Badge>
                 </Group>
               </Stack>
             )}
@@ -185,8 +184,8 @@ export function AccessTab({
               <Stack gap="4xs">
                 <Group gap="xs">
                   <Text size="sm" tone="muted">{t('admin_access_campaigns_label', 'Campaigns:')}</Text>
-                  <Badge variant="light" color="green">{t('admin_access_n_active', '{{count}} active', { count: selectedCompany.activeCampaigns })}</Badge>
-                  <Badge variant="light" color="gray">{t('admin_access_n_archived', '{{count}} archived', { count: selectedCompany.archivedCampaigns })}</Badge>
+                  <Badge tone="default" size="md" variant="light">{t('admin_access_n_active', '{{count}} active', { count: selectedCompany.activeCampaigns })}</Badge>
+                  <Badge tone="default" size="md" variant="light">{t('admin_access_n_archived', '{{count}} archived', { count: selectedCompany.archivedCampaigns })}</Badge>
                 </Group>
                 {selectedCompany.activeCampaigns > 0 && (
                   <Button
@@ -202,7 +201,7 @@ export function AccessTab({
                 )}
                 <Group gap="xs" style={{ marginTop: uiRem(0.125) }}>
                   <Text size="xs" tone="muted">{t('admin_access_total_users', 'Total users:')}</Text>
-                  <Badge variant="light" color="blue">{t('admin_access_badge_count', 'Access {{count}}', { count: accessEntriesCount })}</Badge>
+                  <Badge tone="default" size="md" variant="light">{t('admin_access_badge_count', 'Access {{count}}', { count: accessEntriesCount })}</Badge>
                 </Group>
               </Stack>
             )}
@@ -239,7 +238,7 @@ export function AccessTab({
                   checked={showExpiredGrants}
                   onChange={(e) => onShowExpiredGrantsChange(e.currentTarget.checked)}
                 />
-                <Badge variant="light">{t('admin_access_n_users', '{{count}} users', { count: accessEntriesCount })}</Badge>
+                <Badge tone="default" size="md" variant="light">{t('admin_access_n_users', '{{count}} users', { count: accessEntriesCount })}</Badge>
               </Group>
             </Group>
 
@@ -366,7 +365,7 @@ export function AccessTab({
                       <Group gap="xs">
                         <Text size="sm" weight={500}>{user.displayName}</Text>
                         <Text size="xs" tone="muted">{user.email}</Text>
-                        {user.isAdmin && <Badge size="xs" color="blue">{t('admin_access_admin_badge', 'Admin')}</Badge>}
+                        {user.isAdmin && <Badge tone="default" variant="filled" size="xs">{t('admin_access_admin_badge', 'Admin')}</Badge>}
                       </Group>
                     </Combobox.Option>
                   ))}

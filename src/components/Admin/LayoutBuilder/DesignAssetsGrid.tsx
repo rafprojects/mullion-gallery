@@ -1,6 +1,6 @@
 
-import { ActionIcon, Tooltip, Badge, Popover, TagsInput } from '@mantine/core';
-import { Text, Box } from '@/ui';
+import { ActionIcon, Tooltip, Popover, TagsInput } from '@mantine/core';
+import { Text, Box, Badge } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { IconX, IconWorld, IconWorldOff, IconTag } from '@tabler/icons-react';
 import type { AssetLibraryItem } from './BuilderDockContext';
@@ -98,10 +98,9 @@ export function DesignAssetsGrid({
               </div>
 
               {/* File-type badge (bottom-left) */}
-              <Badge
+              <Badge tone="default"
                 size="xs"
                 variant="filled"
-                color="dark"
                 radius="sm"
                 style={{
                   position: 'absolute',

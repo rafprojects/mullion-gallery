@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
-import { Modal, Card, Badge, Loader } from '@mantine/core';
-import { Stack, Group, Text, SimpleGrid, Center } from '@/ui';
+import { Modal, Card, Loader } from '@mantine/core';
+import { Stack, Group, Text, SimpleGrid, Center, Badge } from '@/ui';
 import { IconLayoutGrid } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient, CampaignTemplate } from '@/services/apiClient';
@@ -90,7 +90,7 @@ export function TemplatePickerModal({ opened, onClose, apiClient, onSelect }: Pr
                 <Stack gap="3xs">
                   <Group gap="xs" wrap="nowrap" justify="space-between">
                     <Text weight={600} size="sm" truncate style={{ flex: 1 }}>{tpl.name}</Text>
-                    <Badge size="xs" variant="light" color={tpl.source === 'builtin' ? 'blue' : 'gray'}>
+                    <Badge size="xs" variant="light" tone="default">
                       {tpl.source === 'builtin' ? t('admin_tpick_builtin', 'Built-in') : t('admin_tpick_custom', 'Custom')}
                     </Badge>
                   </Group>

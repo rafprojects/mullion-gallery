@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActionIcon,
-  Badge,
   Loader,
   Paper,
   ScrollArea,
@@ -19,6 +18,7 @@ import {
   Alert,
   Center,
   SimpleGrid,
+  Badge,
 } from '@/ui';
 import {
   CartesianGrid,
@@ -225,10 +225,9 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
           {/* P34-A: refresh affordance + freshness indicator */}
           <Group gap="xs" align="center">
             {!isOnline && (
-              <Badge
+              <Badge tone="danger" variant="filled"
                 size="xs"
-                color="red"
-                leftSection={<IconWifi size={10} />}
+                icon={<IconWifi size={10} />}
                 aria-label={t('admin_analytics_offline_aria', 'Browser is offline — polling paused')}
               >
                 {t('admin_analytics_offline', 'Offline')}
@@ -395,10 +394,10 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
                             <Text size="xs" font="mono">{item.media_id}</Text>
                           </Table.Td>
                           <Table.Td style={{ textAlign: 'right' }}>
-                            <Badge variant="light" color="blue" size="sm">{item.views.toLocaleString()}</Badge>
+                            <Badge tone="default" variant="light" size="sm">{item.views.toLocaleString()}</Badge>
                           </Table.Td>
                           <Table.Td style={{ textAlign: 'right' }}>
-                            <Badge variant="light" color="teal" size="sm">{item.lightbox_opens.toLocaleString()}</Badge>
+                            <Badge tone="default" variant="light" size="sm">{item.lightbox_opens.toLocaleString()}</Badge>
                           </Table.Td>
                         </Table.Tr>
                       ))}
@@ -431,7 +430,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
                         <Table.Td c="dimmed">{i + 1}</Table.Td>
                         <Table.Td>{c.title}</Table.Td>
                         <Table.Td style={{ textAlign: 'right' }}>
-                          <Badge variant="light" color="blue" size="sm">{c.views.toLocaleString()}</Badge>
+                          <Badge tone="default" variant="light" size="sm">{c.views.toLocaleString()}</Badge>
                         </Table.Td>
                       </Table.Tr>
                     ))}
