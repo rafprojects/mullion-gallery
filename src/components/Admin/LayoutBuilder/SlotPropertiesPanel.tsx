@@ -2,7 +2,6 @@ import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Select,
-  Tooltip,
   Accordion,
 } from '@mantine/core';
 import { BuilderColorInput as ColorInput } from './BuilderColorInput';
@@ -32,7 +31,7 @@ import type {
 } from '@/types';
 import { buildSlotEntranceCss, REVEAL_CLASS } from '@/utils/slotEntrance';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box, ActionIcon, Button, SegmentedControl, Slider, NumberInput, TextInput } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, ActionIcon, Button, SegmentedControl, Slider, NumberInput, TextInput, Popover, Tooltip } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -123,11 +122,15 @@ function PropRow({ label, children, tooltip }: { label: string; children: React.
       <Group gap="4xs" align="center" wrap="nowrap" style={{ width: 70, flexShrink: 0 }}>
         <Text size="xs" tone="muted" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
         {tooltip && (
-          <Tooltip label={tooltip} multiline style={{ width: uiRem(15) }} position="left" withArrow>
-            <ActionIcon size={14} variant="transparent" tone="muted" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })}>
+          // An explanation behind a focusable icon opens on click, since a tooltip gives assistive tech nothing (P81-A).
+          <Popover>
+            <Popover.Trigger render={<ActionIcon size={14} variant="transparent" tone="muted" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })} />}>
               <IconInfoCircle size={12} />
-            </ActionIcon>
-          </Tooltip>
+            </Popover.Trigger>
+            <Popover.Content side="left" width={240}>
+              <Text size="xs">{tooltip}</Text>
+            </Popover.Content>
+          </Popover>
         )}
       </Group>
       <Box style={{ flex: 1, minWidth: 0 }}>{children}</Box>
@@ -534,7 +537,7 @@ export function SlotPropertiesPanel({
                   leftSection={<Text size="xs" tone="muted">W</Text>}
                 />
               </Box>
-              <Tooltip label={lockSizeRatio ? t('lb_slot_unlock', 'Unlock aspect ratio') : t('lb_slot_lock', 'Lock aspect ratio')} position="top">
+              <Tooltip label={lockSizeRatio ? t('lb_slot_unlock', 'Unlock aspect ratio') : t('lb_slot_lock', 'Lock aspect ratio')} side="top">
                 <ActionIcon
                   size="sm"
                   variant={lockSizeRatio ? 'filled' : 'subtle'}
@@ -832,22 +835,22 @@ export function SlotPropertiesPanel({
               </PropRow>
               <Group gap="4xs" style={{ flexShrink: 0 }}>
                 <Tooltip label={t('lb_slot_send_back_tt', 'Send to Back (Shift+[)')}>
-                  <ActionIcon size="xs" variant="subtle" onClick={onSendToBack} aria-label={t('lb_slot_send_back_aria', 'Send to back')}>
+                  <ActionIcon aria-keyshortcuts="Shift+[" size="xs" variant="subtle" onClick={onSendToBack} aria-label={t('lb_slot_send_back_aria', 'Send to back')}>
                     <IconArrowBigDownLine size={14} />
                   </ActionIcon>
                 </Tooltip>
                 <Tooltip label={t('lb_slot_send_bwd_tt', 'Send Backward ([)')}>
-                  <ActionIcon size="xs" variant="subtle" onClick={onSendBackward} aria-label={t('lb_slot_send_bwd_aria', 'Send backward')}>
+                  <ActionIcon aria-keyshortcuts="[" size="xs" variant="subtle" onClick={onSendBackward} aria-label={t('lb_slot_send_bwd_aria', 'Send backward')}>
                     <IconArrowDown size={14} />
                   </ActionIcon>
                 </Tooltip>
                 <Tooltip label={t('lb_slot_bring_fwd_tt', 'Bring Forward (])')}>
-                  <ActionIcon size="xs" variant="subtle" onClick={onBringForward} aria-label={t('lb_slot_bring_fwd_aria', 'Bring forward')}>
+                  <ActionIcon aria-keyshortcuts="]" size="xs" variant="subtle" onClick={onBringForward} aria-label={t('lb_slot_bring_fwd_aria', 'Bring forward')}>
                     <IconArrowUp size={14} />
                   </ActionIcon>
                 </Tooltip>
                 <Tooltip label={t('lb_slot_bring_front_tt', 'Bring to Front (Shift+])')}>
-                  <ActionIcon size="xs" variant="subtle" onClick={onBringToFront} aria-label={t('lb_slot_bring_front_aria', 'Bring to front')}>
+                  <ActionIcon aria-keyshortcuts="Shift+]" size="xs" variant="subtle" onClick={onBringToFront} aria-label={t('lb_slot_bring_front_aria', 'Bring to front')}>
                     <IconArrowBigUpLine size={14} />
                   </ActionIcon>
                 </Tooltip>

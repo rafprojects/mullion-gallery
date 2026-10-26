@@ -297,6 +297,12 @@ const RULES = {
   // [P81-A] Dialogs portal into their provider's overlay root (P80-F), so `withinPortal` goes; a
   // debug-only `closeButtonProps` goes too. Anything carrying behaviour is listed for a hand fix.
   // The compound overlays are reshaped by `ui-codemod-overlays.mjs`; this moves their imports.
+  // Rule 20: no arrows, and the framework tooltip wraps at 288px by itself.
+  Tooltip: {
+    rename: { position: 'side' },
+    unsupported: ['color', 'radius', 'transitionProps', 'events', 'withinPortal', 'classNames', 'styles', 'unstyled', 'inline', 'refProp'],
+    props: { withArrow: () => ({ replace: '' }), multiline: () => ({ replace: '' }) },
+  },
   Menu: { rename: {}, unsupported: [] },
   Popover: { rename: {}, unsupported: [] },
   Modal: { rename: {}, unsupported: DIALOG_UNSUPPORTED, props: DIALOG_PROPS },

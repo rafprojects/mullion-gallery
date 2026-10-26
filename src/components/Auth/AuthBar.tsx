@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip } from '@mantine/core';
-import { Group, Text, Box, Container, Button, ActionIcon, Menu } from '@/ui';
+import { Group, Text, Box, Container, Button, ActionIcon, Menu, Tooltip } from '@/ui';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconSettings, IconLogout, IconDashboard, IconDotsVertical } from '@tabler/icons-react';
 import type { GalleryBehaviorSettings } from '@/types';

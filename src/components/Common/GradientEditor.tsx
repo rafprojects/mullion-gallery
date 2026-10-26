@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   Select,
-  Tooltip,
 } from '@mantine/core';
 import {
   Stack,
@@ -12,6 +11,7 @@ import {
   Slider,
   SegmentedControl,
   NumberInput,
+  Tooltip,
 } from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import type { GradientStop, GradientDirection, GradientType, RadialShape, RadialSize } from '@/types';
@@ -95,7 +95,7 @@ export function GradientEditor({ value, onChange }: GradientEditorProps) {
           <GRow label="Dir">
             <Group gap="3xs">
               {GRADIENT_DIRECTIONS.map((d) => (
-                <Tooltip key={d.value} label={d.label} position="top">
+                <Tooltip key={d.value} label={d.label} side="top">
                   <ActionIcon
                     size="sm"
                     variant={dir === d.value && value.angle == null ? 'filled' : 'subtle'}

@@ -1,15 +1,13 @@
 import { useRef, useState, type KeyboardEvent, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Tooltip,
-} from '@mantine/core';
-import {
   Group,
   Text,
   ActionIcon,
   TextInput,
   uiRem,
   Menu,
+  Tooltip,
 } from '@/ui';
 import {
   IconPhoto,
@@ -224,7 +222,7 @@ export function LayerRow({
 
       {/* Visibility toggle */}
       {!isBackground && (
-        <Tooltip label={visible ? t('lb_row_hide', 'Hide layer') : t('lb_row_show', 'Show layer')} withArrow openDelay={400}>
+        <Tooltip label={visible ? t('lb_row_hide', 'Hide layer') : t('lb_row_show', 'Show layer')} openDelay={400}>
           <ActionIcon
             size="xs"
             variant="subtle"
@@ -239,7 +237,7 @@ export function LayerRow({
 
       {/* Lock toggle */}
       {!isNonInteractive && (
-        <Tooltip label={locked ? t('lb_row_unlock', 'Unlock layer') : t('lb_row_lock', 'Lock layer')} withArrow openDelay={400}>
+        <Tooltip label={locked ? t('lb_row_unlock', 'Unlock layer') : t('lb_row_lock', 'Lock layer')} openDelay={400}>
           <ActionIcon
             size="xs"
             variant="subtle"
@@ -308,7 +306,7 @@ export function LayerRow({
 
       {/* ── Delete button — separated from other controls to prevent accidental clicks ── */}
       {!isBackground && onDelete && (
-        <Tooltip label={t('lb_row_delete', 'Delete layer')} withArrow openDelay={400}>
+        <Tooltip label={t('lb_row_delete', 'Delete layer')} openDelay={400}>
           <ActionIcon
             size="xs"
             variant="subtle"

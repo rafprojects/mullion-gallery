@@ -188,7 +188,10 @@ Tabs.Panel = TabsPanel;
 // ---------------------------------------------------------------------------
 
 /** One segment. A bare string is its own label, as 20 of the 27 call sites pass it. */
-export type UiSegmentData = ReadonlyArray<string | { value: string; label: ReactNode; disabled?: boolean }>;
+/** `aria-label` names a segment whose label is an icon, which has no name of its own (P81-A). */
+export type UiSegmentData = ReadonlyArray<
+  string | { value: string; label: ReactNode; disabled?: boolean; 'aria-label'?: string }
+>;
 
 export interface SegmentedControlProps extends FieldStyleProps {
   data: UiSegmentData;
@@ -207,6 +210,7 @@ interface Segment {
   value: string;
   label: ReactNode;
   disabled?: boolean | undefined;
+  'aria-label'?: string | undefined;
 }
 
 function toSegment(entry: UiSegmentData[number]): Segment {
@@ -310,6 +314,7 @@ export function SegmentedControl({
           value={segment.value}
           className="mullion-segmented-item"
           {...(segment.disabled ? { disabled: true } : {})}
+          {...(segment['aria-label'] ? { 'aria-label': segment['aria-label'] } : {})}
           {...focusableInset}
         >
           <span

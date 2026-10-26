@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Tooltip, type SelectProps } from '@mantine/core';
+import { type SelectProps } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { useGalleryAdapterSettingsIO } from '@/hooks/useGalleryAdapterSettingsIO';
@@ -12,7 +12,7 @@ import { tFieldLabel, tFieldDescription, tFieldPlaceholder, tFieldOptions } from
 import { ModalSelect } from '@/components/Common/ModalSelect';
 import { cloneGalleryConfig, collectGalleryAdapterSettingValues, GALLERY_BREAKPOINTS, getGalleryConfigScopeAdapterIds, resolveGalleryConfig, setGalleryAdapterSetting } from '@/utils/galleryConfig';
 import { DimensionInput } from './DimensionInput';
-import { uiRem, Group, Stack, Text, Box, SimpleGrid, ActionIcon, Button, Switch, NumberInput, TextInput } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, SimpleGrid, ActionIcon, Button, Switch, NumberInput, TextInput, Tooltip } from '@/ui';
 
 export type UpdateGallerySetting = <K extends keyof GalleryBehaviorSettings>(
   key: K,
@@ -118,7 +118,7 @@ function fieldLabel(label: string, onReset: () => void): ReactNode {
   return (
     <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: 4 }}>
       <span>{label}</span>
-      <Tooltip label={i18n.t('set_ad_reset_default', 'Reset to default', { ns: 'mullion' })} withArrow position="top" offset={4}>
+      <Tooltip label={i18n.t('set_ad_reset_default', 'Reset to default', { ns: 'mullion' })} side="top" offset={4}>
         <ActionIcon
           size="xs"
           variant="subtle"

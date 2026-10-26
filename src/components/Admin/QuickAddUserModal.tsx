@@ -2,7 +2,6 @@ import type { Dispatch, SetStateAction } from 'react';
 import {
   Modal,
   Select,
-  Tooltip,
 } from '@mantine/core';
 import {
   Group,
@@ -14,7 +13,7 @@ import {
   Checkbox,
   TextInput,
 } from '@/ui';
-import { IconAlertCircle, IconUserPlus } from '@tabler/icons-react';
+import { IconUserPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 
@@ -76,11 +75,7 @@ function QuickAddUserSuccessState({ quickAddResult, onClose, onNotify }: QuickAd
               value={quickAddResult.resetUrl}
               readOnly
               onClick={(e) => (e.target as HTMLInputElement).select()}
-              rightSection={(
-                <Tooltip label={t('admin_qau_click_select', 'Click to select')}>
-                  <IconAlertCircle size={16} />
-                </Tooltip>
-              )}
+              description={t('admin_qau_click_select', 'Click to select')}
             />
             <Group style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} gap="xs">
               <Button

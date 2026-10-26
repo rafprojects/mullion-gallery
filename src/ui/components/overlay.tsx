@@ -28,6 +28,7 @@ import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { Separator as BaseSeparator } from '@base-ui/react/separator';
 import {
   createContext,
+  isValidElement,
   useCallback,
   useContext,
   useMemo,
@@ -441,15 +442,20 @@ export function Tooltip({
   const body = (
     <BaseTooltip.Root {...(disabled ? { disabled: true } : {})}>
         {/*
-          * A span, not a button: the 115 call sites wrap a control that is
-          * already focusable, and a button around a button is invalid. Base UI
-          * adds no `type` or `tabindex` to a tooltip trigger it is told to
-          * render as a span, and focus events from the real control inside it
-          * bubble to this element, so a keyboard focus still opens the tooltip.
+          * The child is the trigger when it is one element, as Mantine's was
+          * (P81-A): the 115 call sites wrap a control that is already focusable
+          * and takes a ref, and a wrapping box changed the layout of a
+          * full-width or absolutely positioned child and anchored the tooltip
+          * to the wrong place. Anything else is wrapped in a span, never a
+          * button, since a button around a button is invalid.
           */}
-        <BaseTooltip.Trigger ref={anchorRef} render={<span className="mullion-tooltip-trigger" />}>
-          {children}
-        </BaseTooltip.Trigger>
+        {isValidElement(children) ? (
+          <BaseTooltip.Trigger ref={anchorRef} render={children} />
+        ) : (
+          <BaseTooltip.Trigger ref={anchorRef} render={<span className="mullion-tooltip-trigger" />}>
+            {children}
+          </BaseTooltip.Trigger>
+        )}
         <BaseTooltip.Portal container={target}>
           <BaseTooltip.Positioner
             className="mullion-overlay-positioner"

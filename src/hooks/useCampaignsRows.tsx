@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, Tooltip, Select } from '@mantine/core';
+import { Table, Select } from '@mantine/core';
 import { IconEdit, IconCopy, IconDownload, IconFileZip, IconArchive, IconArchiveOff, IconLayoutGrid, IconTrash, IconChevronDown, IconArrowsExchange, IconPhotoPlus } from '@tabler/icons-react';
 import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignCategoryEntry } from '@/services/apiClient';
@@ -9,7 +9,7 @@ import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { CompanyCombobox } from '@/components/Common/CompanyCombobox';
 import type { ApiClient } from '@/services/apiClient';
-import { uiRem, Group, Text, Box, Badge, Button, Checkbox, Menu, notify } from '@/ui';
+import { uiRem, Group, Text, Box, Badge, Button, Checkbox, Menu, notify, VisuallyHidden, Tooltip } from '@/ui';
 
 function toSlug(name: string): string {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -90,7 +90,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
               <Group gap="2xs">
                 <Text weight={600}>{c.title}</Text>
                 {hasCampaignGalleryOverrides(c) && (
-                  <Tooltip label={t('admin_custom_gallery', 'Custom gallery: {{summary}}', { summary: overrideText })} withArrow>
+                  <Tooltip label={t('admin_custom_gallery', 'Custom gallery: {{summary}}', { summary: overrideText })}>
                     <Box
                       render={<span />}
                       role="img"
@@ -168,12 +168,18 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
           <Table.Td>
             {summary !== undefined ? (
               <Group gap="3xs" wrap="nowrap">
-                <Tooltip label={t('admin_camprow_grants_tt', '{{count}} active grant', { count: summary.grantCount })} withArrow>
-                  <Badge tone="default" variant="light" size="sm">{summary.grantCount}</Badge>
+                <Tooltip label={t('admin_camprow_grants_tt', '{{count}} active grant', { count: summary.grantCount })}>
+                  <Badge tone="default" variant="light" size="sm">
+                    <span aria-hidden>{summary.grantCount}</span>
+                    <VisuallyHidden>{t('admin_camprow_grants_tt', '{{count}} active grant', { count: summary.grantCount })}</VisuallyHidden>
+                  </Badge>
                 </Tooltip>
                 {summary.pendingRequestCount > 0 && (
-                  <Tooltip label={t('admin_camprow_pending_tt', '{{count}} pending request', { count: summary.pendingRequestCount })} withArrow>
-                    <Badge tone="warning" variant="outline" size="sm">{summary.pendingRequestCount}</Badge>
+                  <Tooltip label={t('admin_camprow_pending_tt', '{{count}} pending request', { count: summary.pendingRequestCount })}>
+                    <Badge tone="warning" variant="outline" size="sm">
+                      <span aria-hidden>{summary.pendingRequestCount}</span>
+                      <VisuallyHidden>{t('admin_camprow_pending_tt', '{{count}} pending request', { count: summary.pendingRequestCount })}</VisuallyHidden>
+                    </Badge>
                   </Tooltip>
                 )}
               </Group>
@@ -243,7 +249,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                 <Button tone="warning" variant="light" size="xs" leftSection={<IconArchive size={14} />} loading={archivingIds.has(cid)} onClick={() => setConfirmArchive(c)}>{t('admin_archive', 'Archive')}</Button>
               )}
               <Tooltip label={t('admin_camprow_delete_tt', 'Permanently delete campaign')}>
-                <Button tone="danger" variant="subtle" size="xs" leftSection={<IconTrash size={14} />} loading={deletingIds.has(cid)} onClick={() => setConfirmDelete(c)} aria-label={t('admin_delete_item', 'Delete {{title}}', { title: c.title })}>{t('admin_delete', 'Delete')}</Button>
+                <Button tone="danger" variant="subtle" size="xs" leftSection={<IconTrash size={14} />} loading={deletingIds.has(cid)} onClick={() => setConfirmDelete(c)} aria-label={t('admin_perm_delete_item', 'Permanently delete {{title}}', { title: c.title })}>{t('admin_delete', 'Delete')}</Button>
               </Tooltip>
             </Group>
           </Table.Td>

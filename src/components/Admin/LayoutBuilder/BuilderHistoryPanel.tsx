@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip, ScrollArea } from '@mantine/core';
-import { Stack, Group, Text, Box, ActionIcon, UnstyledButton } from '@/ui';
+import { ScrollArea } from '@mantine/core';
+import { Stack, Group, Text, Box, ActionIcon, UnstyledButton, Tooltip } from '@/ui';
 import { IconClockHour4, IconTrash } from '@tabler/icons-react';
 import type { IDockviewPanelProps } from 'dockview';
 import { useBuilderDock } from './BuilderDockContext';
@@ -57,7 +57,7 @@ export function BuilderHistoryPanel(_props: IDockviewPanelProps) {
         </Text>
         <Group gap="3xs">
           <Tooltip label={t('lb_hist_undo_tt', 'Undo (Ctrl+Z)')}>
-            <ActionIcon
+            <ActionIcon aria-keyshortcuts="Control+Z Meta+Z"
               size="sm"
               variant="subtle"
               disabled={!canUndo}
@@ -68,7 +68,7 @@ export function BuilderHistoryPanel(_props: IDockviewPanelProps) {
             </ActionIcon>
           </Tooltip>
           <Tooltip label={t('lb_hist_redo_tt', 'Redo (Ctrl+Shift+Z)')}>
-            <ActionIcon
+            <ActionIcon aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z"
               size="sm"
               variant="subtle"
               disabled={!canRedo}

@@ -2,8 +2,8 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { ApiClient, CampaignTemplate } from '@/services/apiClient';
-import { Tabs, Loader, Tooltip, Select, Collapse } from '@mantine/core';
-import { Group, Title, Center, Box, Badge, Card, Button, ActionIcon, Chip, Switch, Menu } from '@/ui';
+import { Tabs, Loader, Select, Collapse } from '@mantine/core';
+import { Group, Title, Center, Box, Badge, Card, Button, ActionIcon, Chip, Switch, Menu, Text, Tooltip } from '@/ui';
 import { useReloadSafeView } from '@/hooks/useReloadSafeView';
 import { IconPlus, IconArrowLeft, IconFileImport, IconKeyboard, IconSettings, IconDotsVertical, IconAdjustments, IconStack2 } from '@tabler/icons-react';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
@@ -290,18 +290,20 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
               </Tooltip>
               {isSystemAdmin && (
                 <Tooltip label={isAllSpaces ? t('admin_pick_space_first', 'Pick a space first') : t('admin_import_campaigns', 'Import campaigns')}>
-                  <Button variant="outline" leftSection={<IconFileImport size={16} />} onClick={() => campaignActions.setImportModalOpen(true)} size="sm" disabled={isAllSpaces}>
+                  <Button variant="outline" leftSection={<IconFileImport size={16} />} onClick={() => campaignActions.setImportModalOpen(true)} size="sm" disabled={isAllSpaces} aria-label={t('admin_import_campaigns', 'Import campaigns')}>
                     {t('admin_import', 'Import')}
                   </Button>
                 </Tooltip>
               )}
+              {/* A disabled button takes neither focus nor hover, so its reason is text (P81-A). */}
+              {isAllSpaces && <Text size="xs" tone="muted">{t('admin_pick_space_first', 'Pick a space first')}</Text>}
               <Tooltip label={t('admin_manage_spaces', 'Manage spaces')}>
                 <ActionIcon variant="subtle" size="lg" onClick={() => setSpaceManagementOpen(true)} aria-label={t('admin_manage_spaces', 'Manage spaces')}>
                   <IconStack2 size={18} />
                 </ActionIcon>
               </Tooltip>
               <Tooltip label={t('admin_keyboard_shortcuts_tooltip', 'Keyboard shortcuts (?)')}>
-                <ActionIcon variant="subtle" size="lg" onClick={() => campaignActions.setShortcutHelpOpen(true)} aria-label={t('admin_keyboard_shortcuts', 'Keyboard shortcuts')}>
+                <ActionIcon aria-keyshortcuts="?" variant="subtle" size="lg" onClick={() => campaignActions.setShortcutHelpOpen(true)} aria-label={t('admin_keyboard_shortcuts', 'Keyboard shortcuts')}>
                   <IconKeyboard size={18} />
                 </ActionIcon>
               </Tooltip>

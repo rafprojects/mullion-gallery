@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Tooltip,
   Modal,
   Select,
   Divider,
@@ -17,6 +16,7 @@ import {
   ActionIcon,
   TextInput,
   Textarea,
+  Tooltip,
 } from '@/ui';
 import { IconTrash, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';

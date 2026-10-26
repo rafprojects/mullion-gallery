@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { ASSET_MIME } from './DesignAssetsGrid';
 import {
   Loader,
-  Tooltip,
 } from '@mantine/core';
 import {
   IconUpload,
@@ -15,7 +14,7 @@ import { DEFAULT_MASK_LAYER } from '@/types';
 import type { AssetLibraryItem } from './BuilderDockContext';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box, FileButton, Button, ActionIcon, SegmentedControl, Slider, NumberInput } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, FileButton, Button, ActionIcon, SegmentedControl, Slider, NumberInput, Popover } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -37,11 +36,15 @@ function PropRow({ label, children, tooltip }: { label: string; children: React.
       <Group gap="4xs" align="center" wrap="nowrap" style={{ width: 70, flexShrink: 0 }}>
         <Text size="xs" tone="muted" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
         {tooltip && (
-          <Tooltip label={tooltip} multiline style={{ width: uiRem(15) }} position="left" withArrow>
-            <ActionIcon size={14} variant="transparent" tone="muted" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })}>
+          // An explanation behind a focusable icon opens on click, since a tooltip gives assistive tech nothing (P81-A).
+          <Popover>
+            <Popover.Trigger render={<ActionIcon size={14} variant="transparent" tone="muted" aria-label={t('lb_slot_prop_info', '{{label}} info', { label })} />}>
               <IconInfoCircle size={12} />
-            </ActionIcon>
-          </Tooltip>
+            </Popover.Trigger>
+            <Popover.Content side="left" width={240}>
+              <Text size="xs">{tooltip}</Text>
+            </Popover.Content>
+          </Popover>
         )}
       </Group>
       <Box style={{ flex: 1, minWidth: 0 }}>{children}</Box>

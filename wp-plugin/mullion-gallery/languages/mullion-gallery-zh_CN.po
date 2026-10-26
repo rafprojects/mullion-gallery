@@ -10668,3 +10668,12 @@ msgstr "编辑活动"
 #: includes/i18n/class-mullion-frontend-strings.php:2654
 msgid "Notifications"
 msgstr "通知"
+
+msgid "Permanently delete {{title}}"
+msgstr "永久删除 {{title}}"
+
+msgid "Exclusive only: show only media exclusive to this campaign"
+msgstr "仅限专属：仅显示此活动专属的媒体"
+
+msgid "Edit tags for {{name}}. Tags: {{tags}}"
+msgstr "编辑 {{name}} 的标签。标签：{{tags}}"

@@ -10668,3 +10668,12 @@ msgstr "Editar campaña"
 #: includes/i18n/class-mullion-frontend-strings.php:2654
 msgid "Notifications"
 msgstr "Notificaciones"
+
+msgid "Permanently delete {{title}}"
+msgstr "Eliminar {{title}} permanentemente"
+
+msgid "Exclusive only: show only media exclusive to this campaign"
+msgstr "Solo exclusivos: mostrar solo los medios exclusivos de esta campaña"
+
+msgid "Edit tags for {{name}}. Tags: {{tags}}"
+msgstr "Editar las etiquetas de {{name}}. Etiquetas: {{tags}}"

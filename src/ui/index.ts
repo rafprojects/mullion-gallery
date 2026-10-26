@@ -62,6 +62,7 @@ export {
   Textarea,
   TextInput,
   Title,
+  Tooltip,
   UnstyledButton,
   type ActionIconProps,
   type UiConfirmOptions,
@@ -101,7 +102,6 @@ export {
   Modal,
   Pagination,
   Tabs,
-  Tooltip,
 } from '@mantine/core';
 
 // ── Feedback and data display ──────────────────────────────────────────────

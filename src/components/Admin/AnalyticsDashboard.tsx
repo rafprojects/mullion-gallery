@@ -5,7 +5,6 @@ import {
   ScrollArea,
   Select,
   Table,
-  Tooltip,
 } from '@mantine/core';
 import {
   Group,
@@ -19,6 +18,7 @@ import {
   Paper,
   ActionIcon,
   SegmentedControl,
+  Tooltip,
 } from '@/ui';
 import {
   CartesianGrid,
@@ -238,7 +238,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
                 {t('admin_analytics_updated', 'Updated {{time}}', { time: formatUpdatedAt(lastUpdatedAt) })}
               </Text>
             )}
-            <Tooltip label={t('admin_analytics_refresh', 'Refresh analytics')} withArrow>
+            <Tooltip label={t('admin_analytics_refresh', 'Refresh analytics')}>
               <ActionIcon
                 variant="subtle"
                 size="sm"

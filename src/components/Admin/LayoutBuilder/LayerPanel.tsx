@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollArea, Tooltip } from '@mantine/core';
+import { ScrollArea } from '@mantine/core';
 import { IconChevronDown, IconChevronRight, IconLayersLinked, IconLayersOff } from '@tabler/icons-react';
 import { buildLayerList, getLayerName, type GroupLayerItem } from '@/utils/layerList';
 import { LayerRow } from './LayerRow';
 import type { LayoutTemplate } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Text, ActionIcon } from '@/ui';
+import { uiRem, Stack, Text, ActionIcon, Tooltip } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 

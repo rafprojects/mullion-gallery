@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { useTranslation } from 'react-i18next';
 import {
   Modal,
-  Tooltip,
   Divider,
 } from '@mantine/core';
 import {
@@ -23,7 +22,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useGetSettings } from '@/services/settingsQuery';
 import { AdminChromeProvider } from '@/components/Admin/AdminChromeProvider';
 import { adminChromeAttributes, adminChromeClassNames, adminChromeStyles, resolveChromeThemeId } from '@/themes/chromeTheme';
-import { getThemeEntry, Group, Text, Box, Button, ActionIcon, TextInput, MullionProvider, confirm, notify } from '@/ui';
+import { getThemeEntry, Group, Text, Box, Button, ActionIcon, TextInput, MullionProvider, confirm, notify, Tooltip } from '@/ui';
 import { useLatestRef } from '@mullion/shared-utils';
 import { DockviewReact, DockviewDefaultTab } from 'dockview';
 import { debugGroup, debugLog, debugGroupEnd } from '@/utils/debug';
@@ -558,7 +557,7 @@ export function LayoutBuilderModal({
               </Group>
               <Divider orientation="vertical" />
               <Tooltip label={tr('lb_mod_undo_tt', 'Undo (Ctrl+Z)')}>
-                <ActionIcon
+                <ActionIcon aria-keyshortcuts="Control+Z Meta+Z"
                   variant="subtle"
                   disabled={!builder.canUndo}
                   onClick={builder.undo}
@@ -568,7 +567,7 @@ export function LayoutBuilderModal({
                 </ActionIcon>
               </Tooltip>
               <Tooltip label={tr('lb_mod_redo_tt', 'Redo (Ctrl+Shift+Z)')}>
-                <ActionIcon
+                <ActionIcon aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z"
                   variant="subtle"
                   disabled={!builder.canRedo}
                   onClick={builder.redo}

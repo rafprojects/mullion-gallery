@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Select,
   Divider,
-  Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -13,7 +12,7 @@ import {
 import type { LayoutTextLayer, LayoutTextSemanticTag, LayoutTextAlign, TypographyOverride } from '@/types';
 import { TypographyEditor } from '@/components/Common/TypographyEditor';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Button, ActionIcon, SegmentedControl, Slider, TextInput, Textarea, NumberInput } from '@/ui';
+import { uiRem, Stack, Group, Text, Button, ActionIcon, SegmentedControl, Slider, TextInput, Textarea, NumberInput, Tooltip } from '@/ui';
 
 export interface TextPropertiesPanelProps {
   text: LayoutTextLayer;

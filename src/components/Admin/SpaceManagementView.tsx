@@ -3,7 +3,6 @@ import {
   Tabs,
   Loader,
   Table,
-  Tooltip,
   Select,
   Divider,
 } from '@mantine/core';
@@ -18,7 +17,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { SpaceAssetLibrary } from './SpaceAssetLibrary';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import type { FontLibraryEntry } from '@mullion/shared-utils';
-import { uiRem, Stack, Group, Text, Alert, Center, Badge, Button, ActionIcon, Switch, Checkbox, TextInput, confirm } from '@/ui';
+import { uiRem, Stack, Group, Text, Alert, Center, Badge, Button, ActionIcon, Switch, Checkbox, TextInput, confirm, VisuallyHidden, Tooltip } from '@/ui';
 
 interface SpaceGrant {
   userId: number;
@@ -461,7 +460,6 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                           label={(grant.access_level ?? 'viewer') === 'viewer'
                             ? t('admin_space_role_viewer_tip', 'Can view this space')
                             : t('admin_space_role_legacy_tip', 'Legacy grant level — treated as view-only. Managing comes from the Gallery Editor role.')}
-                          withArrow
                         >
                           <Badge
                             variant="light"
@@ -469,6 +467,11 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                             aria-label={t('admin_space_role_for', 'Role for {{name}}', { name: grant.user?.displayName ?? t('admin_space_user_lc', 'user {{id}}', { id: grant.userId }) })}
                           >
                             {spaceRoleLabel(grant.access_level ?? 'viewer')}
+                            <VisuallyHidden>
+                              {`: ${(grant.access_level ?? 'viewer') === 'viewer'
+                                ? t('admin_space_role_viewer_tip', 'Can view this space')
+                                : t('admin_space_role_legacy_tip', 'Legacy grant level — treated as view-only. Managing comes from the Gallery Editor role.')}`}
+                            </VisuallyHidden>
                           </Badge>
                         </Tooltip>
                       </Table.Td>

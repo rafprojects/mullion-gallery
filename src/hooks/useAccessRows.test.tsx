@@ -90,12 +90,13 @@ describe('useAccessRows — P75-I read-only role badge', () => {
     render(
       <TestRows entries={[{ ...baseEntry, source: 'company', access_level: 'viewer' }]} />,
     );
-    expect(screen.getByText(/company/i)).toBeInTheDocument();
+    // [P81-A] The badge's tooltip text is now inside it, hidden visually: both are found.
+    expect(screen.getByText(/company-wide access/i)).toBeInTheDocument();
   });
 
   it('renders the revoke action icon for each row', () => {
     render(<TestRows entries={[{ ...baseEntry, access_level: 'viewer' }]} />);
-    expect(screen.getByRole('button', { name: /revoke access/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /revoke .*access/i })).toBeInTheDocument();
   });
 
   it('shows expired styling when is_expired is true', () => {
@@ -109,7 +110,8 @@ describe('useAccessRows — P75-I read-only role badge', () => {
         }]}
       />,
     );
-    expect(screen.getByText(/expired/i)).toBeInTheDocument();
+    expect(screen.getByText(/^expired$/i)).toBeInTheDocument();
+    expect(screen.getByText(/this grant has expired/i)).toBeInTheDocument();
   });
 
   it('renders distinct role badges across multiple rows', () => {
@@ -131,7 +133,8 @@ describe('useAccessRows — P75-I read-only role badge', () => {
 // P64-B: revoke must be confirmed, and the confirmation copy must state the
 // actual outcome — which differs for a company-sourced grant by view mode.
 describe('useAccessRows — P64-B revoke confirmation', () => {
-  const revokeButton = () => screen.getByRole('button', { name: /revoke access/i });
+  // [P81-A] Named by what it revokes, campaign or company-wide access.
+  const revokeButton = () => screen.getByRole('button', { name: /revoke .*access/i });
 
   it('does not revoke immediately on click — it opens a confirm dialog first', async () => {
     const onRevokeAccess = vi.fn().mockResolvedValue(undefined);

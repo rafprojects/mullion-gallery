@@ -8,6 +8,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
+import { MullionProvider } from '@/ui';
 import type { ReactNode } from 'react';
 import { useLayoutBuilderState, createEmptyTemplate } from '@/hooks/useLayoutBuilderState';
 
@@ -25,8 +26,13 @@ vi.mock('@/utils/debug', () => ({
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
+// [P81-A] The panel's tooltips are the framework's, which need a provider.
 function wrapper({ children }: { children: ReactNode }) {
-  return <MantineProvider>{children}</MantineProvider>;
+  return (
+    <MantineProvider>
+      <MullionProvider>{children}</MullionProvider>
+    </MantineProvider>
+  );
 }
 
 // ── useLayoutBuilderState — history entry tracking ───────────────────────────

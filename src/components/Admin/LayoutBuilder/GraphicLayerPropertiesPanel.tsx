@@ -16,7 +16,6 @@ import {
   Accordion,
   Divider,
   Select,
-  Tooltip,
 } from '@mantine/core';
 import {
   Group,
@@ -30,6 +29,7 @@ import {
   Switch,
   NumberInput,
   TextInput,
+  Tooltip,
 } from '@/ui';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -517,7 +517,7 @@ export function GraphicLayerPropertiesPanel({
       <Divider label={t('lb_gl_stacking', 'Stacking')} labelPosition="left" />
       <Group gap="3xs" justify="center">
         <Tooltip label={t('lb_slot_send_back_tt', 'Send to Back (Shift+[)')}>
-          <ActionIcon
+          <ActionIcon aria-keyshortcuts="Shift+["
             size="sm"
             variant="subtle"
             onClick={() => onSendToBack(overlay.id)}
@@ -527,7 +527,7 @@ export function GraphicLayerPropertiesPanel({
           </ActionIcon>
         </Tooltip>
         <Tooltip label={t('lb_slot_send_bwd_tt', 'Send Backward ([)')}>
-          <ActionIcon
+          <ActionIcon aria-keyshortcuts="["
             size="sm"
             variant="subtle"
             onClick={() => onSendBackward(overlay.id)}
@@ -537,7 +537,7 @@ export function GraphicLayerPropertiesPanel({
           </ActionIcon>
         </Tooltip>
         <Tooltip label={t('lb_slot_bring_fwd_tt', 'Bring Forward (])')}>
-          <ActionIcon
+          <ActionIcon aria-keyshortcuts="]"
             size="sm"
             variant="subtle"
             onClick={() => onBringForward(overlay.id)}
@@ -547,7 +547,7 @@ export function GraphicLayerPropertiesPanel({
           </ActionIcon>
         </Tooltip>
         <Tooltip label={t('lb_slot_bring_front_tt', 'Bring to Front (Shift+])')}>
-          <ActionIcon
+          <ActionIcon aria-keyshortcuts="Shift+]"
             size="sm"
             variant="subtle"
             onClick={() => onBringToFront(overlay.id)}

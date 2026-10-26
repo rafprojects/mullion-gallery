@@ -1,6 +1,5 @@
 
-import { Tooltip } from '@mantine/core';
-import { Group, Text, Paper, Button, ActionIcon } from '@/ui';
+import { Group, Text, Paper, Button, ActionIcon, Tooltip } from '@/ui';
 import { IconX, IconArchive, IconArchiveOff, IconFileZip, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';

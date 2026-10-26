@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Table, Tooltip } from '@mantine/core';
-import { Stack, Group, Text, Badge, ActionIcon, confirm } from '@/ui';
+import { Table } from '@mantine/core';
+import { Stack, Group, Text, Badge, ActionIcon, confirm, VisuallyHidden, Tooltip } from '@/ui';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { CompanyAccessGrant as CompanyAccessGrantType } from '@/services/adminQuery';
@@ -108,7 +108,8 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
             <Stack gap="4xs">
               <Tooltip label={a.source === 'company' ? t('accessrow_src_company_tip', 'Company-wide access') : t('accessrow_src_campaign_tip', 'Direct campaign access')}>
                 <Badge variant="light" size="md" tone="default">
-                  {a.source === 'company' ? t('accessrow_src_company', '🏢 Company') : t('accessrow_src_campaign', '📋 Campaign')}
+                  <span aria-hidden>{a.source === 'company' ? t('accessrow_src_company', '🏢 Company') : t('accessrow_src_campaign', '📋 Campaign')}</span>
+                  <VisuallyHidden>{a.source === 'company' ? t('accessrow_src_company_tip', 'Company-wide access') : t('accessrow_src_campaign_tip', 'Direct campaign access')}</VisuallyHidden>
                 </Badge>
               </Tooltip>
               {isExpired && (
@@ -126,13 +127,14 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
               P53-D still show their own level, tooltipped as view-only. */}
           <Table.Td>
             <Group gap="xs" wrap="nowrap">
-              <Tooltip label={cfg.tip} withArrow>
+              <Tooltip label={cfg.tip}>
                 <Badge
                   variant="light"
                   size="md" tone="default"
                   aria-label={t('admin_space_role_for', 'Role for {{name}}', { name: a.user?.displayName ?? t('accessrow_user_short', 'user {{id}}', { id: a.userId }) })}
                 >
                   {cfg.label}
+                  <VisuallyHidden>{`: ${cfg.tip}`}</VisuallyHidden>
                 </Badge>
               </Tooltip>
             </Group>
@@ -144,6 +146,8 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
                 <Tooltip label={isExpired ? t('accessrow_expires_tip_expired', 'This grant has expired') : t('accessrow_expires_tip_active', 'Grant expires at this time')}>
                   <Text size="xs" tone={isExpired ? 'danger' : 'muted'}>
                     {t('accessrow_expires_label', 'Expires: {{date}}', { date: new Date(a.expires_at).toLocaleString() })}
+                    {/* Expired is shown by colour alone; the words carry it too. */}
+                    <VisuallyHidden>{` (${isExpired ? t('accessrow_expires_tip_expired', 'This grant has expired') : t('accessrow_expires_tip_active', 'Grant expires at this time')})`}</VisuallyHidden>
                   </Text>
                 </Tooltip>
               )}
@@ -151,7 +155,7 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
           </Table.Td>
           <Table.Td>
             <Tooltip label={a.source === 'company' ? t('accessrow_revoke_company_tip', 'Revoke company-wide access') : t('accessrow_revoke_campaign_tip', 'Revoke campaign access')}>
-              <ActionIcon tone="danger" variant="light" size="lg" onClick={() => openRevokeConfirm(a)} aria-label={t('admin_space_revoke_aria', 'Revoke access')}>
+              <ActionIcon tone="danger" variant="light" size="lg" onClick={() => openRevokeConfirm(a)} aria-label={a.source === 'company' ? t('accessrow_revoke_company_tip', 'Revoke company-wide access') : t('accessrow_revoke_campaign_tip', 'Revoke campaign access')}>
                 <IconTrash size={16} />
               </ActionIcon>
             </Tooltip>

@@ -465,15 +465,22 @@ describe('the menu', () => {
 });
 
 describe('the tooltip', () => {
-  it('does not wrap its child in a second button', () => {
+  // [P81-A] The child is the trigger, as Mantine's was: a wrapper box changed the layout of a
+  // full-width or absolutely positioned child and anchored the tooltip to the wrong place.
+  it('makes its child the trigger, with no wrapper', () => {
     mount(
       <Tooltip label="Delete this">
         <button type="button">Delete</button>
       </Tooltip>,
     );
     const trigger = screen.getByRole('button', { name: 'Delete' });
-    expect(trigger.closest('.mullion-tooltip-trigger')!.tagName).toBe('SPAN');
+    expect(trigger.closest('.mullion-tooltip-trigger')).toBeNull();
     expect(trigger.parentElement!.tagName).not.toBe('BUTTON');
+  });
+
+  it('wraps a child that is not a single element in a span', () => {
+    mount(<Tooltip label="About this">plain text</Tooltip>);
+    expect(screen.getByText('plain text').closest('.mullion-tooltip-trigger')!.tagName).toBe('SPAN');
   });
 
   it('shows its label on hover', async () => {

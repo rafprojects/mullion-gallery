@@ -337,6 +337,32 @@ The overlays that open inside dialogs move before the dialogs (user decision abo
 
 **A flake to watch.** In one full run, `portal-mode.spec.ts`'s drawer test timed out clicking the Admin menu's Settings item, intercepted by the hostile fixture's sticky header while the newly framework menu was still settling. It passed in the same run's re-run and in four further runs alone. If it recurs, the test should wait for the menu to finish positioning before clicking. The allow-list fell from 160 to 141.
 
+### Pass 2: tooltips (2026-10-26)
+
+**The trigger is the child.** The framework tooltip wrapped its child in a span, while Mantine made the child itself the trigger. A wrapping box changes the layout of a full-width or absolutely positioned child, and anchors the tooltip to the box rather than the control. All 115 call sites wrap one element that takes a ref (Mantine required it), so the framework now renders that element as the trigger through Base UI's `render`, and wraps only text or several nodes in a span (`overlays.test.tsx`, red first). The pass-2 codemod renames `position` to `side` and drops `withArrow` (rule 20) and `multiline`, since the framework tooltip wraps at 288px by itself: 91 edits in 32 files.
+
+**The 22 tooltips that carried information** (P80-F item 10, listed under P81-B) each have their own channel now:
+
+| Kind | Where | Channel |
+|------|-------|---------|
+| No name | The media tab's three view-mode segments | Each segment has an `aria-label`; the framework segmented control gained one per segment |
+| Explanation behind a focusable icon | The slot and mask properties' info buttons | A popover that opens on click |
+| Explanation behind a focusable icon | The design assets' tag button | The current tags follow its name |
+| Reason on a disabled control | "Pick a space first" on New campaign and Import | Shown as text beside them while all spaces are selected |
+| Extra detail on a visible-text control | Permanently delete (mobile list and table), the exclusive-only switch | Folded into the name, which keeps the visible text (WCAG 2.5.3) |
+| Extra detail on a visible-text control | Fit to viewport or canvas | The explanation is the button's description; its name is now its visible text |
+| On a non-focusable element | Custom gallery icon (mobile list) | Its summary is in the icon's name |
+| On a non-focusable element | Grant and pending counts, access source, role and expiry badges | The text is inside the element, visually hidden |
+| On a non-focusable element | "Click to select" on the reset link field | The field's description |
+| Shortcut hint | 26 controls in the builder and the admin toolbar | `aria-keyshortcuts`, Control and Meta both listed where the hint says Ctrl |
+| Transient feedback | "Copied!" on the webhook secret | A polite live region beside the button |
+
+Two of the 22 had been fixed in passing since the classification: the mobile list's grant badge reads "3 grants", and the Move button's name already says "to another space".
+
+Three of the new names are new strings rather than two translations joined with a colon, which a translator could not reorder: "Permanently delete {{title}}", the exclusive-only switch's name, and the tag button's name with its tags, each translated in all five locales. `BuilderHistory.test.tsx` mounted only Mantine's provider, which the framework tooltip needs; it mounts both now.
+
+**Validation.** Typecheck, lint, the allow-list (141 to 137) and both i18n checks clean. The full unit run had 4488 passing and 6 failing, all in `BuilderHistory.test.tsx` for the missing provider; with it, the file's 24 pass, and the files beside every renamed name pass after the string change (153 tests). The theme captures match the last batch's (16 compared, 0 differ), and the full e2e run passes (241, one skipped).
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Select,
-  Tooltip,
 } from '@mantine/core';
 import { BuilderColorInput as ColorInput } from './BuilderColorInput';
 import { IconTrash } from '@tabler/icons-react';
@@ -19,7 +18,7 @@ import { useBuilderDock } from './BuilderDockContext';
 import { AssetUploader } from './AssetUploader';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box, Button, ActionIcon, Slider, SegmentedControl, NumberInput } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, Button, ActionIcon, Slider, SegmentedControl, NumberInput, Tooltip } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -208,7 +207,7 @@ function BackgroundModeControls({
             <GRow label={t('lb_bg_dir', 'Dir')}>
               <Group gap="3xs">
                 {GRADIENT_DIRECTIONS.map((d) => (
-                  <Tooltip key={d.value} label={t(`lb_bg_dir_${d.value}`, d.label)} position="top">
+                  <Tooltip key={d.value} label={t(`lb_bg_dir_${d.value}`, d.label)} side="top">
                     <ActionIcon
                       size="sm"
                       variant={dir === d.value && builder.template.backgroundGradientAngle == null ? 'filled' : 'subtle'}

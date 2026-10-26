@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import {
   Loader,
   Pagination,
-  Tooltip,
 } from '@mantine/core';
 import {
   IconArchive, IconArchiveOff, IconChevronDown, IconCopy, IconDownload, IconEdit,
@@ -13,7 +12,7 @@ import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Box, Center, Badge, Card, Button, Checkbox, Menu } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, Badge, Card, Button, Checkbox, Menu, Tooltip } from '@/ui';
 
 // Returns an i18next key + English default so the caller can translate in render.
 function scheduleLabel(publishAt?: string, unpublishAt?: string): { key: string; text: string; tone: 'info' | 'warning' | 'danger' } | null {
@@ -96,8 +95,8 @@ export function CampaignsMobileList({
                 />
                 <Text weight={600} size="sm" truncate style={{ flex: 1 }}>{c.title}</Text>
                 {hasCampaignGalleryOverrides(c) && (
-                  <Tooltip label={t('admin_custom_gallery', 'Custom gallery: {{summary}}', { summary: galleryOverrideSummary.join(', ') || t('admin_nested_overrides', 'Nested overrides') })} withArrow>
-                    <Box render={<span />} role="img" aria-label={t('admin_custom_gallery_aria', 'Custom gallery overrides')} style={{ display: 'inline-flex' }}>
+                  <Tooltip label={t('admin_custom_gallery', 'Custom gallery: {{summary}}', { summary: galleryOverrideSummary.join(', ') || t('admin_nested_overrides', 'Nested overrides') })}>
+                    <Box render={<span />} role="img" aria-label={t('admin_custom_gallery', 'Custom gallery: {{summary}}', { summary: galleryOverrideSummary.join(', ') || t('admin_nested_overrides', 'Nested overrides') })} style={{ display: 'inline-flex' }}>
                       <IconLayoutGrid size={13} color="var(--mantine-color-violet-5)" aria-hidden />
                     </Box>
                   </Tooltip>
@@ -119,7 +118,7 @@ export function CampaignsMobileList({
               {sched && <Badge size="xs" variant="light" tone={sched.tone}>{t(sched.key, sched.text)}</Badge>}
               {c.companyId && <Badge tone="default" size="xs" variant="outline">{c.companyId}</Badge>}
               {summary !== undefined && (
-                <Tooltip label={t('admin_grant_count', '{{count}} grant', { count: summary.grantCount })} withArrow>
+                <Tooltip label={t('admin_grant_count', '{{count}} grant', { count: summary.grantCount })}>
                   <Badge tone="default" size="xs" variant="light">{t('admin_grants_badge', '{{count}} grants', { count: summary.grantCount })}</Badge>
                 </Tooltip>
               )}
@@ -163,7 +162,7 @@ export function CampaignsMobileList({
                 </Button>
               )}
               <Tooltip label={t('admin_perm_delete', 'Permanently delete')}>
-                <Button size="xs" tone="danger" variant="subtle" leftSection={<IconTrash size={12} />} loading={deletingIds.has(cid)} onClick={() => setConfirmDelete(c)} aria-label={t('admin_delete_item', 'Delete {{title}}', { title: c.title })}>
+                <Button size="xs" tone="danger" variant="subtle" leftSection={<IconTrash size={12} />} loading={deletingIds.has(cid)} onClick={() => setConfirmDelete(c)} aria-label={t('admin_perm_delete_item', 'Permanently delete {{title}}', { title: c.title })}>
                   {t('admin_delete', 'Delete')}
                 </Button>
               </Tooltip>

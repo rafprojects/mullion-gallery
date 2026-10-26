@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
-import { Modal, Table, Tooltip } from '@mantine/core';
+import { Modal, Table } from '@mantine/core';
 import { IconEdit, IconCheck, IconX, IconRotateClockwise } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { ACTION_IDS, ACTION_DEFAULTS, type ShortcutActionId, type ShortcutConfigHandle } from '@/hooks/useShortcutConfig';
-import { uiRem, Stack, Group, Text, Badge, Button, ActionIcon, TextInput } from '@/ui';
+import { uiRem, Stack, Group, Text, Badge, Button, ActionIcon, TextInput, Tooltip } from '@/ui';
 
 // ── Key display helpers ───────────────────────────────────────────────────────
 
@@ -162,14 +162,14 @@ function EditRow({ id, currentKey, defaultKey, config }: EditRowProps) {
       <Table.Td style={{ width: uiRem(5) }}>
         <Group gap="3xs" wrap="nowrap">
           {!recording && (
-            <Tooltip label={t('admin_ksc_remap', 'Remap')} withArrow>
+            <Tooltip label={t('admin_ksc_remap', 'Remap')}>
               <ActionIcon size="xs" variant="subtle" onClick={startRecording} aria-label={t('admin_ksc_remap_name', 'Remap {{name}}', { name: ACTION_DEFAULTS[id].label })}>
                 <IconEdit size={13} />
               </ActionIcon>
             </Tooltip>
           )}
           {isCustomized && !recording && (
-            <Tooltip label={t('admin_ksc_reset_default', 'Reset to default')} withArrow>
+            <Tooltip label={t('admin_ksc_reset_default', 'Reset to default')}>
               <ActionIcon size="xs" variant="subtle" tone="warning" onClick={resetRow} aria-label={t('admin_ksc_reset_name', 'Reset {{name}} to default', { name: ACTION_DEFAULTS[id].label })}>
                 <IconRotateClockwise size={13} />
               </ActionIcon>

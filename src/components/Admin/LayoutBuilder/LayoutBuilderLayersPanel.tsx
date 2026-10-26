@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip, Divider } from '@mantine/core';
-import { Group, ActionIcon, TextInput } from '@/ui';
+import { Divider } from '@mantine/core';
+import { Group, ActionIcon, TextInput, Tooltip } from '@/ui';
 import { IconSearch, IconX } from '@tabler/icons-react';
 import {
   IconPlus, IconTrash, IconCopy, IconMask, IconLetterT,

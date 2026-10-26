@@ -5,7 +5,6 @@ import {
   Select,
   Skeleton,
   Table,
-  Tooltip,
 } from '@mantine/core';
 import { IconAlertCircle, IconArchive, IconUserPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +14,7 @@ import { PendingRequestsPanel } from './PendingRequestsPanel';
 import type { ApiClient } from '@/services/apiClient';
 import type { AdminAccessState } from '@/hooks/useAdminAccessState';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Alert, Box, Center, Badge, Card, useMediaQuery, Button, Checkbox, SegmentedControl, TextInput } from '@/ui';
+import { uiRem, Group, Stack, Text, Alert, Box, Center, Badge, Card, useMediaQuery, Button, Checkbox, SegmentedControl, TextInput, Tooltip } from '@/ui';
 
 type AccessViewMode = 'campaign' | 'company' | 'all';
 

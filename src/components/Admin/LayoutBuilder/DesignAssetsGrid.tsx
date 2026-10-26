@@ -1,6 +1,6 @@
 
-import { Tooltip, TagsInput } from '@mantine/core';
-import { Text, Box, Badge, ActionIcon, Popover } from '@/ui';
+import { TagsInput } from '@mantine/core';
+import { Text, Box, Badge, ActionIcon, Popover, Tooltip } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { IconX, IconWorld, IconWorldOff, IconTag } from '@tabler/icons-react';
 import type { AssetLibraryItem } from './BuilderDockContext';
@@ -118,9 +118,12 @@ export function DesignAssetsGrid({
               {/* Universal (all-spaces) toggle — bottom-right */}
               {onSetUniversal && (
                 <Tooltip
-                  label={item.isUniversal ? 'Available to all spaces — click to make space-specific' : 'Make available to all spaces'}
-                  withArrow
-                  position="top"
+                  label={
+                    item.isUniversal
+                      ? t('admin_font_make_specific', 'Make {{name}} space-specific', { name: item.name })
+                      : t('admin_font_make_universal', 'Make {{name}} available to all spaces', { name: item.name })
+                  }
+                  side="top"
                 >
                   <ActionIcon
                     size={16}
@@ -153,7 +156,7 @@ export function DesignAssetsGrid({
               {/* P50-K: tag editor — top-left */}
               {onSetTags && (
                 <Popover>
-                  <Tooltip label={item.tags?.length ? t('lb_dag_tags_list', 'Tags: {{tags}}', { tags: item.tags.join(', ') }) : t('lb_dag_add_tags', 'Add tags')} withArrow position="top">
+                  <Tooltip label={item.tags?.length ? t('lb_dag_tags_list', 'Tags: {{tags}}', { tags: item.tags.join(', ') }) : t('lb_dag_add_tags', 'Add tags')} side="top">
                     <Popover.Trigger
                       render={
                         <ActionIcon
@@ -163,7 +166,12 @@ export function DesignAssetsGrid({
                           radius="xl"
                           style={{ position: 'absolute', top: 2, left: 2, zIndex: 1, opacity: item.tags?.length ? 1 : 0.7 }}
                           onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                          aria-label={t('lb_dag_edit_tags', 'Edit tags for {{name}}', { name: item.name })}
+                          // The current tags are in the name, since the tooltip that lists them gives assistive tech nothing (P81-A).
+                          aria-label={
+                            item.tags?.length
+                              ? t('lb_dag_edit_tags_with', 'Edit tags for {{name}}. Tags: {{tags}}', { name: item.name, tags: item.tags.join(', ') })
+                              : t('lb_dag_edit_tags', 'Edit tags for {{name}}', { name: item.name })
+                          }
                         />
                       }
                     >
@@ -185,7 +193,7 @@ export function DesignAssetsGrid({
 
               {/* X delete overlay */}
               {onDelete && (
-                <Tooltip label={t('lb_dag_delete', 'Delete')} withArrow position="top">
+                <Tooltip label={t('lb_dag_delete', 'Delete')} side="top">
                   <ActionIcon
                     size={16}
                     variant="filled"

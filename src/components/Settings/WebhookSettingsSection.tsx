@@ -5,7 +5,6 @@ import {
   Loader,
   Modal,
   MultiSelect,
-  Tooltip,
 } from '@mantine/core';
 import {
   Group,
@@ -21,6 +20,8 @@ import {
   Switch,
   TextInput,
   notify,
+  VisuallyHidden,
+  Tooltip,
 } from '@/ui';
 import { IconCopy, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -78,11 +79,15 @@ function SecretReveal({ secret }: { secret: string }) {
         </Text>
         <CopyButton value={secret}>
           {({ copied, copy }) => (
-            <Tooltip label={copied ? t('set_wh_copied', 'Copied!') : t('set_wh_copy_secret', 'Copy secret')}>
-              <ActionIcon size="sm" variant="subtle" onClick={copy} aria-label={t('set_wh_copy_secret', 'Copy secret')}>
-                <IconCopy size={14} />
-              </ActionIcon>
-            </Tooltip>
+            <>
+              <Tooltip label={copied ? t('set_wh_copied', 'Copied!') : t('set_wh_copy_secret', 'Copy secret')}>
+                <ActionIcon size="sm" variant="subtle" onClick={copy} aria-label={t('set_wh_copy_secret', 'Copy secret')}>
+                  <IconCopy size={14} />
+                </ActionIcon>
+              </Tooltip>
+              {/* The confirmation is announced, since a tooltip gives assistive tech nothing (P81-A). */}
+              <VisuallyHidden aria-live="polite">{copied ? t('set_wh_copied', 'Copied!') : ''}</VisuallyHidden>
+            </>
           )}
         </CopyButton>
       </Group>

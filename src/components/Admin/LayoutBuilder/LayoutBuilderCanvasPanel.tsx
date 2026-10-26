@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getHotkeyHandler, useElementSize, useMergedRef } from '@mantine/hooks';
 import {
   Divider,
-  Tooltip,
 } from '@mantine/core';
 import type { ResponsiveBreakpoint } from '@/types';
 import { IconHandGrab, IconArrowsMaximize, IconSeparatorVertical, IconSeparatorHorizontal } from '@tabler/icons-react';
@@ -18,7 +17,7 @@ import { safeLocalStorage, fitRectsIntoBand } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group, Text, Box, Alert, Button, ActionIcon, Switch, Slider, SegmentedControl, NumberInput } from '@/ui';
+import { uiRem, Group, Text, Box, Alert, Button, ActionIcon, Switch, Slider, SegmentedControl, NumberInput, VisuallyHidden, Tooltip } from '@/ui';
 
 // ── P30-C: Device preview presets ────────────────────────────────────────────
 
@@ -75,6 +74,7 @@ const SNAP_MODE_DATA = (Object.entries(SNAP_MODE_LABELS) as [SnapMode, string][]
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
+  const fitDescriptionId = useId();
   const {
     builder,
     media,
@@ -674,12 +674,19 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                         size="xs"
                         variant="light"
                         onClick={handleFitToViewport}
-                        aria-label={breakpointViewportPx ? tr('lb_canvas_fit_slots_vp', 'Fit slots to viewport') : tr('lb_canvas_fit_slots_cv', 'Fit slots to canvas')}
+                        // Named by its visible text (WCAG 2.5.3), described by what the tooltip explains.
+                        aria-describedby={fitDescriptionId}
                         data-testid="fit-to-viewport"
                       >
                         {breakpointViewportPx ? tr('lb_canvas_fit_viewport', 'Fit to viewport') : tr('lb_canvas_fit_canvas', 'Fit to canvas')}
                       </Button>
                     </Tooltip>
+                    {/* What the tooltip explains, as the button's description (P81-A). */}
+                    <VisuallyHidden id={fitDescriptionId}>
+                      {breakpointViewportPx
+                        ? tr('lb_canvas_fit_vp_tt', "Move/scale the selected slots (or all slots) to fit this device's viewport — applies to this breakpoint only")
+                        : tr('lb_canvas_fit_cv_tt', 'Move/scale the selected slots (or all slots) back inside the canvas bounds')}
+                    </VisuallyHidden>
                   </Group>
                   <Divider orientation="vertical" />
                 </>
@@ -696,7 +703,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
               {/* ── Zoom controls ────────────────────────────────── */}
               <Group gap="3xs" wrap="nowrap">
                 <Tooltip label={isHandTool ? tr('lb_canvas_select_tool', 'Switch to select tool') : tr('lb_canvas_hand_tool_tt', 'Hand tool — pan canvas (H)')}>
-                  <ActionIcon
+                  <ActionIcon aria-keyshortcuts="H"
                     variant={isHandTool ? 'filled' : 'subtle'}
                     size="sm"
                     onClick={() => setIsHandTool((v) => !v)}
@@ -707,7 +714,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                   </ActionIcon>
                 </Tooltip>
                 <Tooltip label={tr('lb_canvas_fit_cv_f', 'Fit canvas to viewport (F)')}>
-                  <ActionIcon
+                  <ActionIcon aria-keyshortcuts="F"
                     variant="subtle"
                     size="sm"
                     onClick={handleFitCanvas}
@@ -785,7 +792,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
               {/* Zoom controls visible in preview mode too */}
               <Group gap="3xs" wrap="nowrap">
                 <Tooltip label={tr('lb_canvas_fit_cv_f', 'Fit canvas to viewport (F)')}>
-                  <ActionIcon
+                  <ActionIcon aria-keyshortcuts="F"
                     variant="subtle"
                     size="sm"
                     onClick={handleFitCanvas}

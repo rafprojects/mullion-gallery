@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip } from '@mantine/core';
-import { Group, ActionIcon, Button, TextInput, Modal } from '@/ui';
+import { Group, ActionIcon, Button, TextInput, Modal, Tooltip } from '@/ui';
 import {
   IconArrowDown,
   IconArrowUp,
@@ -185,7 +184,7 @@ export function ContextualToolbar({
             </ActionIcon>
           </Tooltip>
           <Tooltip label={t('lb_ctb_ungroup_tt', 'Ungroup (Ctrl+Shift+G)')} openDelay={400}>
-            <ActionIcon
+            <ActionIcon aria-keyshortcuts="Control+Shift+G Meta+Shift+G"
               size="sm"
               variant="subtle"
               tone="default"
@@ -220,7 +219,7 @@ export function ContextualToolbar({
           </Tooltip>
           <ToolbarDivider />
           <Tooltip label={t('lb_ctb_bring_fwd_tt', 'Bring forward (])')} openDelay={400}>
-            <ActionIcon
+            <ActionIcon aria-keyshortcuts="]"
               size="sm"
               variant="subtle"
               tone="default"
@@ -231,7 +230,7 @@ export function ContextualToolbar({
             </ActionIcon>
           </Tooltip>
           <Tooltip label={t('lb_ctb_send_bwd_tt', 'Send backward ([)')} openDelay={400}>
-            <ActionIcon
+            <ActionIcon aria-keyshortcuts="["
               size="sm"
               variant="subtle"
               tone="default"
@@ -247,7 +246,7 @@ export function ContextualToolbar({
       {selectionKind === 'multi' && (
         <>
           <Tooltip label={t('lb_ctb_group_tt', 'Group (Ctrl+G)')} openDelay={400}>
-            <ActionIcon
+            <ActionIcon aria-keyshortcuts="Control+G Meta+G"
               size="sm"
               variant="subtle"
               tone="default"
@@ -258,7 +257,7 @@ export function ContextualToolbar({
             </ActionIcon>
           </Tooltip>
           <Tooltip label={t('lb_ctb_dup_tt', 'Duplicate (Ctrl+D)')} openDelay={400}>
-            <ActionIcon
+            <ActionIcon aria-keyshortcuts="Control+D Meta+D"
               size="sm"
               variant="subtle"
               tone="default"
@@ -270,7 +269,7 @@ export function ContextualToolbar({
           </Tooltip>
           <ToolbarDivider />
           <Tooltip label={t('lb_ctb_del_tt', 'Delete (Del)')} openDelay={400}>
-            <ActionIcon
+            <ActionIcon aria-keyshortcuts="Delete"
               size="sm"
               variant="subtle"
               tone="danger"
@@ -286,7 +285,7 @@ export function ContextualToolbar({
       {selectionKind === 'single' && (
         <>
           <Tooltip label={t('lb_ctb_dup_tt', 'Duplicate (Ctrl+D)')} openDelay={400}>
-            <ActionIcon
+            <ActionIcon aria-keyshortcuts="Control+D Meta+D"
               size="sm"
               variant="subtle"
               tone="default"
@@ -297,7 +296,7 @@ export function ContextualToolbar({
             </ActionIcon>
           </Tooltip>
           <Tooltip label={t('lb_ctb_bring_fwd_tt', 'Bring forward (])')} openDelay={400}>
-            <ActionIcon
+            <ActionIcon aria-keyshortcuts="]"
               size="sm"
               variant="subtle"
               tone="default"
@@ -308,7 +307,7 @@ export function ContextualToolbar({
             </ActionIcon>
           </Tooltip>
           <Tooltip label={t('lb_ctb_send_bwd_tt', 'Send backward ([)')} openDelay={400}>
-            <ActionIcon
+            <ActionIcon aria-keyshortcuts="["
               size="sm"
               variant="subtle"
               tone="default"
@@ -320,7 +319,7 @@ export function ContextualToolbar({
           </Tooltip>
           <ToolbarDivider />
           <Tooltip label={t('lb_ctb_del_tt', 'Delete (Del)')} openDelay={400}>
-            <ActionIcon
+            <ActionIcon aria-keyshortcuts="Delete"
               size="sm"
               variant="subtle"
               tone="danger"

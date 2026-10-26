@@ -7,7 +7,6 @@ import {
   Progress,
   Tabs,
   TagsInput,
-  Tooltip,
 } from '@mantine/core';
 import type { CampaignCategoryEntry } from '@/services/apiClient';
 import type { TagEntry } from '@/services/api/campaignsApi';
@@ -36,7 +35,7 @@ import {
   setCampaignBreakpointScopeAdapterOverride,
   syncCampaignGalleryOverrideMode,
 } from '@/utils/campaignGalleryOverrides';
-import { uiRem, Group, Stack, Text, Box, Center, SimpleGrid, Badge, Card, ActionIcon, Button, FileButton, TextInput, Textarea } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, SimpleGrid, Badge, Card, ActionIcon, Button, FileButton, TextInput, Textarea, Tooltip } from '@/ui';
 
 
 const LazyGalleryConfigEditorModal = lazy(() =>

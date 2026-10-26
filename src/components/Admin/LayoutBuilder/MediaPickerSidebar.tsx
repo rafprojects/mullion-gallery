@@ -13,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 import {
   ScrollArea,
   Image,
-  Tooltip,
 } from '@mantine/core';
 import {
   IconWand,
@@ -29,7 +28,7 @@ import {
 } from '@tabler/icons-react';
 import type { LayoutSlot, LayoutTemplate, MediaItem } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Badge, Button, UnstyledButton, ActionIcon, TextInput, Menu } from '@/ui';
+import { uiRem, Stack, Group, Text, Badge, Button, UnstyledButton, ActionIcon, TextInput, Menu, Tooltip } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 

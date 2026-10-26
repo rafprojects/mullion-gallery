@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, useRef, memo } from 'react';
-import { Select, Table, Tooltip, Pagination, Skeleton, type Primitive } from '@mantine/core';
+import { Select, Table, Pagination, Skeleton, type Primitive } from '@mantine/core';
 
 // Mantine's SegmentedControl calls setState inside its ref callbacks, which triggers
 // React's "maximum update depth" error when the component re-renders rapidly.
@@ -51,7 +51,7 @@ import { useMediaExternal } from '@/hooks/useMediaExternal';
 import { useMediaCrud } from '@/hooks/useMediaCrud';
 import { useMediaDisplay } from '@/hooks/useMediaDisplay';
 import styles from './MediaTab.module.scss';
-import { uiRem, Group, Text, Grid, Box, Button, Switch, SegmentedControl } from '@/ui';
+import { uiRem, Group, Text, Grid, Box, Button, Switch, SegmentedControl, Tooltip } from '@/ui';
 
 // Position the DragOverlay so its top-center sits just below the cursor.
 // The overlay is 140 px wide; placing the cursor at (width/2, 12) gives a natural
@@ -273,9 +273,10 @@ export default function MediaTab({ campaignId, apiClient, onCampaignsUpdated }: 
   // Stable data arrays for SegmentedControl — new array references on every render can trigger
   // Mantine's internal ref-measurement loop and cause infinite setState cycles under rapid updates.
   const viewModeData = useMemo(() => [
-    { value: 'grid', label: <Tooltip label={t('admin_media_view_grid', 'Grid View')}><Box><IconLayoutGrid size={16} /></Box></Tooltip> },
-    { value: 'compact', label: <Tooltip label={t('admin_media_view_compact', 'Compact Grid')}><Box><IconGridDots size={16} /></Box></Tooltip> },
-    { value: 'list', label: <Tooltip label={t('admin_media_view_list', 'List View')}><Box><IconList size={16} /></Box></Tooltip> },
+    // Icon-only segments are named, since a tooltip gives assistive tech nothing (P81-A).
+    { value: 'grid', 'aria-label': t('admin_media_view_grid', 'Grid View'), label: <Tooltip label={t('admin_media_view_grid', 'Grid View')}><Box><IconLayoutGrid size={16} /></Box></Tooltip> },
+    { value: 'compact', 'aria-label': t('admin_media_view_compact', 'Compact Grid'), label: <Tooltip label={t('admin_media_view_compact', 'Compact Grid')}><Box><IconGridDots size={16} /></Box></Tooltip> },
+    { value: 'list', 'aria-label': t('admin_media_view_list', 'List View'), label: <Tooltip label={t('admin_media_view_list', 'List View')}><Box><IconList size={16} /></Box></Tooltip> },
   ], [t]);
 
   const cardSizeData = useMemo(() => [
@@ -348,7 +349,8 @@ export default function MediaTab({ campaignId, apiClient, onCampaignsUpdated }: 
               label={t('admin_media_exclusive', 'Exclusive only')}
               checked={orphanFilter}
               onChange={(checked) => setOrphanFilter(checked)}
-              aria-label={t('admin_media_exclusive_aria', 'Show only media exclusive to this campaign')}
+              // The visible label first, so the name contains it (WCAG 2.5.3), then what the tooltip explains.
+              aria-label={t('admin_media_exclusive_named', 'Exclusive only: show only media exclusive to this campaign')}
             />
           </Tooltip>
           <Button
