@@ -417,3 +417,229 @@ for (const theme of ['default-light', 'default-dark'] as const) {
     expect.soft(got.disabled.opacity, 'disabled opacity').toBe('1');
   });
 }
+
+// [P81-A] The fields, by Mantine measured live in the settings drawer and by
+// the designer's answers (2026-10-26): label, then description, then input,
+// 5px apart; 8px corners; the label 12px at xs and 14px at sm, 500 and `text`;
+// padding a third of the height; stacked steppers 17px and 24px wide, out of
+// the tab order, `textMuted` chevrons behind a `border` divider; a disabled
+// field recessed by rule 16; a `bare` field that reserves its edge at rest.
+const FIELDS = {
+  xs: { height: 30, label: 12, input: 12, pad: 10, stepper: 17, chevron: 10 },
+  sm: { height: 36, label: 14, input: 14, pad: 12, stepper: 24, chevron: 14 },
+} as const;
+
+test('fields take Mantine geometry and the designer order', async ({ page }) => {
+  test.setTimeout(90_000);
+  await serveShowcase(page);
+  await page.goto('/ui-showcase?mount=shadow&controls=1&theme=default-light&chrome=follow');
+  await page.getByTestId('inline-number-sm').waitFor();
+  await settle(page);
+  for (const [size, want] of Object.entries(FIELDS)) {
+    const got = await page.evaluate((size) => {
+      const root = document.getElementById('showcase')!.shadowRoot!;
+      const token = (name: string) => {
+        const probe = document.createElement('div');
+        probe.style.color = `var(${name})`;
+        root.firstElementChild!.appendChild(probe);
+        const value = getComputedStyle(probe).color;
+        probe.remove();
+        return value;
+      };
+      const field = (id: string) => root.querySelector(`[data-testid="${id}"]`)!.closest('.mullion-field')!;
+      const box = (el: Element | null) => el!.getBoundingClientRect();
+      const read = (id: string) => {
+        const f = field(id);
+        const label = f.querySelector('.mullion-field-label')!;
+        const control = f.querySelector('.mullion-field-control')!;
+        const input = f.querySelector('.mullion-field-input')!;
+        return {
+          label: box(label),
+          labelSize: parseFloat(getComputedStyle(label).fontSize),
+          labelWeight: getComputedStyle(label).fontWeight,
+          labelInk: getComputedStyle(label).color,
+          desc: box(f.querySelector('.mullion-field-description')),
+          control: box(control),
+          radius: getComputedStyle(control).borderTopLeftRadius,
+          inputSize: parseFloat(getComputedStyle(input).fontSize),
+          pad: parseFloat(getComputedStyle(input).paddingInlineStart),
+        };
+      };
+      const num = field(`inline-number-${size}`);
+      const steppers = num.querySelector('.mullion-field-steppers') as HTMLElement | null;
+      const buttons = steppers ? [...steppers.querySelectorAll('button')] : [];
+      return {
+        text: read(`inline-field-${size}`),
+        number: read(`inline-number-${size}`),
+        stepper: steppers
+          ? {
+              width: steppers.getBoundingClientRect().width,
+              divider: getComputedStyle(steppers).borderInlineStartColor,
+              count: buttons.length,
+              tabbable: buttons.filter((b) => b.tabIndex >= 0).length,
+              hidden: buttons.every((b) => b.getAttribute('aria-hidden') === 'true'),
+              ink: getComputedStyle(buttons[0]!).color,
+              chevron: buttons[0]!.querySelector('svg')!.getBoundingClientRect().width,
+            }
+          : null,
+        textInk: token('--mullion-color-text'),
+        muted: token('--mullion-color-text-muted'),
+        border: token('--mullion-color-border'),
+      };
+    }, size);
+    const at = `(${size})`;
+    for (const kind of ['text', 'number'] as const) {
+      const f = got[kind];
+      expect.soft(f.desc.top, `${kind} description above the input ${at}`).toBeLessThan(f.control.top);
+      expect.soft(f.desc.top - f.label.bottom, `${kind} label to description ${at}`).toBeCloseTo(5, 1);
+      expect.soft(f.control.top - f.desc.bottom, `${kind} description to input ${at}`).toBeCloseTo(5, 1);
+      expect.soft(f.control.height, `${kind} height ${at}`).toBeCloseTo(want.height, 1);
+      expect.soft(f.radius, `${kind} radius ${at}`).toBe('8px');
+      expect.soft(f.labelSize, `${kind} label size ${at}`).toBe(want.label);
+      expect.soft(f.labelWeight, `${kind} label weight ${at}`).toBe('500');
+      expect.soft(f.labelInk, `${kind} label ink ${at}`).toBe(got.textInk);
+      expect.soft(f.inputSize, `${kind} input size ${at}`).toBe(want.input);
+      expect.soft(f.pad, `${kind} input padding ${at}`).toBeCloseTo(want.pad, 1);
+    }
+    expect.soft(got.stepper, `steppers on by default ${at}`).not.toBeNull();
+    if (got.stepper) {
+      expect.soft(got.stepper.width, `stepper width ${at}`).toBeCloseTo(want.stepper, 1);
+      expect.soft(got.stepper.count, `two chevrons ${at}`).toBe(2);
+      expect.soft(got.stepper.tabbable, `steppers out of the tab order ${at}`).toBe(0);
+      expect.soft(got.stepper.hidden, `steppers hidden from assistive tech ${at}`).toBe(true);
+      expect.soft(got.stepper.ink, `chevron ink ${at}`).toBe(got.muted);
+      expect.soft(got.stepper.divider, `stepper divider ${at}`).toBe(got.border);
+      expect.soft(got.stepper.chevron, `chevron size ${at}`).toBeCloseTo(want.chevron, 1);
+    }
+  }
+});
+
+for (const theme of ['default-light', 'default-dark'] as const) {
+  test(`a disabled field is recessed and a bare field reserves its edge (${theme})`, async ({ page }) => {
+    await serveShowcase(page);
+    await page.goto(`/ui-showcase?mount=shadow&controls=1&theme=${theme}&chrome=follow`);
+    await page.getByTestId('inline-bare').waitFor();
+    await settle(page);
+    const read = () =>
+      page.evaluate(() => {
+        const root = document.getElementById('showcase')!.shadowRoot!;
+        const token = (name: string) => {
+          const probe = document.createElement('div');
+          probe.style.color = `var(${name})`;
+          root.firstElementChild!.appendChild(probe);
+          const value = getComputedStyle(probe).color;
+          probe.remove();
+          return value;
+        };
+        const control = (id: string) =>
+          root.querySelector(`[data-testid="${id}"]`)!.closest('.mullion-field')!.querySelector('.mullion-field-control') as HTMLElement;
+        const c = (id: string) => getComputedStyle(control(id));
+        const disabledInput = getComputedStyle(control('inline-number-disabled').querySelector('.mullion-field-input')!);
+        return {
+          disabled: { ground: c('inline-number-disabled').backgroundColor, edge: c('inline-number-disabled').borderTopColor, ink: disabledInput.color, opacity: c('inline-number-disabled').opacity },
+          bare: { ground: c('inline-bare').backgroundColor, edge: c('inline-bare').borderTopColor, width: c('inline-bare').borderTopWidth, box: control('inline-bare').getBoundingClientRect() },
+          plain: { ground: c('inline-plain').backgroundColor, focusEdge: token('--mullion-input-bd-focus') },
+          background: token('--mullion-color-background'),
+          border: token('--mullion-color-border'),
+          strong: token('--mullion-color-border-strong'),
+        };
+      });
+    const rest = await read();
+    expect.soft(rest.disabled.ground, 'disabled ground').toBe(rest.background);
+    expect.soft(rest.disabled.edge, 'disabled edge').toBe(rest.border);
+    expect.soft(rest.disabled.ink, 'disabled ink').toBe(rest.strong);
+    expect.soft(rest.disabled.opacity, 'disabled opacity').toBe('1');
+    expect.soft(rest.bare.ground, 'bare ground at rest').toBe('rgba(0, 0, 0, 0)');
+    expect.soft(rest.bare.edge, 'bare edge at rest').toBe('rgba(0, 0, 0, 0)');
+    expect.soft(rest.bare.width, 'bare edge reserved').toBe('1px');
+
+    const bare = page.getByTestId('inline-bare');
+    await bare.hover();
+    await expect.poll(async () => (await read()).bare.edge, { message: 'bare hover edge' }).toBe(rest.border);
+    await bare.focus();
+    await expect.poll(async () => (await read()).bare.ground, { message: 'bare focus ground' }).toBe(rest.plain.ground);
+    const focused = await read();
+    expect.soft(focused.bare.edge, 'bare focus edge').toBe(rest.plain.focusEdge);
+    expect.soft(focused.bare.box.x, 'nothing moves on focus').toBeCloseTo(rest.bare.box.x, 1);
+    expect.soft(focused.bare.box.width, 'nothing moves on focus').toBeCloseTo(rest.bare.box.width, 1);
+  });
+}
+
+// [P81-A] Rule 16 for the toggles: a disabled switch or checkbox is recessed
+// (`background` ground, `border` edge, `borderStrong` ink and label), not faded.
+for (const theme of ['default-light', 'default-dark'] as const) {
+  test(`disabled toggles are recessed (${theme})`, async ({ page }) => {
+    await serveShowcase(page);
+    await page.goto(`/ui-showcase?mount=shadow&controls=1&theme=${theme}&chrome=follow`);
+    await page.getByTestId('inline-switch-disabled').waitFor();
+    await settle(page);
+    const got = await page.evaluate(() => {
+      const root = document.getElementById('showcase')!.shadowRoot!;
+      const token = (name: string) => {
+        const probe = document.createElement('div');
+        probe.style.color = `var(${name})`;
+        root.firstElementChild!.appendChild(probe);
+        const value = getComputedStyle(probe).color;
+        probe.remove();
+        return value;
+      };
+      const read = (id: string, mark: string) => {
+        const control = root.querySelector(`[data-testid="${id}"]`) as HTMLElement;
+        const field = control.closest('.mullion-toggle')!;
+        const cs = getComputedStyle(control);
+        return {
+          ground: cs.backgroundColor,
+          edge: cs.borderTopColor,
+          mark: getComputedStyle(control.querySelector(mark)!).backgroundColor,
+          markInk: getComputedStyle(control.querySelector(mark)!).color,
+          label: getComputedStyle(field.querySelector('.mullion-toggle-label')!).color,
+          opacity: getComputedStyle(field.querySelector('.mullion-toggle-row')!).opacity,
+        };
+      };
+      return {
+        off: read('inline-switch-disabled', '.mullion-switch-thumb'),
+        on: read('inline-switch-disabled-on', '.mullion-switch-thumb'),
+        box: read('inline-checkbox-disabled-on', '.mullion-checkbox-indicator'),
+        background: token('--mullion-color-background'),
+        border: token('--mullion-color-border'),
+        strong: token('--mullion-color-border-strong'),
+      };
+    });
+    for (const [name, c] of Object.entries({ off: got.off, on: got.on, box: got.box })) {
+      expect.soft(c.ground, `${name} ground`).toBe(got.background);
+      expect.soft(c.edge, `${name} edge`).toBe(got.border);
+      expect.soft(c.label, `${name} label`).toBe(got.strong);
+      expect.soft(c.opacity, `${name} opacity`).toBe('1');
+    }
+    expect.soft(got.off.mark, 'thumb').toBe(got.strong);
+    expect.soft(got.on.mark, 'thumb when on').toBe(got.strong);
+    expect.soft(got.box.markInk, 'check mark').toBe(got.strong);
+  });
+}
+
+// [P81-A] Mantine's sections are a square the field's height wide, 36px at
+// `sm`, and the input is padded by exactly that inside its 1px border, so the
+// text starts 37px from the outer edge. The gallery's visitor-facing search
+// showed the framework's text further in.
+test('a field section is a square the height of the field', async ({ page }) => {
+  await serveShowcase(page);
+  await page.goto('/ui-showcase?mount=shadow&controls=1&theme=default-light&chrome=follow');
+  const input = page.getByTestId('inline-sectioned');
+  await input.waitFor();
+  await settle(page);
+  const got = await input.evaluate((el) => {
+    const control = el.closest('.mullion-field-control')!.getBoundingClientRect();
+    const box = el.getBoundingClientRect();
+    const cs = getComputedStyle(el);
+    const sections = [...el.closest('.mullion-field-control')!.querySelectorAll('.mullion-field-section')].map((s) => s.getBoundingClientRect().width);
+    return {
+      textStart: box.left + parseFloat(cs.paddingInlineStart) - control.left,
+      textEnd: control.right - (box.right - parseFloat(cs.paddingInlineEnd)),
+      sections,
+      height: control.height,
+    };
+  });
+  expect.soft(got.sections, 'each section is as wide as the field is tall').toEqual([36, 36]);
+  expect.soft(got.textStart, 'text starts after the left section').toBeCloseTo(37, 0);
+  expect.soft(got.textEnd, 'text ends before the right section').toBeCloseTo(37, 0);
+});

@@ -245,6 +245,35 @@ The designer approved the toggles with conditions and chose the framework's one 
 - **The "Items Per Page" label was muted** because the Mantine theme adapter painted `NumberInput` and `ColorInput` labels `textMuted`. Both are `text` now; the framework's labels already were.
 - **The slider moved, as one slider.** A 14px thumb on `surface` with a 2px `primaryStroke` ring, the filled track `primaryStroke` and the rest `border`, recessed when disabled (rule 16) rather than faded. Its 20px row gained a band 2px above and below it as a pseudo-element, so the drag target is WCAG 2.2's 24px and no panel moves; the spec checks both edges land on the control and fails without the band. Mark labels were already centred on their values, and there are no dots. The spec reads the hit test after scrolling the slider into view, because `elementFromPoint` sees only the viewport.
 
+### Pass 2: the fields (2026-10-26)
+
+**Measured, not read.** The research pass left the label block unresolved, so a Mantine `NumberInput` was measured in the running settings drawer: a 36px input with 8px corners and 12px padding, a label row of 24.8px (set by the inherited 16px line box, not by the label), the description directly under it at 14.4px, then 5px to the input, and steppers 24px wide in two 17px halves with `tabIndex=-1` and `aria-hidden`. The framework's 19.6px label plus its 5px gap lands the input at 24.6px, so its gaps were kept and only the order changed; a described field is about 2px taller because the description keeps the type scale's 1.4 line height.
+
+**What the designer decided, and what was built** (rule 19), each failing `e2e/control-parity.spec.ts` first:
+
+- **Label, description, input, error.** The description moved above the input in the shared field shell and in `NumberInput`, which renders its own.
+- **8px corners**, the same as the buttons, and the label at the field's size (12px at `xs`, 14px at `sm`), 500 and `text`. The input is padded a third of its height and takes the size's font, as Mantine's was.
+- **Stacked steppers by default**, 17px at `xs` and 24px at `sm`, `textMuted` chevrons behind a `border` divider with a subtle icon button's hover, out of the tab order and hidden from assistive tech, since the arrow keys are the keyboard path. The flanking minus and plus are `controls="flank"`; `controls="none"` is Mantine's `hideControls`.
+- **Disabled is recessed** by rule 16, steppers included, rather than faded.
+- **One field look.** The codemod dropped `filled` from 29 fields. The builder's title is `variant="bare"`: no ground or edge at rest, both reserved so nothing moves, an edge on hover and the ordinary field once focused, which the spec checks for position as well as paint.
+
+**A silent API gap.** `NumberInput` took no attributes beyond its props, and TypeScript accepts any hyphenated attribute on a component, so the `aria-label` on nine number fields and a test id on one would have vanished without a compile error. It now passes a named set of input attributes through to the input. `TextInput` gained `onClick`, `autoFocus` and `type="datetime-local"`, which call sites already passed.
+
+**Two behaviour changes the first verification caught**, each with a unit test that failed first:
+
+- **An explicit `aria-label` lost to the visible label.** Base UI's field links its input to the label with `aria-labelledby`, which outranks `aria-label`, so the media dialog's URL field, labelled "External URL" and named "External media URL", lost the more specific name and two end-to-end flows could not find it. Under Mantine the `aria-label` won; it wins again.
+- **Number fields grouped their digits.** Base UI formats by locale, so a pixel width showed "1,200". Mantine showed plain digits unless asked, and so does the framework now.
+
+Eight unit tests found a number field by its displayed value and now skip Base UI's `aria-hidden` twin input, which exists for form submission, while still requiring exactly one visible match.
+
+**Field sections, caught by the captures.** The gallery's visitor-facing search showed its placeholder about 12px further in than Mantine's: the framework padded the section and the input both. A section is now a square the field's height wide and the input gives up its padding beside it, so the text starts 37px from the outer edge, as Mantine's did; the spec measures both sides.
+
+**Disabled toggles follow rule 16 too.** A disabled switch or checkbox faded to 60%; it is now recessed like every other control, its label in `borderStrong`, and the spec checks off, on and checked on both defaults.
+
+**Found in the designer's crop: the off switch has no visible thumb.** The thumb is `surface` on a `surface2` track, 1.02 to 1.23:1 across the 23 themes and ΔE00 0.75 on default-light, so an off switch reads as an empty outlined pill. Mantine drew a white thumb on a grey track. It went to the designer with a proposal rather than being changed here.
+
+**The batch.** 138 codemod edits in 46 files, after the codemod learned to read `true` and `false` literals (it had reported `allowDecimal={false}` as "not false"). By hand: four sites carried Mantine's empty-string value for an empty number field through their own state and now carry `null`; the builder's layer rename keeps the row's 22px height by overriding the `xs` control height, in the size basis; the builder title, the layers search and the access-request form lost their `styles` overrides to the one look; and `SearchableEntityInput` lost `rightSectionPointerEvents`, so clicking its search icon no longer focuses the field. `UnitScrubField` keeps Mantine's `NumberInput`: it is the component the unit slot was built to replace, and its rewrite is P81-B's. The allow-list fell from 161 to 160.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.
@@ -468,6 +497,8 @@ The user's partial pass of `ACCESSIBILITY_MANUAL_AUDIT.md` on 2026-10-25, and th
 | Dropping `@mantine/dates` | Listed in Phase 80's follow-ons; confirm it is genuinely unused before removing. |
 | The visitor lightbox, reviewed whole | The designer's request, 2026-10-26: the one surface a site's visitors see, built from `Select` and the dialogs, so it is reviewed once their flips land rather than twice. |
 | The media picker's "already added" tile | `MediaLibraryPicker.tsx` fades a tile that is already in the campaign to 50% opacity. It is out of the tab order, so it is not the focus bug rule 16 names, but it is a disabled state drawn with opacity. The designer's answer (2026-10-26) is neither: a photo wants a non-colour mark, a check or an "Added" label on a scrim (rule 15), because opacity on an image is a composite nobody audited. It lands with the media picker's batch. |
+| Small field differences left after the fields batch | Mantine's label row is 24.8px at every size because the inherited 16px line box sets it, so an `xs` framework field sits about 3px tighter, which suits the dense panels. The password field's reveal button is the `sm` icon button (22px) where Mantine's was 26px, with a glyph rather than Mantine's eye icon, and the textarea keeps the framework's padding where Mantine's was 4.5 and 5.5px at `xs` and `sm`. None was raised by the designer; they are recorded so a later pass can choose. |
+| Clicking a field's section focuses the field | Mantine laid sections over the input with `pointer-events: none`, so clicking a decorative icon focused the field; `SearchableEntityInput` relied on it. The framework's sections sit beside the input, so the click lands on the row. A row-level handler that focuses the input when the click is not on an interactive element would restore it everywhere. |
 | User-entered rem lengths and the size basis | P81-F put every rem the product owns on one basis, but a value a user picks in rem in the Settings panel goes out through `toCss()` in `shared-utils` as plain rem and still shrinks with a host's 62.5% root. Whether a user's `1rem` means a design rem is the designer's call; if it does, `toCss()` emits it through the same multiplier. |
 | ~~Row-selection keyboard support in `Table`~~ | **Moved into P81-B 2026-10-02.** The gap is `SpaceManagementView`'s `<tr onClick>`, and migrating that screen while keeping it would fail this phase's own per-batch keyboard pass. Only the keyboard fix moved; the screen's wider UX pass stays in FUTURE_TASKS. |
 

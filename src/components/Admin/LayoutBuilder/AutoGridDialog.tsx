@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, NumberInput } from '@mantine/core';
+import { Modal } from '@mantine/core';
 import { computeGridSlots } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Button, Switch } from '@/ui';
+import { uiRem, Stack, Group, Text, Button, Switch, NumberInput } from '@/ui';
 
 export interface AutoGridDialogProps {
   opened: boolean;
@@ -14,7 +14,7 @@ export interface AutoGridDialogProps {
   hasExistingSlots?: boolean;
 }
 
-function toNum(v: string | number, fallback: number): number {
+function toNum(v: number | null, fallback: number): number {
   return typeof v === 'number' && Number.isFinite(v) ? v : fallback;
 }
 
@@ -44,8 +44,8 @@ export function AutoGridDialog({ opened, onClose, onGenerate, hasExistingSlots =
     <Modal opened={opened} onClose={onClose} title={t('lb_grid_title', 'Generate grid')} size="md" aria-label={t('lb_grid_aria', 'Auto-grid generator')}>
       <Stack gap="md">
         <Group grow>
-          <NumberInput label={t('lb_grid_rows', 'Rows')} value={rows} onChange={(v) => setRows(toNum(v, rows))} min={1} max={20} allowDecimal={false} />
-          <NumberInput label={t('lb_grid_cols', 'Columns')} value={cols} onChange={(v) => setCols(toNum(v, cols))} min={1} max={20} allowDecimal={false} />
+          <NumberInput label={t('lb_grid_rows', 'Rows')} value={rows} onChange={(v) => setRows(toNum(v, rows))} min={1} max={20} decimalScale={0} />
+          <NumberInput label={t('lb_grid_cols', 'Columns')} value={cols} onChange={(v) => setCols(toNum(v, cols))} min={1} max={20} decimalScale={0} />
         </Group>
         <Group grow>
           <NumberInput label={t('lb_grid_gap', 'Gap (%)')} value={gapPct} onChange={(v) => setGapPct(toNum(v, gapPct))} min={0} max={20} step={0.5} />

@@ -37,6 +37,8 @@ function literal(attr) {
   const e = ts.isJsxExpression(init) ? init.expression : undefined;
   if (e && (ts.isStringLiteral(e) || ts.isNoSubstitutionTemplateLiteral(e))) return e.text;
   if (e && ts.isNumericLiteral(e)) return Number(e.text);
+  if (e && e.kind === ts.SyntaxKind.TrueKeyword) return true;
+  if (e && e.kind === ts.SyntaxKind.FalseKeyword) return false;
   return undefined;
 }
 
@@ -201,8 +203,16 @@ const textSize = (attr) => {
 };
 
 /** Per component: renames, props handled specially, and Mantine props with no framework meaning. */
+/** One field look (designer, 2026-10-26): `filled` goes, and an edit-in-place `unstyled` field is `bare`. */
+const fieldVariant = (attr) => {
+  const v = literal(attr);
+  if (v === 'filled' || v === 'default') return { replace: '' };
+  if (v === 'unstyled') return { replace: 'variant="bare"', review: 'unstyled is bare: check it is edited in place' };
+  return { blocked: 'variant is an expression' };
+};
+
 const FIELD_UNSUPPORTED = [
-  'variant', 'classNames', 'styles', 'unstyled', 'inputWrapperOrder', 'withAsterisk', 'labelProps', 'descriptionProps',
+  'classNames', 'styles', 'unstyled', 'inputWrapperOrder', 'withAsterisk', 'labelProps', 'descriptionProps',
   'errorProps', 'wrapperProps', 'inputContainer', 'pointer', 'rightSectionPointerEvents', 'rightSectionWidth',
   'leftSectionPointerEvents', 'leftSectionWidth',
 ];
@@ -251,21 +261,25 @@ const RULES = {
   'Chip.Group': { rename: {}, unsupported: [] },
   CopyButton: { rename: {}, unsupported: [] },
   FileButton: { rename: {}, unsupported: ['capture', 'form', 'name', 'inputProps'] },
-  // [P81-A] The input family. `variant` stays unsupported until the designer
-  // answers on Mantine's `filled` and `unstyled` fields.
-  TextInput: { rename: {}, unsupported: FIELD_UNSUPPORTED },
-  PasswordInput: { rename: {}, unsupported: FIELD_UNSUPPORTED },
+  // [P81-A] The input family.
+  TextInput: { rename: {}, unsupported: FIELD_UNSUPPORTED, props: { variant: fieldVariant } },
+  PasswordInput: { rename: {}, unsupported: FIELD_UNSUPPORTED, props: { variant: fieldVariant } },
   Textarea: {
     rename: {},
     unsupported: [...FIELD_UNSUPPORTED, 'resize'],
     // The framework textarea always grows with its content between minRows and maxRows.
-    props: { autosize: (attr) => (literal(attr) === true ? { replace: '' } : { blocked: 'autosize is an expression' }) },
+    props: {
+      variant: fieldVariant,
+      autosize: (attr) => (literal(attr) === true ? { replace: '' } : { blocked: 'autosize is an expression' }),
+    },
   },
   NumberInput: {
     rename: {},
-    unsupported: [...FIELD_UNSUPPORTED, 'prefix', 'thousandSeparator', 'hideControls', 'allowNegative', 'clampBehavior'],
+    unsupported: [...FIELD_UNSUPPORTED, 'prefix', 'thousandSeparator', 'allowNegative', 'clampBehavior'],
     props: {
+      variant: fieldVariant,
       suffix: numberSuffix,
+      hideControls: (attr) => (literal(attr) === true ? { replace: 'controls="none"' } : { blocked: 'hideControls is an expression' }),
       allowDecimal: (attr) => (literal(attr) === false ? { replace: 'decimalScale={0}' } : { blocked: 'allowDecimal is not false' }),
     },
   },

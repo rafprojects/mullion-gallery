@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   Modal,
   Tabs,
-  TextInput,
 } from '@mantine/core';
 import { IconCheck, IconPencil, IconPlus, IconTrash, IconX } from '@tabler/icons-react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -17,7 +16,7 @@ import {
   useMediaTags,
 } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Badge, ActionIcon, Button } from '@/ui';
+import { uiRem, Group, Stack, Text, Badge, ActionIcon, Button, TextInput } from '@/ui';
 
 interface TaxonomyManagerModalProps {
   opened: boolean;

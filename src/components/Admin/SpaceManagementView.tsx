@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import {
   Tabs,
-  TextInput,
   Loader,
   Table,
   Tooltip,
@@ -20,7 +19,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { SpaceAssetLibrary } from './SpaceAssetLibrary';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import type { FontLibraryEntry } from '@mullion/shared-utils';
-import { uiRem, Stack, Group, Text, Alert, Center, Badge, Button, ActionIcon, Switch, Checkbox } from '@/ui';
+import { uiRem, Stack, Group, Text, Alert, Center, Badge, Button, ActionIcon, Switch, Checkbox, TextInput } from '@/ui';
 
 interface SpaceGrant {
   userId: number;

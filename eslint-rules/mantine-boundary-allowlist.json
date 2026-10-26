@@ -9,7 +9,7 @@
     "@mantine/notifications",
     "@base-ui/react"
   ],
-  "maxFiles": 161,
+  "maxFiles": 160,
   "files": [
     "packages/shared-ui/src/AuthBarFloating.tsx",
     "packages/shared-ui/src/AuthBarMinimal.tsx",
@@ -101,7 +101,6 @@
     "src/components/Campaign/UnifiedCampaignModal.tsx",
     "src/components/CampaignGallery/CampaignCard.tsx",
     "src/components/CampaignGallery/CardGallery.tsx",
-    "src/components/CampaignGallery/RequestAccessForm.tsx",
     "src/components/CardViewer/CampaignViewer.tsx",
     "src/components/Common/CampaignSelector.tsx",
     "src/components/Common/CompanyCombobox.tsx",

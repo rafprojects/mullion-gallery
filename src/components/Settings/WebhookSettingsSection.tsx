@@ -5,7 +5,6 @@ import {
   Loader,
   Modal,
   MultiSelect,
-  TextInput,
   Tooltip,
 } from '@mantine/core';
 import {
@@ -20,6 +19,7 @@ import {
   CopyButton,
   Checkbox,
   Switch,
+  TextInput,
 } from '@/ui';
 import { IconCopy, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';

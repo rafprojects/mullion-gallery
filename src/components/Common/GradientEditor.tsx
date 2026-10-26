@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   Select,
-  NumberInput,
   Tooltip,
 } from '@mantine/core';
 import {
@@ -12,6 +11,7 @@ import {
   ActionIcon,
   Slider,
   SegmentedControl,
+  NumberInput,
 } from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import type { GradientStop, GradientDirection, GradientType, RadialShape, RadialSize } from '@/types';
@@ -112,9 +112,9 @@ export function GradientEditor({ value, onChange }: GradientEditorProps) {
           <GRow label="Angle">
             <NumberInput
               size="xs"
-              value={value.angle ?? ''}
-              onChange={(val) => update({ angle: val === '' || val === undefined ? undefined : Number(val) })}
-              placeholder="auto" min={0} max={360} step={5} suffix="°" style={{ flex: 1 }}
+              value={value.angle ?? null}
+              onChange={(val) => update({ angle: val ?? undefined })}
+              placeholder="auto" min={0} max={360} step={5} unit="°" style={{ flex: 1 }}
             />
           </GRow>
         </>
@@ -152,7 +152,7 @@ export function GradientEditor({ value, onChange }: GradientEditorProps) {
       {gradType === 'conic' && (
         <>
           <GRow label="Angle">
-            <NumberInput size="xs" value={value.angle ?? 0} onChange={(val) => update({ angle: val === '' ? 0 : Number(val) })} min={0} max={360} step={5} suffix="°" style={{ flex: 1 }} />
+            <NumberInput size="xs" value={value.angle ?? 0} onChange={(val) => update({ angle: val ?? 0 })} min={0} max={360} step={5} unit="°" style={{ flex: 1 }} />
           </GRow>
           <GRow label="Ctr X">
             <Slider size="xs" value={value.centerX ?? 50} onChange={(v) => update({ centerX: v })} min={0} max={100} step={1} label={(v) => `${v}%`} style={{ flex: 1 }} />

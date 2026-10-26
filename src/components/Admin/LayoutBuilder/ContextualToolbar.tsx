@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TextInput, Tooltip } from '@mantine/core';
-import { Group, ActionIcon, Button } from '@/ui';
+import { Tooltip } from '@mantine/core';
+import { Group, ActionIcon, Button, TextInput } from '@/ui';
 import { modals } from '@mantine/modals';
 import {
   IconArrowDown,

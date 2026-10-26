@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { TextInput } from '@mantine/core';
 import { IconMail, IconCheck, IconAlertCircle } from '@tabler/icons-react';
 import { Trans, useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Text, Box, Alert, Button } from '@/ui';
+import { uiRem, Stack, Text, Box, Alert, Button, TextInput } from '@/ui';
 
 interface RequestAccessFormProps {
   campaignId: string;
@@ -106,13 +105,6 @@ export function RequestAccessForm({ campaignId, campaignTitle, apiClient }: Requ
           leftSection={<IconMail size={14} />}
           aria-label={t('raf_email_aria', 'Email address')}
           disabled={submitState === 'loading'}
-          styles={{
-            input: {
-              background: 'var(--mantine-color-default)',
-              color: 'var(--mantine-color-text)',
-              borderColor: 'var(--mantine-color-default-border)',
-            },
-          }}
         />
 
         <Button

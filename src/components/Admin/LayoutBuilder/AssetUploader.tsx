@@ -12,12 +12,12 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Loader,
-  TextInput,
 } from '@mantine/core';
 import {
   Stack,
   Button,
   FileButton,
+  TextInput,
 } from '@/ui';
 import { IconUpload } from '@tabler/icons-react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';

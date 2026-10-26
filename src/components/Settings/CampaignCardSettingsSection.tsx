@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Accordion, Divider, NumberInput, TextInput } from '@mantine/core';
-import { Stack, Text, Slider, Switch } from '@/ui';
+import { Accordion, Divider } from '@mantine/core';
+import { Stack, Text, Slider, Switch, NumberInput, TextInput } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { ModalSelect } from '@/components/Common/ModalSelect';

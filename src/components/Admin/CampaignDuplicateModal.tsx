@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import {
   Modal,
-  TextInput,
   Divider,
 } from '@mantine/core';
 import { IconCopy } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { AdminCampaign } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Button, Switch } from '@/ui';
+import { uiRem, Group, Stack, Text, Button, Switch, TextInput } from '@/ui';
 
 export interface CampaignDuplicateModalProps {
   /** Source campaign to duplicate; null when modal is closed. */

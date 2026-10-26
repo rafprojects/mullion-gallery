@@ -1,9 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  NumberInput,
   Select,
-  TextInput,
   Tooltip,
   Accordion,
 } from '@mantine/core';
@@ -34,7 +32,7 @@ import type {
 } from '@/types';
 import { buildSlotEntranceCss, REVEAL_CLASS } from '@/utils/slotEntrance';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box, ActionIcon, Button, SegmentedControl, Slider } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, ActionIcon, Button, SegmentedControl, Slider, NumberInput, TextInput } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -225,11 +223,11 @@ function ShadowSection({ slot, onUpdate }: EffectSectionProps) {
           <Group grow gap="2xs">
             <PropRow label={t('lb_slot_offx', 'Off X')}>
               <NumberInput value={sh.offsetX} onChange={(v) => setSh({ offsetX: Number(v) || 0 })}
-                min={-50} max={50} size="xs" variant="filled" suffix=" px" />
+                min={-50} max={50} size="xs" unit="px" />
             </PropRow>
             <PropRow label={t('lb_slot_offy', 'Off Y')}>
               <NumberInput value={sh.offsetY} onChange={(v) => setSh({ offsetY: Number(v) || 0 })}
-                min={-50} max={50} size="xs" variant="filled" suffix=" px" />
+                min={-50} max={50} size="xs" unit="px" />
             </PropRow>
           </Group>
           <PropRow label={t('lb_slot_blur', 'Blur')}>
@@ -308,11 +306,11 @@ function TiltEffectSection({ slot, onUpdate }: EffectSectionProps) {
           </PropRow>
           <PropRow label={t('lb_slot_persp', 'Persp.')}>
             <NumberInput value={tilt.perspective} onChange={(v) => setTilt({ perspective: Number(v) || 1000 })}
-              min={200} max={5000} step={50} size="xs" variant="filled" suffix=" px" />
+              min={200} max={5000} step={50} size="xs" unit="px" />
           </PropRow>
           <PropRow label={t('lb_slot_reset', 'Reset')}>
             <NumberInput value={tilt.resetSpeed} onChange={(v) => setTilt({ resetSpeed: Number(v) || 300 })}
-              min={50} max={2000} step={50} size="xs" variant="filled" suffix=" ms" />
+              min={50} max={2000} step={50} size="xs" unit="ms" />
           </PropRow>
         </>
       )}
@@ -383,7 +381,7 @@ function EntranceSection({ slot, onUpdate }: EffectSectionProps) {
             <NumberInput
               value={anim.durationMs ?? 600}
               onChange={(v) => setAnim({ durationMs: typeof v === 'number' ? v : 600 })}
-              min={50} max={5000} step={50} size="xs" variant="filled" suffix=" ms"
+              min={50} max={5000} step={50} size="xs" unit="ms"
               aria-label={t('lb_slot_ent_dur_aria', 'Entrance duration')}
             />
           </PropRow>
@@ -391,7 +389,7 @@ function EntranceSection({ slot, onUpdate }: EffectSectionProps) {
             <NumberInput
               value={anim.delayMs ?? 0}
               onChange={(v) => setAnim({ delayMs: typeof v === 'number' ? v : 0 })}
-              min={0} max={5000} step={50} size="xs" variant="filled" suffix=" ms"
+              min={0} max={5000} step={50} size="xs" unit="ms"
               aria-label={t('lb_slot_ent_delay_aria', 'Entrance delay')}
             />
           </PropRow>
@@ -499,7 +497,6 @@ export function SlotPropertiesPanel({
                 onChange={(e) => onUpdate({ name: e.currentTarget.value || undefined })}
                 placeholder={t('lb_slot_name_ph', 'Slot')}
                 size="xs"
-                variant="filled"
               />
             </PropRow>
 
@@ -509,14 +506,14 @@ export function SlotPropertiesPanel({
                 <NumberInput
                   value={slot.x}
                   onChange={(val) => onUpdate({ x: Number(val) || 0 })}
-                  min={0} max={100} step={0.5} size="xs" decimalScale={2} variant="filled"
+                  min={0} max={100} step={0.5} size="xs" decimalScale={2}
                 />
               </PropRow>
               <PropRow label={t('lb_slot_y', 'Y %')}>
                 <NumberInput
                   value={slot.y}
                   onChange={(val) => onUpdate({ y: Number(val) || 0 })}
-                  min={0} max={100} step={0.5} size="xs" decimalScale={2} variant="filled"
+                  min={0} max={100} step={0.5} size="xs" decimalScale={2}
                 />
               </PropRow>
             </Group>
@@ -532,7 +529,7 @@ export function SlotPropertiesPanel({
                     const height = clampPct(Number((width * aspectRatio).toFixed(2)));
                     onUpdate({ width, height });
                   }}
-                  min={1} max={100} step={0.5} size="xs" decimalScale={2} variant="filled"
+                  min={1} max={100} step={0.5} size="xs" decimalScale={2}
                   aria-label={t('lb_slot_width_aria', 'Width %')}
                   leftSection={<Text size="xs" tone="muted">W</Text>}
                 />
@@ -558,7 +555,7 @@ export function SlotPropertiesPanel({
                     const width = clampPct(Number((height / aspectRatio).toFixed(2)));
                     onUpdate({ width, height });
                   }}
-                  min={1} max={100} step={0.5} size="xs" decimalScale={2} variant="filled"
+                  min={1} max={100} step={0.5} size="xs" decimalScale={2}
                   aria-label={t('lb_slot_height_aria', 'Height %')}
                   leftSection={<Text size="xs" tone="muted">H</Text>}
                 />
@@ -599,7 +596,7 @@ export function SlotPropertiesPanel({
                   const deg = ((Math.round(Number(val)) % 360) + 360) % 360;
                   onUpdate({ rotation: deg === 0 ? undefined : deg });
                 }}
-                min={0} max={359} step={1} size="xs" variant="filled"
+                min={0} max={359} step={1} size="xs"
                 aria-label={t('lb_slot_rot_aria', 'Rotation degrees')}
                 rightSection={<Text size="xs" tone="muted">°</Text>}
                 style={{ flex: 1 }}
@@ -642,7 +639,6 @@ export function SlotPropertiesPanel({
                   onChange={(e) => onUpdate({ clipPath: e.currentTarget.value })}
                   placeholder={t('lb_slot_clippath_ph', 'polygon(50% 0%, 100% 50%, …)')}
                   size="xs"
-                  variant="filled"
                 />
               </PropRow>
             )}
@@ -747,7 +743,6 @@ export function SlotPropertiesPanel({
                 onChange={(e) => onUpdate({ objectPosition: e.currentTarget.value })}
                 placeholder={t('lb_slot_custom_ph', '50% 50%')}
                 size="xs"
-                variant="filled"
               />
             </PropRow>
 
@@ -757,8 +752,8 @@ export function SlotPropertiesPanel({
                 <NumberInput
                   value={slot.borderRadius}
                   onChange={(val) => onUpdate({ borderRadius: Number(val) || 0 })}
-                  min={0} max={200} size="xs" variant="filled"
-                  suffix=" px"
+                  min={0} max={200} size="xs"
+                  unit="px"
                 />
               </PropRow>
             )}
@@ -767,8 +762,8 @@ export function SlotPropertiesPanel({
                 <NumberInput
                   value={slot.borderWidth}
                   onChange={(val) => onUpdate({ borderWidth: Number(val) || 0 })}
-                  min={0} max={20} size="xs" variant="filled"
-                  suffix=" px"
+                  min={0} max={20} size="xs"
+                  unit="px"
                 />
               </PropRow>
               <PropRow label={t('lb_slot_color', 'Color')}>
@@ -832,7 +827,7 @@ export function SlotPropertiesPanel({
                 <NumberInput
                   value={slot.zIndex}
                   onChange={(val) => onUpdate({ zIndex: Number(val) || 0 })}
-                  min={0} max={100} size="xs" variant="filled"
+                  min={0} max={100} size="xs"
                 />
               </PropRow>
               <Group gap="4xs" style={{ flexShrink: 0 }}>

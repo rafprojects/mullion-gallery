@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { NumberInput, TextInput, Tooltip, type SelectProps } from '@mantine/core';
+import { Tooltip, type SelectProps } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { useGalleryAdapterSettingsIO } from '@/hooks/useGalleryAdapterSettingsIO';
@@ -12,7 +12,7 @@ import { tFieldLabel, tFieldDescription, tFieldPlaceholder, tFieldOptions } from
 import { ModalSelect } from '@/components/Common/ModalSelect';
 import { cloneGalleryConfig, collectGalleryAdapterSettingValues, GALLERY_BREAKPOINTS, getGalleryConfigScopeAdapterIds, resolveGalleryConfig, setGalleryAdapterSetting } from '@/utils/galleryConfig';
 import { DimensionInput } from './DimensionInput';
-import { uiRem, Group, Stack, Text, Box, SimpleGrid, ActionIcon, Button, Switch } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, SimpleGrid, ActionIcon, Button, Switch, NumberInput, TextInput } from '@/ui';
 
 export type UpdateGallerySetting = <K extends keyof GalleryBehaviorSettings>(
   key: K,

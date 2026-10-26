@@ -107,14 +107,15 @@ export function FieldShell({
           )}
         </Field.Label>
       )}
+      {/* Label, description, input, error: what you need before typing comes first (designer, 2026-10-26). */}
+      {description !== undefined && (
+        <Field.Description className="mullion-field-description">{description}</Field.Description>
+      )}
       <div className={cx('mullion-field-control', variantClass)}>
         {leftSection !== undefined && <span className="mullion-field-section">{leftSection}</span>}
         {children}
         {rightSection !== undefined && <span className="mullion-field-section">{rightSection}</span>}
       </div>
-      {description !== undefined && (
-        <Field.Description className="mullion-field-description">{description}</Field.Description>
-      )}
       {typeof error !== 'boolean' && error !== undefined && (
         <Field.Error className="mullion-field-error" match>
           {error}

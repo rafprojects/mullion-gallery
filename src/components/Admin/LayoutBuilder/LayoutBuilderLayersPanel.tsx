@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip, Divider, TextInput } from '@mantine/core';
-import { Group, ActionIcon } from '@/ui';
+import { Tooltip, Divider } from '@mantine/core';
+import { Group, ActionIcon, TextInput } from '@/ui';
 import { IconSearch, IconX } from '@tabler/icons-react';
 import {
   IconPlus, IconTrash, IconCopy, IconMask, IconLetterT,
@@ -377,7 +377,6 @@ export function LayoutBuilderLayersPanel(_props: IDockviewPanelProps) {
               )
               : null
           }
-          styles={{ input: { background: 'var(--mullion-builder-surface)', color: 'var(--mullion-builder-text)', borderColor: 'var(--mullion-builder-border)' } }}
         />
       </div>
 

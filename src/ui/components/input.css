@@ -15,15 +15,65 @@
  * today and the seam still shows.
  */
 @layer mullion.components {
+  /*
+   * Mantine's geometry (P81-A), measured live in the settings drawer and read
+   * off its sheet for the other steps: the label and input scale with the
+   * size, the input is padded a third of its height, and the steppers are
+   * 17px wide at `xs` and 24px at `sm`. The label and description sit 5px
+   * apart and 5px above the input, which lands the input where Mantine's did.
+   */
   .mullion-field {
+    --mullion-field-h: var(--mullion-control-height-sm);
+    --mullion-field-fz: var(--mullion-font-size-sm);
+    --mullion-field-note-fz: var(--mullion-font-size-xs);
+    --mullion-field-pad: calc(var(--mullion-control-height-sm) / 3);
+    --mullion-stepper-w: 1.5rem;
+    --mullion-chevron: 0.875rem;
     display: flex;
     flex-direction: column;
     gap: calc(var(--mullion-spacing-xs) / 2);
     min-inline-size: 0;
   }
 
+  .mullion-field[data-size='xs'] {
+    --mullion-field-h: var(--mullion-control-height-xs);
+    --mullion-field-fz: var(--mullion-font-size-xs);
+    --mullion-field-note-fz: var(--mullion-font-size-xs);
+    --mullion-field-pad: calc(var(--mullion-control-height-xs) / 3);
+    --mullion-stepper-w: 1.0625rem;
+    --mullion-chevron: 0.625rem;
+  }
+
+  .mullion-field[data-size='md'] {
+    --mullion-field-h: var(--mullion-control-height-md);
+    --mullion-field-fz: var(--mullion-font-size-md);
+    --mullion-field-note-fz: var(--mullion-font-size-sm);
+    --mullion-field-pad: calc(var(--mullion-control-height-md) / 3);
+    --mullion-stepper-w: 1.6875rem;
+    --mullion-chevron: 1rem;
+  }
+
+  .mullion-field[data-size='lg'] {
+    --mullion-field-h: var(--mullion-control-height-lg);
+    --mullion-field-fz: var(--mullion-font-size-lg);
+    --mullion-field-note-fz: var(--mullion-font-size-md);
+    --mullion-field-pad: calc(var(--mullion-control-height-lg) / 3);
+    --mullion-stepper-w: 1.9375rem;
+    --mullion-chevron: 1.125rem;
+  }
+
+  .mullion-field[data-size='xl'] {
+    --mullion-field-h: var(--mullion-control-height-xl);
+    --mullion-field-fz: var(--mullion-font-size-xl);
+    --mullion-field-note-fz: var(--mullion-font-size-lg);
+    --mullion-field-pad: calc(var(--mullion-control-height-xl) / 3);
+    --mullion-stepper-w: 2.125rem;
+    --mullion-chevron: 1.25rem;
+  }
+
+  /* `text` at 500, never muted: at 12px the label and its description differ by weight and ink alone. */
   .mullion-field-label {
-    font-size: var(--mullion-font-size-sm);
+    font-size: var(--mullion-field-fz);
     font-weight: 500;
     line-height: 1.4;
     color: var(--mullion-color-text);
@@ -53,7 +103,7 @@
     min-inline-size: 0;
     block-size: var(--mullion-control-height-md);
     border: 1px solid var(--mullion-input-bd);
-    border-radius: var(--mullion-radius, var(--mullion-radius-sm));
+    border-radius: var(--mullion-radius, var(--mullion-radius-md));
     background-color: var(--mullion-input-bg);
     color: var(--mullion-input-color);
     overflow: hidden;
@@ -99,9 +149,26 @@
     border-color: var(--mullion-error-text);
   }
 
+  /* Rule 16: recessed one rung rather than faded, steppers included. */
   .mullion-field[data-disabled] .mullion-field-control {
-    opacity: 0.6;
+    border-color: var(--mullion-color-border);
+    background-color: var(--mullion-color-background);
+    color: var(--mullion-color-border-strong);
     cursor: not-allowed;
+  }
+
+  /*
+   * A field edited in place (designer, 2026-10-26). At rest it has no ground
+   * and no edge, but the border and padding stay so nothing moves; hover
+   * shows the edge, and focus is the ordinary field.
+   */
+  .mullion-field-control-bare:not(:focus-within) {
+    border-color: transparent;
+    background-color: transparent;
+  }
+
+  .mullion-field-control-bare:not(:focus-within):hover {
+    border-color: var(--mullion-color-border);
   }
 
   /* ── The control itself ──────────────────────────────────────────────── */
@@ -109,22 +176,13 @@
   .mullion-field-input {
     flex: 1 1 auto;
     min-inline-size: 0;
-    padding-inline: var(--mullion-spacing-xs);
+    padding-inline: var(--mullion-field-pad);
     border: 0;
     background: none;
     color: inherit;
     font-family: inherit;
-    font-size: var(--mullion-font-size-sm);
+    font-size: var(--mullion-field-fz);
     line-height: 1.4;
-  }
-
-  .mullion-field[data-size='xs'] .mullion-field-input {
-    font-size: var(--mullion-font-size-xs);
-  }
-
-  .mullion-field[data-size='lg'] .mullion-field-input,
-  .mullion-field[data-size='xl'] .mullion-field-input {
-    font-size: var(--mullion-font-size-md);
   }
 
   /*
@@ -157,13 +215,27 @@
 
   /* ── Sections, the unit slot and the stepper ─────────────────────────── */
 
+  /*
+   * A section is a square the field's height wide, as Mantine's was, and the
+   * input beside it gives up its padding on that side, so the text starts
+   * where the section ends.
+   */
   .mullion-field-section {
     display: inline-flex;
     flex: none;
     align-items: center;
+    justify-content: center;
     gap: var(--mullion-spacing-xs);
-    padding-inline: var(--mullion-spacing-xs);
+    min-inline-size: var(--mullion-field-h);
     color: var(--mullion-color-text-muted);
+  }
+
+  .mullion-field-section + .mullion-field-input {
+    padding-inline-start: 0;
+  }
+
+  .mullion-field-input:has(+ .mullion-field-section) {
+    padding-inline-end: 0;
   }
 
   /*
@@ -206,18 +278,60 @@
     color: var(--mullion-color-text);
   }
 
+  /*
+   * The stacked steppers (designer, 2026-10-26): `textMuted` chevrons behind a
+   * `border` divider, with a subtle icon button's hover. They are out of the
+   * tab order in the TSX, because the arrow keys are the keyboard path.
+   */
+  .mullion-field-steppers {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    inline-size: var(--mullion-stepper-w);
+    border-inline-start: 1px solid var(--mullion-color-border);
+  }
+
+  .mullion-field-stepper {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--mullion-color-text-muted);
+    cursor: pointer;
+  }
+
+  .mullion-field-stepper svg {
+    inline-size: var(--mullion-chevron);
+    block-size: var(--mullion-chevron);
+  }
+
+  .mullion-field-stepper:hover:not(:disabled) {
+    background-color: var(--mullion-color-surface2);
+    color: var(--mullion-color-text);
+  }
+
+  .mullion-field[data-disabled] .mullion-field-stepper,
+  .mullion-field[data-disabled] .mullion-field-step {
+    color: var(--mullion-color-border-strong);
+    cursor: not-allowed;
+  }
+
   /* ── Description and error ───────────────────────────────────────────── */
 
   /* Base UI renders the description as a `<p>`, so its margins are the browser's unless reset. */
   .mullion-field-description {
     margin: 0;
-    font-size: var(--mullion-font-size-xs);
+    font-size: var(--mullion-field-note-fz);
     line-height: 1.4;
     color: var(--mullion-color-text-muted);
   }
 
   .mullion-field-error {
-    font-size: var(--mullion-font-size-xs);
+    font-size: var(--mullion-field-note-fz);
     line-height: 1.4;
     color: var(--mullion-error-text);
   }

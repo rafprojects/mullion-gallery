@@ -2,13 +2,14 @@ import { useRef, useState, type KeyboardEvent, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Tooltip,
-  TextInput,
   Menu,
 } from '@mantine/core';
 import {
   Group,
   Text,
   ActionIcon,
+  TextInput,
+  uiRem,
 } from '@/ui';
 import {
   IconPhoto,
@@ -198,8 +199,8 @@ export function LayerRow({
           onChange={(e) => setDraftName(e.currentTarget.value)}
           onBlur={commitEdit}
           onKeyDown={handleKeyDown}
-          styles={{ input: { height: 22, minHeight: 22, padding: '0 4px', fontSize: 12 } }}
-          style={{ flex: 1, minWidth: 0 }}
+          // The rename sits in a 22px layer row, so the field takes that height rather than xs's 30px.
+          style={{ flex: 1, minWidth: 0, '--mullion-control-height-xs': uiRem(22 / 16) }}
           autoFocus
         />
       ) : (

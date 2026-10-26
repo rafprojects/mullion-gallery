@@ -66,8 +66,11 @@
   }
 
   .mullion-toggle[data-disabled] .mullion-toggle-row {
-    opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  .mullion-toggle[data-disabled] .mullion-toggle-label {
+    color: var(--mullion-color-border-strong);
   }
 
   .mullion-toggle-label {
@@ -206,6 +209,21 @@
   .mullion-switch[data-checked] .mullion-switch-thumb {
     background-color: var(--mullion-color-primary-on);
     translate: calc(var(--mullion-switch-w) - var(--mullion-switch-thumb) - 2 * var(--mullion-switch-pad) - 2px) 0;
+  }
+
+  /*
+   * Rule 16: a disabled toggle is recessed, checked or not, with its label in
+   * the same ink, rather than faded. Later than the checked rules so it wins.
+   */
+  .mullion-toggle[data-disabled] .mullion-checkbox,
+  .mullion-toggle[data-disabled] .mullion-switch {
+    border-color: var(--mullion-color-border);
+    background-color: var(--mullion-color-background);
+    color: var(--mullion-color-border-strong);
+  }
+
+  .mullion-toggle[data-disabled] .mullion-switch-thumb {
+    background-color: var(--mullion-color-border-strong);
   }
 
   @media (prefers-reduced-motion: reduce) {

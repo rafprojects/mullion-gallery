@@ -4,14 +4,12 @@ import {
   Modal,
   Progress,
   Select,
-  TextInput,
-  Textarea,
 } from '@mantine/core';
 import { IconUpload, IconX, IconFile, IconVideo } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { OEmbedResponse } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Card, Paper, ActionIcon, Button, FileButton } from '@/ui';
+import { uiRem, Group, Stack, Text, Card, Paper, ActionIcon, Button, FileButton, TextInput, Textarea } from '@/ui';
 
 interface MediaAddModalProps {
   opened: boolean;
@@ -275,7 +273,6 @@ export function MediaAddModal({
                   placeholder={t('admin_media_add_caption_ph', 'Enter a caption or description (optional)')}
                   value={uploadCaption}
                   onChange={(e) => onUploadCaptionChange(e.currentTarget.value)}
-                  autosize
                   minRows={2}
                   maxRows={4}
                 />

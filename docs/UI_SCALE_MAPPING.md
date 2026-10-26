@@ -134,6 +134,7 @@ Three rungs join the spacing scale below `xs`: `4xs` 2px, `3xs` 4px, `2xs` 6px. 
 | `Chip`, `Chip.Group` | 2026-10-26 | 8 edits in 4 files | One look for every chip (designer, rule 17), so a literal `variant` is dropped. `Chip.Group` defaults to single choice, as Mantine's did. |
 | `Checkbox`, `Switch`, `SegmentedControl` | 2026-10-26 | 155 edits in 35 files | A toggle's inline `onChange` that reads only `e.currentTarget.checked` takes the boolean; other handlers are listed. `Slider` stays on Mantine for the designer's answer on its thumb. |
 | `Slider` | 2026-10-26 | none | One slider at every size (designer, rule 18): `size` is accepted and draws the same slider. |
+| `TextInput`, `NumberInput`, `Textarea`, `PasswordInput` | 2026-10-26 | 138 edits in 46 files | `filled` dropped and `unstyled` is `bare` (rule 19); `suffix` to the unit slot; `allowDecimal={false}` to `decimalScale={0}`; `hideControls` to `controls="none"`; `autosize` dropped, since the textarea always grows. `styles` overrides went by hand. `UnitScrubField` stays on Mantine for P81-B. |
 
 **Checks every flip carries**, both found on the first one:
 

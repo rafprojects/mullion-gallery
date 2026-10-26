@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
-import { Modal, Table, Tooltip, TextInput } from '@mantine/core';
+import { Modal, Table, Tooltip } from '@mantine/core';
 import { IconEdit, IconCheck, IconX, IconRotateClockwise } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { ACTION_IDS, ACTION_DEFAULTS, type ShortcutActionId, type ShortcutConfigHandle } from '@/hooks/useShortcutConfig';
-import { uiRem, Stack, Group, Text, Badge, Button, ActionIcon } from '@/ui';
+import { uiRem, Stack, Group, Text, Badge, Button, ActionIcon, TextInput } from '@/ui';
 
 // ── Key display helpers ───────────────────────────────────────────────────────
 

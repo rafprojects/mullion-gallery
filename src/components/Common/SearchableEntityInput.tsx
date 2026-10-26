@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
-import { ActionIcon } from '@/ui';
+import { Combobox, Loader, useCombobox } from '@mantine/core';
+import { ActionIcon, TextInput } from '@/ui';
 import type { MantineSize } from '@mantine/core';
 import { IconSearch, IconTrash } from '@tabler/icons-react';
 
@@ -75,7 +75,6 @@ export function SearchableEntityInput({
               <IconSearch size={16} />
             )
           }
-          rightSectionPointerEvents={hasSelection ? 'auto' : 'none'}
           onChange={(e) => {
             committedRef.current = false;
             onInputChange(e.currentTarget.value);

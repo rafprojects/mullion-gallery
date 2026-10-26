@@ -435,11 +435,35 @@ function ControlSizes({ prefix }: { prefix: string }) {
         />
         <Slider defaultValue={50} disabled aria-label="slider disabled" data-testid={`${prefix}-slider-disabled`} />
       </Group>
+      <Group gap="lg" align="flex-start" data-testid={`${prefix}-designer-crop`}>
+        <Stack gap="sm">
+          <Switch label="Off" data-testid={`${prefix}-switch-off`} />
+          <Switch label="On" defaultChecked data-testid={`${prefix}-switch-on`} />
+          <Switch label="Disabled" disabled data-testid={`${prefix}-switch-disabled`} />
+          <Switch label="Disabled, on" disabled defaultChecked data-testid={`${prefix}-switch-disabled-on`} />
+          <Checkbox label="Disabled, checked" disabled defaultChecked data-testid={`${prefix}-checkbox-disabled-on`} />
+        </Stack>
+        <NumberInput label="Items per page" description="Between 1 and 100." defaultValue={12} min={1} max={100} />
+        <NumberInput label="Width" defaultValue={1200} unit="px" />
+      </Group>
+      <Group gap="md" align="flex-start">
+        <NumberInput label="Disabled" defaultValue={3} disabled data-testid={`${prefix}-number-disabled`} />
+        <TextInput variant="bare" size="lg" defaultValue="A title edited in place" aria-label="title" data-testid={`${prefix}-bare`} />
+        <TextInput label="Plain" defaultValue="value" data-testid={`${prefix}-plain`} />
+        <TextInput
+          aria-label="search"
+          placeholder="Search"
+          leftSection={<span aria-hidden>⌕</span>}
+          rightSection={<span aria-hidden>×</span>}
+          data-testid={`${prefix}-sectioned`}
+        />
+      </Group>
       {(['xs', 'sm'] as const).map((size) => (
         <Group key={size} gap="md" align="flex-start">
           <Checkbox size={size} label="Checkbox" description="Its description" data-testid={`${prefix}-checkbox-${size}`} />
           <Switch size={size} label="Switch" description="Its description" data-testid={`${prefix}-switch-${size}`} />
           <TextInput size={size} label="Field" description="Its description" data-testid={`${prefix}-field-${size}`} />
+          <NumberInput size={size} label="Number" description="Its description" defaultValue={12} data-testid={`${prefix}-number-${size}`} />
           <SegmentedControl
             size={size}
             data={['One', 'Two']}

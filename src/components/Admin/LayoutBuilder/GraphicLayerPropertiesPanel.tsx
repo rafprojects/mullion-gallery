@@ -15,9 +15,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Accordion,
   Divider,
-  NumberInput,
   Select,
-  TextInput,
   Tooltip,
 } from '@mantine/core';
 import {
@@ -30,6 +28,8 @@ import {
   SegmentedControl,
   Slider,
   Switch,
+  NumberInput,
+  TextInput,
 } from '@/ui';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -161,9 +161,9 @@ function ShadowControls({
         <>
           <Group grow gap="2xs">
             <NumberInput label={t('lb_slot_offx', 'Off X')} value={sh.offsetX} onChange={(v) => set({ offsetX: Number(v) || 0 })}
-              min={-50} max={50} size="xs" suffix=" px" />
+              min={-50} max={50} size="xs" unit="px" />
             <NumberInput label={t('lb_slot_offy', 'Off Y')} value={sh.offsetY} onChange={(v) => set({ offsetY: Number(v) || 0 })}
-              min={-50} max={50} size="xs" suffix=" px" />
+              min={-50} max={50} size="xs" unit="px" />
           </Group>
           <Text size="xs" tone="muted">{t('lb_gl_blur', 'Blur')}</Text>
           <Slider value={sh.blur} onChange={(v) => set({ blur: v })}
@@ -393,7 +393,7 @@ export function GraphicLayerPropertiesPanel({
                     onChange={(v) => set({ borderRadius: Number(v) || 0 })}
                     min={0}
                     max={500}
-                    suffix=" px"
+                    unit="px"
                   />
                 )}
                 <NumberInput
@@ -403,7 +403,7 @@ export function GraphicLayerPropertiesPanel({
                   onChange={(v) => set({ borderWidth: Math.max(0, Number(v) || 0) })}
                   min={0}
                   max={50}
-                  suffix=" px"
+                  unit="px"
                 />
               </Group>
               {(overlay.borderWidth ?? 0) > 0 && (

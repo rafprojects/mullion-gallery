@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { useTranslation } from 'react-i18next';
 import {
   Modal,
-  TextInput,
   Tooltip,
   Divider,
 } from '@mantine/core';
@@ -26,7 +25,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useGetSettings } from '@/services/settingsQuery';
 import { AdminChromeProvider } from '@/components/Admin/AdminChromeProvider';
 import { adminChromeAttributes, adminChromeClassNames, adminChromeStyles, resolveChromeThemeId } from '@/themes/chromeTheme';
-import { getThemeEntry, Group, Text, Box, Button, ActionIcon } from '@/ui';
+import { getThemeEntry, Group, Text, Box, Button, ActionIcon, TextInput } from '@/ui';
 import { useLatestRef } from '@mullion/shared-utils';
 import { DockviewReact, DockviewDefaultTab } from 'dockview';
 import { debugGroup, debugLog, debugGroupEnd } from '@/utils/debug';
@@ -548,16 +547,9 @@ export function LayoutBuilderModal({
                 <TextInput
                   value={builder.template.name}
                   onChange={(e) => builder.setTemplateField('name', e.currentTarget.value)}
-                  variant="unstyled"
-                  size="lg"
-                  styles={{
-                    input: {
-                      fontWeight: 600,
-                      fontSize: 'var(--mantine-font-size-lg)',
-                      padding: '0 4px',
-                      height: 'auto',
-                    },
-                  }}
+                  variant="bare"
+                  // Edited in place, so it keeps the title's type style at an ordinary field's height.
+                  style={{ fontWeight: 600, '--mullion-field-fz': 'var(--mullion-font-size-lg)' }}
                   aria-label={tr('lb_mod_template_name', 'Template name')}
                 />
               </Group>

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getHotkeyHandler, useElementSize, useMergedRef } from '@mantine/hooks';
 import {
-  NumberInput,
   Divider,
   Tooltip,
 } from '@mantine/core';
@@ -19,7 +18,7 @@ import { safeLocalStorage, fitRectsIntoBand } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group, Text, Box, Alert, Button, ActionIcon, Switch, Slider, SegmentedControl } from '@/ui';
+import { uiRem, Group, Text, Box, Alert, Button, ActionIcon, Switch, Slider, SegmentedControl, NumberInput } from '@/ui';
 
 // ── P30-C: Device preview presets ────────────────────────────────────────────
 
@@ -521,7 +520,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                   step={10}
                   size="xs"
                   style={{ width: uiRem(5) }}
-                  suffix="px"
+                  unit="px"
                   aria-label={tr('lb_canvas_max_width_aria', 'Canvas max width')}
                 />
               </Group>
@@ -589,7 +588,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                     step={4}
                     size="xs"
                     style={{ width: uiRem(4.25) }}
-                    suffix="px"
+                    unit="px"
                     aria-label={tr('lb_canvas_grid_size_aria', 'Grid cell size')}
                   />
                 )}
@@ -764,7 +763,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                   step={10}
                   size="xs"
                   style={{ width: uiRem(5.625) }}
-                  suffix="px"
+                  unit="px"
                   aria-label={tr('lb_canvas_custom_width_aria', 'Custom preview width')}
                   data-testid="custom-preview-width-input"
                 />

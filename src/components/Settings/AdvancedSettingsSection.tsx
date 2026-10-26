@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Accordion, Divider, Loader, NumberInput, Select, TextInput } from '@mantine/core';
-import { Group, Stack, Text, Alert, Badge, Slider, Switch } from '@/ui';
+import { Accordion, Divider, Loader, Select } from '@mantine/core';
+import { Group, Stack, Text, Alert, Badge, Slider, Switch, NumberInput, TextInput } from '@/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 

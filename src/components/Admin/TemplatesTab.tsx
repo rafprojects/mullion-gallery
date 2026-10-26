@@ -2,11 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   Tooltip,
   Modal,
-  TextInput,
   Select,
   Divider,
   Loader,
-  Textarea,
 } from '@mantine/core';
 import {
   Stack,
@@ -17,6 +15,8 @@ import {
   Badge,
   Button,
   ActionIcon,
+  TextInput,
+  Textarea,
 } from '@/ui';
 import { IconTrash, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';

@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  TextInput,
-  Textarea,
   Select,
   Divider,
-  NumberInput,
   Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -16,7 +13,7 @@ import {
 import type { LayoutTextLayer, LayoutTextSemanticTag, LayoutTextAlign, TypographyOverride } from '@/types';
 import { TypographyEditor } from '@/components/Common/TypographyEditor';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Button, ActionIcon, SegmentedControl, Slider } from '@/ui';
+import { uiRem, Stack, Group, Text, Button, ActionIcon, SegmentedControl, Slider, TextInput, Textarea, NumberInput } from '@/ui';
 
 export interface TextPropertiesPanelProps {
   text: LayoutTextLayer;
@@ -82,7 +79,6 @@ export function TextPropertiesPanel({
       <Textarea
         label={t('lb_text_text', 'Text')}
         size="xs"
-        autosize
         minRows={2}
         maxRows={6}
         value={contentValue}

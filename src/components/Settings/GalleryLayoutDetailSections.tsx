@@ -1,6 +1,6 @@
 
-import { Accordion, Divider, NumberInput } from '@mantine/core';
-import { Stack, Switch } from '@/ui';
+import { Accordion, Divider } from '@mantine/core';
+import { Stack, Switch, NumberInput } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { ModalSelect } from '@/components/Common/ModalSelect';
 import { DimensionInput } from '@/components/Settings/DimensionInput';

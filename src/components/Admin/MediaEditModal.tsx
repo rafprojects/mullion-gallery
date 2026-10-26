@@ -1,6 +1,6 @@
 
-import { Modal, TextInput, Textarea } from '@mantine/core';
-import { Group, Stack, Button } from '@/ui';
+import { Modal } from '@mantine/core';
+import { Group, Stack, Button, TextInput, Textarea } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { useDirtyGuard } from '@mullion/shared-utils';
 import { ConfirmModal } from '@/components/Common/ConfirmModal';
@@ -54,7 +54,6 @@ function MediaEditForm({
         placeholder={t('admin_media_edit_caption_ph', 'Enter a caption or description')}
         value={editingCaption}
         onChange={(e) => onEditingCaptionChange(e.currentTarget.value)}
-        autosize
         minRows={2}
         maxRows={4}
         description={t('admin_media_edit_caption_desc', 'Descriptive text shown with the media')}

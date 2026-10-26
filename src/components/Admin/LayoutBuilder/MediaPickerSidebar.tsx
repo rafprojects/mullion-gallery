@@ -14,7 +14,6 @@ import {
   ScrollArea,
   Image,
   Tooltip,
-  TextInput,
   Menu,
 } from '@mantine/core';
 import {
@@ -31,7 +30,7 @@ import {
 } from '@tabler/icons-react';
 import type { LayoutSlot, LayoutTemplate, MediaItem } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Badge, Button, UnstyledButton, ActionIcon } from '@/ui';
+import { uiRem, Stack, Group, Text, Badge, Button, UnstyledButton, ActionIcon, TextInput } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 

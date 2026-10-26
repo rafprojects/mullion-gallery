@@ -5,6 +5,22 @@ import { getAdapterSelectOptions } from '@/components/Galleries/Adapters/adapter
 
 import { GalleryConfigEditorModal } from './GalleryConfigEditorModal';
 
+/**
+ * Base UI's number field keeps an aria-hidden twin input for form submission,
+ * so a display-value query finds two. This finds the one a user sees and
+ * still insists there is exactly one.
+ */
+function getShownByDisplayValue(value: string) {
+  const shown = screen.getAllByDisplayValue(value).filter((el) => el.getAttribute('aria-hidden') !== 'true');
+  expect(shown).toHaveLength(1);
+  return shown[0]!;
+}
+
+async function findShownByDisplayValue(value: string) {
+  await screen.findAllByDisplayValue(value);
+  return getShownByDisplayValue(value);
+}
+
 function openAccordionSection(name: string) {
   fireEvent.click(screen.getByRole('button', { name }));
 }
@@ -39,7 +55,7 @@ describe('GalleryConfigEditorModal', () => {
 
     expect(await screen.findByText('Adapter-Specific Settings')).toBeInTheDocument();
     expect(screen.getByText('Masonry Columns (0 = auto)')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('3')).toBeInTheDocument();
+    expect(getShownByDisplayValue('3')).toBeInTheDocument();
     expect(screen.getByLabelText('Auto Column Breakpoints')).toHaveValue('480:2,768:3,1024:4,1280:5');
   });
 
@@ -73,9 +89,9 @@ describe('GalleryConfigEditorModal', () => {
     expect(screen.getByLabelText('Card Aspect Ratio', { selector: 'input' })).toHaveValue('3:4 (portrait)');
     expect(screen.getByLabelText('Max Columns (0 = auto)')).toBeInTheDocument();
     expect(screen.getByLabelText('Card Min Height (px)')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('180')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('3')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('220')).toBeInTheDocument();
+    expect(getShownByDisplayValue('180')).toBeInTheDocument();
+    expect(getShownByDisplayValue('3')).toBeInTheDocument();
+    expect(getShownByDisplayValue('220')).toBeInTheDocument();
   });
 
   it('renders schema-driven carousel adapter fields for classic selections', async () => {
@@ -200,13 +216,13 @@ describe('GalleryConfigEditorModal', () => {
     );
 
     expect(await screen.findByLabelText('Unified Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.getByDisplayValue('3')).toBeInTheDocument();
+    expect(getShownByDisplayValue('3')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Tablet' }));
 
     expect(await screen.findByText('Editing breakpoint-specific unified settings for the Tablet layout.')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('2')).toBeInTheDocument();
-    fireEvent.change(screen.getByDisplayValue('2'), { target: { value: '4' } });
+    expect(getShownByDisplayValue('2')).toBeInTheDocument();
+    fireEvent.change(getShownByDisplayValue('2'), { target: { value: '4' } });
     fireEvent.click(screen.getByLabelText('Unified Gallery Adapter', { selector: 'input' }));
     fireEvent.click(screen.getByRole('option', { name: tabletAdapterLabel ?? 'Justified' }));
     fireEvent.click(screen.getByRole('button', { name: 'Apply Gallery Config' }));
@@ -573,7 +589,7 @@ describe('GalleryConfigEditorModal', () => {
     expect(await screen.findByText('Adapter-Specific Settings')).toBeInTheDocument();
     expect(screen.getByLabelText('Layout Builder Scope', { selector: 'input' })).toHaveValue('Viewport Only');
     expect(screen.getByText('Default Glow Spread (px)')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('18')).toBeInTheDocument();
+    expect(getShownByDisplayValue('18')).toBeInTheDocument();
   });
 
   it('renders shared common adapter spacing controls from nested common settings', async () => {
@@ -601,8 +617,8 @@ describe('GalleryConfigEditorModal', () => {
     );
 
     openAccordionSection('Shared Adapter Sizing');
-    expect(await screen.findByDisplayValue('20')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Space Between')).toBeInTheDocument();
+    expect(await findShownByDisplayValue('20')).toBeInTheDocument();
+    expect(getShownByDisplayValue('Space Between')).toBeInTheDocument();
   });
 
   it('renders shared section sizing controls from nested common settings', async () => {
@@ -634,13 +650,13 @@ describe('GalleryConfigEditorModal', () => {
     );
 
     openAccordionSection('Shared Section Sizing');
-    expect(await screen.findByDisplayValue('1200')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('350')).toBeInTheDocument();
+    expect(await findShownByDisplayValue('1200')).toBeInTheDocument();
+    expect(getShownByDisplayValue('350')).toBeInTheDocument();
     expect(screen.getByLabelText('Section Height Mode', { selector: 'input' })).toHaveValue(
       'Manual (fixed max height)',
     );
-    expect(screen.getByDisplayValue('640')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('240')).toBeInTheDocument();
+    expect(getShownByDisplayValue('640')).toBeInTheDocument();
+    expect(getShownByDisplayValue('240')).toBeInTheDocument();
     expect(screen.getByLabelText('Equal Height Sections (Per-Type)', { selector: 'input' })).toHaveValue('On');
   });
 
@@ -671,8 +687,8 @@ describe('GalleryConfigEditorModal', () => {
 
     openAccordionSection('Shared Adapter Sizing');
     expect(await screen.findByDisplayValue('Manual (custom %)')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('85')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('90')).toBeInTheDocument();
+    expect(getShownByDisplayValue('85')).toBeInTheDocument();
+    expect(getShownByDisplayValue('90')).toBeInTheDocument();
   });
 
   it('renders shared gallery height controls from nested common settings', async () => {
@@ -733,7 +749,7 @@ describe('GalleryConfigEditorModal', () => {
 
     openAccordionSection('Shared Gallery Presentation');
     expect(await screen.findByDisplayValue('Photos')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Clips')).toBeInTheDocument();
+    expect(getShownByDisplayValue('Clips')).toBeInTheDocument();
     expect(screen.getByLabelText('Gallery Label Justification', { selector: 'input' })).toHaveValue('Center');
     expect(screen.getByLabelText('Show Gallery Label Icons', { selector: 'input' })).toHaveValue('On');
     expect(screen.getByLabelText('Show Gallery Section Labels', { selector: 'input' })).toHaveValue('Off');
@@ -804,7 +820,7 @@ describe('GalleryConfigEditorModal', () => {
       />,
     );
 
-    const input = await screen.findByDisplayValue('3');
+    const input = await findShownByDisplayValue('3');
     fireEvent.change(input, { target: { value: '5' } });
     fireEvent.click(screen.getByRole('button', { name: /^Reset$/ }));
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Reset All Changes' }));

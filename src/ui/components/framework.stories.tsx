@@ -99,7 +99,7 @@ export const Inputs: Story = {
 
         <Section title="Numbers, the stepper and the scrub label">
           <Group gap="md" align="flex-end">
-            <NumberInput label="Columns" defaultValue={3} min={1} max={12} withControls />
+            <NumberInput label="Columns" defaultValue={3} min={1} max={12} controls="flank" />
             <NumberInput label="Gap" defaultValue={8} step={2} scrubbable description="Drag the label" />
           </Group>
         </Section>
@@ -137,7 +137,7 @@ export const Inputs: Story = {
 
         <Section title="Sizes">
           {STEPS.map((step) => (
-            <NumberInput key={step} size={step} label={`size ${step}`} defaultValue={12} unit="px" withControls />
+            <NumberInput key={step} size={step} label={`size ${step}`} defaultValue={12} unit="px" controls="flank" />
           ))}
         </Section>
       </Stack>

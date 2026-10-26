@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Select,
-  NumberInput,
   Tooltip,
 } from '@mantine/core';
 import { BuilderColorInput as ColorInput } from './BuilderColorInput';
@@ -20,7 +19,7 @@ import { useBuilderDock } from './BuilderDockContext';
 import { AssetUploader } from './AssetUploader';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box, Button, ActionIcon, Slider, SegmentedControl } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, Button, ActionIcon, Slider, SegmentedControl, NumberInput } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -226,9 +225,9 @@ function BackgroundModeControls({
             <GRow label={t('lb_bg_angle', 'Angle')}>
               <NumberInput
                 size="xs"
-                value={builder.template.backgroundGradientAngle ?? ''}
-                onChange={(val) => { builder.setTemplateField('backgroundGradientAngle', val === '' || val === undefined ? undefined : Number(val)); }}
-                placeholder={t('lb_bg_auto', 'auto')} min={0} max={360} step={5} suffix="°" style={{ flex: 1 }}
+                value={builder.template.backgroundGradientAngle ?? null}
+                onChange={(val) => { builder.setTemplateField('backgroundGradientAngle', val ?? undefined); }}
+                placeholder={t('lb_bg_auto', 'auto')} min={0} max={360} step={5} unit="°" style={{ flex: 1 }}
               />
             </GRow>
           </>
@@ -266,7 +265,7 @@ function BackgroundModeControls({
         {gradType === 'conic' && (
           <>
             <GRow label={t('lb_bg_angle', 'Angle')}>
-              <NumberInput size="xs" value={builder.template.backgroundGradientAngle ?? 0} onChange={(val) => builder.setTemplateField('backgroundGradientAngle', val === '' ? 0 : Number(val))} min={0} max={360} step={5} suffix="°" style={{ flex: 1 }} />
+              <NumberInput size="xs" value={builder.template.backgroundGradientAngle ?? 0} onChange={(val) => builder.setTemplateField('backgroundGradientAngle', val ?? 0)} min={0} max={360} step={5} unit="°" style={{ flex: 1 }} />
             </GRow>
             <GRow label={t('lb_bg_ctr_x', 'Ctr X')}>
               <Slider size="xs" value={builder.template.backgroundGradientCenterX ?? 50} onChange={(v) => builder.setTemplateField('backgroundGradientCenterX', v)} min={0} max={100} step={1} label={(v) => `${v}%`} style={{ flex: 1 }} />

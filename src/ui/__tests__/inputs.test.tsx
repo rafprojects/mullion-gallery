@@ -31,6 +31,13 @@ describe('the field shell', () => {
     expect(screen.getByRole('textbox', { name: /campaign title/i })).toBeTruthy();
   });
 
+  // [P81-A] Mantine let an explicit aria-label name the input over its visible
+  // label; Base UI's field links the label with aria-labelledby, which outranks it.
+  it('lets an explicit aria-label name the control over the visible label', () => {
+    render(<TextInput label="External URL" aria-label="External media URL" />);
+    expect(screen.getByRole('textbox', { name: 'External media URL' })).toBeTruthy();
+  });
+
   it('describes the control by its description', () => {
     mount(<TextInput label="Slug" description="Lowercase, no spaces" />);
     expect(screen.getByRole('textbox', { name: /slug/i })).toHaveAccessibleDescription(
@@ -119,6 +126,13 @@ describe('Textarea', () => {
 });
 
 describe('NumberInput', () => {
+  // [P81-A] Mantine showed digits ungrouped unless asked; Base UI groups by
+  // locale, which put "1,200" in a pixel-width field.
+  it('shows a number without digit grouping', () => {
+    render(<NumberInput label="Width" defaultValue={1200} />);
+    expect((screen.getByRole('textbox', { name: 'Width' }) as HTMLInputElement).value).toBe('1200');
+  });
+
   it('hands onChange the value, not an event', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
@@ -162,7 +176,7 @@ describe('NumberInput', () => {
         label="Gap"
         defaultValue={4}
         step={2}
-        withControls
+        controls="flank"
         incrementLabel="Increase gap"
         decrementLabel="Decrease gap"
         onChange={onChange}
@@ -181,7 +195,7 @@ describe('the structural axe gate', () => {
         <TextInput label="Slug" error="Already taken" />
         <PasswordInput label="Password" revealLabel="Show password" />
         <Textarea label="Notes" minRows={2} />
-        <NumberInput label="Columns" defaultValue={2} withControls unit="px" />
+        <NumberInput label="Columns" defaultValue={2} controls="flank" unit="px" />
         <NumberInput label="Gap" defaultValue={4} scrubbable description="Drag the label" />
       </>,
     );

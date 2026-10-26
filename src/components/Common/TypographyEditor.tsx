@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import {
   Accordion,
-  NumberInput,
   Select,
 } from '@mantine/core';
 import {
@@ -10,6 +9,7 @@ import {
   Text,
   Badge,
   ActionIcon,
+  NumberInput,
 } from '@/ui';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -359,8 +359,8 @@ export function TypographyEditor({ value, onChange, customFonts }: TypographyEdi
         <NumberInput
           label={t('typo_line_height', 'Line Height')}
           placeholder={t('typo_line_height_ph', 'e.g. 1.4')}
-          value={value.lineHeight ?? ''}
-          onChange={(v) => set('lineHeight', typeof v === 'number' ? v : undefined)}
+          value={value.lineHeight ?? null}
+          onChange={(v) => set('lineHeight', v ?? undefined)}
           min={0.5}
           max={5}
           step={0.1}

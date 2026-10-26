@@ -28,6 +28,7 @@ import {
   useRef,
   useState,
   type ChangeEvent,
+  type InputHTMLAttributes,
   type ReactNode,
   type Ref,
 } from 'react';
@@ -54,13 +55,23 @@ export interface TextInputProps extends FieldShellProps, FieldStyleProps {
   onChange?: ((event: ChangeEvent<HTMLInputElement>) => void) | undefined;
   placeholder?: string | undefined;
   /** `PasswordInput` is the field to reach for; `'password'` is here so it can set it. */
-  type?: 'text' | 'email' | 'url' | 'search' | 'tel' | 'password' | undefined;
+  type?: 'text' | 'email' | 'url' | 'search' | 'tel' | 'password' | 'datetime-local' | undefined;
+  /**
+   * `bare` is a field edited in place, such as a title: no ground or edge at
+   * rest, with both reserved so nothing moves, an edge on hover and the
+   * ordinary field once focused (designer, 2026-10-26). There is no `filled`.
+   */
+  variant?: 'default' | 'bare' | undefined;
   name?: string | undefined;
   readOnly?: boolean | undefined;
   autoComplete?: string | undefined;
   onKeyDown?: React.KeyboardEventHandler<HTMLInputElement> | undefined;
   onBlur?: React.FocusEventHandler<HTMLInputElement> | undefined;
   onFocus?: React.FocusEventHandler<HTMLInputElement> | undefined;
+  onClick?: React.MouseEventHandler<HTMLInputElement> | undefined;
+  autoFocus?: boolean | undefined;
+  /** Names the input over its visible label, as Mantine let it. */
+  'aria-label'?: string | undefined;
 }
 
 /** A single-line text field. */
@@ -77,6 +88,7 @@ export const TextInput = forwardRef(function TextInput(
     rightSection,
     className,
     style,
+    variant,
     ...input
   }: TextInputProps,
   ref: Ref<HTMLInputElement>,
@@ -84,6 +96,7 @@ export const TextInput = forwardRef(function TextInput(
   return (
     <FieldShell
       {...{ label, description, error, required, disabled, size, radius, leftSection, rightSection, className, style }}
+      {...(variant === 'bare' ? { variantClass: 'mullion-field-control-bare' } : {})}
     >
       <Field.Control
         ref={ref}
@@ -92,6 +105,8 @@ export const TextInput = forwardRef(function TextInput(
         {...(disabled ? { disabled: true } : {})}
         {...(required ? { required: true } : {})}
         {...input}
+        // An explicit aria-label names the input, as it did under Mantine; Base UI's label link would outrank it.
+        {...(input['aria-label'] !== undefined ? { 'aria-labelledby': undefined } : {})}
       />
     </FieldShell>
   );
@@ -240,7 +255,13 @@ export const Textarea = forwardRef(function Textarea(
 // NumberInput
 // ---------------------------------------------------------------------------
 
-export interface NumberInputProps extends FieldShellProps, FieldStyleProps {
+/** What a call site may put on the input itself: its name for assistive tech and its handlers. */
+type NumberInputAttributes = Pick<
+  InputHTMLAttributes<HTMLInputElement>,
+  'aria-label' | 'aria-labelledby' | 'name' | 'autoFocus' | 'onBlur' | 'onFocus' | 'onKeyDown'
+>;
+
+export interface NumberInputProps extends FieldShellProps, FieldStyleProps, NumberInputAttributes {
   value?: number | null | undefined;
   defaultValue?: number | null | undefined;
   /** The value, not an event: this is how the 136 call sites read it. */
@@ -265,8 +286,13 @@ export interface NumberInputProps extends FieldShellProps, FieldStyleProps {
    * Typography panel redesign.
    */
   unit?: ReactNode | undefined;
-  /** Show the increment and decrement buttons. */
-  withControls?: boolean | undefined;
+  /**
+   * The steppers. `stacked` chevrons at the right edge by default, as Mantine
+   * drew them, out of the tab order because the arrow keys are the keyboard
+   * path (designer, 2026-10-26). `flank` puts a minus before the value and a
+   * plus after it, focusable, for the rare call site that wants them.
+   */
+  controls?: 'stacked' | 'flank' | 'none' | undefined;
   /** Labels for the stepper buttons. Pass translated strings. */
   incrementLabel?: string | undefined;
   decrementLabel?: string | undefined;
@@ -276,6 +302,22 @@ export interface NumberInputProps extends FieldShellProps, FieldStyleProps {
    * which `UnitScrubField` currently hand-rolls.
    */
   scrubbable?: boolean | undefined;
+}
+
+/** A stepper's chevron, drawn in the stepper's ink. */
+function Chevron({ up }: { up?: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden focusable={false}>
+      <path
+        d={up ? 'M6 15 L12 9 L18 15' : 'M6 9 L12 15 L18 9'}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }
 
 /** A numeric field with an optional unit slot and stepper. */
@@ -301,10 +343,11 @@ export function NumberInput({
   readOnly,
   decimalScale,
   unit,
-  withControls,
+  controls = 'stacked',
   incrementLabel = 'Increment',
   decrementLabel = 'Decrement',
   scrubbable,
+  ...attributes
 }: NumberInputProps) {
   const invalid = error !== undefined && error !== false;
   /*
@@ -317,6 +360,7 @@ export function NumberInput({
    */
   const inputId = useId();
   const describedBy: string[] = [];
+  const flank = controls === 'flank';
   if (description !== undefined) describedBy.push(`${inputId}-description`);
   if (typeof error !== 'boolean' && error !== undefined) describedBy.push(`${inputId}-error`);
 
@@ -334,9 +378,8 @@ export function NumberInput({
       {...(disabled ? { disabled: true } : {})}
       {...(readOnly ? { readOnly: true } : {})}
       {...(required ? { required: true } : {})}
-      {...(decimalScale !== undefined
-        ? { format: { maximumFractionDigits: decimalScale } }
-        : {})}
+      // Ungrouped, as Mantine showed it: a pixel width reads 1200, not 1,200.
+      format={{ useGrouping: false, ...(decimalScale !== undefined ? { maximumFractionDigits: decimalScale } : {}) }}
       style={{ ...customProperties({ '--mullion-radius': radiusValue(radius) }), ...style }}
     >
       {label !== undefined &&
@@ -355,11 +398,16 @@ export function NumberInput({
             )}
           </label>
         ))}
+      {description !== undefined && (
+        <span className="mullion-field-description" id={`${inputId}-description`}>
+          {description}
+        </span>
+      )}
       <NumberField.Group
         className={cx('mullion-field-control', invalid && 'mullion-field-control-invalid')}
       >
         {leftSection !== undefined && <span className="mullion-field-section">{leftSection}</span>}
-        {withControls && (
+        {flank && (
           <NumberField.Decrement
             className="mullion-field-step"
             aria-label={decrementLabel}
@@ -369,6 +417,7 @@ export function NumberInput({
           </NumberField.Decrement>
         )}
         <NumberField.Input
+          {...attributes}
           id={inputId}
           className="mullion-field-input"
           {...focusable}
@@ -380,7 +429,7 @@ export function NumberInput({
          * there is no second control to line up and no seam to hide.
          */}
         {unit !== undefined && <span className="mullion-field-unit">{unit}</span>}
-        {withControls && (
+        {flank && (
           <NumberField.Increment
             className="mullion-field-step"
             aria-label={incrementLabel}
@@ -389,13 +438,18 @@ export function NumberInput({
             <span aria-hidden>+</span>
           </NumberField.Increment>
         )}
+        {controls === 'stacked' && (
+          <span className="mullion-field-steppers">
+            <NumberField.Increment className="mullion-field-stepper" tabIndex={-1} aria-hidden>
+              <Chevron up />
+            </NumberField.Increment>
+            <NumberField.Decrement className="mullion-field-stepper" tabIndex={-1} aria-hidden>
+              <Chevron />
+            </NumberField.Decrement>
+          </span>
+        )}
         {rightSection !== undefined && <span className="mullion-field-section">{rightSection}</span>}
       </NumberField.Group>
-      {description !== undefined && (
-        <span className="mullion-field-description" id={`${inputId}-description`}>
-          {description}
-        </span>
-      )}
       {typeof error !== 'boolean' && error !== undefined && (
         <span className="mullion-field-error" id={`${inputId}-error`}>
           {error}

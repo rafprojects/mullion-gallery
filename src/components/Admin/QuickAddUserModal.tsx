@@ -2,7 +2,6 @@ import type { Dispatch, SetStateAction } from 'react';
 import {
   Modal,
   Select,
-  TextInput,
   Tooltip,
 } from '@mantine/core';
 import {
@@ -13,6 +12,7 @@ import {
   Box,
   Button,
   Checkbox,
+  TextInput,
 } from '@/ui';
 import { IconAlertCircle, IconUserPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';

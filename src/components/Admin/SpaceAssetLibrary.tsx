@@ -10,14 +10,14 @@
  * is presentational + local filter state only.
  */
 import { useMemo, useState } from 'react';
-import { TextInput, Loader } from '@mantine/core';
+import { Loader } from '@mantine/core';
 import { IconSearch, IconCheck } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import { CHECKERED_BG } from '@/utils/checkeredBg';
 import { getAssetFileType } from '@/utils/assetFileType';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Text, Box, Center, Badge, Button, Chip } from '@/ui';
+import { uiRem, Group, Text, Box, Center, Badge, Button, Chip, TextInput } from '@/ui';
 
 export interface SpaceAssetLibraryProps {
   assets: AssetLibraryItem[];

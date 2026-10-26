@@ -2,7 +2,6 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ASSET_MIME } from './DesignAssetsGrid';
 import {
-  NumberInput,
   Loader,
   Tooltip,
 } from '@mantine/core';
@@ -16,7 +15,7 @@ import { DEFAULT_MASK_LAYER } from '@/types';
 import type { AssetLibraryItem } from './BuilderDockContext';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box, FileButton, Button, ActionIcon, SegmentedControl, Slider } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, FileButton, Button, ActionIcon, SegmentedControl, Slider, NumberInput } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -181,7 +180,6 @@ export function MaskPropertiesPanel({
                 onChange={(v) => setMask({ x: Number(v) || 0 })}
                 step={1}
                 size="xs"
-                variant="filled"
               />
             </PropRow>
             <PropRow label={t('lb_slot_y', 'Y %')}>
@@ -190,7 +188,6 @@ export function MaskPropertiesPanel({
                 onChange={(v) => setMask({ y: Number(v) || 0 })}
                 step={1}
                 size="xs"
-                variant="filled"
               />
             </PropRow>
           </Group>
@@ -206,7 +203,6 @@ export function MaskPropertiesPanel({
                 max={500}
                 step={1}
                 size="xs"
-                variant="filled"
               />
             </PropRow>
             <PropRow label={t('lb_gl_h', 'H %')}>
@@ -217,7 +213,6 @@ export function MaskPropertiesPanel({
                 max={500}
                 step={1}
                 size="xs"
-                variant="filled"
               />
             </PropRow>
           </Group>
