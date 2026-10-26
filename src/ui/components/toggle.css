@@ -196,7 +196,8 @@
     inline-size: var(--mullion-switch-thumb);
     block-size: var(--mullion-switch-thumb);
     border-radius: 999px;
-    background-color: var(--mullion-color-surface);
+    /* `textMuted`, so an off switch shows where its thumb is (designer, 2026-10-26). */
+    background-color: var(--mullion-color-text-muted);
     translate: 0;
     transition: translate var(--mullion-duration-fast) ease;
   }

@@ -643,3 +643,51 @@ test('a field section is a square the height of the field', async ({ page }) => 
   expect.soft(got.textStart, 'text starts after the left section').toBeCloseTo(37, 0);
   expect.soft(got.textEnd, 'text ends before the right section').toBeCloseTo(37, 0);
 });
+
+// [P81-A] The password reveal (sign-off, 2026-10-26): the eye and the eye
+// with a slash, named "Show password" with `aria-pressed`, in a 24px target.
+test('the password reveal is a 24px eye that reports its state', async ({ page }) => {
+  await serveShowcase(page);
+  await page.goto('/ui-showcase?mount=shadow&controls=1&theme=default-light&chrome=follow');
+  const field = page.getByTestId('inline-password');
+  await field.waitFor();
+  const reveal = page.locator('.mullion-field', { has: field }).getByRole('button', { name: 'Show password' });
+  const read = () =>
+    reveal.evaluate((el) => ({
+      size: [el.getBoundingClientRect().width, el.getBoundingClientRect().height],
+      pressed: el.getAttribute('aria-pressed'),
+      icon: el.querySelector('svg')?.getAttribute('data-icon') ?? null,
+    }));
+  const before = await read();
+  expect.soft(before.size, '24px target').toEqual([24, 24]);
+  expect.soft(before.pressed).toBe('false');
+  expect.soft(before.icon).toBe('eye');
+  await reveal.click();
+  const after = await read();
+  expect.soft(after.pressed).toBe('true');
+  expect.soft(after.icon).toBe('eye-off');
+  await expect(field).toHaveAttribute('type', 'text');
+});
+
+// [P81-A] Sign-off, 2026-10-26: an off switch's thumb is `textMuted`, so its
+// position shows. `surface` on the `surface2` track was 1.02 to 1.23:1.
+for (const theme of ['default-light', 'default-dark'] as const) {
+  test(`an off switch shows its thumb (${theme})`, async ({ page }) => {
+    await serveShowcase(page);
+    await page.goto(`/ui-showcase?mount=shadow&controls=1&theme=${theme}&chrome=follow`);
+    const sw = page.getByTestId('inline-switch-off');
+    await sw.waitFor();
+    await settle(page);
+    const got = await sw.evaluate((el) => {
+      const probe = document.createElement('div');
+      probe.style.color = 'var(--mullion-color-text-muted)';
+      el.parentElement!.appendChild(probe);
+      const muted = getComputedStyle(probe).color;
+      probe.remove();
+      const thumb = el.querySelector('.mullion-switch-thumb')!;
+      return { thumb: getComputedStyle(thumb).backgroundColor, size: thumb.getBoundingClientRect().width, muted };
+    });
+    expect.soft(got.thumb).toBe(got.muted);
+    expect.soft(got.size, 'the same size as when on').toBeCloseTo(14, 1);
+  });
+}

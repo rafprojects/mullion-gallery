@@ -239,7 +239,9 @@ Rules 16 and 17 are from
 with rule 17's check weight and checked hover from
 [`designer-signoff-disabled-chips-2026-10-26.md`](correspondences/designer-signoff-disabled-chips-2026-10-26.md).
 Rules 18 and 19 are from
-[`designer-answers-toggles-fields-2026-10-26.md`](correspondences/designer-answers-toggles-fields-2026-10-26.md).
+[`designer-answers-toggles-fields-2026-10-26.md`](correspondences/designer-answers-toggles-fields-2026-10-26.md),
+with the switch's states in rule 18 from
+[`designer-signoff-fields-2026-10-26.md`](correspondences/designer-signoff-fields-2026-10-26.md).
 
 ### Grounds and inks
 
@@ -375,7 +377,11 @@ alone for a reader who cannot see the edge's colour. *(2026-10-26.)*
 **18. Where a control's outline is drawn in the primary colour, it is `primaryStroke`, never the
 fill.** A checked switch keeps `primaryFill` as its ground, with a `primaryOnFill` thumb on it, and
 its edge takes `primaryStroke`: the track is the control's outline, and on default-dark the fill is
-2.95:1 against `surface`. The slider is one slider at every size:
+2.95:1 against `surface`. The switch, in full: **off**, a `textMuted` thumb on the track's ground
+(5.10:1 at worst across the themes, where a `surface` thumb was 1.02 to 1.23:1 and showed no
+position); **on**, a `primaryOnFill` thumb on `primaryFill` with a `primaryStroke` edge;
+**disabled**, rule 16. The thumb is the same size in every state, since its position carries the
+state. The slider is one slider at every size:
 
 | part | paint |
 |---|---|

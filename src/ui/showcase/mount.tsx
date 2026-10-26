@@ -450,6 +450,7 @@ function ControlSizes({ prefix }: { prefix: string }) {
         <NumberInput label="Disabled" defaultValue={3} disabled data-testid={`${prefix}-number-disabled`} />
         <TextInput variant="bare" size="lg" defaultValue="A title edited in place" aria-label="title" data-testid={`${prefix}-bare`} />
         <TextInput label="Plain" defaultValue="value" data-testid={`${prefix}-plain`} />
+        <PasswordInput label="Password" defaultValue="secret" data-testid={`${prefix}-password`} />
         <TextInput
           aria-label="search"
           placeholder="Search"

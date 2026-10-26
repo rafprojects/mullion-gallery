@@ -125,6 +125,29 @@ export interface PasswordInputProps extends Omit<TextInputProps, 'type'> {
  * every other control. A reveal that only a mouse can reach is the usual
  * defect here.
  */
+/** The eye, struck through once the password shows: the icons people recognise for this. */
+function EyeIcon({ off }: { off: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden
+      focusable={false}
+      data-icon={off ? 'eye-off' : 'eye'}
+      width="1em"
+      height="1em"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M2 12 C5 6.5 8.5 4.5 12 4.5 C15.5 4.5 19 6.5 22 12 C19 17.5 15.5 19.5 12 19.5 C8.5 19.5 5 17.5 2 12 Z" />
+      <circle cx="12" cy="12" r="3" />
+      {off && <path d="M4 4 L20 20" />}
+    </svg>
+  );
+}
+
 export const PasswordInput = forwardRef(function PasswordInput(
   { revealLabel = 'Show password', rightSection, ...rest }: PasswordInputProps,
   ref: Ref<HTMLInputElement>,
@@ -138,14 +161,15 @@ export const PasswordInput = forwardRef(function PasswordInput(
       rightSection={
         <>
           {rightSection}
+          {/* A 24px target, since a control inside a field has no spacing exception (designer, 2026-10-26). */}
           <ActionIcon
             variant="subtle"
-            size="sm"
+            size={24}
             aria-label={revealLabel}
             aria-pressed={revealed}
             onClick={() => setRevealed((v) => !v)}
           >
-            <span aria-hidden>{revealed ? '●' : '○'}</span>
+            <EyeIcon off={revealed} />
           </ActionIcon>
         </>
       }
