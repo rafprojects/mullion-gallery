@@ -114,6 +114,8 @@ const withChoice = withKeyboard || params.get('choice') === '1';
 const withManagers = withKeyboard || params.get('managers') === '1';
 /** P81-A: layout primitives nested inside ones that set every property, for the inheritance test. */
 const withNesting = params.get('nesting') === '1';
+/** P81-A: rule 13's surfaces, for the elevation spec. */
+const withElevation = params.get('elevation') === '1';
 /** `?host=hostile` reproduces the P77-B probe around the whole fixture. */
 const hostileHost = params.get('host') === 'hostile';
 
@@ -243,6 +245,7 @@ function Gallery({ prefix }: { prefix: string }) {
       {withChoice && <Toggles prefix={prefix} />}
       {withChoice && <Gaps prefix={prefix} />}
       {withNesting && <Nesting prefix={prefix} />}
+      {withElevation && <Elevation prefix={prefix} />}
       {withKeyboard && <KeyboardExtras prefix={prefix} />}
     </Stack>
   );
@@ -348,6 +351,24 @@ function Nesting({ prefix }: { prefix: string }) {
         <span style={{ whiteSpace: 'nowrap' }}>a label far wider than its equal share of the row</span>
         <span>short</span>
       </Group>
+    </Stack>
+  );
+}
+
+/**
+ * Rule 13's three cases: a panel one rung up from the page, a panel over a
+ * panel, and a panel at the ceiling, which keeps its ground and takes a divider.
+ */
+function Elevation({ prefix }: { prefix: string }) {
+  return (
+    <Stack gap="md">
+      <Paper elevated padding="md" data-testid={`${prefix}-elev-panel`}>
+        <Card raised elevated data-testid={`${prefix}-elev-raised`}>
+          <Card raised withBorder data-testid={`${prefix}-elev-ceiling`}>
+            at the ceiling
+          </Card>
+        </Card>
+      </Paper>
     </Stack>
   );
 }

@@ -26,18 +26,26 @@ export interface PaperProps extends UiElementProps, UiPaddingProps, UiAttributes
   withBorder?: boolean | undefined;
   /** Sit one rung up the surface ladder, for a panel over a panel. */
   raised?: boolean | undefined;
+  /**
+   * This surface stepped up a rung from the ground it sits on, so it carries
+   * rule 13's edge: the `raised-bd` hairline on a light theme, nothing visible
+   * on a dark one, where the rung's lightness does the work. `withBorder` is a
+   * divider between things on the same ground, never elevation (P81-A).
+   */
+  elevated?: boolean | undefined;
   children?: ReactNode;
 }
 
 /** Everything a surface sets, plus whatever else the caller passed, forwarded. */
 function surfaceProps(props: Omit<PaperProps, 'render' | 'children'>, base: string) {
-  const { className, style, radius, shadow, withBorder, raised, ...withPadding } = props;
+  const { className, style, radius, shadow, withBorder, raised, elevated, ...withPadding } = props;
   const [pad, rest] = splitPadding(withPadding);
   return {
     ...rest,
     className: cx(base, className),
     ...(withBorder ? { 'data-with-border': '' } : {}),
     ...(raised ? { 'data-raised': '' } : {}),
+    ...(elevated ? { 'data-elevated': '' } : {}),
     style: {
       ...customProperties({
         ...pad,

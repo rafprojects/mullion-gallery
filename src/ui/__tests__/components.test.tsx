@@ -368,6 +368,26 @@ describe('controls', () => {
   });
 });
 
+describe('surfaces (P81-A)', () => {
+  it('keep ground and edge apart: raised sets the rung, elevated the rule-13 edge, withBorder a divider', () => {
+    const { container } = render(
+      <>
+        <Paper elevated data-testid="panel" />
+        <Card raised elevated data-testid="raised" />
+        <Card raised withBorder data-testid="ceiling" />
+      </>,
+    );
+    const attrs = (id: string) => {
+      const el = container.querySelector(`[data-testid="${id}"]`)!;
+      return ['data-raised', 'data-elevated', 'data-with-border'].filter((a) => el.hasAttribute(a));
+    };
+    expect(attrs('panel')).toEqual(['data-elevated']);
+    expect(attrs('raised')).toEqual(['data-raised', 'data-elevated']);
+    expect(attrs('ceiling')).toEqual(['data-raised', 'data-with-border']);
+    expect(container.querySelector('[elevated]')).toBeNull();
+  });
+});
+
 describe('feedback and display', () => {
   // [P81-A] Mantine parity the first flip needed.
   it('lets an alert be polite: a role the caller gives wins over the default', () => {

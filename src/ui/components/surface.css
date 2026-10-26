@@ -41,6 +41,15 @@
     border: 1px solid var(--mullion-color-border);
   }
 
+  /*
+   * Rule 13: a surface that stepped up a rung carries `raised-bd`, which is
+   * transparent on a dark theme, so the box is the same size on every theme.
+   */
+  .mullion-paper[data-elevated],
+  .mullion-card[data-elevated] {
+    border: 1px solid var(--mullion-raised-bd);
+  }
+
   /* Padded md by default and a positioning context, as Mantine's card is. */
   .mullion-card {
     --mullion-card-pad-block: var(--mullion-pad-block, var(--mullion-pad, var(--mullion-spacing-md)));
