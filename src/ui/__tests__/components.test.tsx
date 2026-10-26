@@ -246,6 +246,20 @@ describe('surfaces', () => {
 });
 
 describe('controls', () => {
+  it('hands a FileButton resetRef a function that clears the picker, as Mantine did (P81-A)', () => {
+    const resetRef = createRef<() => void>() as { current: (() => void) | null };
+    const { container } = render(
+      <FileButton onChange={() => {}} resetRef={resetRef}>
+        {(props) => <button {...props}>pick</button>}
+      </FileButton>,
+    );
+    expect(typeof resetRef.current).toBe('function');
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    Object.defineProperty(input, 'value', { value: 'C:\\fakepath\\a.png', writable: true });
+    resetRef.current!();
+    expect(input.value).toBe('');
+  });
+
   it('default to type="button" and stamp the focus attribute', () => {
     render(<Button>Save</Button>);
     const button = screen.getByRole('button', { name: 'Save' });

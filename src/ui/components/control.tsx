@@ -369,6 +369,12 @@ export interface FileButtonProps {
   accept?: string | undefined;
   multiple?: boolean | undefined;
   disabled?: boolean | undefined;
+  /**
+   * Given a function that clears the picker, as Mantine's was. The input
+   * already clears after every pick, so this exists for the call sites that
+   * reset it explicitly after handling a file (P81-A).
+   */
+  resetRef?: { current: (() => void) | null } | undefined;
   /** Handed the props to spread onto whatever opens the picker. */
   children: (props: { onClick: () => void; disabled: boolean }) => ReactNode;
 }
@@ -384,9 +390,18 @@ export interface FileButtonProps {
  * what `react-hooks/refs` forbids. State costs one extra render on mount and
  * makes the dependency honest.
  */
-export function FileButton({ onChange, accept, multiple, disabled, children }: FileButtonProps) {
+export function FileButton({ onChange, accept, multiple, disabled, resetRef, children }: FileButtonProps) {
   const [input, setInput] = useState<HTMLInputElement | null>(null);
   const open = useCallback(() => input?.click(), [input]);
+  useEffect(() => {
+    if (!resetRef) return undefined;
+    resetRef.current = () => {
+      if (input) input.value = '';
+    };
+    return () => {
+      resetRef.current = null;
+    };
+  }, [resetRef, input]);
   return (
     <>
       {children({ onClick: open, disabled: disabled === true })}
