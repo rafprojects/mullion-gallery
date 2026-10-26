@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { Table, Tooltip } from '@mantine/core';
-import { Stack, Group, Text, Badge, ActionIcon } from '@/ui';
-import { modals } from '@mantine/modals';
+import { Stack, Group, Text, Badge, ActionIcon, confirm } from '@/ui';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { CompanyAccessGrant as CompanyAccessGrantType } from '@/services/adminQuery';
@@ -51,17 +50,17 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
 
       let title: string;
       let body: string;
-      let confirm: string;
+      let confirmLabel: string;
       if (isCampaignView && isCompanySrc) {
         // Campaign endpoint writes a per-campaign deny override; company grant kept.
         title = t('accessrow_revoke_block_title', 'Block on this campaign?');
         body = t('accessrow_revoke_block_body', '{{name}} has company-wide access. Blocking here removes them from this campaign only — access to other {{company}} campaigns is kept.', { name, company });
-        confirm = t('accessrow_revoke_block_confirm', 'Block on this campaign');
+        confirmLabel = t('accessrow_revoke_block_confirm', 'Block on this campaign');
       } else if (isCompanySrc) {
         // Company/All view: the company endpoint revokes company-wide.
         title = t('accessrow_revoke_companywide_title', 'Revoke company-wide access?');
         body = t('accessrow_revoke_companywide_body', 'This revokes company-wide access for {{name}} across ALL campaigns of {{company}}.', { name, company });
-        confirm = t('accessrow_revoke_companywide_confirm', 'Revoke company-wide');
+        confirmLabel = t('accessrow_revoke_companywide_confirm', 'Revoke company-wide');
       } else {
         // Campaign-sourced grant (either view): plain single-campaign revoke.
         const campaign = isCampaignView
@@ -69,13 +68,13 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
           : (a.campaignTitle ?? t('accessrow_this_campaign', 'this campaign'));
         title = t('accessrow_revoke_title', 'Revoke access?');
         body = t('accessrow_revoke_body', 'Revoke access to {{campaign}} for {{name}}?', { campaign, name });
-        confirm = t('accessrow_revoke_confirm', 'Revoke');
+        confirmLabel = t('accessrow_revoke_confirm', 'Revoke');
       }
 
-      modals.openConfirmModal({
+      void confirm({
         title,
         children: <Text size="sm">{body}</Text>,
-        labels: { confirm, cancel: t('accessrow_revoke_cancel', 'Cancel') },
+        labels: { confirm: confirmLabel, cancel: t('accessrow_revoke_cancel', 'Cancel') },
         confirmProps: { color: 'red' },
         onConfirm: () => { void onRevokeAccess(a); },
       });

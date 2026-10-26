@@ -9,7 +9,10 @@ import type { ApiClient } from '@/services/apiClient';
 import type { MediaItem } from '@/types';
 import type { QueryClient } from '@tanstack/react-query';
 
-vi.mock('@mantine/notifications', () => ({ showNotification: vi.fn() }));
+vi.mock('@/ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/ui')>()),
+  notify: { show: vi.fn(), hide: vi.fn(), update: vi.fn() },
+}));
 
 function makeItem(id = 'm1'): MediaItem {
   return { id, type: 'image', source: 'upload', url: `/${id}.jpg`, order: 1 };
@@ -34,17 +37,17 @@ function makeHook(apiOverrides: Partial<ApiClient> = {}) {
 
 describe('useMediaCrud — handleRescanTypes', () => {
   it('shows "all correct" message when no items were updated (line 89 else branch)', async () => {
-    const { showNotification } = await import('@mantine/notifications');
+    const { notify } = await import('@/ui');
     const { result } = makeHook({ post: vi.fn().mockResolvedValue({ updated: 0, total: 5, message: 'ok' }) });
     await act(async () => result.current.handleRescanTypes());
-    expect(showNotification).toHaveBeenCalledWith(
+    expect(notify.show).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'All media types are correct.' }),
     );
     expect(result.current.rescanning).toBe(false);
   });
 
   it('shows update count and calls mutateMedia when items were updated', async () => {
-    const { showNotification } = await import('@mantine/notifications');
+    const { notify } = await import('@/ui');
     const mutateMedia = vi.fn().mockResolvedValue(undefined);
     const setMedia = vi.fn();
     const apiClient = {
@@ -56,16 +59,16 @@ describe('useMediaCrud — handleRescanTypes', () => {
     );
     await act(async () => result.current.handleRescanTypes());
     expect(mutateMedia).toHaveBeenCalled();
-    expect(showNotification).toHaveBeenCalledWith(
+    expect(notify.show).toHaveBeenCalledWith(
       expect.objectContaining({ message: expect.stringContaining('3 of 10') }),
     );
   });
 
   it('shows error notification when rescan throws', async () => {
-    const { showNotification } = await import('@mantine/notifications');
+    const { notify } = await import('@/ui');
     const { result } = makeHook({ post: vi.fn().mockRejectedValue(new Error('rescan failed')) });
     await act(async () => result.current.handleRescanTypes());
-    expect(showNotification).toHaveBeenCalledWith(expect.objectContaining({ title: 'Rescan failed' }));
+    expect(notify.show).toHaveBeenCalledWith(expect.objectContaining({ title: 'Rescan failed' }));
     expect(result.current.rescanning).toBe(false);
   });
 });

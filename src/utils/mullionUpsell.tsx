@@ -1,6 +1,5 @@
-import { notifications } from '@mantine/notifications';
 import { Anchor } from '@mantine/core';
-import { Text } from '@/ui';
+import { Text, notify } from '@/ui';
 import i18n from '@/i18n';
 
 /**
@@ -19,7 +18,7 @@ import i18n from '@/i18n';
  */
 export function showProUpsell(messageKey: string, fallback: string, upgradeUrl: string): void {
   const t = i18n.t.bind(i18n);
-  notifications.show({
+  notify.show({
     title: t('upsell_pro_title', 'Pro feature'),
     color: 'yellow',
     autoClose: 6000,

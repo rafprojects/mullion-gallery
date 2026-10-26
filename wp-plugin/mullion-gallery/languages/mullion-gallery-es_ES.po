@@ -10664,3 +10664,7 @@ msgstr "Ajustes de Mullion"
 #: includes/i18n/class-mullion-frontend-strings.php:2786
 msgid "Edit campaign"
 msgstr "Editar campaña"
+
+#: includes/i18n/class-mullion-frontend-strings.php:2654
+msgid "Notifications"
+msgstr "Notificaciones"

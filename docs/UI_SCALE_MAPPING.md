@@ -136,6 +136,8 @@ Three rungs join the spacing scale below `xs`: `4xs` 2px, `3xs` 4px, `2xs` 6px. 
 | `Slider` | 2026-10-26 | none | One slider at every size (designer, rule 18): `size` is accepted and draws the same slider. |
 | `TextInput`, `NumberInput`, `Textarea`, `PasswordInput` | 2026-10-26 | 138 edits in 46 files | `filled` dropped and `unstyled` is `bare` (rule 19); `suffix` to the unit slot; `allowDecimal={false}` to `decimalScale={0}`; `hideControls` to `controls="none"`; `autosize` dropped, since the textarea always grows. `styles` overrides went by hand. `UnitScrubField` stays on Mantine for P81-B. |
 | `Modal`, `Drawer` | set aside | (83 edits in 27 files, saved as a patch) | Rules written; the flip waits for the overlays that open inside dialogs, by user decision 2026-10-26. |
+| `Menu`, `Popover` | 2026-10-26 | 102 reshaping edits in 13 files (`ui-codemod-overlays.mjs`), 26 import moves | Placement and width move from the root to `Content`; `Target`'s child becomes the trigger's `render`; arrows, shadows and `withinPortal` dropped; a red item is `danger`. |
+| `notifications`, `showNotification`, `modals.openConfirmModal` | 2026-10-26 | 23 files | Callee renamed to `notify` and `confirm`; the page hosts are the framework's. |
 
 **Checks every flip carries**, both found on the first one:
 

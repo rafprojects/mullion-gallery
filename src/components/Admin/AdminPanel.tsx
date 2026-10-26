@@ -2,8 +2,8 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { ApiClient, CampaignTemplate } from '@/services/apiClient';
-import { Tabs, Loader, Tooltip, Select, Menu, Collapse } from '@mantine/core';
-import { Group, Title, Center, Box, Badge, Card, Button, ActionIcon, Chip, Switch } from '@/ui';
+import { Tabs, Loader, Tooltip, Select, Collapse } from '@mantine/core';
+import { Group, Title, Center, Box, Badge, Card, Button, ActionIcon, Chip, Switch, Menu } from '@/ui';
 import { useReloadSafeView } from '@/hooks/useReloadSafeView';
 import { IconPlus, IconArrowLeft, IconFileImport, IconKeyboard, IconSettings, IconDotsVertical, IconAdjustments, IconStack2 } from '@tabler/icons-react';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
@@ -258,13 +258,11 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
             />
           )}
           {isMobile ? (
-            <Menu shadow="md" width={200} position="bottom-end">
-              <Menu.Target>
-                <ActionIcon variant="light" size="lg" aria-label={t('admin_actions_menu', 'Actions menu')}>
+            <Menu>
+              <Menu.Trigger render={<ActionIcon variant="light" size="lg" aria-label={t('admin_actions_menu', 'Actions menu')} />}>
                   <IconDotsVertical size={18} />
-                </ActionIcon>
-              </Menu.Target>
-              <Menu.Dropdown>
+                </Menu.Trigger>
+              <Menu.Content width={200} side="bottom" align="end">
                 <Menu.Item leftSection={<IconPlus size={14} />} onClick={campaignActions.handleCreate} disabled={isAllSpaces}>
                   {t('admin_new_campaign', 'New Campaign')}
                 </Menu.Item>
@@ -281,7 +279,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
                 <Menu.Item leftSection={<IconKeyboard size={14} />} onClick={() => campaignActions.setShortcutHelpOpen(true)}>
                   {t('admin_keyboard_shortcuts', 'Keyboard shortcuts')}
                 </Menu.Item>
-              </Menu.Dropdown>
+              </Menu.Content>
             </Menu>
           ) : (
             <>

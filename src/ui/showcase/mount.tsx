@@ -687,6 +687,25 @@ function DialogSizes({ prefix }: { prefix: string }) {
   return (
     <Stack gap="sm" data-testid={`${prefix}-dialogs`} data-exits={exits}>
       <Group gap="xs">
+        <Popover>
+          <Popover.Trigger render={<Button size="xs" variant="default" data-testid={`${prefix}-plain-popover-trigger`} />}>
+            popover
+          </Popover.Trigger>
+          <Popover.Content data-testid={`${prefix}-plain-popover`}>
+            <Text size="sm">default padding</Text>
+          </Popover.Content>
+        </Popover>
+        <Menu>
+          <Menu.Trigger render={<Button size="xs" variant="default" data-testid={`${prefix}-plain-menu-trigger`} />}>menu</Menu.Trigger>
+          <Menu.Content data-testid={`${prefix}-plain-menu`}>
+            <Menu.Item>one</Menu.Item>
+          </Menu.Content>
+        </Menu>
+        <Tooltip label="a tooltip" openDelay={0}>
+          <Button size="xs" variant="default" data-testid={`${prefix}-plain-tooltip-trigger`}>
+            tooltip
+          </Button>
+        </Tooltip>
         {[...sizes, 'default', 'centered', 'drawer', 'drawer-lg', 'fade', 'long'].map((key) => (
           <Button key={key} size="xs" variant="default" data-testid={`${prefix}-open-${key}`} onClick={() => setOpen(key)}>
             {key}

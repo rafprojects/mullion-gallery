@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, Tooltip, Select, Menu } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
+import { Table, Tooltip, Select } from '@mantine/core';
 import { IconEdit, IconCopy, IconDownload, IconFileZip, IconArchive, IconArchiveOff, IconLayoutGrid, IconTrash, IconChevronDown, IconArrowsExchange, IconPhotoPlus } from '@tabler/icons-react';
 import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignCategoryEntry } from '@/services/apiClient';
@@ -10,7 +9,7 @@ import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { CompanyCombobox } from '@/components/Common/CompanyCombobox';
 import type { ApiClient } from '@/services/apiClient';
-import { uiRem, Group, Text, Box, Badge, Button, Checkbox } from '@/ui';
+import { uiRem, Group, Text, Box, Badge, Button, Checkbox, Menu, notify } from '@/ui';
 
 function toSlug(name: string): string {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -118,7 +117,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                   const status = v as AdminCampaign['status'];
                   patchCampaign(
                     { id: cid, apiPatch: { status }, optimisticPatch: { status } },
-                    { onError: () => notifications.show({ message: t('admin_camprow_fail_status', 'Failed to update status.'), color: 'red', autoClose: 3000 }) },
+                    { onError: () => notify.show({ message: t('admin_camprow_fail_status', 'Failed to update status.'), color: 'red', autoClose: 3000 }) },
                   );
                 }}
                 styles={{ input: { minWidth: 90 } }}
@@ -140,7 +139,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                 const visibility = v as AdminCampaign['visibility'];
                 patchCampaign(
                   { id: cid, apiPatch: { visibility }, optimisticPatch: { visibility } },
-                  { onError: () => notifications.show({ message: t('admin_camprow_fail_visibility', 'Failed to update visibility.'), color: 'red', autoClose: 3000 }) },
+                  { onError: () => notify.show({ message: t('admin_camprow_fail_visibility', 'Failed to update visibility.'), color: 'red', autoClose: 3000 }) },
                 );
               }}
               styles={{ input: { minWidth: 80 } }}
@@ -157,7 +156,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                 const companyPayload = existing ? v : { name: v, slug: toSlug(v) };
                 patchCampaign(
                   { id: cid, apiPatch: { company: companyPayload } },
-                  { onError: () => notifications.show({ message: t('admin_camprow_fail_company', 'Failed to update company.'), color: 'red', autoClose: 3000 }) },
+                  { onError: () => notify.show({ message: t('admin_camprow_fail_company', 'Failed to update company.'), color: 'red', autoClose: 3000 }) },
                 );
               }}
               companies={companies}
@@ -220,27 +219,23 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                   <Button variant="subtle" size="xs" leftSection={<IconArrowsExchange size={14} />} onClick={() => setMoveSource(c)} aria-label={t('admin_camprow_move_aria', 'Move {{title}} to another space', { title: c.title })}>{t('admin_move', 'Move')}</Button>
                 </Tooltip>
               )}
-              <Menu shadow="md" width={210} position="bottom-end" withinPortal>
-                <Menu.Target>
-                  <Button
-                    variant="subtle"
+              <Menu>
+                <Menu.Trigger render={<Button variant="subtle"
                     size="xs"
                     leftSection={<IconDownload size={14} />}
                     rightSection={<IconChevronDown size={12} />}
                     loading={binaryExportingIds.has(cid)}
-                    aria-label={t('admin_export_item', 'Export {{title}}', { title: c.title })}
-                  >
+                    aria-label={t('admin_export_item', 'Export {{title}}', { title: c.title })} />}>
                     {t('admin_export', 'Export')}
-                  </Button>
-                </Menu.Target>
-                <Menu.Dropdown>
+                  </Menu.Trigger>
+                <Menu.Content width={210} side="bottom" align="end">
                   <Menu.Item leftSection={<IconFileZip size={14} />} onClick={() => void handleBinaryExportCampaign(c)}>
                     {t('admin_export_zip_media', 'Export as ZIP (includes media)')}
                   </Menu.Item>
                   <Menu.Item leftSection={<IconDownload size={14} />} onClick={() => void handleExportCampaign(c)}>
                     {t('admin_export_json', 'Export as JSON (data only)')}
                   </Menu.Item>
-                </Menu.Dropdown>
+                </Menu.Content>
               </Menu>
               {c.status === 'archived' ? (
                 <Button tone="primary" size="xs" leftSection={<IconArchiveOff size={14} />} loading={restoringIds.has(cid)} onClick={() => setConfirmRestore(c)}>{t('admin_restore', 'Restore')}</Button>

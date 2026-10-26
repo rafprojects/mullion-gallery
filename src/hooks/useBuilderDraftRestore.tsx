@@ -1,7 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { notifications } from '@mantine/notifications';
-import { modals } from '@mantine/modals';
-import { Text } from '@/ui';
+import { Text, confirm, notify } from '@/ui';
 import { useLatestRef } from '@mullion/shared-utils';
 import i18n from '@/i18n';
 import type { LayoutTemplate } from '@/types';
@@ -94,7 +92,7 @@ export function useBuilderDraftRestore({
         : t('draftrestore_age_minutes', '{{count}} minute ago', { count: draftAge });
 
     const draftSnapshot = payload.template;
-    modals.openConfirmModal({
+    void confirm({
       title: isConflict
         ? t('draftrestore_conflict_title', 'Draft conflict detected')
         : t('draftrestore_found_title', 'Unsaved draft found'),
@@ -115,7 +113,7 @@ export function useBuilderDraftRestore({
       confirmProps: { color: isConflict ? 'orange' : 'blue' },
       onConfirm: () => {
         onRestoreDraftRef.current(draftSnapshot);
-        notifications.show({
+        notify.show({
           title: t('draft_restored_title', 'Draft restored'),
           message: t('draft_restored_message', 'Your previous session has been restored.'),
           color: 'blue',
@@ -124,7 +122,7 @@ export function useBuilderDraftRestore({
       },
       onCancel: () => {
         onDiscardDraftRef.current();
-        notifications.show({
+        notify.show({
           message: t('draft_discarded_message', 'Draft discarded.'),
           color: 'gray',
           autoClose: 3000,

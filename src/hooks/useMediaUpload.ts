@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import { showNotification } from '@mantine/notifications';
 import { useXhrUpload } from '@mullion/shared-utils';
 import { getErrorMessage } from '@mullion/shared-utils';
 import i18n from '@/i18n';
@@ -13,6 +12,7 @@ import type {
   UploadDuplicateCampaign,
 } from '@/types';
 import type { QueryClient } from '@tanstack/react-query';
+import { notify } from '@/ui';
 
 export interface NearDuplicateEntry {
   file: File;
@@ -71,7 +71,7 @@ export function useMediaUpload({
     const skippedCount = incoming.length - mediaFiles.length;
 
     if (skippedCount > 0) {
-      showNotification({
+      notify.show({
         title: t('mediaup_skipped_title', 'Some files were skipped'),
         message: t('mediaup_skipped_msg', '{{count}} non-media file was ignored.', { count: skippedCount }),
         color: 'yellow',
@@ -85,7 +85,7 @@ export function useMediaUpload({
     ];
 
     if (merged.length > maxBatchUploadSize) {
-      showNotification({
+      notify.show({
         title: t('mediaup_batch_limit_title', 'Batch limit reached'),
         message: t('mediaup_batch_limit_msg', 'Only the first {{count}} files were kept.', { count: maxBatchUploadSize }),
         color: 'yellow',
@@ -227,14 +227,14 @@ export function useMediaUpload({
       const addFailClause = batchAddFailures > 0
         ? ' ' + t('mediaup_add_fail_clause', '{{count}} file could not be added to the campaign.', { count: batchAddFailures })
         : '';
-      showNotification({
+      notify.show({
         title: hasFailures ? t('mediaup_complete_issues_title', 'Upload complete with issues') : t('mediaup_complete_title', 'Upload complete'),
         message: completeMessage + addFailClause,
         color: hasFailures ? 'yellow' : 'blue',
       });
     } catch (err) {
       console.error(err);
-      showNotification({ title: t('mediaup_upload_failed_title', 'Upload failed'), message: getErrorMessage(err, t('mediaup_upload_failed_msg', 'Upload failed.')), color: 'red' });
+      notify.show({ title: t('mediaup_upload_failed_title', 'Upload failed'), message: getErrorMessage(err, t('mediaup_upload_failed_msg', 'Upload failed.')), color: 'red' });
     } finally {
       resetProgress();
     }
@@ -264,10 +264,10 @@ export function useMediaUpload({
           (prev) => [...(prev ?? []), ...batchAddResponse.added],
         );
         onCampaignsUpdated?.();
-        showNotification({ title: t('mediaup_existing_added_title', 'Existing image added'), message: t('mediaup_existing_added_msg', 'Using existing image for "{{filename}}".', { filename: entry.filename }), color: 'blue' });
+        notify.show({ title: t('mediaup_existing_added_title', 'Existing image added'), message: t('mediaup_existing_added_msg', 'Using existing image for "{{filename}}".', { filename: entry.filename }), color: 'blue' });
       }
     } catch (err) {
-      showNotification({ title: t('mediaup_add_image_failed_title', 'Failed to add image'), message: getErrorMessage(err, t('mediaup_add_image_failed_msg', 'Could not add existing image.')), color: 'red' });
+      notify.show({ title: t('mediaup_add_image_failed_title', 'Failed to add image'), message: getErrorMessage(err, t('mediaup_add_image_failed_msg', 'Could not add existing image.')), color: 'red' });
     } finally {
       setNearDupLoading(false);
       setPendingNearDuplicates((prev) => prev.slice(1));
@@ -304,10 +304,10 @@ export function useMediaUpload({
           (prev) => [...(prev ?? []), ...batchAddResponse.added],
         );
         onCampaignsUpdated?.();
-        showNotification({ title: t('mediaup_uploaded_title', 'Image uploaded'), message: t('mediaup_uploaded_msg', '"{{filename}}" uploaded successfully.', { filename: entry.filename }), color: 'blue' });
+        notify.show({ title: t('mediaup_uploaded_title', 'Image uploaded'), message: t('mediaup_uploaded_msg', '"{{filename}}" uploaded successfully.', { filename: entry.filename }), color: 'blue' });
       }
     } catch (err) {
-      showNotification({ title: t('mediaup_upload_failed_title', 'Upload failed'), message: getErrorMessage(err, t('mediaup_upload_failed_msg', 'Upload failed.')), color: 'red' });
+      notify.show({ title: t('mediaup_upload_failed_title', 'Upload failed'), message: getErrorMessage(err, t('mediaup_upload_failed_msg', 'Upload failed.')), color: 'red' });
     } finally {
       setNearDupLoading(false);
       setPendingNearDuplicates((prev) => prev.slice(1));

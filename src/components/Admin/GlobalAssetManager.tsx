@@ -13,8 +13,7 @@
  */
 import { useCallback, useState } from 'react';
 import { Loader } from '@mantine/core';
-import { Group, Title, Center } from '@/ui';
-import { modals } from '@mantine/modals';
+import { Group, Title, Center, confirm } from '@/ui';
 import { useTranslation } from 'react-i18next';
 
 import type { ApiClient } from '@/services/apiClient';
@@ -65,7 +64,7 @@ export function GlobalAssetManager({ apiClient, onNotify }: GlobalAssetManagerPr
     (id: string) => {
       const item = assets?.find((a) => a.id === id);
       if (!item) return;
-      modals.openConfirmModal({
+      void confirm({
         title: t('admin_asset_delete_title', 'Delete asset?'),
         children: t('admin_asset_delete_confirm', 'Delete "{{name}}"? This cannot be undone.', { name: item.name }),
         labels: { confirm: t('admin_asset_delete', 'Delete'), cancel: t('admin_asset_cancel', 'Cancel') },

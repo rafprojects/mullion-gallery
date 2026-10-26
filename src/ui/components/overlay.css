@@ -245,7 +245,8 @@
     max-inline-size: 18rem;
     padding-block: calc(var(--mullion-spacing-xs) / 2);
     padding-inline: var(--mullion-spacing-xs);
-    border-radius: var(--mullion-radius-sm);
+    /* 8px, the product's radius for floating surfaces (rule 20). */
+    border-radius: var(--mullion-radius-md);
     border: 1px solid var(--mullion-tooltip-bd);
     background-color: var(--mullion-tooltip-bg);
     color: var(--mullion-tooltip-color);
@@ -271,7 +272,8 @@
     inline-size: var(--mullion-popover-width, auto);
     max-inline-size: calc(100vw - 2 * var(--mullion-spacing-md));
     padding-block: var(--mullion-pad-block, var(--mullion-pad, var(--mullion-spacing-sm)));
-    padding-inline: var(--mullion-pad-inline, var(--mullion-pad, var(--mullion-spacing-sm)));
+    /* Mantine's popover padding: 12 by 16. */
+    padding-inline: var(--mullion-pad-inline, var(--mullion-pad, var(--mullion-spacing-md)));
     border: 1px solid var(--mullion-menu-bd);
     border-radius: var(--mullion-radius, var(--mullion-radius-md));
     background-color: var(--mullion-menu-bg);

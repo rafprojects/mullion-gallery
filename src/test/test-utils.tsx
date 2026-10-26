@@ -2,9 +2,8 @@ import { type ReactElement, type PropsWithChildren, useState } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { render, type RenderOptions } from '@testing-library/react';
 import { MantineProvider, mergeThemeOverrides } from '@mantine/core';
-import { ModalsProvider } from '@mantine/modals';
 import { createTestQueryClient } from '@/services/queryClient';
-import { MullionProvider } from '@/ui';
+import { Confirmations, MullionProvider, Notifications } from '@/ui';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { theme } from '../theme';
 
@@ -28,7 +27,10 @@ function Providers({ themeId, children }: PropsWithChildren<{ themeId?: string |
       <MullionProvider theme={themeId}>
         <ThemeProvider>
           <MantineProvider theme={testTheme} env="test">
-            <ModalsProvider>{children}</ModalsProvider>
+            {/* The framework's page hosts, as main.tsx mounts them (P81-A). */}
+            <Notifications label="Notifications" closeButtonLabel="Close" />
+            <Confirmations />
+            {children}
           </MantineProvider>
         </ThemeProvider>
       </MullionProvider>

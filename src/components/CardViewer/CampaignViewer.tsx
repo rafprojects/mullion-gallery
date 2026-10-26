@@ -17,7 +17,6 @@ import { loadGoogleFontsFromOverrides } from '@mullion/shared-utils';
 import { GOOGLE_FONT_NAMES } from '@/data/googleFontNames';
 import { useCampaignContext } from '@/contexts/CampaignContext';
 import { getErrorMessage } from '@mullion/shared-utils';
-import { notifications } from '@mantine/notifications';
 import { CompanyLogo } from '@/components/Common/CompanyLogo';
 import { resolveCampaignViewerGalleryShellLayout } from '@/utils/campaignViewerLayout';
 import {
@@ -27,7 +26,7 @@ import {
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { UnifiedGallerySection } from './UnifiedGallerySection';
 import { PerTypeGallerySection } from './PerTypeGallerySection';
-import { uiRem, Group, Stack, Title, Text, SimpleGrid, Box, Center, Badge, Paper, Alert, inkOn, Switch, Button } from '@/ui';
+import { uiRem, Group, Stack, Title, Text, SimpleGrid, Box, Center, Badge, Paper, Alert, inkOn, Switch, Button, notify } from '@/ui';
 import styles from './CampaignViewer.module.scss';
 
 /** A settings length in the size basis: a number is pixels, as Mantine's `h` read it. */
@@ -429,7 +428,7 @@ export function CampaignViewer({
     loadGoogleFontsFromOverrides(s.typographyOverrides, GOOGLE_FONT_NAMES);
   }, [s.typographyOverrides]);
   const inContextSave = useInContextSave(apiClient, s, 500, (err) => {
-    notifications.show({ color: 'red', message: getErrorMessage(err, 'Failed to save settings.') });
+    notify.show({ color: 'red', message: getErrorMessage(err, 'Failed to save settings.') });
   }, spaceId);
   const campaignTitleStyle = useTypographyStyle('campaignTitle', s);
   const campaignDateStyle = useTypographyStyle('campaignDate', s);

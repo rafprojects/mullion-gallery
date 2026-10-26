@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
-import { ModalsProvider } from '@mantine/modals';
+import { Confirmations, MullionProvider } from '@/ui';
 import { type ReactNode, useState } from 'react';
 import { createTestQueryClient } from '@/services/queryClient';
 
@@ -157,9 +157,13 @@ function Wrapper({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider>
-        <ModalsProvider>{children}</ModalsProvider>
-      </MantineProvider>
+      {/* [P81-A] The framework confirm needs its provider and page host. */}
+      <MullionProvider>
+        <MantineProvider>
+          <Confirmations />
+          {children}
+        </MantineProvider>
+      </MullionProvider>
     </QueryClientProvider>
   );
 }

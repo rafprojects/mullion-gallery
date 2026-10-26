@@ -39,13 +39,19 @@ export {
   Checkbox,
   Chip,
   CloseButton,
+  Confirmations,
+  confirm,
   Container,
   CopyButton,
   FileButton,
   Grid,
   Group,
+  Menu,
+  Notifications,
+  notify,
   NumberInput,
   Paper,
+  Popover,
   PasswordInput,
   SegmentedControl,
   SimpleGrid,
@@ -58,6 +64,8 @@ export {
   Title,
   UnstyledButton,
   type ActionIconProps,
+  type UiConfirmOptions,
+  type UiNotifyOptions,
   type UiDialogTransition,
   type AlertProps,
   type BadgeProps,
@@ -90,10 +98,8 @@ export {
   Accordion,
   Collapse,
   Drawer,
-  Menu,
   Modal,
   Pagination,
-  Popover,
   Tabs,
   Tooltip,
 } from '@mantine/core';
@@ -150,8 +156,6 @@ export {
 } from '@mantine/hooks';
 
 // ── Imperative surfaces ────────────────────────────────────────────────────
-export { modals, ModalsProvider } from '@mantine/modals';
-export { notifications, Notifications, showNotification } from '@mantine/notifications';
 export { useForm } from '@mantine/form';
 
 // ── Framework: provider and theme registry (P79-A) ─────────────────────────

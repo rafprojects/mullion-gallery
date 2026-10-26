@@ -8,7 +8,10 @@ import { useMediaExternal } from './useMediaExternal';
 import type { ApiClient } from '@/services/apiClient';
 import type { QueryClient } from '@tanstack/react-query';
 
-vi.mock('@mantine/notifications', () => ({ showNotification: vi.fn() }));
+vi.mock('@/ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/ui')>()),
+  notify: { show: vi.fn(), hide: vi.fn(), update: vi.fn() },
+}));
 
 function makeApiClient(overrides: Partial<ApiClient> = {}): ApiClient {
   return {
@@ -44,11 +47,11 @@ describe('useMediaExternal — getMediaTypeFromUrl (line 14)', () => {
 
 describe('useMediaExternal — isValidExternalUrl false branch (line 25)', () => {
   it('shows error when URL is not a valid https URL (invalid URL path, line 25)', async () => {
-    const { showNotification } = await import('@mantine/notifications');
+    const { notify } = await import('@/ui');
     const { result } = makeHook();
     act(() => result.current.setExternalUrl('not-a-url'));
     await act(async () => result.current.handleAddExternal());
-    expect(showNotification).toHaveBeenCalledWith(expect.objectContaining({ title: 'Invalid URL' }));
+    expect(notify.show).toHaveBeenCalledWith(expect.objectContaining({ title: 'Invalid URL' }));
   });
 
   it('sets error when URL is invalid for oEmbed fetch too', async () => {

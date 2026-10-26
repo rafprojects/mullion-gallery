@@ -25,7 +25,6 @@
  */
 
 import mantineCoreStyles from '@mantine/core/styles.css?inline';
-import mantineNotificationsStyles from '@mantine/notifications/styles.css?inline';
 import rowsPhotoAlbumStyles from 'react-photo-album/rows.css?inline';
 import masonryPhotoAlbumStyles from 'react-photo-album/masonry.css?inline';
 import dockviewStyles from 'dockview/dist/styles/dockview.css?inline';
@@ -43,7 +42,6 @@ import { registerUiStyles } from './ui';
 const VENDOR = { layer: 'mullion.vendor' };
 
 registerUiStyles('vendor/mantine-core', mantineCoreStyles, VENDOR);
-registerUiStyles('vendor/mantine-notifications', mantineNotificationsStyles, VENDOR);
 registerUiStyles('vendor/react-photo-album-rows', rowsPhotoAlbumStyles);
 registerUiStyles('vendor/react-photo-album-masonry', masonryPhotoAlbumStyles);
 // Dockview and builder.css were overlay-root-only until P79-B; the Layout

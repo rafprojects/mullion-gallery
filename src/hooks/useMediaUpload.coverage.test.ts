@@ -10,7 +10,10 @@ import type { MediaItem } from '@/types';
 import type { QueryClient } from '@tanstack/react-query';
 
 // ── Mantine mock ───────────────────────────────────────────────────────────
-vi.mock('@mantine/notifications', () => ({ showNotification: vi.fn() }));
+vi.mock('@/ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/ui')>()),
+  notify: { show: vi.fn(), hide: vi.fn(), update: vi.fn() },
+}));
 
 // ── useXhrUpload mock ──────────────────────────────────────────────────────
 const uploadManyMock = vi.hoisted(() => vi.fn());
@@ -193,12 +196,12 @@ describe('handleUpload — near duplicate', () => {
 
 describe('handleUpload — upload throws', () => {
   it('shows error notification on exception', async () => {
-    const { showNotification } = await import('@mantine/notifications');
+    const { notify } = await import('@/ui');
     uploadManyMock.mockRejectedValue(new Error('Network error'));
     const { result } = makeHook();
     act(() => result.current.handleSelectFiles(makeFile()));
     await act(async () => result.current.handleUpload());
-    expect(showNotification).toHaveBeenCalledWith(expect.objectContaining({ title: 'Upload failed' }));
+    expect(notify.show).toHaveBeenCalledWith(expect.objectContaining({ title: 'Upload failed' }));
     expect(resetProgressMock).toHaveBeenCalled();
   });
 });
@@ -238,7 +241,7 @@ describe('handleNearDupUseExisting', () => {
   });
 
   it('shows error notification when addCampaignMediaBatch fails', async () => {
-    const { showNotification } = await import('@mantine/notifications');
+    const { notify } = await import('@/ui');
     uploadManyMock.mockResolvedValue({
       results: [{ success: false, near_duplicate: true, similar_id: 42, similar_url: 'https://cdn/s.jpg', distance: 0.1, similar_name: 'similar.jpg', similar_campaigns: [] }],
     });
@@ -248,7 +251,7 @@ describe('handleNearDupUseExisting', () => {
     act(() => result.current.handleSelectFiles(makeFile()));
     await act(async () => result.current.handleUpload());
     await act(async () => result.current.handleNearDupUseExisting());
-    expect(showNotification).toHaveBeenCalledWith(expect.objectContaining({ title: 'Failed to add image' }));
+    expect(notify.show).toHaveBeenCalledWith(expect.objectContaining({ title: 'Failed to add image' }));
   });
 });
 

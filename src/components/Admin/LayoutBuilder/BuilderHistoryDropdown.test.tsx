@@ -4,20 +4,26 @@
  * The lightweight history popover that appears in the modal header bar,
  * replacing the dedicated dock panel tab from P19-B.
  *
- * Implementation note: the component uses Mantine Popover with keepMounted=true,
+ * Implementation note: the component uses the framework Popover with keepMounted,
  * so the dropdown content is always present in the DOM. The open/closed state is
  * reflected on the trigger button's aria-expanded attribute.
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
+import { MullionProvider } from '@/ui';
 import type { ReactNode } from 'react';
 import { BuilderHistoryDropdown, type HistoryEntry } from './BuilderHistoryDropdown';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function wrapper({ children }: { children: ReactNode }) {
-  return <MantineProvider>{children}</MantineProvider>;
+  // [P81-A] The framework popover needs its provider.
+  return (
+    <MullionProvider>
+      <MantineProvider>{children}</MantineProvider>
+    </MullionProvider>
+  );
 }
 
 const ENTRIES: HistoryEntry[] = [

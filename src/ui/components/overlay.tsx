@@ -26,7 +26,18 @@ import { Popover as BasePopover } from '@base-ui/react/popover';
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { Separator as BaseSeparator } from '@base-ui/react/separator';
-import { createContext, useCallback, useContext, useMemo, useState, type ReactElement, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type HTMLAttributes,
+  type MouseEventHandler,
+  type ReactElement,
+  type ReactNode,
+  type Ref,
+} from 'react';
 import { useAnchorContainer, type AnchorContainer } from './anchor';
 import { registerModal } from './modalStack';
 import { cx, focusableInset, type UiElementProps } from './element';
@@ -106,7 +117,7 @@ function useAnchorTarget(override: HTMLElement | null | undefined): HTMLElement 
  * `aria-dialog-name`, P80-F). It is named by its trigger unless the caller
  * names it, the way a menu already is.
  */
-function usePopoverName(props: { 'aria-label'?: unknown; 'aria-labelledby'?: unknown }) {
+function usePopoverName(props: Record<string, unknown>) {
   const anchor = useContext(AnchorContext);
   if (props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined) return {};
   return anchor?.anchorId ? { 'aria-labelledby': anchor.anchorId } : {};
@@ -414,7 +425,7 @@ export function Tooltip({
   children,
   side = 'top',
   align = 'center',
-  offset = 6,
+  offset = 5,
   openDelay,
   closeDelay,
   disabled,
@@ -498,6 +509,8 @@ Tooltip.Group = TooltipGroup;
 
 export interface PopoverProps extends PortalProps {
   children?: ReactNode;
+  /** Keep the content in the DOM while closed, hidden, as Mantine's `keepMounted` did. */
+  keepMounted?: boolean | undefined;
   opened?: boolean | undefined;
   defaultOpened?: boolean | undefined;
   onChange?: ((opened: boolean) => void) | undefined;
@@ -507,6 +520,8 @@ export interface PopoverProps extends PortalProps {
 
 export interface PopoverContentProps extends OverlayStyleProps, PortalProps {
   render?: ReactElement | undefined;
+  /** A click inside the popover, which a call site may keep from reaching its trigger's ancestors. */
+  onClick?: MouseEventHandler<HTMLDivElement> | undefined;
   children?: ReactNode;
   side?: UiSide | undefined;
   align?: UiAlign | undefined;
@@ -524,9 +539,13 @@ export interface PopoverContentProps extends OverlayStyleProps, PortalProps {
  * The parts take our names rather than Mantine's, per the boundary's rule
  * that a vendor's vocabulary does not become the framework's.
  */
-export function Popover({ children, opened, defaultOpened, onChange, modal, container }: PopoverProps) {
+/** Whether the popover's content stays in the DOM while closed, as Mantine's `keepMounted` did. */
+const KeepMountedContext = createContext(false);
+
+export function Popover({ children, opened, defaultOpened, onChange, modal, container, keepMounted = false }: PopoverProps) {
   const anchor = useAnchorScope(container);
   return (
+    <KeepMountedContext.Provider value={keepMounted}>
     <AnchorContext.Provider value={anchor}>
       <BasePopover.Root
         {...(opened !== undefined ? { open: opened } : {})}
@@ -537,6 +556,34 @@ export function Popover({ children, opened, defaultOpened, onChange, modal, cont
         {children}
       </BasePopover.Root>
     </AnchorContext.Provider>
+    </KeepMountedContext.Provider>
+  );
+}
+
+/**
+ * What a trigger takes beyond its own props: the handlers and ref a wrapper
+ * such as a tooltip puts on it, which a trigger that dropped them left dead
+ * (P81-A), and Base UI's `nativeButton={false}` for a trigger that is not a button.
+ */
+type TriggerProps = {
+  children?: ReactNode;
+  render?: ReactElement | undefined;
+  nativeButton?: boolean | undefined;
+  ref?: Ref<HTMLElement> | undefined;
+} & Omit<HTMLAttributes<HTMLElement>, 'children'>;
+
+/** The anchor's ref and a wrapper's, both told about the trigger element. */
+function useTriggerRef(anchorRef: ((el: HTMLElement | null) => void) | undefined, ref: Ref<HTMLElement> | undefined) {
+  // Filling a wrapper's object ref is the one way to hand it the element, which this rule cannot tell apart.
+  // eslint-disable-next-line react-hooks/immutability
+  return useCallback(
+    (el: HTMLElement | null) => {
+      anchorRef?.(el);
+      if (typeof ref === 'function') ref(el);
+      // eslint-disable-next-line react-hooks/immutability -- as above
+      else if (ref) (ref as { current: HTMLElement | null }).current = el;
+    },
+    [anchorRef, ref],
   );
 }
 
@@ -549,11 +596,13 @@ export function Popover({ children, opened, defaultOpened, onChange, modal, cont
  * stamped `type="button"` on it with no `role`: invalid markup and an
  * unannounced control. Compose with `render={<Button />}` instead.
  */
-function PopoverTrigger({ children, render }: { children?: ReactNode; render?: ReactElement | undefined }) {
+function PopoverTrigger({ children, render, ref, ...rest }: TriggerProps) {
   const anchor = useContext(AnchorContext);
+  const triggerRef = useTriggerRef(anchor?.anchorRef, ref);
   return (
     <BasePopover.Trigger
-      ref={anchor?.anchorRef}
+      {...rest}
+      ref={triggerRef}
       className="mullion-popover-trigger"
       {...(render ? { render } : {})}
     >
@@ -566,7 +615,7 @@ function PopoverContent({
   children,
   side = 'bottom',
   align = 'center',
-  offset = 6,
+  offset = 8,
   width,
   padding,
   radius,
@@ -578,6 +627,7 @@ function PopoverContent({
   ...rest
 }: PopoverContentProps) {
   const target = useAnchorTarget(container);
+  const keepMounted = useContext(KeepMountedContext);
   const name = usePopoverName(rest);
   const vars = customProperties({
     '--mullion-popover-width': spacingValue(width),
@@ -586,7 +636,7 @@ function PopoverContent({
   });
 
   return (
-    <BasePopover.Portal container={target}>
+    <BasePopover.Portal container={target} keepMounted={keepMounted}>
       <BasePopover.Positioner
         className="mullion-overlay-positioner"
         side={side}
@@ -672,10 +722,11 @@ export function Menu({ children, opened, defaultOpened, onChange, loop, modal, c
 }
 
 /** The control that opens the menu. A native `<button>` unless `render` says otherwise. */
-function MenuTrigger({ children, render }: { children?: ReactNode; render?: ReactElement | undefined }) {
+function MenuTrigger({ children, render, ref, ...rest }: TriggerProps) {
   const anchor = useContext(AnchorContext);
+  const triggerRef = useTriggerRef(anchor?.anchorRef, ref);
   return (
-    <BaseMenu.Trigger ref={anchor?.anchorRef} className="mullion-menu-trigger" {...(render ? { render } : {})}>
+    <BaseMenu.Trigger {...rest} ref={triggerRef} className="mullion-menu-trigger" {...(render ? { render } : {})}>
       {children}
     </BaseMenu.Trigger>
   );
@@ -685,7 +736,7 @@ function MenuContent({
   children,
   side = 'bottom',
   align = 'start',
-  offset = 6,
+  offset = 8,
   width,
   radius,
   container,

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Menu, Divider } from '@mantine/core';
+import { Divider } from '@mantine/core';
 import {
   IconChevronDown,
   IconDeviceFloppy,
@@ -23,7 +23,7 @@ import {
 } from '@tabler/icons-react';
 import type { DockviewApi } from 'dockview';
 import type { LayoutScope } from '@/hooks/useBuilderWorkspacePrefs';
-import { uiRem, Group, Button } from '@/ui';
+import { uiRem, Group, Button, Menu } from '@/ui';
 
 // The four panel ids used in the default layout.
 const SIDE_PANELS = ['layers', 'media', 'properties'] as const;
@@ -85,18 +85,14 @@ export interface LayoutBuilderMenuBarProps {
 
 function MenuButton({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <Menu shadow="md" width={220} position="bottom-start" withinPortal>
-      <Menu.Target>
-        <Button
-          variant="subtle"
+    <Menu>
+      <Menu.Trigger render={<Button variant="subtle"
           size="xs" compact
           rightSection={<IconChevronDown size={10} />}
-          style={{ fontWeight: 500, fontSize: 12, letterSpacing: 0 }}
-        >
+          style={{ fontWeight: 500, fontSize: 12, letterSpacing: 0 }} />}>
           {label}
-        </Button>
-      </Menu.Target>
-      <Menu.Dropdown>{children}</Menu.Dropdown>
+        </Menu.Trigger>
+      <Menu.Content width={220} side="bottom" align="start">{children}</Menu.Content>
     </Menu>
   );
 }
@@ -238,7 +234,7 @@ export function LayoutBuilderMenuBar({
         <Menu.Item leftSection={<IconCopy size={14} />} onClick={onDuplicate} disabled={!hasSelection}>
           {t('lb_menu_duplicate', 'Duplicate')}
         </Menu.Item>
-        <Menu.Item leftSection={<IconTrash size={14} />} onClick={onDelete} disabled={!hasSelection} color="red">
+        <Menu.Item leftSection={<IconTrash size={14} />} onClick={onDelete} disabled={!hasSelection} tone="danger">
           {t('lb_menu_delete', 'Delete')}
         </Menu.Item>
         <Menu.Divider />
@@ -252,18 +248,14 @@ export function LayoutBuilderMenuBar({
       </MenuButton>
 
       {/* ── View ── */}
-      <Menu shadow="md" width={220} position="bottom-start" withinPortal onOpen={refreshPanelState}>
-        <Menu.Target>
-          <Button
-            variant="subtle"
+      <Menu onChange={(opened) => { if (opened) (refreshPanelState)(); }}>
+        <Menu.Trigger render={<Button variant="subtle"
             size="xs" compact
             rightSection={<IconChevronDown size={10} />}
-            style={{ fontWeight: 500, fontSize: 12, letterSpacing: 0 }}
-          >
+            style={{ fontWeight: 500, fontSize: 12, letterSpacing: 0 }} />}>
             {t('lb_menu_view', 'View')}
-          </Button>
-        </Menu.Target>
-        <Menu.Dropdown>
+          </Menu.Trigger>
+        <Menu.Content width={220} side="bottom" align="start">
           <Menu.Label>{t('lb_menu_panels', 'Panels')}</Menu.Label>
           {SIDE_PANELS.map((id) => (
             <CheckItem
@@ -283,7 +275,7 @@ export function LayoutBuilderMenuBar({
             leftSection={<IconTrash size={14} />}
             onClick={onClearGuides}
             disabled={guideCount === 0}
-            color="red"
+            tone="danger"
           >
             {t('lb_menu_clear_guides', 'Clear guides')}
           </Menu.Item>
@@ -291,7 +283,7 @@ export function LayoutBuilderMenuBar({
           <Menu.Item leftSection={<IconRefresh size={14} />} onClick={handleResetLayout}>
             {t('lb_menu_reset_layout', 'Reset layout')}
           </Menu.Item>
-        </Menu.Dropdown>
+        </Menu.Content>
       </Menu>
 
       {/* ── Options ── */}

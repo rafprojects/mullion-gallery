@@ -2,7 +2,6 @@ import { useRef, useState, type KeyboardEvent, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Tooltip,
-  Menu,
 } from '@mantine/core';
 import {
   Group,
@@ -10,6 +9,7 @@ import {
   ActionIcon,
   TextInput,
   uiRem,
+  Menu,
 } from '@/ui';
 import {
   IconPhoto,
@@ -254,19 +254,15 @@ export function LayerRow({
 
       {/* Context menu */}
       {!isNonInteractive && (
-        <Menu width={160} withinPortal>
-          <Menu.Target>
-            <ActionIcon
-              size="xs"
+        <Menu>
+          <Menu.Trigger render={<ActionIcon size="xs"
               variant="subtle"
               tone="default"
               aria-label={t('lb_row_options', 'Layer options')}
-              onClick={(e) => e.stopPropagation()}
-            >
+              onClick={(e) => e.stopPropagation()} />}>
               <IconDots size={12} />
-            </ActionIcon>
-          </Menu.Target>
-          <Menu.Dropdown>
+            </Menu.Trigger>
+          <Menu.Content width={160}>
             <Menu.Item
               leftSection={<IconLayoutAlignTop size={12} />}
               onClick={() => onBringToFront(item.id)}
@@ -306,7 +302,7 @@ export function LayerRow({
                 </>
               ) : null;
             })()}
-          </Menu.Dropdown>
+          </Menu.Content>
         </Menu>
       )}
 

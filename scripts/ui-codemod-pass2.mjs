@@ -296,6 +296,9 @@ const RULES = {
   },
   // [P81-A] Dialogs portal into their provider's overlay root (P80-F), so `withinPortal` goes; a
   // debug-only `closeButtonProps` goes too. Anything carrying behaviour is listed for a hand fix.
+  // The compound overlays are reshaped by `ui-codemod-overlays.mjs`; this moves their imports.
+  Menu: { rename: {}, unsupported: [] },
+  Popover: { rename: {}, unsupported: [] },
   Modal: { rename: {}, unsupported: DIALOG_UNSUPPORTED, props: DIALOG_PROPS },
   Drawer: { rename: {}, unsupported: DIALOG_UNSUPPORTED, props: DIALOG_PROPS },
   Checkbox: { rename: {}, unsupported: TOGGLE_UNSUPPORTED, props: { onChange: toggleOnChange } },

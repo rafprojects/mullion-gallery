@@ -17,8 +17,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { TagsInput } from '@mantine/core';
-import { Stack, Checkbox } from '@/ui';
-import { notifications } from '@mantine/notifications';
+import { Stack, Checkbox, notify } from '@/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { MediaAddModal } from './MediaAddModal';
@@ -189,7 +188,7 @@ export function MediaUploadController({
       const total = selectedFiles.length;
       const succeeded = total - failures;
       if (succeeded > 0) {
-        notifications.show({
+        notify.show({
           message: isGeneral
             ? t('admin_upload_added_lib', '{{count}} file added to the asset library', { count: succeeded })
             : t('admin_upload_added', '{{count}} file added', { count: succeeded }),
@@ -199,7 +198,7 @@ export function MediaUploadController({
         onUploaded?.(target);
       }
       if (failures > 0) {
-        notifications.show({
+        notify.show({
           title: t('admin_upload_some_failed_title', 'Some uploads failed'),
           message: t('admin_upload_failed_msg', '{{failures}} of {{total}} file could not be uploaded.', { failures, total, count: total }),
           color: 'red',
@@ -210,7 +209,7 @@ export function MediaUploadController({
         onClose();
       }
     } catch (err) {
-      notifications.show({
+      notify.show({
         title: t('admin_upload_failed_title', 'Upload failed'),
         message: err instanceof Error ? err.message : t('admin_upload_failed_generic', 'Upload failed.'),
         color: 'red',
@@ -254,7 +253,7 @@ export function MediaUploadController({
         }]);
         await queryClient.invalidateQueries({ queryKey: getMediaItemsQueryKey(apiClient, target) });
       }
-      notifications.show({ message: t('admin_upload_ext_added', 'External asset added'), color: 'green', autoClose: 3000 });
+      notify.show({ message: t('admin_upload_ext_added', 'External asset added'), color: 'green', autoClose: 3000 });
       onUploaded?.(target);
       resetState();
       onClose();

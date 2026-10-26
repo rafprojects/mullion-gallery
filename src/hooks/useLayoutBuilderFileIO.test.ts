@@ -9,7 +9,10 @@ import { createEmptyTemplate } from './useLayoutBuilderState';
 import type { UseLayoutBuilderReturn } from './useLayoutBuilderState';
 
 const showMock = vi.hoisted(() => vi.fn());
-vi.mock('@mantine/notifications', () => ({ notifications: { show: showMock } }));
+vi.mock('@/ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/ui')>()),
+  notify: { show: showMock, hide: vi.fn(), update: vi.fn() },
+}));
 
 // URL.createObjectURL / revokeObjectURL are already stubbed in src/test/setup.ts
 

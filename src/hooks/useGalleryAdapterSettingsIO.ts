@@ -1,10 +1,10 @@
 import { useCallback, useRef } from 'react';
-import { notifications } from '@mantine/notifications';
 import i18n from '@/i18n';
 import { BUILTIN_ADAPTERS, SETTING_GROUP_DEFINITIONS } from '@/data/adapterSettingGroups';
 import { GalleryConfigSchema } from '@/types/settingsSchemas';
 import type { GalleryConfig } from '@/types';
 import type { UpdateGallerySetting } from '@/components/Settings/GalleryAdapterSettingsSection';
+import { notify } from '@/ui';
 
 // [P71-E, extended P72-A] Notification copy routed through the shared i18next
 // instance (outside JSX). Also used by `validateImportPayload`, whose returned
@@ -96,7 +96,7 @@ export function useGalleryAdapterSettingsIO({
 
   const handleExport = useCallback(() => {
     if (!galleryConfig) {
-      notifications.show({
+      notify.show({
         title: t('gasettings_nothing_title', 'Nothing to export'),
         message: t('gasettings_nothing_message', 'No gallery adapter settings have been configured yet.'),
         color: 'yellow',
@@ -133,7 +133,7 @@ export function useGalleryAdapterSettingsIO({
           const result = validateImportPayload(raw);
 
           if (!result.ok) {
-            notifications.show({
+            notify.show({
               title: t('gasettings_invalid_title', 'Invalid settings file'),
               message: result.error,
               color: 'red',
@@ -143,14 +143,14 @@ export function useGalleryAdapterSettingsIO({
           }
 
           updateSetting('galleryConfig', result.config);
-          notifications.show({
+          notify.show({
             title: t('gasettings_imported_title', 'Adapter settings imported'),
             message: t('gasettings_imported_message', 'Gallery adapter settings applied. Save to persist.'),
             color: 'green',
             autoClose: 3000,
           });
         } catch {
-          notifications.show({
+          notify.show({
             title: t('gasettings_import_failed_title', 'Import failed'),
             message: t('gasettings_import_failed_message', 'Could not parse JSON file.'),
             color: 'red',
@@ -161,7 +161,7 @@ export function useGalleryAdapterSettingsIO({
         }
       };
       reader.onerror = () => {
-        notifications.show({
+        notify.show({
           title: t('gasettings_import_failed_title', 'Import failed'),
           message: t('gasettings_read_failed_message', 'Could not read the selected file.'),
           color: 'red',

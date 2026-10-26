@@ -32,7 +32,7 @@ import {
   type SettingsData,
   type SettingsDataInput,
 } from '@/contexts/SettingsStore';
-import { uiLayer, Group, Stack, Text, Title, Box, Center, Badge, Button, MullionProvider } from '@/ui';
+import { uiLayer, Group, Stack, Text, Title, Box, Center, Badge, Button, MullionProvider, confirm, notify } from '@/ui';
 import { SettingTooltip } from './SettingTooltip';
 import type { CustomFontEntry } from '../Common/TypographyEditor';
 import type { UpdateGallerySetting } from '../Settings/GalleryAdapterSettingsSection';
@@ -52,8 +52,6 @@ import { adminChromeAttributes, adminChromeClassNames, adminChromeStyles } from 
 import { getMullionDebugProps } from '@/utils/mullionDebug';
 import { useRootId } from '@mullion/shared-ui';
 import { useScrollRestore } from '@/hooks/useScrollRestore';
-import { modals } from '@mantine/modals';
-import { notifications } from '@mantine/notifications';
 import { getErrorMessage, spaceColor } from '@mullion/shared-utils';
 
 import { GalleryConfigEditorLoader } from '@/components/Common/GalleryConfigEditorLoader';
@@ -429,7 +427,7 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
     draftPromptShownRef.current = true;
     const draftAge = Math.round((Date.now() - persistedDraft.savedAt) / 60_000);
     const ageLabel = draftAge < 1 ? t('set_age_now', 'just now') : t('set_age_min', '{{count}} minute ago', { count: draftAge });
-    modals.openConfirmModal({
+    void confirm({
       title: t('set_restore_title', 'Unsaved settings found'),
       children: (
         <Text size="sm">
@@ -440,7 +438,7 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
       confirmProps: { color: 'blue' },
       onConfirm: () => {
         applySettingsUpdate(() => persistedDraft!.settings);
-        notifications.show({
+        notify.show({
           title: t('set_restored_title', 'Settings restored'),
           message: t('set_restored_message', 'Your previous unsaved changes have been restored.'),
           color: 'blue',
@@ -450,7 +448,7 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
       onCancel: () => {
         resetToOriginal();
         clearSettingsDraft(rootId);
-        notifications.show({
+        notify.show({
           message: t('set_discarded_message', 'Unsaved settings discarded.'),
           color: 'gray',
           autoClose: 3000,

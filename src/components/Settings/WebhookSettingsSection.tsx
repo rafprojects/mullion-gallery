@@ -20,11 +20,11 @@ import {
   Checkbox,
   Switch,
   TextInput,
+  notify,
 } from '@/ui';
 import { IconCopy, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient, WebhookEndpoint } from '@/services/apiClient';
-import { notifications } from '@mantine/notifications';
 import { getErrorMessage } from '@mullion/shared-utils';
 
 // value + English default; the label is translated at the use site (t key set_wh_<event>).
@@ -234,7 +234,7 @@ export function WebhookSettingsSection({ apiClient }: Props) {
       invalidate();
     },
     onError: (err) => {
-      notifications.show({ color: 'red', message: getErrorMessage(err, t('set_wh_err_create', 'Failed to create webhook endpoint.')) });
+      notify.show({ color: 'red', message: getErrorMessage(err, t('set_wh_err_create', 'Failed to create webhook endpoint.')) });
     },
   });
 
@@ -242,7 +242,7 @@ export function WebhookSettingsSection({ apiClient }: Props) {
     mutationFn: (index: number) => apiClient.deleteWebhookEndpoint(index),
     onSuccess: invalidate,
     onError: (err) => {
-      notifications.show({ color: 'red', message: getErrorMessage(err, t('set_wh_err_delete', 'Failed to delete webhook endpoint.')) });
+      notify.show({ color: 'red', message: getErrorMessage(err, t('set_wh_err_delete', 'Failed to delete webhook endpoint.')) });
     },
   });
 
@@ -251,7 +251,7 @@ export function WebhookSettingsSection({ apiClient }: Props) {
       apiClient.updateWebhookEndpoint(index, data),
     onSuccess: invalidate,
     onError: (err) => {
-      notifications.show({ color: 'red', message: getErrorMessage(err, t('set_wh_err_update', 'Failed to update webhook endpoint.')) });
+      notify.show({ color: 'red', message: getErrorMessage(err, t('set_wh_err_update', 'Failed to update webhook endpoint.')) });
     },
   });
 
@@ -264,7 +264,7 @@ export function WebhookSettingsSection({ apiClient }: Props) {
       setRotatedSecret(data.secret);
     },
     onError: (err) => {
-      notifications.show({ color: 'red', message: getErrorMessage(err, t('set_wh_err_rotate', 'Failed to rotate webhook secret.')) });
+      notify.show({ color: 'red', message: getErrorMessage(err, t('set_wh_err_rotate', 'Failed to rotate webhook secret.')) });
     },
   });
 

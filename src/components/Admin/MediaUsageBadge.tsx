@@ -6,8 +6,8 @@
  * campaign names. A count of 0 is highlighted in red (orphaned media).
  */
 import { useState } from 'react';
-import { Popover, Anchor, Loader } from '@mantine/core';
-import { Stack, Text, Alert, Badge } from '@/ui';
+import { Anchor, Loader } from '@mantine/core';
+import { Stack, Text, Alert, Badge, Popover } from '@/ui';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
@@ -116,31 +116,28 @@ export function MediaUsageBadge({ count, mediaId, apiClient, size = 'sm' }: Medi
       {...getMullionDebugProps('MediaUsageBadge')}
       opened={opened}
       onChange={handleOpen}
-      withArrow
-      shadow="md"
-      width={240}
-      position="bottom-start"
     >
-      <Popover.Target>
-        <Badge
-          {...getMullionDebugProps('MediaUsageBadge', 'badge')}
-          tone={tone}
-          variant="light"
-          size={size}
-          style={{ cursor: 'pointer', pointerEvents: 'auto' }}
-          onClick={(event) => {
-            event.stopPropagation();
-            handleOpen(!opened);
-          }}
-          aria-label={t('admin_usage_aria', 'Media used in {{label}}', { label })}
-        >
-          {label}
-        </Badge>
-      </Popover.Target>
+      {/* A badge, not a button, so Base UI gives it the button role and keys (P81-A). */}
+      <Popover.Trigger
+        nativeButton={false}
+        render={
+          <Badge
+            {...getMullionDebugProps('MediaUsageBadge', 'badge')}
+            tone={tone}
+            variant="light"
+            size={size}
+            style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+            onClick={(event) => event.stopPropagation()}
+            aria-label={t('admin_usage_aria', 'Media used in {{label}}', { label })}
+          />
+        }
+      >
+        {label}
+      </Popover.Trigger>
 
-      <Popover.Dropdown {...getMullionDebugProps('MediaUsageBadge', 'dropdown')}>
+      <Popover.Content width={240} side="bottom" align="start" {...getMullionDebugProps('MediaUsageBadge', 'dropdown')}>
         <MediaUsageBadgeContent loading={loading} error={error} detail={detail} />
-      </Popover.Dropdown>
+      </Popover.Content>
     </Popover>
   );
 }

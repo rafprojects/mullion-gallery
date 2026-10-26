@@ -843,3 +843,38 @@ test('small icon buttons have a 24px target', async ({ page }) => {
     expect.soft(got.beyond, `${size} goes no further`).toBe(false);
   }
 });
+
+// [P81-A] The floating surfaces at Mantine's spacing (designer: match it
+// without asking) and rule 20: a tooltip has 8px corners and sits 5px from its
+// trigger; menus and popovers sit 8px away; a popover is padded 12 by 16.
+test('menus, popovers and tooltips take Mantine spacing and rule 20', async ({ page }) => {
+  await serveShowcase(page);
+  await page.goto('/ui-showcase?mount=shadow&dialogs=1&theme=default-light&chrome=follow');
+  const gap = async (trigger: string, popup: string) => {
+    const t = (await page.getByTestId(trigger).boundingBox())!;
+    const p = (await page.getByTestId(popup).boundingBox())!;
+    return p.y - (t.y + t.height);
+  };
+  await page.getByTestId('inline-plain-popover-trigger').click();
+  await page.getByTestId('inline-plain-popover').waitFor();
+  await settle(page);
+  expect.soft(await gap('inline-plain-popover-trigger', 'inline-plain-popover'), 'popover offset').toBeCloseTo(8, 0);
+  const pad = await page.getByTestId('inline-plain-popover').evaluate((el) => [getComputedStyle(el).paddingBlockStart, getComputedStyle(el).paddingInlineStart]);
+  expect.soft(pad, 'popover padding').toEqual(['12px', '16px']);
+  await page.keyboard.press('Escape');
+
+  await page.getByTestId('inline-plain-menu-trigger').click();
+  await page.getByTestId('inline-plain-menu').waitFor();
+  await settle(page);
+  expect.soft(await gap('inline-plain-menu-trigger', 'inline-plain-menu'), 'menu offset').toBeCloseTo(8, 0);
+  await page.keyboard.press('Escape');
+
+  await page.getByTestId('inline-plain-tooltip-trigger').hover();
+  const tip = page.locator('.mullion-tooltip').filter({ hasText: 'a tooltip' });
+  await tip.waitFor();
+  await settle(page);
+  const t = (await page.getByTestId('inline-plain-tooltip-trigger').boundingBox())!;
+  const b = (await tip.boundingBox())!;
+  expect.soft(t.y - (b.y + b.height), 'tooltip offset').toBeCloseTo(5, 0);
+  expect.soft(await tip.evaluate((el) => getComputedStyle(el).borderTopLeftRadius), 'tooltip corners').toBe('8px');
+});

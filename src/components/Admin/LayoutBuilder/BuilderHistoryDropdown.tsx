@@ -8,13 +8,12 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Popover,
   ScrollArea,
   Tooltip,
 } from '@mantine/core';
 import { IconClockHour4, IconTrash } from '@tabler/icons-react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Text, Box, ActionIcon, UnstyledButton } from '@/ui';
+import { uiRem, Stack, Text, Box, ActionIcon, UnstyledButton, Popover } from '@/ui';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -67,29 +66,15 @@ export function BuilderHistoryDropdown({
   const count = historyEntries.length;
 
   return (
-    <Popover
-      opened={opened}
-      onChange={setOpened}
-      position="bottom-start"
-      width={280}
-      shadow="md"
-      withArrow
-      keepMounted
-    >
-      <Popover.Target>
-        <Tooltip label={t('lb_hist_title', 'History ({{count}})', { count })}>
-          <ActionIcon
-            variant="subtle"
-            onClick={() => setOpened((o) => !o)}
-            aria-label={t('lb_histd_open', 'Open history')}
-            aria-expanded={opened}
-          >
-            <IconClockHour4 size={18} />
-          </ActionIcon>
-        </Tooltip>
-      </Popover.Target>
+    <Popover opened={opened} onChange={setOpened} keepMounted>
+      {/* The trigger toggles the popover and reports its state itself (P81-A). */}
+      <Tooltip label={t('lb_hist_title', 'History ({{count}})', { count })}>
+        <Popover.Trigger render={<ActionIcon variant="subtle" aria-label={t('lb_histd_open', 'Open history')} />}>
+          <IconClockHour4 size={18} />
+        </Popover.Trigger>
+      </Tooltip>
 
-      <Popover.Dropdown style={{ padding: '0' }}>
+      <Popover.Content side="bottom" align="start" width={280} style={{ padding: '0' }}>
         {/* Header */}
         <Box paddingInline="sm" style={{ paddingTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))', paddingBottom: uiRem(0.25), borderBottom: '1px solid var(--mantine-color-default-border)' }}>
           <Text size="xs" weight={600} tone="muted" transform="uppercase">
@@ -176,7 +161,7 @@ export function BuilderHistoryDropdown({
             </Stack>
           </ScrollArea>
         )}
-      </Popover.Dropdown>
+      </Popover.Content>
     </Popover>
   );
 }

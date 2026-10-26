@@ -10,7 +10,6 @@ import {
 import {
   IconPlus, IconTrash, IconAlertCircle, IconUserPlus, IconSettings, IconInfoCircle,
 } from '@tabler/icons-react';
-import { modals } from '@mantine/modals';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
@@ -19,7 +18,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { SpaceAssetLibrary } from './SpaceAssetLibrary';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import type { FontLibraryEntry } from '@mullion/shared-utils';
-import { uiRem, Stack, Group, Text, Alert, Center, Badge, Button, ActionIcon, Switch, Checkbox, TextInput } from '@/ui';
+import { uiRem, Stack, Group, Text, Alert, Center, Badge, Button, ActionIcon, Switch, Checkbox, TextInput, confirm } from '@/ui';
 
 interface SpaceGrant {
   userId: number;
@@ -272,7 +271,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
   // campaign/company duality), matching the campaign/company Access tab.
   const requestRevokeAccess = useCallback((grant: SpaceGrant) => {
     const name = grant.user?.displayName ?? t('admin_space_user_lc', 'user {{id}}', { id: grant.userId });
-    modals.openConfirmModal({
+    void confirm({
       title: t('admin_space_revoke_confirm_title', 'Revoke space access?'),
       children: (
         <Text size="sm">

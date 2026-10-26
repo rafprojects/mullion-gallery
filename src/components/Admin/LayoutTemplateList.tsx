@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-  Menu,
   Skeleton,
   Table,
   Tooltip,
@@ -54,7 +53,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useBuilderDeepLink } from '@mullion/shared-utils';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group, Stack, Text, Box, Center, Badge, Card, ActionIcon, Button, FileButton, UnstyledButton, SegmentedControl, TextInput } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, Badge, Card, ActionIcon, Button, FileButton, UnstyledButton, SegmentedControl, TextInput, Menu } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -663,17 +662,13 @@ function TemplateGridCard({ template, onEdit, onDuplicate, onDelete, onExport }:
           pre-P72-G: over the dark preview canvas a `subtle` ActionIcon has almost no
           contrast in light mode. */}
       <Box style={{ position: 'absolute', bottom: uiRem(0.5), right: uiRem(0.5) }}>
-        <Menu position="bottom-end" withArrow>
-          <Menu.Target>
-            <ActionIcon
-              variant="subtle"
+        <Menu>
+          <Menu.Trigger render={<ActionIcon variant="subtle"
               size="sm"
-              aria-label={tr('admin_lt_actions_for', 'Actions for {{name}}', { name: t.name })}
-            >
+              aria-label={tr('admin_lt_actions_for', 'Actions for {{name}}', { name: t.name })} />}>
               <IconDots size={16} />
-            </ActionIcon>
-          </Menu.Target>
-          <Menu.Dropdown>
+            </Menu.Trigger>
+          <Menu.Content side="bottom" align="end">
             <Menu.Item leftSection={<IconEdit size={14} />} onClick={() => onEdit(t)}>
               {tr('admin_lt_edit', 'Edit')}
             </Menu.Item>
@@ -684,10 +679,10 @@ function TemplateGridCard({ template, onEdit, onDuplicate, onDelete, onExport }:
               {tr('admin_lt_export_json', 'Export JSON')}
             </Menu.Item>
             <Menu.Divider />
-            <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={() => onDelete(t)}>
+            <Menu.Item leftSection={<IconTrash size={14} />} tone="danger" onClick={() => onDelete(t)}>
               {tr('admin_lt_delete', 'Delete')}
             </Menu.Item>
-          </Menu.Dropdown>
+          </Menu.Content>
         </Menu>
       </Box>
     </Card>

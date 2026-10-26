@@ -42,7 +42,8 @@ describe('LayoutBuilderMenuBar — Clear guides (P59-F)', () => {
     render(<LayoutBuilderMenuBar {...makeProps({ guideCount: 0 })} />);
     fireEvent.click(screen.getByText('View'));
     const item = screen.getByText('Clear guides').closest('[role="menuitem"]');
-    expect(item).toHaveAttribute('data-disabled', 'true');
+    // [P81-A] Base UI marks a disabled item with the bare attribute.
+    expect(item).toHaveAttribute('data-disabled');
   });
 
   it('is enabled and calls onClearGuides when guides exist', () => {

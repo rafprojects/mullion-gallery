@@ -1,9 +1,9 @@
 import { useCallback, useRef } from 'react';
-import { notifications } from '@mantine/notifications';
 import i18n from '@/i18n';
 import type { UseLayoutBuilderReturn } from './useLayoutBuilderState';
 import { createEmptyTemplate } from './useLayoutBuilderState';
 import type { LayoutTemplate } from '@/types';
+import { notify } from '@/ui';
 
 // [P71-E] Notification copy routed through the shared i18next instance (outside JSX).
 const t = i18n.t.bind(i18n);
@@ -39,7 +39,7 @@ export function useLayoutBuilderFileIO({ builder }: { builder: UseLayoutBuilderR
             !Array.isArray((parsed as { slots: unknown }).slots) ||
             !('canvasAspectRatio' in parsed)
           ) {
-            notifications.show({
+            notify.show({
               title: t('lbfileio_invalid_title', 'Invalid layout file'),
               message: t('lbfileio_invalid_message', 'The file is missing required fields (name, slots, canvasAspectRatio).'),
               color: 'red',
@@ -56,14 +56,14 @@ export function useLayoutBuilderFileIO({ builder }: { builder: UseLayoutBuilderR
             updatedAt: defaults.updatedAt,
           };
           builder.setTemplate(imported, { preserveSelection: false });
-          notifications.show({
+          notify.show({
             title: t('lbfileio_imported_title', 'Layout imported'),
             message: t('lbfileio_imported_message', '"{{name}}" loaded successfully.', { name: imported.name }),
             color: 'green',
             autoClose: 3000,
           });
         } catch {
-          notifications.show({
+          notify.show({
             title: t('lbfileio_import_failed_title', 'Import failed'),
             message: t('lbfileio_import_failed_message', 'Could not parse JSON file.'),
             color: 'red',

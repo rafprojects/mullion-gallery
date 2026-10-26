@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip, Menu } from '@mantine/core';
-import { Group, Text, Box, Container, Button, ActionIcon } from '@/ui';
+import { Tooltip } from '@mantine/core';
+import { Group, Text, Box, Container, Button, ActionIcon, Menu } from '@/ui';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconSettings, IconLogout, IconDashboard, IconDotsVertical } from '@tabler/icons-react';
 import type { GalleryBehaviorSettings } from '@/types';
@@ -239,15 +239,17 @@ function AuthBarFull({
 
               {isMobile ? (
                 /* ── Mobile: single overflow menu ── */
-                <Menu shadow="md" width={200} position="bottom-end" withArrow
-                  styles={{ dropdown: color ? { borderColor: `var(--mantine-color-${color}-5)` } : {} }}
-                >
-                  <Menu.Target>
-                    <ActionIcon {...getMullionDebugProps('AuthBar', 'menu-trigger')} variant="default" size="lg" aria-label={t('auth_user_menu_label', 'User menu')}>
+                <Menu>
+                  <Menu.Trigger render={<ActionIcon {...getMullionDebugProps('AuthBar', 'menu-trigger')} variant="default" size="lg" aria-label={t('auth_user_menu_label', 'User menu')} />}>
                       <IconDotsVertical size={18} />
-                    </ActionIcon>
-                  </Menu.Target>
-                  <Menu.Dropdown {...getMullionDebugProps('AuthBar', 'menu-dropdown')}>
+                    </Menu.Trigger>
+                  <Menu.Content
+                    width={200}
+                    side="bottom"
+                    align="end"
+                    {...(color ? { style: { borderColor: `var(--mantine-color-${color}-5)` } } : {})}
+                    {...getMullionDebugProps('AuthBar', 'menu-dropdown')}
+                  >
                     {isAdmin && (
                       <>
                         <Menu.Item leftSection={<IconDashboard size={16} />} onClick={handleOpenAdmin}>
@@ -268,10 +270,10 @@ function AuthBarFull({
                         <Menu.Divider />
                       </>
                     )}
-                    <Menu.Item leftSection={<IconLogout size={16} />} onClick={onLogout} color="red">
+                    <Menu.Item leftSection={<IconLogout size={16} />} onClick={onLogout} tone="danger">
                       {t('auth_sign_out', 'Sign out')}
                     </Menu.Item>
-                  </Menu.Dropdown>
+                  </Menu.Content>
                 </Menu>
               ) : (
                 /* ── Desktop: inline controls ── */

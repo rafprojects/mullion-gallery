@@ -1,6 +1,6 @@
 import type { DrawerProps } from '@mantine/core';
-import { Accordion, Drawer, Menu, Tabs } from '@mantine/core';
-import { Group, Stack, Text, Button, NumberInput, TextInput, MullionProvider } from '@/ui';
+import { Accordion, Drawer, Tabs } from '@mantine/core';
+import { Group, Stack, Text, Button, NumberInput, TextInput, MullionProvider, Menu } from '@/ui';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useEffect, useState, type ReactElement, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -374,13 +374,11 @@ export function GalleryConfigEditorModal({
         <Group style={{ width: '100%' }} justify="space-between" wrap="nowrap" gap="sm">
           <Text weight={600} size="sm" style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</Text>
           <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
-            <Menu shadow="md" position="bottom-end">
-              <Menu.Target>
-                <Button variant="subtle" size="sm" rightSection={<IconChevronDown size={14} />}>
+            <Menu>
+              <Menu.Trigger render={<Button variant="subtle" size="sm" rightSection={<IconChevronDown size={14} />} />}>
                   {t('set_ad_gce_reset', 'Reset')}
-                </Button>
-              </Menu.Target>
-              <Menu.Dropdown>
+                </Menu.Trigger>
+              <Menu.Content side="bottom" align="end">
                 <Menu.Item onClick={() => updateDraft((c) => resetBreakpointToBaseline(c, resolvedBaseline, activeBreakpoint))}>
                   {t('set_ad_gce_reset_target', 'Reset {{label}}', { label: activeBreakpointLabel })}
                 </Menu.Item>
@@ -390,10 +388,10 @@ export function GalleryConfigEditorModal({
                   </Menu.Item>
                 ))}
                 <Menu.Divider />
-                <Menu.Item color="red" onClick={handleResetAllChanges}>
+                <Menu.Item tone="danger" onClick={handleResetAllChanges}>
                   {t('set_ad_gce_reset_all', 'Reset All Changes')}
                 </Menu.Item>
-              </Menu.Dropdown>
+              </Menu.Content>
             </Menu>
             <Button variant="default" size="sm" onClick={onClose}>{t('common_cancel', 'Cancel')}</Button>
             <Button size="sm" onClick={handleSaveDraft}>{resolvedSaveLabel}</Button>

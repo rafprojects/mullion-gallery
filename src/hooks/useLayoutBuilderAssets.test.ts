@@ -10,7 +10,10 @@ import type { UseLayoutBuilderReturn } from './useLayoutBuilderState';
 
 // ── Stubs ─────────────────────────────────────────────────────────────────
 
-vi.mock('@mantine/notifications', () => ({ notifications: { show: vi.fn() } }));
+vi.mock('@/ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/ui')>()),
+  notify: { show: vi.fn(), hide: vi.fn(), update: vi.fn() },
+}));
 
 function makeApi(overrides: Partial<ApiClient> = {}): ApiClient {
   return {

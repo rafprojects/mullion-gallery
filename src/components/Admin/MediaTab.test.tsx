@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act, within } from '../../test/test-utils';
 import MediaTab from './MediaTab';
-import { showNotification } from '@mantine/notifications';
+import { notify } from '@/ui';
 
-vi.mock('@mantine/notifications', () => ({
-  showNotification: vi.fn(),
+vi.mock('@/ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/ui')>()),
+  notify: { show: vi.fn(), hide: vi.fn(), update: vi.fn() },
 }));
 
 function suppressConsoleError() {
@@ -297,7 +298,7 @@ describe('MediaTab', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Add external media' }));
 
-    expect(showNotification).toHaveBeenCalledWith(
+    expect(notify.show).toHaveBeenCalledWith(
       expect.objectContaining({ title: 'Invalid URL' }),
     );
   });
@@ -370,7 +371,7 @@ describe('MediaTab', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Preview external media' }));
 
     await waitFor(() => {
-      expect(showNotification).toHaveBeenCalledWith(
+      expect(notify.show).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'Preview failed' }),
       );
     });
@@ -391,7 +392,7 @@ describe('MediaTab', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add external media' }));
 
     await waitFor(() => {
-      expect(showNotification).toHaveBeenCalledWith(
+      expect(notify.show).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'Add failed' }),
       );
     });
@@ -428,7 +429,7 @@ describe('MediaTab', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
-      expect(showNotification).toHaveBeenCalledWith(
+      expect(notify.show).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'Save failed' }),
       );
     });
@@ -605,7 +606,7 @@ describe('MediaTab', () => {
     });
 
     expect(await screen.findByText('File too large')).toBeInTheDocument();
-    expect(showNotification).toHaveBeenCalledWith(
+    expect(notify.show).toHaveBeenCalledWith(
       expect.objectContaining({ title: 'Upload complete with issues' }),
     );
 
@@ -643,7 +644,7 @@ describe('MediaTab', () => {
     await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'Remove media Item One' })); });
 
     await waitFor(() => {
-      expect(showNotification).toHaveBeenCalledWith(
+      expect(notify.show).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'Delete failed' }),
       );
     });
@@ -710,7 +711,7 @@ describe('MediaTab', () => {
     dragHandle.focus();
     await act(async () => { fireEvent.keyDown(dragHandle, { key: 'ArrowRight', code: 'ArrowRight' }); });
     await waitFor(() => {
-      expect(showNotification).toHaveBeenCalledWith(
+      expect(notify.show).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'Reorder failed' }),
       );
     }, { timeout: 3000 });
@@ -790,7 +791,7 @@ describe('MediaTab', () => {
       );
     });
 
-    expect(showNotification).toHaveBeenCalledWith(
+    expect(notify.show).toHaveBeenCalledWith(
       expect.objectContaining({ title: 'Rescan Complete' }),
     );
   });
@@ -816,7 +817,7 @@ describe('MediaTab', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Rescan Types' }));
 
     await waitFor(() => {
-      expect(showNotification).toHaveBeenCalledWith(
+      expect(notify.show).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'Rescan failed' }),
       );
     });

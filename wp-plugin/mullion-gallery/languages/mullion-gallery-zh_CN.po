@@ -10664,3 +10664,7 @@ msgstr "Mullion 设置"
 #: includes/i18n/class-mullion-frontend-strings.php:2786
 msgid "Edit campaign"
 msgstr "编辑活动"
+
+#: includes/i18n/class-mullion-frontend-strings.php:2654
+msgid "Notifications"
+msgstr "通知"

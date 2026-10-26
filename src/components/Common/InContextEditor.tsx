@@ -1,9 +1,9 @@
 import { forwardRef, useCallback, type ReactNode } from 'react';
-import { Popover, ScrollArea } from '@mantine/core';
+import { ScrollArea } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Box, ActionIcon } from '@/ui';
+import { uiRem, Box, ActionIcon, Popover } from '@/ui';
 
 interface InContextEditorProps {
   /** Position relative to the nearest positioned parent, or `inline` to sit in its parent's flow. */
@@ -56,11 +56,17 @@ interface InContextEditorContentProps {
 
 function InContextEditorContent({ children }: InContextEditorContentProps) {
   return (
-    <Popover.Dropdown {...getMullionDebugProps('InContextEditor', 'dropdown')}>
+    <Popover.Content
+      side="bottom"
+      align="end"
+      width={340}
+      style={{ backdropFilter: 'blur(8px)' }}
+      {...getMullionDebugProps('InContextEditor', 'dropdown')}
+    >
       <ScrollArea.Autosize {...getMullionDebugProps('InContextEditor', 'content')} style={{ maxHeight: uiRem(25) }}>
         {children}
       </ScrollArea.Autosize>
-    </Popover.Dropdown>
+    </Popover.Content>
   );
 }
 
@@ -97,19 +103,11 @@ export function InContextEditor({
       <Popover
         {...getMullionDebugProps('InContextEditor')}
         opened={opened}
-        onClose={close}
-        withinPortal={false}
-        position="bottom-end"
-        shadow="lg"
-        width={340}
-        withArrow
-        closeOnClickOutside
-        closeOnEscape
-        styles={{ dropdown: { backdropFilter: 'blur(8px)' } }}
+        onChange={(next) => {
+          if (!next) close();
+        }}
       >
-        <Popover.Target>
-          <InContextEditorToggle onToggle={toggle} />
-        </Popover.Target>
+        <Popover.Trigger render={<InContextEditorToggle onToggle={toggle} />} />
         <InContextEditorContent>{children}</InContextEditorContent>
       </Popover>
     </Box>

@@ -4,7 +4,10 @@ import { MediaUploadController, GENERAL_LIBRARY_TARGET } from './MediaUploadCont
 import type { ApiClient } from '@/services/apiClient';
 
 // Silence notifications (no <Notifications/> provider in the test tree).
-vi.mock('@mantine/notifications', () => ({ notifications: { show: vi.fn() } }));
+vi.mock('@/ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/ui')>()),
+  notify: { show: vi.fn(), hide: vi.fn(), update: vi.fn() },
+}));
 
 // Campaign uploads route through useXhrUpload.uploadMany — stub it. The hook
 // now lives in the shared-utils barrel (P51-B), so spread the real module and

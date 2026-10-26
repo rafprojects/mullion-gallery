@@ -2651,6 +2651,7 @@ class Mullion_Frontend_Strings {
             'accessrow_revoke_companywide_body' => __('This revokes company-wide access for {{name}} across ALL campaigns of {{company}}.', 'mullion-gallery'),
             'accessrow_revoke_companywide_confirm' => __('Revoke company-wide', 'mullion-gallery'),
             'common_close' => __('Close', 'mullion-gallery'),
+            'common_notifications' => __('Notifications', 'mullion-gallery'),
             'common_cancel' => __('Cancel', 'mullion-gallery'),
             'ndw_title' => __('Visually similar image found', 'mullion-gallery'),
             'ndw_looks_like' => __('<strong>{{filename}}</strong> looks like an image already in your library.', 'mullion-gallery'),

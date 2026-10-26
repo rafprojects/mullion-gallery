@@ -1,8 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader, Modal } from '@mantine/core';
-import { Stack, Alert, Center, Container, Button } from '@/ui';
-import { notifications } from '@mantine/notifications';
+import { Stack, Alert, Center, Container, Button, notify } from '@/ui';
 import { useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { CardGallery } from './components/CampaignGallery/CardGallery';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -351,7 +350,7 @@ function AppContent({
     onTimeout: () => void logout(),
     warningThresholdMs: resolvedSettings.sessionIdleWarningSeconds * 1000,
     onWarning: (secondsRemaining) => {
-      notifications.show({
+      notify.show({
         id: 'idle-timeout-warning',
         title: t('app_idle_title', 'Session expiring soon'),
         message: (
@@ -362,7 +361,7 @@ function AppContent({
               variant="light"
               onClick={() => {
                 idleResetRef.current();
-                notifications.hide('idle-timeout-warning');
+                notify.hide('idle-timeout-warning');
               }}
             >
               {t('app_idle_stay', 'Stay signed in')}

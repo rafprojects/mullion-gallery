@@ -1,8 +1,7 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from '@mantine/core';
-import { Group, ActionIcon, Button, TextInput } from '@/ui';
-import { modals } from '@mantine/modals';
+import { Group, ActionIcon, Button, TextInput, Modal } from '@/ui';
 import {
   IconArrowDown,
   IconArrowUp,
@@ -111,6 +110,7 @@ export function ContextualToolbar({
   callbacks,
 }: ContextualToolbarProps) {
   const { t } = useTranslation('mullion');
+  const [renaming, setRenaming] = useState<{ gid: string; defaultName: string } | null>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   if (!selectionRect || selectedSlotIds.size === 0) return null;
@@ -135,47 +135,17 @@ export function ContextualToolbar({
   const isGroupLocked = selectedGroup?.locked ?? false;
   const isGroupHidden = selectedGroup?.visible === false;
 
-  // ── Group rename handler (opens modal) ───────────────────────
+  // ── Group rename (a dialog with local state, P81-A: `confirm` does not cover a form) ──
 
   const handleRenameGroupClick = () => {
     if (!selectedGroup) return;
-    const gid = selectedGroup.id;
-    const defaultName = selectedGroup.name ?? '';
-    modals.open({
-      title: t('lb_ctb_rename_group', 'Rename group'),
-      size: 'xs',
-      children: (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const input = e.currentTarget.elements.namedItem('groupName') as HTMLInputElement;
-            callbacks.onGroupRename(gid, input.value.trim() || defaultName);
-            modals.closeAll();
-          }}
-        >
-          <TextInput
-            name="groupName"
-            defaultValue={defaultName}
-            placeholder={t('lb_ctb_group_name_ph', 'Group name')}
-            data-autofocus
-            style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}
-          />
-          <Group justify="flex-end" gap="xs">
-            <Button variant="subtle" size="xs" onClick={() => modals.closeAll()}>
-              {t('lb_ctb_cancel', 'Cancel')}
-            </Button>
-            <Button size="xs" type="submit">
-              {t('lb_ctb_rename', 'Rename')}
-            </Button>
-          </Group>
-        </form>
-      ),
-    });
+    setRenaming({ gid: selectedGroup.id, defaultName: selectedGroup.name ?? '' });
   };
 
   // ── Render ────────────────────────────────────────────────────
 
   return (
+    <>
     <div
       ref={toolbarRef}
       data-testid="contextual-toolbar"
@@ -363,6 +333,35 @@ export function ContextualToolbar({
         </>
       )}
     </div>
+    <Modal opened={renaming !== null} onClose={() => setRenaming(null)} title={t('lb_ctb_rename_group', 'Rename group')} size="xs">
+      {renaming && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const input = e.currentTarget.elements.namedItem('groupName') as HTMLInputElement;
+            callbacks.onGroupRename(renaming.gid, input.value.trim() || renaming.defaultName);
+            setRenaming(null);
+          }}
+        >
+          <TextInput
+            name="groupName"
+            defaultValue={renaming.defaultName}
+            placeholder={t('lb_ctb_group_name_ph', 'Group name')}
+            data-autofocus
+            style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}
+          />
+          <Group justify="flex-end" gap="xs">
+            <Button variant="subtle" size="xs" onClick={() => setRenaming(null)}>
+              {t('lb_ctb_cancel', 'Cancel')}
+            </Button>
+            <Button size="xs" type="submit">
+              {t('lb_ctb_rename', 'Rename')}
+            </Button>
+          </Group>
+        </form>
+      )}
+    </Modal>
+    </>
   );
 }
 

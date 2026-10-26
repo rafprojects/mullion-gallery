@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useEffect, useRef } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import { showNotification } from '@mantine/notifications';
 import { getErrorMessage } from '@mullion/shared-utils';
 import i18n from '@/i18n';
 import { getMediaItemsQueryKey } from '@/services/adminQuery';
@@ -9,6 +8,7 @@ import { applySortMode, type MediaSortMode } from '@/components/Admin/applySortM
 import type { ApiClient } from '@/services/apiClient';
 import type { MediaItem } from '@/types';
 import type { QueryClient } from '@tanstack/react-query';
+import { notify } from '@/ui';
 
 const LIST_PAGE_SIZE = 50;
 
@@ -59,12 +59,12 @@ export function useMediaDisplay({
       const reorderedMedia = nextMedia.map((it, i) => ({ ...it, order: i + 1 }));
       setMedia(reorderedMedia);
       queryClient.setQueryData<MediaItem[]>(getMediaItemsQueryKey(apiClient, campaignId), reorderedMedia);
-      showNotification({ title: t('mediadisp_reordered_title', 'Reordered'), message: t('mediadisp_reordered_message', 'Media order updated.') });
+      notify.show({ title: t('mediadisp_reordered_title', 'Reordered'), message: t('mediadisp_reordered_message', 'Media order updated.') });
       onCampaignsUpdated?.();
     } catch (err) {
       // Roll back local state to previous order
       setMedia(prev);
-      showNotification({ title: t('mediadisp_reorder_failed_title', 'Reorder failed'), message: getErrorMessage(err, t('mediadisp_reorder_failed_message', 'Failed to reorder media.')), color: 'red' });
+      notify.show({ title: t('mediadisp_reorder_failed_title', 'Reorder failed'), message: getErrorMessage(err, t('mediadisp_reorder_failed_message', 'Failed to reorder media.')), color: 'red' });
     } finally {
       reorderingRef.current = false;
     }

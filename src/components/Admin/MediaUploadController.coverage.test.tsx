@@ -9,7 +9,10 @@ import { MediaUploadController } from './MediaUploadController';
 import type { ApiClient } from '@/services/apiClient';
 
 const { notifyShow, uploadMany } = vi.hoisted(() => ({ notifyShow: vi.fn(), uploadMany: vi.fn() }));
-vi.mock('@mantine/notifications', () => ({ notifications: { show: notifyShow } }));
+vi.mock('@/ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/ui')>()),
+  notify: { show: notifyShow, hide: vi.fn(), update: vi.fn() },
+}));
 
 vi.mock('@mullion/shared-utils', async () => {
   const actual = await vi.importActual<typeof import('@mullion/shared-utils')>('@mullion/shared-utils');

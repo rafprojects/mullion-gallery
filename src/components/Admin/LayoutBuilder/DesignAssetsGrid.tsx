@@ -1,6 +1,6 @@
 
-import { Tooltip, Popover, TagsInput } from '@mantine/core';
-import { Text, Box, Badge, ActionIcon } from '@/ui';
+import { Tooltip, TagsInput } from '@mantine/core';
+import { Text, Box, Badge, ActionIcon, Popover } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { IconX, IconWorld, IconWorldOff, IconTag } from '@tabler/icons-react';
 import type { AssetLibraryItem } from './BuilderDockContext';
@@ -152,23 +152,25 @@ export function DesignAssetsGrid({
 
               {/* P50-K: tag editor — top-left */}
               {onSetTags && (
-                <Popover position="bottom-start" withArrow shadow="md" width={220} withinPortal>
-                  <Popover.Target>
-                    <Tooltip label={item.tags?.length ? t('lb_dag_tags_list', 'Tags: {{tags}}', { tags: item.tags.join(', ') }) : t('lb_dag_add_tags', 'Add tags')} withArrow position="top">
-                      <ActionIcon
-                        size={16}
-                        variant={item.tags?.length ? 'filled' : 'light'}
-                        tone={item.tags?.length ? 'primary' : 'default'}
-                        radius="xl"
-                        style={{ position: 'absolute', top: 2, left: 2, zIndex: 1, opacity: item.tags?.length ? 1 : 0.7 }}
-                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                        aria-label={t('lb_dag_edit_tags', 'Edit tags for {{name}}', { name: item.name })}
-                      >
-                        <IconTag size={10} />
-                      </ActionIcon>
-                    </Tooltip>
-                  </Popover.Target>
-                  <Popover.Dropdown onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                <Popover>
+                  <Tooltip label={item.tags?.length ? t('lb_dag_tags_list', 'Tags: {{tags}}', { tags: item.tags.join(', ') }) : t('lb_dag_add_tags', 'Add tags')} withArrow position="top">
+                    <Popover.Trigger
+                      render={
+                        <ActionIcon
+                          size={16}
+                          variant={item.tags?.length ? 'filled' : 'light'}
+                          tone={item.tags?.length ? 'primary' : 'default'}
+                          radius="xl"
+                          style={{ position: 'absolute', top: 2, left: 2, zIndex: 1, opacity: item.tags?.length ? 1 : 0.7 }}
+                          onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                          aria-label={t('lb_dag_edit_tags', 'Edit tags for {{name}}', { name: item.name })}
+                        />
+                      }
+                    >
+                      <IconTag size={10} />
+                    </Popover.Trigger>
+                  </Tooltip>
+                  <Popover.Content side="bottom" align="start" width={220} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                     <TagsInput
                       size="xs"
                       label={t('lb_dag_tags', 'Tags')}
@@ -177,7 +179,7 @@ export function DesignAssetsGrid({
                       onChange={(tags) => onSetTags(item.id, tags)}
                       clearable
                     />
-                  </Popover.Dropdown>
+                  </Popover.Content>
                 </Popover>
               )}
 

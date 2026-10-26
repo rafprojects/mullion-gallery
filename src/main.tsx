@@ -9,13 +9,10 @@ import App from './App'
 import './appStyles'
 import { MantineProvider, mergeThemeOverrides } from '@mantine/core'
 import i18n from './i18n'
-import { Notifications } from '@mantine/notifications'
-import { ModalsProvider } from '@mantine/modals'
 import '@mantine/core/styles.css'
 // Also on the P79-B list; this document copy serves the wp-admin apps, which
 // have no provider until P81-B, and leaves with Mantine in Phase 81.
 import './styles/chrome-portable.scss'
-import '@mantine/notifications/styles.css'
 import 'dockview/dist/styles/dockview.css'
 import './styles/builder.css'
 import './styles/wpAdminFormReset.css'
@@ -25,7 +22,7 @@ import { createAppQueryClient } from './services/queryClient'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { resolveWpThemeIds } from './services/wpThemeId'
 import { useTheme } from './hooks/useTheme'
-import { MullionProvider, usePageHost, useRootScale } from './ui'
+import { Confirmations, MullionProvider, Notifications, useRootScale } from './ui'
 import { RootIdProvider } from '@mullion/shared-ui'
 import { parseProps, parseNodeConfig, type MountProps, type NodeConfig } from './mountConfig'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -154,8 +151,6 @@ function MantineBridge({
   portal: ReturnType<typeof usePortalTarget>
 }) {
   const { mantineTheme, colorScheme } = useTheme()
-  // P80-F: Mantine's two stores are module-wide, so a host per gallery showed every toast and opened every confirm once per gallery.
-  const isPageHost = usePageHost('mantine-managers')
 
   // P60-D: give every Mantine close button (modals, drawers) an accessible name.
   // Mantine leaves CloseButton unlabeled by default, which trips axe `button-name`
@@ -194,12 +189,13 @@ function MantineBridge({
       >
         <OverlayRootSync portal={portal} colorScheme={colorScheme} />
         {/*
-          * One of each per page, beside the app rather than around it so a
-          * handover never remounts it: confirming both of a gallery pair's
-          * dialogs ran the action twice. Nothing reads the modals context.
+          * [P81-A] The framework's hosts, beside the app rather than around it so
+          * a handover never remounts them. Each is a page singleton itself
+          * (P80-F): only the first mounted renders, so a gallery pair shows a
+          * toast once and opens a confirm once.
           */}
-        {isPageHost && <Notifications withinPortal={false} />}
-        {isPageHost && <ModalsProvider />}
+        <Notifications label={i18n.t('common_notifications', 'Notifications')} closeButtonLabel={i18n.t('common_close', 'Close')} />
+        <Confirmations />
         {/* P69-D: public-facing boundary. With no isAdmin prop a public visitor
             sees generic copy, never a raw exception message (Sentry still gets
             the full error). Admin sub-trees have their own inner ErrorBoundary

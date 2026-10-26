@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import { showNotification } from '@mantine/notifications';
 import { getErrorMessage } from '@mullion/shared-utils';
 import i18n from '@/i18n';
 import { getMediaItemsQueryKey } from '@/services/adminQuery';
 import type { ApiClient } from '@/services/apiClient';
 import type { MediaItem, OEmbedResponse } from '@/types';
 import type { QueryClient } from '@tanstack/react-query';
+import { notify } from '@/ui';
 
 // [P71-E] Notification copy routed through the shared i18next instance (outside JSX).
 const t = i18n.t.bind(i18n);
@@ -53,7 +53,7 @@ export function useMediaExternal({
   async function handleAddExternal() {
     if (!externalUrl) return;
     if (!isValidExternalUrl(externalUrl)) {
-      showNotification({ title: t('extmedia_invalid_url_title', 'Invalid URL'), message: t('extmedia_invalid_url_message', 'Please enter a valid https URL.'), color: 'red' });
+      notify.show({ title: t('extmedia_invalid_url_title', 'Invalid URL'), message: t('extmedia_invalid_url_message', 'Please enter a valid https URL.'), color: 'red' });
       return;
     }
     try {
@@ -72,11 +72,11 @@ export function useMediaExternal({
       setExternalUrl('');
       setExternalPreview(null);
       setAddOpen(false);
-      showNotification({ title: t('extmedia_added_title', 'Added'), message: t('extmedia_added_message', 'External media added.') });
+      notify.show({ title: t('extmedia_added_title', 'Added'), message: t('extmedia_added_message', 'External media added.') });
       onCampaignsUpdated?.();
     } catch (err) {
       console.error(err);
-      showNotification({ title: t('extmedia_add_failed_title', 'Add failed'), message: getErrorMessage(err, t('extmedia_add_failed_message', 'Failed to add external media.')), color: 'red' });
+      notify.show({ title: t('extmedia_add_failed_title', 'Add failed'), message: getErrorMessage(err, t('extmedia_add_failed_message', 'Failed to add external media.')), color: 'red' });
     }
   }
 
@@ -95,14 +95,14 @@ export function useMediaExternal({
       const data = await apiClient.get<OEmbedResponse>(`/wp-json/mullion-gallery/v1/oembed?url=${encodeURIComponent(externalUrl)}`);
       if (data) {
         setExternalPreview(data);
-        showNotification({ title: t('extmedia_preview_loaded_title', 'Preview loaded'), message: data.title ?? t('extmedia_preview_available', 'Preview available') });
+        notify.show({ title: t('extmedia_preview_loaded_title', 'Preview loaded'), message: data.title ?? t('extmedia_preview_available', 'Preview available') });
       } else {
         throw new Error('No preview available');
       }
     } catch (err) {
       console.error(err);
       setExternalError(getErrorMessage(err, t('extmedia_preview_failed_message', 'Failed to load preview.')));
-      showNotification({ title: t('extmedia_preview_failed_title', 'Preview failed'), message: getErrorMessage(err, t('extmedia_preview_failed_message', 'Failed to load preview.')), color: 'red' });
+      notify.show({ title: t('extmedia_preview_failed_title', 'Preview failed'), message: getErrorMessage(err, t('extmedia_preview_failed_message', 'Failed to load preview.')), color: 'red' });
     } finally {
       setExternalLoading(false);
     }

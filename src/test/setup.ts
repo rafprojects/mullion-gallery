@@ -3,6 +3,8 @@ import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 // Initialise i18next with English defaults so t() returns English strings in tests.
 import '../i18n';
+import { confirm } from '@/ui/components/confirm';
+import { notify } from '@/ui/components/notification';
 
 // JSDOM doesn't implement real navigation, so any attempt raises a "Not implemented:
 // navigation (except hash changes)" jsdomError that its default virtual console forwards
@@ -269,4 +271,8 @@ if (typeof URL.revokeObjectURL !== 'function') {
 afterEach(() => {
 	cleanup();
 	localStorage.clear();
+	// [P81-A] The framework's toast and confirm stores are module-wide, as Mantine's were, but no
+	// provider resets them per render: a confirm one test leaves open would make the next test's page inert.
+	confirm.closeAll();
+	notify.clean();
 });

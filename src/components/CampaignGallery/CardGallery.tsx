@@ -14,7 +14,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader, Select } from '@mantine/core';
-import { Group, Stack, Title, Text, Alert, Box, Center, Container, Chip, SegmentedControl, Switch, TextInput } from '@/ui';
+import { Group, Stack, Title, Text, Alert, Box, Center, Container, Chip, SegmentedControl, Switch, TextInput, notify } from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { IconSearch } from '@tabler/icons-react';
 import { CampaignCard } from './CampaignCard';
@@ -29,7 +29,6 @@ import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { InContextEditor } from '@/components/Common/InContextEditor';
 import { TypographyEditor } from '@/components/Common/TypographyEditor';
 import { GOOGLE_FONT_NAMES } from '@/data/googleFontNames';
-import { notifications } from '@mantine/notifications';
 import { loadGoogleFontsFromOverrides } from '@mullion/shared-utils';
 import { buildGradientCss } from '@mullion/shared-utils';
 import { getErrorMessage } from '@mullion/shared-utils';
@@ -92,7 +91,7 @@ export function CardGallery({
   const viewerTitleStyle = useTypographyStyle('viewerTitle', galleryBehaviorSettings);
   const viewerSubtitleStyle = useTypographyStyle('viewerSubtitle', galleryBehaviorSettings);
   const inContextSave = useInContextSave(apiClient, galleryBehaviorSettings, 500, (err) => {
-    notifications.show({ color: 'red', message: getErrorMessage(err, t('cardgal_save_error', 'Failed to save settings.')) });
+    notify.show({ color: 'red', message: getErrorMessage(err, t('cardgal_save_error', 'Failed to save settings.')) });
   }, spaceId);
 
   // Load Google Fonts referenced in typography overrides.

@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import {
   Loader,
-  Menu,
   Pagination,
   Tooltip,
 } from '@mantine/core';
@@ -14,7 +13,7 @@ import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Box, Center, Badge, Card, Button, Checkbox } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, Badge, Card, Button, Checkbox, Menu } from '@/ui';
 
 // Returns an i18next key + English default so the caller can translate in render.
 function scheduleLabel(publishAt?: string, unpublishAt?: string): { key: string; text: string; tone: 'info' | 'warning' | 'danger' } | null {
@@ -136,27 +135,23 @@ export function CampaignsMobileList({
                   {t('admin_clone', 'Clone')}
                 </Button>
               </Tooltip>
-              <Menu shadow="md" width={210} position="bottom-end" withinPortal>
-                <Menu.Target>
-                  <Button
-                    size="xs"
+              <Menu>
+                <Menu.Trigger render={<Button size="xs"
                     variant="subtle"
                     leftSection={<IconDownload size={12} />}
                     rightSection={<IconChevronDown size={11} />}
                     loading={binaryExportingIds.has(cid)}
-                    aria-label={t('admin_export_item', 'Export {{title}}', { title: c.title })}
-                  >
+                    aria-label={t('admin_export_item', 'Export {{title}}', { title: c.title })} />}>
                     {t('admin_export', 'Export')}
-                  </Button>
-                </Menu.Target>
-                <Menu.Dropdown>
+                  </Menu.Trigger>
+                <Menu.Content width={210} side="bottom" align="end">
                   <Menu.Item leftSection={<IconFileZip size={14} />} onClick={() => void handleBinaryExportCampaign(c)}>
                     {t('admin_export_zip_media', 'Export as ZIP (includes media)')}
                   </Menu.Item>
                   <Menu.Item leftSection={<IconDownload size={14} />} onClick={() => void handleExportCampaign(c)}>
                     {t('admin_export_json', 'Export as JSON (data only)')}
                   </Menu.Item>
-                </Menu.Dropdown>
+                </Menu.Content>
               </Menu>
               {c.status === 'archived' ? (
                 <Button size="xs" tone="primary" leftSection={<IconArchiveOff size={12} />} loading={restoringIds.has(cid)} onClick={() => setConfirmRestore(c)}>

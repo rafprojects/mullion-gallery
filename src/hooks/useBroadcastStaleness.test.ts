@@ -9,7 +9,10 @@ import { createEmptyTemplate } from './useLayoutBuilderState';
 import type { LayoutTemplate } from '@/types';
 
 const showMock = vi.hoisted(() => vi.fn());
-vi.mock('@mantine/notifications', () => ({ notifications: { show: showMock } }));
+vi.mock('@/ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/ui')>()),
+  notify: { show: showMock, hide: vi.fn(), update: vi.fn() },
+}));
 
 // ── BroadcastChannel stub ─────────────────────────────────────────────────
 type MessageHandler = (event: MessageEvent<unknown>) => void;
@@ -44,6 +47,8 @@ describe('useBroadcastStaleness — message matching', () => {
     renderHook(() => useBroadcastStaleness(template));
     act(() => fireMessage({ type: 'template-saved', templateId: 'tmpl-abc' }));
     expect(showMock).toHaveBeenCalled();
+    // [P81-A] Kept up until dismissed: `notify` reads 0 as no timer, where Mantine closed it on the next tick.
+    expect(showMock).toHaveBeenCalledWith(expect.objectContaining({ autoClose: 0 }));
   });
 
   it('does NOT show notification when templateId does not match', () => {

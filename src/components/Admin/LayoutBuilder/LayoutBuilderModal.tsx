@@ -5,7 +5,6 @@ import {
   Tooltip,
   Divider,
 } from '@mantine/core';
-import { modals } from '@mantine/modals';
 import {
   IconDeviceFloppy,
   IconArrowBackUp,
@@ -13,7 +12,6 @@ import {
   IconEye,
   IconEyeOff,
 } from '@tabler/icons-react';
-import { notifications } from '@mantine/notifications';
 import type { LayoutTemplate } from '@/types';
 import type { ApiClient } from '@/services/apiClient';
 import {
@@ -25,7 +23,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useGetSettings } from '@/services/settingsQuery';
 import { AdminChromeProvider } from '@/components/Admin/AdminChromeProvider';
 import { adminChromeAttributes, adminChromeClassNames, adminChromeStyles, resolveChromeThemeId } from '@/themes/chromeTheme';
-import { getThemeEntry, Group, Text, Box, Button, ActionIcon, TextInput, MullionProvider } from '@/ui';
+import { getThemeEntry, Group, Text, Box, Button, ActionIcon, TextInput, MullionProvider, confirm, notify } from '@/ui';
 import { useLatestRef } from '@mullion/shared-utils';
 import { DockviewReact, DockviewDefaultTab } from 'dockview';
 import { debugGroup, debugLog, debugGroupEnd } from '@/utils/debug';
@@ -212,7 +210,7 @@ export function LayoutBuilderModal({
   // ── Close with dirty guard ──
   const handleClose = useCallback(() => {
     if (builder.isDirty) {
-      modals.openConfirmModal({
+      void confirm({
         title: tr('lb_mod_discard_title', 'Discard changes?'),
         children: <Text size="sm">{tr('lb_mod_discard_body', 'You have unsaved changes. Discard them?')}</Text>,
         labels: {
@@ -260,14 +258,14 @@ export function LayoutBuilderModal({
       builder.clearDraft();
       onSaved?.(saved);
       onNotify?.({ type: 'success', text: tr('lb_mod_saved', 'Layout "{{name}}" saved', { name: saved.name }) });
-      notifications.show({ message: tr('lb_mod_saved', 'Layout "{{name}}" saved', { name: saved.name }), color: 'green', autoClose: 3000 });
+      notify.show({ message: tr('lb_mod_saved', 'Layout "{{name}}" saved', { name: saved.name }), color: 'green', autoClose: 3000 });
       // P30-D: Notify other tabs that this template was saved
       postSaved(saved.id);
       return true;
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : 'Failed to save layout';
       onNotify?.({ type: 'error', text: errMsg });
-      notifications.show({ title: tr('lb_mod_save_failed', 'Save failed'), message: errMsg, color: 'red', autoClose: 5000 });
+      notify.show({ title: tr('lb_mod_save_failed', 'Save failed'), message: errMsg, color: 'red', autoClose: 5000 });
       return false;
     } finally {
       setIsSaving(false);
@@ -279,13 +277,13 @@ export function LayoutBuilderModal({
     if (selectedGuideId) {
       builder.removeGuide(selectedGuideId);
       setSelectedGuideId(null);
-      notifications.show({ message: tr('lb_mod_guide_deleted', 'Guide deleted'), color: 'gray', autoClose: 2500 });
+      notify.show({ message: tr('lb_mod_guide_deleted', 'Guide deleted'), color: 'gray', autoClose: 2500 });
       return;
     }
     const ids = Array.from(builder.selectedSlotIds);
     if (ids.length === 0) return;
     builder.removeSlots(ids);
-    notifications.show({
+    notify.show({
       message: tr('lb_mod_slots_deleted', '{{count}} slot deleted', { count: ids.length }),
       color: 'gray',
       autoClose: 2500,
@@ -297,7 +295,7 @@ export function LayoutBuilderModal({
     const ids = Array.from(builder.selectedSlotIds);
     if (ids.length === 0) return;
     builder.duplicateSlots(ids);
-    notifications.show({
+    notify.show({
       message: tr('lb_mod_slots_duplicated', '{{count}} slot duplicated', { count: ids.length }),
       color: 'blue',
       autoClose: 2500,
@@ -320,7 +318,7 @@ export function LayoutBuilderModal({
     if (ids.length < 2) return;
     builder.createGroup(ids);
     announce(tr('lb_mod_group_created', 'Group created ({{count}} slots)', { count: ids.length }));
-    notifications.show({ message: tr('lb_mod_group_created', 'Group created ({{count}} slots)', { count: ids.length }), color: 'blue', autoClose: 2500 });
+    notify.show({ message: tr('lb_mod_group_created', 'Group created ({{count}} slots)', { count: ids.length }), color: 'blue', autoClose: 2500 });
   }, [builder, announce, tr]);
 
   // The toolbar always resolves the target group before calling this and passes
@@ -329,7 +327,7 @@ export function LayoutBuilderModal({
   const handleUngroupSelected = useCallback((groupId: string) => {
     builder.dissolveGroup(groupId);
     announce(tr('lb_mod_ungrouped', 'Ungrouped'));
-    notifications.show({ message: tr('lb_mod_ungrouped', 'Ungrouped'), color: 'gray', autoClose: 2500 });
+    notify.show({ message: tr('lb_mod_ungrouped', 'Ungrouped'), color: 'gray', autoClose: 2500 });
   }, [builder, announce, tr]);
 
   const handleGroupLockToggle = useCallback(
@@ -380,7 +378,7 @@ export function LayoutBuilderModal({
     builder.autoAssignMedia(mediaIds, media);
     const assignedCount = Math.min(mediaIds.length, builder.template.slots.length);
     announce(tr('lb_mod_media_assigned', '{{count}} media item assigned', { count: assignedCount }));
-    notifications.show({
+    notify.show({
       message: tr('lb_mod_media_assigned', '{{count}} media item assigned', { count: assignedCount }),
       color: 'blue',
       autoClose: 3000,

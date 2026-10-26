@@ -2,17 +2,16 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
-import { Notifications, notifications } from '@mantine/notifications';
-import { ModalsProvider } from '@mantine/modals';
-import { MullionProvider } from '@/ui';
+import { Confirmations, MullionProvider, Notifications, notify } from '@/ui';
+import i18n from '@/i18n';
 
 import { ApiClient } from '@/services/apiClient';
 import { getWpNonce, setWpNonce, WP_NONCE_PATH } from '@/services/wpNonce';
 import { createAppQueryClient } from '@/services/queryClient';
 import { SpaceManagementView } from '@/components/Admin/SpaceManagementView';
 
-function notify(message: { type: 'error' | 'success'; text: string }) {
-  notifications.show({
+function notifyMessage(message: { type: 'error' | 'success'; text: string }) {
+  notify.show({
     color: message.type === 'error' ? 'red' : 'green',
     message: message.text,
   });
@@ -49,17 +48,16 @@ export function mountSpacesAdmin(host: HTMLElement): void {
           */}
         <MullionProvider theme="default-light" scope={host} instanceId="spaces-admin">
           <MantineProvider>
-            <Notifications />
-            <ModalsProvider>
+            <Notifications label={i18n.t('common_notifications', 'Notifications')} closeButtonLabel={i18n.t('common_close', 'Close')} />
+            <Confirmations />
               <SpaceManagementView
                 apiClient={apiClient}
-                onNotify={notify}
+                onNotify={notifyMessage}
                 onSpacesChanged={() => { /* standalone page: useSpaces refetches itself */ }}
                 // P53-A: the WP-admin "Gallery Spaces" page is registered with the
                 // manage_options capability, so only a System Admin can load it.
                 isSystemAdmin
               />
-            </ModalsProvider>
           </MantineProvider>
         </MullionProvider>
       </QueryClientProvider>

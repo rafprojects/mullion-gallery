@@ -14,11 +14,10 @@ import type { LayoutDraftPayload } from './useLayoutBuilderState';
 const openConfirmModalMock = vi.hoisted(() => vi.fn());
 const notificationsShowMock = vi.hoisted(() => vi.fn());
 
-vi.mock('@mantine/modals', () => ({
-  modals: { openConfirmModal: openConfirmModalMock },
-}));
-vi.mock('@mantine/notifications', () => ({
-  notifications: { show: notificationsShowMock },
+vi.mock('@/ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/ui')>()),
+  confirm: openConfirmModalMock,
+  notify: { show: notificationsShowMock, hide: vi.fn(), update: vi.fn() },
 }));
 vi.mock('@mantine/core', () => ({
   Text: ({ children }: { children: React.ReactNode }) => children,

@@ -14,7 +14,6 @@ import {
   ScrollArea,
   Image,
   Tooltip,
-  Menu,
 } from '@mantine/core';
 import {
   IconWand,
@@ -30,7 +29,7 @@ import {
 } from '@tabler/icons-react';
 import type { LayoutSlot, LayoutTemplate, MediaItem } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Badge, Button, UnstyledButton, ActionIcon, TextInput } from '@/ui';
+import { uiRem, Stack, Group, Text, Badge, Button, UnstyledButton, ActionIcon, TextInput, Menu } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -179,19 +178,15 @@ export function MediaPickerSidebar({
         <Text size="sm" weight={600}>
           {t('lb_mps_media_count', 'Media ({{count}})', { count: media.length })}
         </Text>
-        <Menu shadow="md" width={190} withinPortal>
-          <Menu.Target>
-            <Button
-              size="xs"
+        <Menu>
+          <Menu.Trigger render={<Button size="xs"
               variant="light"
               leftSection={<IconWand size={14} />}
               rightSection={<IconChevronDown size={12} />}
-              disabled={media.length === 0 || template.slots.length === 0}
-            >
+              disabled={media.length === 0 || template.slots.length === 0} />}>
               {t('lb_mps_auto', 'Auto')}
-            </Button>
-          </Menu.Target>
-          <Menu.Dropdown>
+            </Menu.Trigger>
+          <Menu.Content width={190}>
             <Menu.Item leftSection={<IconArrowRight size={13} />} onClick={onAutoAssign}>
               {t('lb_mps_autofill_fwd', 'Auto-fill (forward)')}
             </Menu.Item>
@@ -204,13 +199,13 @@ export function MediaPickerSidebar({
             <Menu.Divider />
             <Menu.Item
               leftSection={<IconTrash size={13} />}
-              color="red"
+              tone="danger"
               onClick={handleClearAll}
               disabled={!template.slots.some((s) => s.mediaId)}
             >
               {t('lb_mps_clear_all', 'Clear all assigns')}
             </Menu.Item>
-          </Menu.Dropdown>
+          </Menu.Content>
         </Menu>
       </Group>
 
