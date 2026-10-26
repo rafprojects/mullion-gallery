@@ -26,6 +26,19 @@
     cursor: not-allowed;
   }
 
+  /*
+   * [P81-A] Each control resets the per-instance properties it reads, as every
+   * other family does: a button inside a rounded Paper used to take the paper's
+   * radius. Size rules below set the control ones; an inline value still wins.
+   */
+  .mullion-button,
+  .mullion-action-icon {
+    --mullion-radius: initial;
+    --mullion-control-height: initial;
+    --mullion-control-pad: initial;
+    --mullion-control-size: initial;
+  }
+
   .mullion-button,
   .mullion-action-icon {
     display: inline-flex;
@@ -37,9 +50,11 @@
        background of its own showed the browser's grey. `outline` was the one
        that did, found in the 2x visual pass. */
     background-color: transparent;
-    border-radius: var(--mullion-radius, var(--mullion-radius-sm));
+    /* Mantine's geometry, so a control is the size it was before it moved:
+       radius `md` and a 600 label, which the brief also asks of buttons. */
+    border-radius: var(--mullion-radius, var(--mullion-radius-md));
     font-family: var(--mullion-font-family);
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1;
     cursor: pointer;
     transition:
@@ -57,43 +72,66 @@
   .mullion-button {
     gap: var(--mullion-spacing-xs);
     block-size: var(--mullion-control-height, var(--mullion-control-height-sm));
-    padding-inline: var(--mullion-control-pad, var(--mullion-spacing-md));
+    padding-inline: var(--mullion-control-pad, 1.125rem);
   }
 
+  /* Side padding grows with the size as Mantine's does: 14, 18, 22, 26, 32px. */
   .mullion-button[data-size='xs'] {
     --mullion-control-height: var(--mullion-control-height-xs);
-    --mullion-control-pad: var(--mullion-spacing-sm);
+    --mullion-control-pad: 0.875rem;
     font-size: var(--mullion-font-size-xs);
   }
 
   .mullion-button[data-size='sm'] {
     --mullion-control-height: var(--mullion-control-height-sm);
+    --mullion-control-pad: 1.125rem;
     font-size: var(--mullion-font-size-sm);
   }
 
   .mullion-button[data-size='md'] {
     --mullion-control-height: var(--mullion-control-height-md);
+    --mullion-control-pad: 1.375rem;
     font-size: var(--mullion-font-size-md);
   }
 
   .mullion-button[data-size='lg'] {
     --mullion-control-height: var(--mullion-control-height-lg);
-    --mullion-control-pad: var(--mullion-spacing-lg);
+    --mullion-control-pad: 1.625rem;
     font-size: var(--mullion-font-size-lg);
   }
 
   .mullion-button[data-size='xl'] {
     --mullion-control-height: var(--mullion-control-height-xl);
-    --mullion-control-pad: var(--mullion-spacing-xl);
+    --mullion-control-pad: 2rem;
     font-size: var(--mullion-font-size-xl);
   }
 
   /* Mantine's `compact-*` sizes, which eight call sites use: the label keeps
      its size and the control loses its height. */
-  .mullion-button[data-compact] {
-    --mullion-control-height: auto;
-    --mullion-control-pad: var(--mullion-spacing-xs);
-    padding-block: 0.25rem;
+  /* Mantine's compact heights and padding, per size. */
+  .mullion-button[data-compact][data-size='xs'] {
+    --mullion-control-height: 1.375rem;
+    --mullion-control-pad: 0.4375rem;
+  }
+
+  .mullion-button[data-compact][data-size='sm'] {
+    --mullion-control-height: 1.625rem;
+    --mullion-control-pad: 0.5rem;
+  }
+
+  .mullion-button[data-compact][data-size='md'] {
+    --mullion-control-height: 1.875rem;
+    --mullion-control-pad: 0.625rem;
+  }
+
+  .mullion-button[data-compact][data-size='lg'] {
+    --mullion-control-height: 2.125rem;
+    --mullion-control-pad: 0.75rem;
+  }
+
+  .mullion-button[data-compact][data-size='xl'] {
+    --mullion-control-height: 2.5rem;
+    --mullion-control-pad: 0.875rem;
   }
 
   .mullion-button[data-full-width] {
@@ -118,31 +156,36 @@
     white-space: nowrap;
   }
 
+  /*
+   * An icon button is smaller than an input-height control, as Mantine's is:
+   * 18, 22, 28, 34 and 44px, 28 by default. The framework first used the input
+   * heights here, which would have grown every icon button (P81-A).
+   */
   .mullion-action-icon {
     flex: 0 0 auto;
-    inline-size: var(--mullion-control-size, var(--mullion-control-height-sm));
-    block-size: var(--mullion-control-size, var(--mullion-control-height-sm));
+    inline-size: var(--mullion-control-size, 1.75rem);
+    block-size: var(--mullion-control-size, 1.75rem);
     padding: 0;
   }
 
   .mullion-action-icon[data-size='xs'] {
-    --mullion-control-size: var(--mullion-control-height-xs);
+    --mullion-control-size: 1.125rem;
   }
 
   .mullion-action-icon[data-size='sm'] {
-    --mullion-control-size: var(--mullion-control-height-sm);
+    --mullion-control-size: 1.375rem;
   }
 
   .mullion-action-icon[data-size='md'] {
-    --mullion-control-size: var(--mullion-control-height-md);
+    --mullion-control-size: 1.75rem;
   }
 
   .mullion-action-icon[data-size='lg'] {
-    --mullion-control-size: var(--mullion-control-height-lg);
+    --mullion-control-size: 2.125rem;
   }
 
   .mullion-action-icon[data-size='xl'] {
-    --mullion-control-size: var(--mullion-control-height-xl);
+    --mullion-control-size: 2.75rem;
   }
 
   /* The variant ladder, shared by both controls. */

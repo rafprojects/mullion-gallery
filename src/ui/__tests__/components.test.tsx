@@ -298,7 +298,7 @@ describe('controls', () => {
     expect(screen.getByLabelText('step').getAttribute('data-size')).toBe('lg');
     const pixels = screen.getByLabelText('pixels');
     expect(pixels.hasAttribute('data-size')).toBe(false);
-    expect(vars(pixels)['--mullion-control-size']).toBe('18px');
+    expect(vars(pixels)['--mullion-control-size']).toBe('calc(1.125rem * var(--mullion-scale, 1))');
   });
 
   it('name the close button even when nobody passes a label', () => {

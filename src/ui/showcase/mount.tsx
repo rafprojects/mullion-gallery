@@ -116,6 +116,8 @@ const withManagers = withKeyboard || params.get('managers') === '1';
 const withNesting = params.get('nesting') === '1';
 /** P81-A: rule 13's surfaces, for the elevation spec. */
 const withElevation = params.get('elevation') === '1';
+/** P81-A: control geometry at Mantine's sizes, for the parity spec. */
+const withControls = params.get('controls') === '1';
 /** `?host=hostile` reproduces the P77-B probe around the whole fixture. */
 const hostileHost = params.get('host') === 'hostile';
 
@@ -246,6 +248,7 @@ function Gallery({ prefix }: { prefix: string }) {
       {withChoice && <Gaps prefix={prefix} />}
       {withNesting && <Nesting prefix={prefix} />}
       {withElevation && <Elevation prefix={prefix} />}
+      {withControls && <ControlSizes prefix={prefix} />}
       {withKeyboard && <KeyboardExtras prefix={prefix} />}
     </Stack>
   );
@@ -369,6 +372,38 @@ function Elevation({ prefix }: { prefix: string }) {
           </Card>
         </Card>
       </Paper>
+    </Stack>
+  );
+}
+
+/** Every control size the product uses, each tagged so the spec can measure it. */
+function ControlSizes({ prefix }: { prefix: string }) {
+  return (
+    <Stack gap="sm">
+      <Group gap="sm">
+        {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map((size) => (
+          <Button key={size} size={size} data-testid={`${prefix}-btn-${size}`}>
+            {size}
+          </Button>
+        ))}
+        <Button size="xs" compact data-testid={`${prefix}-btn-compact-xs`}>
+          compact
+        </Button>
+        <Button data-testid={`${prefix}-btn-default`}>default</Button>
+      </Group>
+      <Group gap="sm">
+        {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map((size) => (
+          <ActionIcon key={size} size={size} aria-label={`icon ${size}`} data-testid={`${prefix}-ai-${size}`}>
+            <span aria-hidden>+</span>
+          </ActionIcon>
+        ))}
+        <ActionIcon aria-label="icon default" data-testid={`${prefix}-ai-default`}>
+          <span aria-hidden>+</span>
+        </ActionIcon>
+        <ActionIcon size={14} aria-label="icon 14" data-testid={`${prefix}-ai-14`}>
+          <span aria-hidden>+</span>
+        </ActionIcon>
+      </Group>
     </Stack>
   );
 }

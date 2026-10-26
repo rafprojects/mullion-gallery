@@ -32,6 +32,7 @@ import {
   type UiTone,
 } from './element';
 import { Loader } from './feedback';
+import { uiRem } from '../styles/rootScale';
 import { resolveRoleGlyph } from './roleGlyph';
 import { customProperties, radiusValue, type UiRadius, type UiScaleStep } from './scale';
 
@@ -159,14 +160,16 @@ export function ActionIcon({
   style,
   children,
   variant = 'subtle',
-  size = 'sm',
+  // Mantine's default icon button is md, 28px; so is its close button (P81-A).
+  size = 'md',
   tone = 'primary',
   radius,
   loading,
   disabled,
   ...rest
 }: ActionIconProps) {
-  const custom = typeof size === 'number' ? `${size}px` : undefined;
+  // A number is pixels in the size basis, as Mantine's `rem(size)` read it (P81-A).
+  const custom = typeof size === 'number' ? uiRem(size / 16) : undefined;
   return (
     <ControlBase
       className={cx('mullion-action-icon', className)}
@@ -184,7 +187,7 @@ export function ActionIcon({
       }}
       {...rest}
     >
-      {loading ? <Loader size={custom ?? 16} /> : children}
+      {loading ? <Loader size={typeof size === 'number' ? size : 16} /> : children}
     </ControlBase>
   );
 }
