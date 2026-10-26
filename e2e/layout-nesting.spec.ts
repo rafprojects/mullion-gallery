@@ -82,5 +82,26 @@ for (const mount of ['shadow', 'light'] as const) {
       });
     expect(await pad('inline-nest-box')).toEqual({ block: '20px', inline: '20px' });
     expect(await pad('inline-nest-alert')).toEqual({ block: '12px', inline: '16px' });
+
+    // A Card is padded md by default, as Mantine's is, and positions its
+    // children; a section bleeds by the card's padding and has none of its
+    // own unless given some; a Paper inside a card keeps its own default.
+    const box = (id: string) =>
+      page.getByTestId(id).evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const cs = getComputedStyle(el);
+        return { left: r.left, right: r.right, top: r.top, padInline: cs.paddingLeft, padBlock: cs.paddingTop, position: cs.position };
+      });
+    const card = await box('inline-nest-card');
+    expect(card.padInline).toBe('16px');
+    expect(card.position).toBe('relative');
+    const section = await box('inline-nest-section');
+    expect(section.left).toBeCloseTo(card.left + 1, 0);
+    expect(section.top).toBeCloseTo(card.top + 1, 0);
+    expect(section.padInline).toBe('0px');
+    expect((await box('inline-nest-paper')).padInline).toBe('0px');
+    const padded = await box('inline-nest-padded-section');
+    expect(padded.left).toBeCloseTo(card.left + 1, 0);
+    expect(padded.padInline).toBe('10px');
   });
 }

@@ -4,6 +4,23 @@
  * light theme and a dark theme render the same markup without a second rule.
  */
 @layer mullion.components {
+  /*
+   * [P81-A] Each surface resets the per-instance properties it reads, as the
+   * layout and feedback families do: a Paper inside a padded Card used to take
+   * the card's padding, radius and ground. Sections bleed by the card's own
+   * `--mullion-card-pad-*`, which nothing resets, rather than by `--mullion-pad`.
+   */
+  .mullion-paper,
+  .mullion-card,
+  .mullion-card-section {
+    --mullion-pad: initial;
+    --mullion-pad-block: initial;
+    --mullion-pad-inline: initial;
+    --mullion-radius: initial;
+    --mullion-shadow: initial;
+    --mullion-surface: initial;
+  }
+
   .mullion-paper,
   .mullion-card {
     padding-block: var(--mullion-pad-block, var(--mullion-pad, 0));
@@ -24,29 +41,35 @@
     border: 1px solid var(--mullion-color-border);
   }
 
+  /* Padded md by default and a positioning context, as Mantine's card is. */
   .mullion-card {
+    --mullion-card-pad-block: var(--mullion-pad-block, var(--mullion-pad, var(--mullion-spacing-md)));
+    --mullion-card-pad-inline: var(--mullion-pad-inline, var(--mullion-pad, var(--mullion-spacing-md)));
+    position: relative;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    padding-block: var(--mullion-card-pad-block);
+    padding-inline: var(--mullion-card-pad-inline);
   }
 
   /*
-   * A section bleeds to the card's edges. The inset is the card's own padding
-   * custom property, inherited on purpose, so a card with unusual padding keeps
-   * its sections aligned; a per-instance reset must leave `--mullion-pad` alone here.
+   * A section bleeds to the card's edges by the card's padding, read from the
+   * properties the card publishes, and has no padding of its own unless given
+   * some: Mantine's reading, where the two used to be one property.
    */
   .mullion-card-section {
-    margin-inline: calc(-1 * var(--mullion-pad-inline, var(--mullion-pad, 0)));
+    margin-inline: calc(-1 * var(--mullion-card-pad-inline, 0px));
     padding-block: var(--mullion-pad-block, var(--mullion-pad, 0));
     padding-inline: var(--mullion-pad-inline, var(--mullion-pad, 0));
   }
 
   .mullion-card-section:first-child {
-    margin-block-start: calc(-1 * var(--mullion-pad-block, var(--mullion-pad, 0)));
+    margin-block-start: calc(-1 * var(--mullion-card-pad-block, 0px));
   }
 
   .mullion-card-section:last-child {
-    margin-block-end: calc(-1 * var(--mullion-pad-block, var(--mullion-pad, 0)));
+    margin-block-end: calc(-1 * var(--mullion-card-pad-block, 0px));
   }
 
   .mullion-card-section[data-with-border] {

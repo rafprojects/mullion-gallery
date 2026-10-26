@@ -13,9 +13,9 @@
    * custom properties inherit, so a primitive that set none used to read its
    * nearest ancestor's: a bare Group inside a spaced-out one spread its
    * children. Each primitive resets what it reads; an inline value still wins,
-   * because inline style beats every layer. One inheritance is deliberate and
-   * must survive any family's reset: `.mullion-card-section` reads its card's
-   * `--mullion-pad` to bleed to the card's edges (surface.css).
+   * because inline style beats every layer. A card's sections read the
+   * card's padding under its own names, `--mullion-card-pad-*`, which no
+   * reset touches (surface.css).
    */
   .mullion-stack,
   .mullion-group,

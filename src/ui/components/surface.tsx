@@ -64,9 +64,10 @@ export interface CardSectionProps extends UiElementProps, UiPaddingProps {
 }
 
 /**
- * A full-bleed band inside a card. It cancels the card's inline padding with a
- * negative margin read from the same custom property the card set, so the two
- * cannot drift apart the way a hardcoded inset would.
+ * A full-bleed band inside a card. It cancels the card's padding with a
+ * negative margin read from the `--mullion-card-pad-*` properties the card
+ * publishes, so the two cannot drift apart the way a hardcoded inset would;
+ * its own padding props pad its content and nothing else (P81-A).
  */
 function CardSection({ className, style, render, children, withBorder, ...props }: CardSectionProps) {
   const [pad, rest] = splitPadding(props);

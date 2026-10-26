@@ -333,6 +333,17 @@ function Nesting({ prefix }: { prefix: string }) {
           an alert inside a padded stack
         </Alert>
       </Stack>
+      <Card withBorder data-testid={`${prefix}-nest-card`} style={{ width: '20rem' }}>
+        <Card.Section data-testid={`${prefix}-nest-section`}>
+          <span>full bleed</span>
+        </Card.Section>
+        <Paper data-testid={`${prefix}-nest-paper`}>
+          <span>a paper inside a card</span>
+        </Paper>
+        <Card.Section paddingInline="xs" data-testid={`${prefix}-nest-padded-section`}>
+          <span>its own padding</span>
+        </Card.Section>
+      </Card>
       <Group grow gap="sm" data-testid={`${prefix}-nest-grow`} style={{ width: '20rem' }}>
         <span style={{ whiteSpace: 'nowrap' }}>a label far wider than its equal share of the row</span>
         <span>short</span>
