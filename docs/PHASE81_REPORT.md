@@ -182,6 +182,14 @@ The designer answered `pass-two-begins` the same night (`designer-answers-pass-t
 
 **Verified.** Photographed surfaces: only the theme selector's two corner flakes. `style-delivery.spec.ts` found the template-picker card by `.mantine-Card-root` and now finds it by a `data-testid` of ours (Decision D); its module-class assertion was tightened, because the framework's own `mullion-card` would have satisfied `/card/` alone. Lint, the allow-list check (163), vitest (4,485) and the full Playwright suite pass. The campaign card is visitor-facing and not photographed (the local data has no campaigns); it gets a look on the dev site at the next deploy.
 
+### The designer's surfaces round (2026-10-26)
+
+`designer-answers-surfaces-2026-10-26.md` settled the rule for surfaces: a container's ground is one rung above the ground it sits on, and where there is no rung above, it stays on that ground and takes `border` as a divider. It also made two small calls, both built: the media usage badge's "Unused" is `warning`, a nudge rather than an error, and the company badges pick black or white against the brand colour through `inkOn()` in the engine, exported from `@/ui`, whose comment says it is the better of two, not a guarantee (the test company's yellow went from white at 2.20:1 to black at 9.53:1).
+
+**The campaign card, checked on the redeployed plugin.** Its zero padding is its own `padding={0}`; the thumbnail section sits 4px in because the site's card settings draw a 4px left accent border; the badges sit where the settings put them. The Access badge keeps its own eye icon instead of the success glyph, since the site passes one.
+
+**The 31 surfaces were classified and sent before anything moves** (`surfaces-classified-2026-10-26.md`), with one premise of the designer's corrected: dialogs and drawers are not "already raised". The framework's `Modal` and `Drawer` paint `surface`, as the Mantine adapter did, so a card in a dialog has a rung above it and only a card inside such a card reaches the ceiling. Whether dialogs themselves should be raised went back as a question, with the table showing both outcomes. The admin panel's own card would lose its border under the rule as written, which is also flagged.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.
