@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { fireEvent, render, screen } from '@/test/test-utils';
+import { fireEvent, render, screen, waitFor, pickOption, shownOption } from '@/test/test-utils';
 import { getAdapterSelectOptions } from '@/components/Galleries/Adapters/adapterRegistry';
 
 import { GalleryConfigEditorModal } from './GalleryConfigEditorModal';
@@ -86,7 +86,7 @@ describe('GalleryConfigEditorModal', () => {
     );
 
     expect(await screen.findByLabelText('Card Width')).toBeInTheDocument();
-    expect(screen.getByLabelText('Card Aspect Ratio', { selector: 'input' })).toHaveValue('3:4 (portrait)');
+    expect(shownOption('Card Aspect Ratio')).toBe('3:4 (portrait)');
     expect(screen.getByLabelText('Max Columns (0 = auto)')).toBeInTheDocument();
     expect(screen.getByLabelText('Card Min Height (px)')).toBeInTheDocument();
     expect(getShownByDisplayValue('180')).toBeInTheDocument();
@@ -148,14 +148,14 @@ describe('GalleryConfigEditorModal', () => {
     expect(screen.getByLabelText('Video Border Radius')).toHaveValue('18');
     expect(screen.getByLabelText('Image Viewport Height')).toHaveValue('560');
     expect(screen.getByLabelText('Video Viewport Height')).toHaveValue('500');
-    expect(screen.getByLabelText('Image Shadow Preset', { selector: 'input' })).toHaveValue('Custom');
+    expect(shownOption('Image Shadow Preset')).toBe('Custom');
     expect(screen.getByLabelText('Image Custom Shadow')).toHaveValue('0 8px 24px rgba(0,0,0,0.35)');
-    expect(screen.getByLabelText('Video Shadow Preset', { selector: 'input' })).toHaveValue('Strong');
+    expect(shownOption('Video Shadow Preset')).toBe('Strong');
     expect(screen.queryByLabelText('Video Custom Shadow')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Visible Cards')).toHaveValue('3');
-    expect(screen.getByLabelText('Loop', { selector: 'input' })).toHaveValue('Off');
-    expect(screen.getByLabelText('Autoplay Direction', { selector: 'input' })).toHaveValue('Right to Left');
-    expect(screen.getByLabelText('Arrow Vertical Position', { selector: 'input' })).toHaveValue('Bottom');
+    expect(shownOption('Loop')).toBe('Off');
+    expect(shownOption('Autoplay Direction')).toBe('Right to Left');
+    expect(shownOption('Arrow Vertical Position')).toBe('Bottom');
     expect(screen.getByLabelText('Arrow Size (px)')).toHaveValue('42');
     expect(screen.getByLabelText('Arrow Color')).toHaveValue('#ff8800');
     expect(screen.getByLabelText('Arrow Background Color')).toHaveValue('rgba(1,2,3,0.5)');
@@ -163,8 +163,8 @@ describe('GalleryConfigEditorModal', () => {
     expect(screen.getByLabelText('Arrow Min Hit Target (px)')).toHaveValue('56');
     expect(screen.getByLabelText('Arrow Fade Duration (ms)')).toHaveValue('320');
     expect(screen.getByLabelText('Arrow Scale Transition (ms)')).toHaveValue('210');
-    expect(screen.getByLabelText('Enable Dot Navigator', { selector: 'input' })).toHaveValue('Off');
-    expect(screen.getByLabelText('Dot Position', { selector: 'input' })).toHaveValue('Overlay Top');
+    expect(shownOption('Enable Dot Navigator')).toBe('Off');
+    expect(shownOption('Dot Position')).toBe('Overlay Top');
     expect(screen.getByLabelText('Max Visible Dots')).toHaveValue('9');
     expect(screen.getByLabelText('Active Dot Color')).toHaveValue('#00ffaa');
     expect(screen.getByLabelText('Inactive Dot Color')).toHaveValue('rgba(4,5,6,0.25)');
@@ -215,7 +215,7 @@ describe('GalleryConfigEditorModal', () => {
       />,
     );
 
-    expect(await screen.findByLabelText('Unified Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
+    expect(await screen.findByRole('combobox', { name: 'Unified Gallery Adapter' })).toBeInTheDocument();
     expect(getShownByDisplayValue('3')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Tablet' }));
@@ -223,8 +223,7 @@ describe('GalleryConfigEditorModal', () => {
     expect(await screen.findByText('Editing breakpoint-specific unified settings for the Tablet layout.')).toBeInTheDocument();
     expect(getShownByDisplayValue('2')).toBeInTheDocument();
     fireEvent.change(getShownByDisplayValue('2'), { target: { value: '4' } });
-    fireEvent.click(screen.getByLabelText('Unified Gallery Adapter', { selector: 'input' }));
-    fireEvent.click(screen.getByRole('option', { name: tabletAdapterLabel ?? 'Justified' }));
+    await pickOption('Unified Gallery Adapter', tabletAdapterLabel ?? 'Justified');
     fireEvent.click(screen.getByRole('button', { name: 'Apply Gallery Config' }));
 
     expect(onSave).toHaveBeenCalledWith(
@@ -555,8 +554,8 @@ describe('GalleryConfigEditorModal', () => {
     expect(screen.getByText('Tile Appearance')).toBeInTheDocument();
     expect(screen.getByLabelText('Border Width (px)')).toHaveValue('2');
     expect(screen.getByLabelText('Border Color')).toHaveValue('#ff0000');
-    expect(screen.getByLabelText('Hover Bounce', { selector: 'input' })).toHaveValue('Off');
-    expect(screen.getByLabelText('Hover Glow', { selector: 'input' })).toHaveValue('On');
+    expect(shownOption('Hover Bounce')).toBe('Off');
+    expect(shownOption('Hover Glow')).toBe('On');
     expect(screen.getByLabelText('Glow Color')).toHaveValue('#00ffaa');
     expect(screen.getByLabelText('Glow Spread (px)')).toHaveValue('18');
   });
@@ -587,7 +586,7 @@ describe('GalleryConfigEditorModal', () => {
     );
 
     expect(await screen.findByText('Adapter-Specific Settings')).toBeInTheDocument();
-    expect(screen.getByLabelText('Layout Builder Scope', { selector: 'input' })).toHaveValue('Viewport Only');
+    expect(shownOption('Layout Builder Scope')).toBe('Viewport Only');
     expect(screen.getByText('Default Glow Spread (px)')).toBeInTheDocument();
     expect(getShownByDisplayValue('18')).toBeInTheDocument();
   });
@@ -618,7 +617,7 @@ describe('GalleryConfigEditorModal', () => {
 
     openAccordionSection('Shared Adapter Sizing');
     expect(await findShownByDisplayValue('20')).toBeInTheDocument();
-    expect(getShownByDisplayValue('Space Between')).toBeInTheDocument();
+    expect(shownOption('Adapter Justification')).toBe('Space Between');
   });
 
   it('renders shared section sizing controls from nested common settings', async () => {
@@ -652,12 +651,10 @@ describe('GalleryConfigEditorModal', () => {
     openAccordionSection('Shared Section Sizing');
     expect(await findShownByDisplayValue('1200')).toBeInTheDocument();
     expect(getShownByDisplayValue('350')).toBeInTheDocument();
-    expect(screen.getByLabelText('Section Height Mode', { selector: 'input' })).toHaveValue(
-      'Manual (fixed max height)',
-    );
+    expect(shownOption('Section Height Mode')).toBe('Manual (fixed max height)');
     expect(getShownByDisplayValue('640')).toBeInTheDocument();
     expect(getShownByDisplayValue('240')).toBeInTheDocument();
-    expect(screen.getByLabelText('Equal Height Sections (Per-Type)', { selector: 'input' })).toHaveValue('On');
+    expect(shownOption('Equal Height Sections (Per-Type)')).toBe('On');
   });
 
   it('renders shared adapter sizing controls from nested common settings', async () => {
@@ -686,7 +683,7 @@ describe('GalleryConfigEditorModal', () => {
     );
 
     openAccordionSection('Shared Adapter Sizing');
-    expect(await screen.findByDisplayValue('Manual (custom %)')).toBeInTheDocument();
+    await waitFor(() => expect(shownOption('Adapter Sizing Mode')).toBe('Manual (custom %)'));
     expect(getShownByDisplayValue('85')).toBeInTheDocument();
     expect(getShownByDisplayValue('90')).toBeInTheDocument();
   });
@@ -716,7 +713,7 @@ describe('GalleryConfigEditorModal', () => {
     );
 
     openAccordionSection('Shared Gallery Height');
-    expect(screen.getByLabelText('Height Constraint', { selector: 'input' })).toHaveValue('Manually control height');
+    expect(shownOption('Height Constraint')).toBe('Manually control height');
     expect(screen.getByLabelText('Manual Gallery Height')).toHaveValue('75vh');
   });
 
@@ -750,9 +747,9 @@ describe('GalleryConfigEditorModal', () => {
     openAccordionSection('Shared Gallery Presentation');
     expect(await screen.findByDisplayValue('Photos')).toBeInTheDocument();
     expect(getShownByDisplayValue('Clips')).toBeInTheDocument();
-    expect(screen.getByLabelText('Gallery Label Justification', { selector: 'input' })).toHaveValue('Center');
-    expect(screen.getByLabelText('Show Gallery Label Icons', { selector: 'input' })).toHaveValue('On');
-    expect(screen.getByLabelText('Show Gallery Section Labels', { selector: 'input' })).toHaveValue('Off');
+    expect(shownOption('Gallery Label Justification')).toBe('Center');
+    expect(shownOption('Show Gallery Label Icons')).toBe('On');
+    expect(shownOption('Show Gallery Section Labels')).toBe('Off');
   });
 
   it('renders scope-specific viewport background controls from nested common settings', async () => {
@@ -787,9 +784,9 @@ describe('GalleryConfigEditorModal', () => {
     );
 
     openAccordionSection('Viewport Backgrounds');
-    expect(screen.getByLabelText('Image Gallery Background', { selector: 'input' })).toHaveValue('Solid Color');
+    expect(shownOption('Image Gallery Background')).toBe('Solid Color');
     expect(screen.getByLabelText('Image Gallery Background Color')).toHaveValue('#112233');
-    expect(screen.getByLabelText('Video Gallery Background', { selector: 'input' })).toHaveValue('Gradient');
+    expect(shownOption('Video Gallery Background')).toBe('Gradient');
     expect(screen.getByLabelText('Video Gallery Background Gradient')).toHaveValue(
       'linear-gradient(135deg, #123456 0%, #654321 100%)',
     );

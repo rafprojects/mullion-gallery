@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { MantineProvider } from '@mantine/core';
 import type { ReactNode } from 'react';
@@ -8,58 +9,6 @@ import { MullionProvider } from '@/ui';
 const { setPreviewThemeSpy } = vi.hoisted(() => ({
   setPreviewThemeSpy: vi.fn(),
 }));
-
-const { selectPropsSpy } = vi.hoisted(() => ({
-  selectPropsSpy: vi.fn(),
-}));
-
-vi.mock('@mantine/core', async () => {
-  const actual = await vi.importActual<typeof import('@mantine/core')>('@mantine/core');
-
-  return {
-    ...actual,
-    Select: ({
-      label,
-      description,
-      value,
-      onChange,
-      data,
-      comboboxProps,
-    }: {
-      label?: ReactNode;
-      description?: ReactNode;
-      value?: string | null;
-      onChange?: (nextValue: string | null) => void;
-      // Accept both flat items and grouped items (P30-H: ThemeSelector passes grouped data)
-      data: Array<{ value: string; label: string } | { group: string; items: Array<{ value: string; label: string }> }>;
-      comboboxProps?: { withinPortal?: boolean };
-    }) => {
-      // Flatten grouped data to extract individual option items
-      const flatItems = data.flatMap((item) =>
-        'items' in item ? item.items : [item],
-      );
-      return (
-        selectPropsSpy({ comboboxProps }),
-        <label>
-          {label ? <span>{label}</span> : null}
-          {description ? <span>{description}</span> : null}
-          <select
-            aria-label={typeof label === 'string' ? label : 'Theme'}
-            data-within-portal={String(comboboxProps?.withinPortal)}
-            value={value ?? ''}
-            onChange={(event) => onChange?.(event.currentTarget.value || null)}
-          >
-            {flatItems.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
-        </label>
-      );
-    },
-  };
-});
 
 vi.mock('@/hooks/useTheme', async () => {
   const themes = await vi.importActual<typeof import('@/themes/index')>('@/themes/index');
@@ -80,6 +29,7 @@ vi.mock('@/hooks/useTheme', async () => {
 import { ThemeSelector } from './ThemeSelector';
 
 const allThemes = getAllThemeMeta();
+const defaultTheme = allThemes.find((theme) => theme.id === DEFAULT_THEME_ID)!;
 const alternateTheme = allThemes.find((theme) => theme.id !== DEFAULT_THEME_ID)!;
 
 // [P79-D] The selector reads the registry through `useMullionTheme()`, so it
@@ -97,7 +47,6 @@ describe('ThemeSelector', () => {
   beforeEach(() => {
     localStorage.clear();
     setPreviewThemeSpy.mockReset();
-    selectPropsSpy.mockReset();
   });
 
   it('renders a Select with default label', () => {
@@ -119,42 +68,55 @@ describe('ThemeSelector', () => {
   it('uses the context theme when no controlled value is provided', () => {
     render(<ThemeSelector />, { wrapper });
 
-    expect(screen.getByRole('combobox')).toHaveValue(DEFAULT_THEME_ID);
+    expect(screen.getByRole('combobox')).toHaveTextContent(defaultTheme.name);
   });
 
   it('prefers the controlled settings value over the theme context value', () => {
     render(<ThemeSelector value={alternateTheme.id} />, { wrapper });
 
-    expect(screen.getByRole('combobox')).toHaveValue(alternateTheme.id);
+    expect(screen.getByRole('combobox')).toHaveTextContent(alternateTheme.name);
   });
 
-  it('applies live preview and reports the selected theme to settings state', () => {
+  it('applies live preview and reports the selected theme to settings state', async () => {
+    const user = userEvent.setup();
     const onThemeChange = vi.fn();
 
     render(<ThemeSelector onThemeChange={onThemeChange} />, { wrapper });
 
-    fireEvent.change(screen.getByRole('combobox'), {
-      target: { value: alternateTheme.id },
-    });
+    await user.click(screen.getByRole('combobox'));
+    const list = await screen.findByRole('listbox');
+    const pick = within(list)
+      .getAllByRole('option')
+      .find((o) => [...o.querySelectorAll('*')].some((el) => el.textContent === alternateTheme.name))!;
+    await user.click(pick);
 
     expect(setPreviewThemeSpy).toHaveBeenCalledWith(alternateTheme.id);
     expect(onThemeChange).toHaveBeenCalledWith(alternateTheme.id);
-    expect(screen.getByRole('combobox')).toHaveValue(alternateTheme.id);
+    await waitFor(() => expect(screen.getByRole('combobox')).toHaveTextContent(alternateTheme.name));
   });
 
-  it('keeps the theme dropdown inside the current render tree', () => {
+  it('shows each theme with its swatches and its description', async () => {
+    const user = userEvent.setup();
     render(<ThemeSelector />, { wrapper });
 
-    expect(selectPropsSpy).toHaveBeenCalled();
-    expect(screen.getByRole('combobox')).toHaveAttribute('data-within-portal', 'false');
+    await user.click(screen.getByRole('combobox'));
+    // By an element reading exactly the name: one theme's name can begin another's.
+    const option = within(await screen.findByRole('listbox'))
+      .getAllByRole('option')
+      .find((o) => [...o.querySelectorAll('*')].some((el) => el.textContent === defaultTheme.name))!;
+    expect(option, `no option is named ${defaultTheme.name}`).toBeTruthy();
+    expect(option.querySelectorAll('.mullion-color-swatch').length).toBeGreaterThan(0);
+    if (defaultTheme.description) expect(option).toHaveTextContent(defaultTheme.description);
   });
 
-  it('does not allow caller-provided comboboxProps to re-enable portal rendering', () => {
-    render(
-      <ThemeSelector selectProps={{ comboboxProps: { withinPortal: true } }} />,
-      { wrapper },
-    );
+  it('keeps the theme list where its field can reach it by id', async () => {
+    // What `withinPortal: false` was for: the gallery is shadow-mounted, and the list must share its root.
+    const user = userEvent.setup();
+    render(<ThemeSelector />, { wrapper });
 
-    expect(screen.getByRole('combobox')).toHaveAttribute('data-within-portal', 'false');
+    const trigger = screen.getByRole('combobox');
+    await user.click(trigger);
+    const list = await screen.findByRole('listbox');
+    expect(list.getRootNode()).toBe(trigger.getRootNode());
   });
 });

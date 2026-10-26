@@ -1,18 +1,17 @@
 import { useCallback } from 'react';
-import { ModalColorInput } from '@/components/Common/ModalColorInput';
-import type { ColorInputProps } from '@mantine/core';
+import { ColorInput, type ColorInputProps } from '@/ui';
 import { useBuilderDock } from './BuilderDockContext';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 
 /**
  * Builder-specific ColorInput wrapper.
  *
- * Extends ModalColorInput with:
+ * Extends ColorInput with:
  * - Saved color swatches from workspace prefs (recently-used palette, persisted per root).
- * - EyeDropper button via Mantine's built-in withEyeDropper (no-op where unsupported).
+ * - The browser's EyeDropper where it exists (no-op where unsupported).
  * - Auto-saves any valid color change to the shared swatch list.
  *
- * Drop-in replacement for ModalColorInput inside the LayoutBuilder panels.
+ * Drop-in replacement for ColorInput inside the LayoutBuilder panels.
  */
 export function BuilderColorInput({ onChangeEnd, withEyeDropper = true, ...rest }: ColorInputProps) {
   const { savedSwatches, addSwatch } = useBuilderDock();
@@ -28,7 +27,7 @@ export function BuilderColorInput({ onChangeEnd, withEyeDropper = true, ...rest 
   );
 
   return (
-    <ModalColorInput
+    <ColorInput
       {...rest}
       swatches={savedSwatches}
       withEyeDropper={withEyeDropper}

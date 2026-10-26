@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '../../test/test-utils';
+import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent, pickOption } from '../../test/test-utils';
 import { CampaignMoveSpaceModal } from './CampaignMoveSpaceModal';
 import type { AdminCampaign, SpaceInfo } from '@/services/adminQuery';
 
@@ -60,10 +61,10 @@ describe('CampaignMoveSpaceModal', () => {
     expect(screen.getByText('Space A')).toBeInTheDocument();
   });
 
-  it('offers only active owned spaces other than the source as targets', () => {
+  it('offers only active owned spaces other than the source as targets', async () => {
     render(<CampaignMoveSpaceModal {...defaults} />);
-    fireEvent.click(screen.getByRole('combobox', { name: 'Target space' }));
-    expect(screen.getByRole('option', { name: 'Space B' })).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('combobox', { name: 'Target space' }));
+    expect(await screen.findByRole('option', { name: 'Space B' })).toBeInTheDocument();
     expect(screen.queryByRole('option', { name: 'Space A' })).not.toBeInTheDocument();
     expect(screen.queryByRole('option', { name: 'Space Archived' })).not.toBeInTheDocument();
     expect(screen.queryByRole('option', { name: 'Space Editor Only' })).not.toBeInTheDocument();
@@ -74,11 +75,10 @@ describe('CampaignMoveSpaceModal', () => {
     expect(screen.getByRole('button', { name: /move/i })).toBeDisabled();
   });
 
-  it('calls onConfirm with the selected space id and name', () => {
+  it('calls onConfirm with the selected space id and name', async () => {
     const onConfirm = vi.fn();
     render(<CampaignMoveSpaceModal {...defaults} onConfirm={onConfirm} />);
-    fireEvent.click(screen.getByRole('combobox', { name: 'Target space' }));
-    fireEvent.click(screen.getByRole('option', { name: 'Space B' }));
+    await pickOption('Target space', 'Space B');
     fireEvent.click(screen.getByRole('button', { name: /move/i }));
     expect(onConfirm).toHaveBeenCalledWith(2, 'Space B');
   });

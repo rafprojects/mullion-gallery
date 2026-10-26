@@ -4,7 +4,6 @@ import {
   Divider,
   Loader,
   Modal,
-  MultiSelect,
 } from '@mantine/core';
 import {
   Group,
@@ -22,6 +21,7 @@ import {
   notify,
   VisuallyHidden,
   Tooltip,
+  MultiSelect,
 } from '@/ui';
 import { IconCopy, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Accordion, Divider, Loader, Select } from '@mantine/core';
-import { Group, Stack, Text, Alert, Badge, Slider, Switch, NumberInput, TextInput } from '@/ui';
+import { Accordion, Divider, Loader } from '@mantine/core';
+import { Group, Stack, Text, Alert, Badge, Slider, Switch, NumberInput, TextInput, Select } from '@/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
@@ -80,8 +80,6 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
                     'settingsPanelAnimation',
                     (value ?? 'slide-left') as GalleryBehaviorSettings['settingsPanelAnimation'],
                   )}
-                  allowDeselect={false}
-                  comboboxProps={{ withinPortal: false }}
                 />
               </Stack>
             ) : null}

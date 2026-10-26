@@ -34,6 +34,8 @@ import { FieldShell, type FieldShellProps, type FieldStyleProps } from './field'
 import { Popover } from './overlay';
 import { Slider } from './toggle';
 import { customProperties } from './scale';
+import { useUiLabels } from '../provider/hooks';
+import { formatUiLabel } from '../provider/labels';
 
 // ---------------------------------------------------------------------------
 // Colour arithmetic
@@ -163,6 +165,7 @@ export interface ColorPickerProps extends FieldStyleProps {
   format?: UiColorFormat | undefined;
   /** Preset colours under the picker. */
   swatches?: readonly string[] | undefined;
+  /** This and the three below default to the provider's `labels`. */
   swatchLabel?: string | undefined;
   surfaceLabel?: string | undefined;
   hueLabel?: string | undefined;
@@ -189,14 +192,15 @@ export function ColorPicker({
   onChangeEnd,
   format = 'hex',
   swatches,
-  swatchLabel = 'Use {color}',
-  surfaceLabel = 'Saturation and brightness',
-  hueLabel = 'Hue',
-  alphaLabel = 'Opacity',
+  swatchLabel,
+  surfaceLabel,
+  hueLabel,
+  alphaLabel,
   className,
   style,
   ...rest
 }: ColorPickerProps) {
+  const labels = useUiLabels();
   const withAlpha = format === 'hexa' || format === 'rgba';
   const controlled = value !== undefined;
   const [internal, setInternal] = useState<UiHsva>(() => parseColor(defaultValue) ?? BLACK);
@@ -303,8 +307,11 @@ export function ColorPicker({
         className="mullion-color-surface"
         role="slider"
         tabIndex={0}
-        aria-label={surfaceLabel}
-        aria-valuetext={`saturation ${Math.round(current.s * 100)}%, brightness ${Math.round(current.v * 100)}%`}
+        aria-label={surfaceLabel ?? labels.colorSurface}
+        aria-valuetext={formatUiLabel(labels.colorSurfaceValue, {
+          saturation: Math.round(current.s * 100),
+          brightness: Math.round(current.v * 100),
+        })}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -315,7 +322,7 @@ export function ColorPicker({
       </div>
 
       <Slider
-        aria-label={hueLabel}
+        aria-label={hueLabel ?? labels.hue}
         className="mullion-color-hue"
         value={Math.round(current.h)}
         min={0}
@@ -328,7 +335,7 @@ export function ColorPicker({
 
       {withAlpha && (
         <Slider
-          aria-label={alphaLabel}
+          aria-label={alphaLabel ?? labels.opacity}
           className="mullion-color-alpha"
           value={Number(current.a.toFixed(2))}
           min={0}
@@ -341,14 +348,14 @@ export function ColorPicker({
       )}
 
       {swatches && swatches.length > 0 && (
-        <div className="mullion-color-swatches">
+        <div className="mullion-color-picker-swatches">
           {swatches.map((swatch) => (
             <button
               key={swatch}
               type="button"
-              className="mullion-color-swatch"
+              className="mullion-color-picker-swatch"
               style={customProperties({ '--mullion-swatch': swatch })}
-              aria-label={swatchLabel.replace('{color}', swatch)}
+              aria-label={formatUiLabel(swatchLabel ?? labels.useColor, { color: swatch })}
               onClick={() => emit(parseColor(swatch) ?? BLACK, true)}
               {...focusable}
             />
@@ -373,6 +380,7 @@ export interface ColorInputProps extends FieldShellProps, FieldStyleProps {
   swatches?: readonly string[] | undefined;
   /** Offers the browser's colour dropper where it exists, and nothing where it does not. */
   withEyeDropper?: boolean | undefined;
+  /** This and the next default to the provider's `labels`. */
   eyeDropperLabel?: string | undefined;
   pickerLabel?: string | undefined;
   'aria-label'?: string | undefined;
@@ -401,8 +409,8 @@ export function ColorInput({
   placeholder,
   swatches,
   withEyeDropper,
-  eyeDropperLabel = 'Pick a colour from the screen',
-  pickerLabel = 'Open the colour picker',
+  eyeDropperLabel,
+  pickerLabel,
   label,
   description,
   error,
@@ -414,6 +422,7 @@ export function ColorInput({
   style,
   ...rest
 }: ColorInputProps) {
+  const labels = useUiLabels();
   const inputId = useId();
   const controlled = value !== undefined;
   const [internal, setInternal] = useState(defaultValue ?? '');
@@ -433,7 +442,9 @@ export function ColorInput({
 
   return (
     <FieldShell
-      label={label !== undefined ? <label htmlFor={inputId}>{label}</label> : undefined}
+      label={label}
+      // The input is ours, not the primitive's, so the label names it by id (P80-F's nesting fix).
+      labelFor={inputId}
       description={description}
       error={error}
       required={required}
@@ -450,7 +461,7 @@ export function ColorInput({
               <button
                 type="button"
                 className="mullion-color-preview"
-                aria-label={pickerLabel}
+                aria-label={pickerLabel ?? labels.openColorPicker}
                 disabled={disabled}
                 style={customProperties({ '--mullion-swatch': parsed ? formatColor(parsed, 'rgba') : 'transparent' })}
                 {...focusable}
@@ -473,7 +484,7 @@ export function ColorInput({
           <button
             type="button"
             className="mullion-color-dropper"
-            aria-label={eyeDropperLabel}
+            aria-label={eyeDropperLabel ?? labels.pickFromScreen}
             disabled={disabled}
             onClick={() => {
               const Api = (window as unknown as { EyeDropper: new () => EyeDropperApi }).EyeDropper;

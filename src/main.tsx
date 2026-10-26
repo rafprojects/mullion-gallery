@@ -9,6 +9,7 @@ import App from './App'
 import './appStyles'
 import { MantineProvider, mergeThemeOverrides } from '@mantine/core'
 import i18n from './i18n'
+import { frameworkLabels } from './frameworkLabels'
 import '@mantine/core/styles.css'
 // Also on the P79-B list; this document copy serves the wp-admin apps, which
 // have no provider until P81-B, and leaves with Mantine in Phase 81.
@@ -120,6 +121,7 @@ function ThemedApp({
       instanceId={rootId}
       persistence={{ allowed: persistTheme && allowThemePersistence, scope: persistenceScope }}
       themeCandidates={resolveWpThemeIds}
+      labels={frameworkLabels()}
     >
       <ThemeProvider>
         <MantineBridge

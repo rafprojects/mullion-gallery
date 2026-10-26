@@ -1,18 +1,16 @@
 import type { DrawerProps } from '@mantine/core';
 import { Accordion, Drawer, Tabs } from '@mantine/core';
-import { Group, Stack, Text, Button, NumberInput, TextInput, MullionProvider, Menu } from '@/ui';
+import { Group, Stack, Text, Button, NumberInput, TextInput, MullionProvider, Menu, ColorInput, Select } from '@/ui';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useEffect, useState, type ReactElement, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { tFieldLabel, tFieldDescription, tFieldPlaceholder, tFieldOptions } from '@/utils/adapterSchemaI18n';
-import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 
 import {
   getActiveSettingGroupDefinitions,
   getAdapterSelectOptions,
 } from '@/components/Galleries/Adapters/adapterRegistry';
-import { ModalSelect as Select } from '@/components/Common/ModalSelect';
 import { DimensionInput } from '@/components/Settings/DimensionInput';
 import type {
   AdapterSettingFieldDefinition,
@@ -473,7 +471,6 @@ export function GalleryConfigEditorModal({
                     ]}
                     value={getRepresentativeStringCommonValue(resolvedDraft, activeBreakpoint, 'sectionHeightMode') ?? 'auto'}
                     onChange={(value) => updateDraft((current) => setCommonSettingForEditableScopes(current, activeBreakpoint, 'sectionHeightMode', value ?? 'auto'))}
-                    allowDeselect={false}
                   />
 
                   {getRepresentativeStringCommonValue(resolvedDraft, activeBreakpoint, 'sectionHeightMode') === 'manual' && (
@@ -507,7 +504,6 @@ export function GalleryConfigEditorModal({
                     ]}
                     value={String(getRepresentativeBooleanCommonValue(resolvedDraft, activeBreakpoint, 'perTypeSectionEqualHeight') ?? false)}
                     onChange={(value) => updateDraft((current) => setCommonSettingForEditableScopes(current, activeBreakpoint, 'perTypeSectionEqualHeight', value === 'true'))}
-                    allowDeselect={false}
                   />
                 </Stack>
               ) : null}
@@ -557,7 +553,6 @@ export function GalleryConfigEditorModal({
                     ]}
                     value={getRepresentativeStringCommonValue(resolvedDraft, activeBreakpoint, 'adapterSizingMode') ?? 'fill'}
                     onChange={(value) => updateDraft((current) => setCommonSettingForEditableScopes(current, activeBreakpoint, 'adapterSizingMode', value ?? 'fill'))}
-                    allowDeselect={false}
                   />
 
                   {getRepresentativeStringCommonValue(resolvedDraft, activeBreakpoint, 'adapterSizingMode') === 'manual' && (
@@ -607,7 +602,6 @@ export function GalleryConfigEditorModal({
                     ]}
                     value={getRepresentativeStringCommonValue(resolvedDraft, activeBreakpoint, 'adapterJustifyContent') ?? 'center'}
                     onChange={(value) => updateDraft((current) => setCommonSettingForEditableScopes(current, activeBreakpoint, 'adapterJustifyContent', value ?? 'center'))}
-                    allowDeselect={false}
                   />
                 </Stack>
               ) : null}
@@ -629,7 +623,6 @@ export function GalleryConfigEditorModal({
                     ]}
                     value={getRepresentativeStringCommonValue(resolvedDraft, activeBreakpoint, 'gallerySizingMode') ?? 'auto'}
                     onChange={(value) => updateDraft((current) => setCommonSettingForEditableScopes(current, activeBreakpoint, 'gallerySizingMode', value ?? 'auto'))}
-                    allowDeselect={false}
                   />
 
                   {getRepresentativeStringCommonValue(resolvedDraft, activeBreakpoint, 'gallerySizingMode') === 'manual' && (
@@ -675,7 +668,6 @@ export function GalleryConfigEditorModal({
                     ]}
                     value={getRepresentativeStringCommonValue(resolvedDraft, activeBreakpoint, 'galleryLabelJustification') ?? 'left'}
                     onChange={(value) => updateDraft((current) => setCommonSettingForEditableScopes(current, activeBreakpoint, 'galleryLabelJustification', value ?? 'left'))}
-                    allowDeselect={false}
                   />
 
                   <Select
@@ -687,7 +679,6 @@ export function GalleryConfigEditorModal({
                     ]}
                     value={String(getRepresentativeBooleanCommonValue(resolvedDraft, activeBreakpoint, 'showGalleryLabelIcon') ?? false)}
                     onChange={(value) => updateDraft((current) => setCommonSettingForEditableScopes(current, activeBreakpoint, 'showGalleryLabelIcon', value === 'true'))}
-                    allowDeselect={false}
                   />
 
                   <Select
@@ -699,7 +690,6 @@ export function GalleryConfigEditorModal({
                     ]}
                     value={String(getRepresentativeBooleanCommonValue(resolvedDraft, activeBreakpoint, 'showCampaignGalleryLabels') ?? true)}
                     onChange={(value) => updateDraft((current) => setCommonSettingForEditableScopes(current, activeBreakpoint, 'showCampaignGalleryLabels', value === 'true'))}
-                    allowDeselect={false}
                   />
                 </Stack>
               ) : null}
@@ -734,7 +724,6 @@ export function GalleryConfigEditorModal({
                           ]}
                           value={bgType}
                           onChange={(value) => updateDraft((current) => setCommonSettingForScope(current, activeBreakpoint, scope, 'viewportBgType', value ?? 'none'))}
-                          allowDeselect={false}
                         />
 
                         {bgType === 'solid' && (
@@ -868,7 +857,6 @@ export function GalleryConfigEditorModal({
                                     field,
                                     value === 'true',
                                   ))}
-                                  allowDeselect={false}
                                 />
                               );
                             }
@@ -924,7 +912,6 @@ export function GalleryConfigEditorModal({
                                   field,
                                   value ?? field.fallback,
                                 ))}
-                                allowDeselect={false}
                               />
                             );
                           })}

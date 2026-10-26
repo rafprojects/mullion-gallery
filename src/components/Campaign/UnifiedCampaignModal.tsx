@@ -3,10 +3,8 @@ import {
   Image,
   Loader,
   Modal,
-  MultiSelect,
   Progress,
   Tabs,
-  TagsInput,
 } from '@mantine/core';
 import type { CampaignCategoryEntry } from '@/services/apiClient';
 import type { TagEntry } from '@/services/api/campaignsApi';
@@ -15,8 +13,6 @@ import { CompanyCombobox } from '@/components/Common/CompanyCombobox';
 import { useMediaQuery } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import { IconLink, IconTrash, IconUpload } from '@tabler/icons-react';
-import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
-import { ModalSelect as Select } from '@/components/Common/ModalSelect';
 import { DEFAULT_GALLERY_BEHAVIOR_SETTINGS, type GalleryBehaviorSettings, type LayoutTemplate, type MediaItem } from '@/types';
 import { FALLBACK_IMAGE_SRC } from '@/utils/fallback';
 import { useDirtyGuard, useLatestRef } from '@mullion/shared-utils';
@@ -35,7 +31,7 @@ import {
   setCampaignBreakpointScopeAdapterOverride,
   syncCampaignGalleryOverrideMode,
 } from '@/utils/campaignGalleryOverrides';
-import { uiRem, Group, Stack, Text, Box, Center, SimpleGrid, Badge, Card, ActionIcon, Button, FileButton, TextInput, Textarea, Tooltip } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, SimpleGrid, Badge, Card, ActionIcon, Button, FileButton, TextInput, Textarea, Tooltip, ColorInput, Select, MultiSelect, TagsInput } from '@/ui';
 
 
 const LazyGalleryConfigEditorModal = lazy(() =>
@@ -337,7 +333,6 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
         value={formState.categories}
         onChange={(v) => updateForm({ ...formState, categories: v })}
         data={buildCategorySelectData(categoryItems)}
-        searchable
         clearable
       />
       <Group grow wrap="wrap" gap="sm">

@@ -14,7 +14,7 @@
  * field's border and share its height by construction.
  */
 
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { Field } from '@base-ui/react/field';
 import { cx, type UiElementProps } from './element';
 import { customProperties, radiusValue, type UiRadius, type UiScaleStep } from './scale';
@@ -55,6 +55,8 @@ export type FieldShellInternal = FieldShellProps &
     labelId?: string | undefined;
     /** The control the label points at, when it is not the field's own control. */
     labelFor?: string | undefined;
+    /** The bordered row, for a popup that lines up with the field rather than its control. */
+    controlRef?: Ref<HTMLDivElement> | undefined;
   };
 
 /**
@@ -83,6 +85,7 @@ export function FieldShell({
   after,
   labelId,
   labelFor,
+  controlRef,
 }: FieldShellInternal) {
   const invalid = error !== undefined && error !== false;
   return (
@@ -111,7 +114,7 @@ export function FieldShell({
       {description !== undefined && (
         <Field.Description className="mullion-field-description">{description}</Field.Description>
       )}
-      <div className={cx('mullion-field-control', variantClass)}>
+      <div ref={controlRef} className={cx('mullion-field-control', variantClass)}>
         {leftSection !== undefined && <span className="mullion-field-section">{leftSection}</span>}
         {children}
         {rightSection !== undefined && <span className="mullion-field-section">{rightSection}</span>}

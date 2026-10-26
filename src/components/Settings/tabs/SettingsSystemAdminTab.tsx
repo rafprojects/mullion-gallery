@@ -1,6 +1,5 @@
 import { memo, type ReactNode } from 'react';
-import { Select } from '@mantine/core';
-import { Stack, Text, Paper } from '@/ui';
+import { Stack, Text, Paper, Select } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import type { ApiClient } from '@/services/apiClient';

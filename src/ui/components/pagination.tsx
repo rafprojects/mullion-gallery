@@ -16,6 +16,8 @@
 import { cx, focusable } from './element';
 import type { FieldStyleProps } from './field';
 import type { UiScaleStep } from './scale';
+import { useUiLabels } from '../provider/hooks';
+import { formatUiLabel } from '../provider/labels';
 
 /** A gap in the run of page numbers. */
 const DOTS = 'dots';
@@ -33,8 +35,8 @@ export interface PaginationProps extends FieldStyleProps {
   size?: UiScaleStep | undefined;
   disabled?: boolean | undefined;
   /**
-   * Names the navigation region. Defaults to "Pagination" so the landmark is
-   * never anonymous; pass a translated string at a real call site.
+   * Names the navigation region, so the landmark is never anonymous. This
+   * and the three below default to the provider's `labels`.
    */
   'aria-label'?: string | undefined;
   previousLabel?: string | undefined;
@@ -111,12 +113,13 @@ export function Pagination({
   disabled,
   className,
   style,
-  'aria-label': ariaLabel = 'Pagination',
-  previousLabel = 'Previous page',
-  nextLabel = 'Next page',
-  pageLabel = 'Page {page}',
+  'aria-label': ariaLabel,
+  previousLabel,
+  nextLabel,
+  pageLabel,
   ...rest
 }: PaginationProps) {
+  const labels = useUiLabels();
   const pages = paginationRange(value, total, siblings, boundaries);
   const go = (page: number) => {
     const next = Math.min(Math.max(page, 1), total);
@@ -127,14 +130,14 @@ export function Pagination({
     <nav
       className={cx('mullion-pagination', className)}
       data-size={size}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ?? labels.pagination}
       {...(style ? { style } : {})}
       {...rest}
     >
       <button
         type="button"
         className="mullion-pagination-control mullion-pagination-prev"
-        aria-label={previousLabel}
+        aria-label={previousLabel ?? labels.previousPage}
         disabled={disabled || value <= 1}
         onClick={() => go(value - 1)}
         {...focusable}
@@ -153,7 +156,7 @@ export function Pagination({
             key={page}
             type="button"
             className="mullion-pagination-control"
-            aria-label={pageLabel.replace('{page}', String(page))}
+            aria-label={formatUiLabel(pageLabel ?? labels.page, { page })}
             {...(page === value ? { 'aria-current': 'page', 'data-active': '' } : {})}
             disabled={disabled}
             onClick={() => go(page)}
@@ -166,7 +169,7 @@ export function Pagination({
       <button
         type="button"
         className="mullion-pagination-control mullion-pagination-next"
-        aria-label={nextLabel}
+        aria-label={nextLabel ?? labels.nextPage}
         disabled={disabled || value >= total}
         onClick={() => go(value + 1)}
         {...focusable}

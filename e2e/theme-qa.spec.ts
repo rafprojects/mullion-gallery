@@ -188,7 +188,7 @@ test.describe('theme behavioral tests', () => {
     // The theme combobox should show the active theme name
     const themeCombo = dialog.getByRole('combobox', { name: 'Theme' });
     await expect(themeCombo).toBeVisible();
-    await expect(themeCombo).toHaveValue('Tokyo Night');
+    await expect(themeCombo).toHaveText('Tokyo Night');
   });
 
   // P77-D: this used to assert `typeof saved === 'string' || saved === null`,
@@ -204,12 +204,12 @@ test.describe('theme behavioral tests', () => {
     const dialog = await openDisplaySettings(page);
     const themeCombo = dialog.getByRole('combobox', { name: 'Theme' });
     await expect(themeCombo).toBeVisible();
-    await expect(themeCombo).toHaveValue('Mullion');
+    await expect(themeCombo).toHaveText('Mullion');
 
     await themeCombo.click();
     // Option names carry the theme description, so match on the leading name only.
     await page.getByRole('option', { name: /^Tokyo Night/ }).click();
-    await expect(themeCombo).toHaveValue('Tokyo Night');
+    await expect(themeCombo).toHaveText('Tokyo Night');
 
     const save = dialog.getByRole('button', { name: 'Save Changes' });
     await expect(save).toBeEnabled();
@@ -482,8 +482,10 @@ test.describe('phase-1 visual snapshots', () => {
     await expect(page.getByRole('button', { name: 'Admin menu' })).toBeVisible();
     await page.addStyleTag({ content: '*, *::before, *::after { animation-duration: 0ms !important; transition-duration: 0ms !important; }' });
     const dialog = await openDisplaySettings(page);
-    const control = dialog.getByRole('combobox', { name: 'Theme' });
-    await expect(control).toBeVisible();
+    const combobox = dialog.getByRole('combobox', { name: 'Theme' });
+    await expect(combobox).toBeVisible();
+    // P81-A: the field's row, since the framework trigger sits inside the row's border.
+    const control = combobox.locator('xpath=ancestor::*[contains(@class, "mullion-field-control")][1]');
     // Keep focus off it: a focused input swaps its colours for the primary
     // stroke, which would make this capture a focus-ring test instead.
     await expect(control).toHaveScreenshot('themed-control-tight-default-dark.png', {

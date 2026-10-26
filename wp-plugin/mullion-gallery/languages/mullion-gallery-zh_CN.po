@@ -10677,3 +10677,39 @@ msgstr "仅限专属：仅显示此活动专属的媒体"
 
 msgid "Edit tags for {{name}}. Tags: {{tags}}"
 msgstr "编辑 {{name}} 的标签。标签：{{tags}}"
+
+msgid "Clear"
+msgstr "清除"
+
+msgid "Show options"
+msgstr "显示选项"
+
+msgid "Remove {{label}}"
+msgstr "移除 {{label}}"
+
+msgid "Show password"
+msgstr "显示密码"
+
+msgid "Increment"
+msgstr "增加"
+
+msgid "Decrement"
+msgstr "减少"
+
+msgid "Open the color picker"
+msgstr "打开颜色选择器"
+
+msgid "Pick a color from the screen"
+msgstr "从屏幕取色"
+
+msgid "Use {{color}}"
+msgstr "使用 {{color}}"
+
+msgid "Saturation and brightness"
+msgstr "饱和度和亮度"
+
+msgid "Saturation {{saturation}}%, brightness {{brightness}}%"
+msgstr "饱和度 {{saturation}}%，亮度 {{brightness}}%"
+
+msgid "Page {{page}}"
+msgstr "第 {{page}} 页"

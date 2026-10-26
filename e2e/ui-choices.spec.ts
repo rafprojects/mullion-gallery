@@ -375,7 +375,7 @@ test.describe('the colour picker', () => {
     // jsdom reports every box as zero and the arithmetic would read as correct
     // against a zero-sized rect.
     await open(page);
-    await gaps(page).getByRole('button', { name: /open the colour picker/i }).click();
+    await gaps(page).getByRole('button', { name: /open the color picker/i }).click();
     const surface = page.getByRole('slider', { name: /saturation/i });
     await surface.waitFor();
 
@@ -389,7 +389,7 @@ test.describe('the colour picker', () => {
     await page.mouse.up();
     await expect
       .poll(async () => surface.getAttribute('aria-valuetext'))
-      .toMatch(/saturation 9[0-9]%|saturation 100%/);
+      .toMatch(/saturation 9[0-9]%|saturation 100%/i);
 
     // The bottom-left corner is no saturation and no brightness: black.
     await page.mouse.move(box.x + 2, box.y + box.height - 2);
@@ -403,14 +403,14 @@ test.describe('the colour picker', () => {
     const field = gaps(page).getByRole('textbox');
     await expect(field).toHaveValue('rgba(18, 52, 86, 0.5)');
 
-    await gaps(page).getByRole('button', { name: /open the colour picker/i }).click();
+    await gaps(page).getByRole('button', { name: /open the color picker/i }).click();
     await page.getByRole('button', { name: 'Use #ffffff' }).click();
     await expect(field).toHaveValue('rgba(255, 255, 255, 1)');
   });
 
   test('the hue rail paints the spectrum rather than a theme colour', async ({ page }) => {
     await open(page);
-    await gaps(page).getByRole('button', { name: /open the colour picker/i }).click();
+    await gaps(page).getByRole('button', { name: /open the color picker/i }).click();
     const track = page.locator('.mullion-color-hue .mullion-slider-track');
     await track.waitFor();
     const background = await track.evaluate((el) => getComputedStyle(el).backgroundImage);

@@ -38,6 +38,7 @@ import { cx, focusable } from './element';
 import { ActionIcon } from './control';
 import { FieldShell, type FieldShellProps, type FieldStyleProps } from './field';
 import { customProperties, radiusValue } from './scale';
+import { useUiLabels } from '../provider/hooks';
 
 // ---------------------------------------------------------------------------
 // TextInput and PasswordInput
@@ -113,7 +114,7 @@ export const TextInput = forwardRef(function TextInput(
 });
 
 export interface PasswordInputProps extends Omit<TextInputProps, 'type'> {
-  /** The accessible name of the reveal toggle. Pass a translated string. */
+  /** The accessible name of the reveal toggle. Defaults to the provider's `labels`. */
   revealLabel?: string | undefined;
 }
 
@@ -149,9 +150,10 @@ function EyeIcon({ off }: { off: boolean }) {
 }
 
 export const PasswordInput = forwardRef(function PasswordInput(
-  { revealLabel = 'Show password', rightSection, ...rest }: PasswordInputProps,
+  { revealLabel, rightSection, ...rest }: PasswordInputProps,
   ref: Ref<HTMLInputElement>,
 ) {
+  const labels = useUiLabels();
   const [revealed, setRevealed] = useState(false);
   return (
     <TextInput
@@ -165,7 +167,7 @@ export const PasswordInput = forwardRef(function PasswordInput(
           <ActionIcon
             variant="subtle"
             size={24}
-            aria-label={revealLabel}
+            aria-label={revealLabel ?? labels.showPassword}
             aria-pressed={revealed}
             onClick={() => setRevealed((v) => !v)}
           >
@@ -317,7 +319,7 @@ export interface NumberInputProps extends FieldShellProps, FieldStyleProps, Numb
    * plus after it, focusable, for the rare call site that wants them.
    */
   controls?: 'stacked' | 'flank' | 'none' | undefined;
-  /** Labels for the stepper buttons. Pass translated strings. */
+  /** Names for the stepper buttons. Default to the provider's `labels`. */
   incrementLabel?: string | undefined;
   decrementLabel?: string | undefined;
   /**
@@ -368,11 +370,12 @@ export function NumberInput({
   decimalScale,
   unit,
   controls = 'stacked',
-  incrementLabel = 'Increment',
-  decrementLabel = 'Decrement',
+  incrementLabel,
+  decrementLabel,
   scrubbable,
   ...attributes
 }: NumberInputProps) {
+  const labels = useUiLabels();
   const invalid = error !== undefined && error !== false;
   /*
    * Base UI's `NumberField` has no `Label` part, so the association is ours to
@@ -434,7 +437,7 @@ export function NumberInput({
         {flank && (
           <NumberField.Decrement
             className="mullion-field-step"
-            aria-label={decrementLabel}
+            aria-label={decrementLabel ?? labels.decrement}
             {...focusable}
           >
             <span aria-hidden>&minus;</span>
@@ -456,7 +459,7 @@ export function NumberInput({
         {flank && (
           <NumberField.Increment
             className="mullion-field-step"
-            aria-label={incrementLabel}
+            aria-label={incrementLabel ?? labels.increment}
             {...focusable}
           >
             <span aria-hidden>+</span>

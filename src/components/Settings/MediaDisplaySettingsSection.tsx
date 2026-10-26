@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 import { Accordion, Divider } from '@mantine/core';
-import { Group, Stack, Text, Slider, Switch, NumberInput, TextInput } from '@/ui';
+import { Group, Stack, Text, Slider, Switch, NumberInput, TextInput, ColorInput, Select } from '@/ui';
 import { useTranslation } from 'react-i18next';
-import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { usePersistentAccordion } from '@/hooks/usePersistentAccordion';
 import { DimensionInput } from '@/components/Settings/DimensionInput';
 
@@ -18,7 +17,6 @@ import {
   type ScrollTransitionType,
   type ShadowPreset,
 } from '@/types';
-import { ModalSelect } from '@/components/Common/ModalSelect';
 import { CSS_BORDER_RADIUS_UNITS, CSS_SPACING_UNITS } from '@mullion/shared-utils';
 import {
   collectGalleryAdapterSettingValues,
@@ -102,7 +100,7 @@ export function GalleryStyleAccordion({ settings, updateSetting, tooltipLabel }:
 
             <Divider label={t('set_md_viewport_dimensions', 'Viewport Dimensions')} labelPosition="center" />
 
-            <ModalSelect
+            <Select
               label={tooltipLabel(t('set_md_height_constraint_label', 'Height Constraint'), 'gallerySizingMode')}
               description={t('set_md_height_constraint_desc', 'Choose whether classic galleries can overflow, are kept within the visible screen, or use a manual CSS height.')}
               data={[
@@ -152,7 +150,7 @@ export function GalleryStyleAccordion({ settings, updateSetting, tooltipLabel }:
 
             <Divider label={t('set_md_shadow_divider', 'Shadow & Depth')} labelPosition="center" />
 
-            <ModalSelect
+            <Select
               label={t('set_md_image_shadow_label', 'Image Shadow Preset')}
               description={t('set_md_image_shadow_desc', 'Box-shadow depth effect for image gallery viewport.')}
               value={getAdapterSettingValue('imageShadowPreset')}
@@ -175,7 +173,7 @@ export function GalleryStyleAccordion({ settings, updateSetting, tooltipLabel }:
               />
             )}
 
-            <ModalSelect
+            <Select
               label={t('set_md_video_shadow_label', 'Video Shadow Preset')}
               description={t('set_md_video_shadow_desc', 'Box-shadow depth effect for video gallery viewport.')}
               value={getAdapterSettingValue('videoShadowPreset')}
@@ -297,7 +295,7 @@ export function GalleryStyleAccordion({ settings, updateSetting, tooltipLabel }:
               onChange={(checked) => updateAdapterSetting('transitionFadeEnabled', checked)}
             />
 
-            <ModalSelect
+            <Select
               label={t('set_md_transition_type_label', 'Transition Type')}
               description={t('set_md_transition_type_desc', 'How gallery media slides between items: fade only, slide only, or combined slide-fade.')}
               value={getAdapterSettingValue('scrollTransitionType')}
@@ -309,7 +307,7 @@ export function GalleryStyleAccordion({ settings, updateSetting, tooltipLabel }:
               ]}
             />
 
-            <ModalSelect
+            <Select
               label={t('set_md_scroll_style_label', 'Scroll Animation Style')}
               description={t('set_md_scroll_style_desc', 'Navigation scroll behavior for gallery thumbnail strips.')}
               value={getAdapterSettingValue('scrollAnimationStyle')}
@@ -330,7 +328,7 @@ export function GalleryStyleAccordion({ settings, updateSetting, tooltipLabel }:
               step={10}
             />
 
-            <ModalSelect
+            <Select
               label={t('set_md_anim_easing_label', 'Animation Easing')}
               description={t('set_md_anim_easing_desc', 'Timing function used for gallery transitions.')}
               value={getAdapterSettingValue('scrollAnimationEasing')}
@@ -455,7 +453,7 @@ export function GalleryNavigationAccordion({ settings, updateSetting, tooltipLab
 
             <Divider label={t('set_md_overlay_arrows_divider', 'Overlay Arrows')} labelPosition="center" />
 
-            <ModalSelect
+            <Select
               label={t('set_md_arrow_vpos_label', 'Arrow Vertical Position')}
               description={t('set_md_arrow_vpos_desc', 'Vertical alignment of the overlay prev/next arrows.')}
               value={getAdapterSettingValue('navArrowPosition')}
@@ -537,7 +535,7 @@ export function GalleryNavigationAccordion({ settings, updateSetting, tooltipLab
 
             {getAdapterSettingValue('dotNavEnabled') && (
               <>
-                <ModalSelect
+                <Select
                   label={t('set_md_dot_position_label', 'Dot Position')}
                   description={t('set_md_dot_position_desc', 'Where to render the dot navigator relative to the viewport.')}
                   value={getAdapterSettingValue('dotNavPosition')}
@@ -559,7 +557,7 @@ export function GalleryNavigationAccordion({ settings, updateSetting, tooltipLab
                   step={1}
                 />
 
-                <ModalSelect
+                <Select
                   label={t('set_md_dot_shape_label', 'Dot Shape')}
                   description={t('set_md_dot_shape_desc', 'Shape of the navigation dots.')}
                   value={getAdapterSettingValue('dotNavShape')}

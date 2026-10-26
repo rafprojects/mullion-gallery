@@ -1,11 +1,9 @@
 
 import { Accordion } from '@mantine/core';
-import { Stack, Text, Box, Slider, Switch, NumberInput, TextInput } from '@/ui';
+import { Stack, Text, Box, Slider, Switch, NumberInput, TextInput, ColorInput, Select } from '@/ui';
 import { useTranslation } from 'react-i18next';
 
 import { GradientEditor } from '@/components/Common/GradientEditor';
-import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
-import { ModalSelect } from '@/components/Common/ModalSelect';
 import { DimensionInput } from '@/components/Settings/DimensionInput';
 import { usePersistentAccordion } from '@/hooks/usePersistentAccordion';
 import type { GalleryBehaviorSettings, GalleryCommonSettings } from '@/types';
@@ -60,7 +58,7 @@ export function CampaignViewerSettingsSection({ settings, updateSetting }: Campa
                 checked={settings.campaignModalFullscreen ?? false}
                 onChange={(checked) => updateSetting('campaignModalFullscreen', checked)}
               />
-              <ModalSelect
+              <Select
                 label={t('set_viewer_openmode_label', 'Campaign Open Mode')}
                 description={t('set_viewer_openmode_desc', 'What to show when a campaign is opened.')}
                 data={[
@@ -144,7 +142,7 @@ export function CampaignViewerSettingsSection({ settings, updateSetting }: Campa
                 max={400}
                 step={10}
               />
-              <ModalSelect
+              <Select
                 label={t('set_viewer_transition_label', 'Modal Transition')}
                 description={t('set_viewer_transition_desc', 'Animation style when opening the campaign modal')}
                 data={[
@@ -286,7 +284,7 @@ export function CampaignViewerSettingsSection({ settings, updateSetting }: Campa
                 value={galleryVideoLabel ?? 'Videos'}
                 onChange={(event) => updateViewerCommonSetting('galleryVideoLabel', event.currentTarget.value)}
               />
-              <ModalSelect
+              <Select
                 label={t('set_viewer_justification_label', 'Label Justification')}
                 description={t('set_viewer_justification_desc', 'Horizontal alignment for gallery section labels')}
                 data={[
@@ -313,7 +311,7 @@ export function CampaignViewerSettingsSection({ settings, updateSetting }: Campa
         <Accordion.Panel>
           {mounted.has('cv-modal-bg') ? (
             <Stack gap="md">
-              <ModalSelect
+              <Select
                 label={t('set_viewer_modalbg_type_label', 'Modal Background Type')}
                 description={t('set_viewer_modalbg_type_desc', 'Background style for the fullscreen campaign modal')}
                 data={[

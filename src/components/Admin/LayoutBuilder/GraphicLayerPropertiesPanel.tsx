@@ -15,7 +15,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Accordion,
   Divider,
-  Select,
 } from '@mantine/core';
 import {
   Group,
@@ -30,6 +29,7 @@ import {
   NumberInput,
   TextInput,
   Tooltip,
+  Select,
 } from '@/ui';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -372,8 +372,6 @@ export function GraphicLayerPropertiesPanel({
                 data={shapeOptions}
                 value={shape}
                 onChange={(val) => set({ shape: (val as LayoutSlotShape) ?? 'rectangle' })}
-                allowDeselect={false}
-                comboboxProps={{ withinPortal: true }}
               />
               {shape === 'custom' && (
                 <TextInput
@@ -490,8 +488,6 @@ export function GraphicLayerPropertiesPanel({
                 data={blendOptions}
                 value={overlay.blendMode ?? 'normal'}
                 onChange={(val) => set({ blendMode: (val as SlotBlendMode) ?? 'normal' })}
-                allowDeselect={false}
-                comboboxProps={{ withinPortal: true }}
               />
               <Divider label={t('lb_gl_filters', 'Filters')} labelPosition="left" />
               <FilterEffectsControls

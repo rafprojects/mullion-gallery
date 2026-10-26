@@ -571,7 +571,7 @@ test.describe('the choice controls, pagination and the colour picker', () => {
       const field = page.getByRole('textbox', { name: 'inline background colour' });
       await field.focus();
       await press(page, 'Shift+Tab');
-      expect(await focusName(page)).toBe('Open the colour picker');
+      expect(await focusName(page)).toBe('Open the color picker');
       await press(page, 'Enter');
       await expect.poll(async () => (await focused(page))?.role).toBe('slider');
 
@@ -586,7 +586,7 @@ test.describe('the choice controls, pagination and the colour picker', () => {
       }
       expect(walk).toEqual(['Hue', 'Opacity', 'Use #102530']);
       await press(page, 'Escape');
-      await expect.poll(() => focusName(page)).toBe('Open the colour picker');
+      await expect.poll(() => focusName(page)).toBe('Open the color picker');
     });
   }
 });
@@ -725,7 +725,7 @@ test.describe('what a screen reader is given', () => {
         - button "Page 1"
         - button "Page 20"
         - button "Next page"
-      - button "Open the colour picker"
+      - button "Open the color picker"
       - textbox "inline background colour"
     `);
   });

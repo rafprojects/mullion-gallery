@@ -188,9 +188,7 @@ describe('IsotopeAdapter — sort', () => {
 
   it('sort select shows the default label on initial render', () => {
     render(<IsotopeAdapter media={THREE_IMAGES} settings={SETTINGS} />);
-    const select = screen.getByRole('combobox', { name: /sort order/i }) as HTMLInputElement;
-    // Mantine Select renders the selected label as the input value
-    expect(select.value).toBe('Default order');
+    expect(screen.getByRole('combobox', { name: /sort order/i })).toHaveTextContent('Default order');
   });
 });
 

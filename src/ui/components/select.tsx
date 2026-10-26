@@ -22,22 +22,31 @@
  * `Combobox`, because all three render an input. Base UI's own guidance is to
  * use `Select` when no input is rendered, and the two have genuinely different
  * ARIA, so picking one for all four cases would make three of them wrong.
+ *
+ * **`Autocomplete` is the fourth form** (P81-A): free text with suggestions,
+ * where the text is the value and choosing an option only fills it in. That is
+ * Base UI's `Autocomplete`, whose parts are the combobox's, so it shares the
+ * popup below.
  */
 
 import {
   useCallback,
   useId,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
 import { Select as BaseSelect } from '@base-ui/react/select';
 import { Combobox } from '@base-ui/react/combobox';
+import { Autocomplete as BaseAutocomplete } from '@base-ui/react/autocomplete';
 import { cx, focusableInset } from './element';
 import { FieldShell, type FieldShellProps, type FieldStyleProps } from './field';
 import { customProperties, spacingValue, type UiSpacing } from './scale';
 import { uiLayer } from '../styles/layers';
 import { useAnchorContainer } from './anchor';
+import { useUiLabels } from '../provider/hooks';
+import { formatUiLabel } from '../provider/labels';
 
 // ---------------------------------------------------------------------------
 // Data
@@ -62,6 +71,13 @@ export interface UiSelectGroup {
  * and the theme selector both build the grouped one.
  */
 export type UiSelectData = ReadonlyArray<string | UiSelectOption | UiSelectGroup>;
+
+/**
+ * Draws an option's content in place of its label. The check mark stays,
+ * because it is how selection is shown, and the closed field still reads the
+ * label.
+ */
+export type UiRenderOption = (item: { option: UiSelectOption }) => ReactNode;
 
 interface NormalisedGroup {
   /** Null for the ungrouped run, which renders with no heading. */
@@ -176,6 +192,15 @@ function ChevronIcon() {
   );
 }
 
+/** The clear and remove mark. */
+function CrossIcon() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden focusable="false">
+      <path d="M4.5 4.5 L11.5 11.5 M11.5 4.5 L4.5 11.5" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 /** The selected-option mark. A shape, so selection does not rest on colour alone. */
 function CheckIcon() {
   return (
@@ -224,6 +249,7 @@ export interface SelectProps extends FieldShellProps, FieldStyleProps {
    * hear. The one call site that sets it is controlled.
    */
   clearable?: boolean | undefined;
+  /** This and `openLabel` default to the provider's `labels`. */
   clearLabel?: string | undefined;
   /** Renders an input and filters the list. A different primitive, see the module note. */
   searchable?: boolean | undefined;
@@ -231,6 +257,7 @@ export interface SelectProps extends FieldShellProps, FieldStyleProps {
   /** Names the chevron beside a searchable field's input. */
   openLabel?: string | undefined;
   nothingFoundMessage?: ReactNode | undefined;
+  renderOption?: UiRenderOption | undefined;
   name?: string | undefined;
   readOnly?: boolean | undefined;
   'aria-label'?: string | undefined;
@@ -259,11 +286,12 @@ export function Select({
   onChange,
   placeholder,
   clearable,
-  clearLabel = 'Clear',
+  clearLabel,
   searchable,
   searchPlaceholder,
-  openLabel = 'Show options',
+  openLabel,
   nothingFoundMessage,
+  renderOption,
   name,
   readOnly,
   width,
@@ -282,9 +310,12 @@ export function Select({
   style,
   ...rest
 }: SelectProps) {
+  const labels = useUiLabels();
   const model = useMemo(() => prepare(data), [data]);
   const { container: target, anchorRef } = useAnchorContainer(container);
   const labelId = useId();
+  const triggerId = useId();
+  const rowRef = useRef<HTMLDivElement>(null);
   const listboxName = listboxNameFor(label, labelId, rest['aria-label']);
 
   const shell = {
@@ -313,9 +344,10 @@ export function Select({
         onChange={onChange}
         placeholder={searchPlaceholder ?? placeholder}
         clearable={clearable}
-        clearLabel={clearLabel}
-        openLabel={openLabel}
+        clearLabel={clearLabel ?? labels.clear}
+        openLabel={openLabel ?? labels.showOptions}
         nothingFoundMessage={nothingFoundMessage}
+        renderOption={renderOption}
         name={name}
         readOnly={readOnly}
         width={width}
@@ -339,8 +371,13 @@ export function Select({
       {...(required ? { required: true } : {})}
       modal={false}
     >
-      <FieldShell {...shell} variantClass="mullion-field-control-select">
+      {/*
+        * The label names the trigger by id. Base UI's field pointed it at an id
+        * nothing rendered, so a click on the label did nothing (P81-A).
+        */}
+      <FieldShell {...shell} labelFor={triggerId} controlRef={rowRef} variantClass="mullion-field-control-select">
         <BaseSelect.Trigger
+          id={triggerId}
           ref={anchorRef}
           className={cx('mullion-field-input', 'mullion-select-trigger')}
           {...focusableInset}
@@ -358,11 +395,14 @@ export function Select({
           </BaseSelect.Icon>
         </BaseSelect.Trigger>
         {clearable && value !== null && value !== undefined && (
-          <ClearButton label={clearLabel} onClear={() => onChange?.(null)} />
+          <ClearButton label={clearLabel ?? labels.clear} onClear={() => onChange?.(null)} />
         )}
       </FieldShell>
       <BaseSelect.Portal container={target}>
+        {/* Start-aligned on the field's row: a list wider than its field keeps the field's left edge (P81-A). */}
         <BaseSelect.Positioner
+          anchor={rowRef}
+          align="start"
           className="mullion-overlay-positioner"
           sideOffset={4}
           alignItemWithTrigger={false}
@@ -373,13 +413,13 @@ export function Select({
             <BaseSelect.List className="mullion-select-list" {...listboxName}>
               {model.groups.map((group, index) =>
                 group.group === null ? (
-                  <SelectOptions key={`run-${index}`} items={group.items} />
+                  <SelectOptions key={`run-${index}`} items={group.items} renderOption={renderOption} />
                 ) : (
                   <BaseSelect.Group key={group.group} className="mullion-select-group">
                     <BaseSelect.GroupLabel className="mullion-select-group-label">
                       {group.group}
                     </BaseSelect.GroupLabel>
-                    <SelectOptions items={group.items} />
+                    <SelectOptions items={group.items} renderOption={renderOption} />
                   </BaseSelect.Group>
                 ),
               )}
@@ -391,7 +431,7 @@ export function Select({
   );
 }
 
-function SelectOptions({ items }: { items: UiSelectOption[] }) {
+function SelectOptions({ items, renderOption }: { items: UiSelectOption[]; renderOption: UiRenderOption | undefined }) {
   return (
     <>
       {items.map((option) => (
@@ -405,7 +445,9 @@ function SelectOptions({ items }: { items: UiSelectOption[] }) {
           <BaseSelect.ItemIndicator className="mullion-select-item-indicator">
             <CheckIcon />
           </BaseSelect.ItemIndicator>
-          <BaseSelect.ItemText className="mullion-select-item-text">{option.label}</BaseSelect.ItemText>
+          <BaseSelect.ItemText className="mullion-select-item-text">
+            {renderOption ? renderOption({ option }) : option.label}
+          </BaseSelect.ItemText>
         </BaseSelect.Item>
       ))}
     </>
@@ -416,9 +458,7 @@ function SelectOptions({ items }: { items: UiSelectOption[] }) {
 function ClearButton({ label, onClear }: { label: string; onClear: () => void }) {
   return (
     <button type="button" className="mullion-select-clear" aria-label={label} onClick={onClear} {...focusableInset}>
-      <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-        <path d="M4.5 4.5 L11.5 11.5 M11.5 4.5 L4.5 11.5" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-      </svg>
+      <CrossIcon />
     </button>
   );
 }
@@ -431,6 +471,7 @@ interface ComboboxShellProps extends FieldShellProps, FieldStyleProps {
   model: NormalisedData;
   placeholder?: string | undefined;
   nothingFoundMessage?: ReactNode | undefined;
+  renderOption?: UiRenderOption | undefined;
   name?: string | undefined;
   readOnly?: boolean | undefined;
   width?: UiSpacing | number | undefined;
@@ -467,6 +508,7 @@ function SearchableSelect({
   clearLabel,
   openLabel,
   nothingFoundMessage,
+  renderOption,
   name,
   readOnly,
   width,
@@ -489,6 +531,7 @@ function SearchableSelect({
   ...rest
 }: SearchableSelectProps) {
   const chevronId = useId();
+  const rowRef = useRef<HTMLDivElement>(null);
   /*
    * No `itemToStringLabel` here or in `ChipCombobox`. Base UI already
    * stringifies a `{ value, label }` item by its label, and the argument it
@@ -510,6 +553,7 @@ function SearchableSelect({
     >
       <FieldShell
         labelId={labelId}
+        controlRef={rowRef}
         label={label}
         description={description}
         error={error}
@@ -532,9 +576,7 @@ function SearchableSelect({
         />
         {clearable && (
           <Combobox.Clear className="mullion-select-clear" aria-label={clearLabel} {...focusableInset}>
-            <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-              <path d="M4.5 4.5 L11.5 11.5 M11.5 4.5 L4.5 11.5" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-            </svg>
+            <CrossIcon />
           </Combobox.Clear>
         )}
         {/*
@@ -556,12 +598,14 @@ function SearchableSelect({
         </Combobox.Trigger>
       </FieldShell>
       <ComboboxPopup
+        anchor={rowRef}
         model={model}
         name={listboxName}
         target={target}
         width={width}
         maxHeight={maxHeight}
         nothingFoundMessage={nothingFoundMessage}
+        renderOption={renderOption}
       />
     </Combobox.Root>
   );
@@ -574,18 +618,36 @@ interface ComboboxPopupProps {
   width?: UiSpacing | number | undefined;
   maxHeight?: number | undefined;
   nothingFoundMessage?: ReactNode | undefined;
+  renderOption?: UiRenderOption | undefined;
+  /** Autocomplete only: told which option was chosen. The other forms read their value. */
+  onPick?: ((value: string) => void) | undefined;
+  /** The field's bordered row, so the list lines up with the field and not the control inside it. */
+  anchor: React.RefObject<HTMLDivElement | null>;
 }
 
 /**
- * The listbox for all three combobox forms. Base UI filters `items` itself;
+ * The listbox for all four combobox forms. Base UI filters `items` itself;
  * the groups are rendered from the unfiltered data and each option is skipped
  * when the filter drops it, which is what `Combobox.Collection` does for the
  * flat case and what a group needs done by hand.
  */
-function ComboboxPopup({ model, name, target, width, maxHeight, nothingFoundMessage }: ComboboxPopupProps) {
+function ComboboxPopup({
+  model,
+  name,
+  target,
+  width,
+  maxHeight,
+  nothingFoundMessage,
+  renderOption,
+  onPick,
+  anchor,
+}: ComboboxPopupProps) {
+  const optionProps = { renderOption, onPick };
   return (
     <Combobox.Portal container={target}>
       <Combobox.Positioner
+        anchor={anchor}
+        align="start"
         className="mullion-overlay-positioner"
         sideOffset={4}
         style={popupStyle({ width, maxHeight })}
@@ -597,9 +659,9 @@ function ComboboxPopup({ model, name, target, width, maxHeight, nothingFoundMess
           <Combobox.List className="mullion-select-list" {...name}>
             {model.grouped
               ? (group: { value: string; items: UiSelectOption[] }) => (
-                  <ComboboxGroup key={group.value} group={group} />
+                  <ComboboxGroup key={group.value} group={group} {...optionProps} />
                 )
-              : (option: UiSelectOption) => <ComboboxOption key={option.value} option={option} />}
+              : (item: UiSelectOption) => <ComboboxOption key={item.value} option={item} {...optionProps} />}
           </Combobox.List>
         </Combobox.Popup>
       </Combobox.Positioner>
@@ -614,10 +676,13 @@ function ComboboxPopup({ model, name, target, width, maxHeight, nothingFoundMess
  * group with no name renders its items with no heading, which is how a loose
  * run travels in a list that is otherwise grouped.
  */
-function ComboboxGroup({ group }: { group: { value: string; items: UiSelectOption[] } }) {
+function ComboboxGroup({
+  group,
+  ...optionProps
+}: { group: { value: string; items: UiSelectOption[] } } & Omit<ComboboxOptionProps, 'option'>) {
   const options = (
     <Combobox.Collection>
-      {(option: UiSelectOption) => <ComboboxOption key={option.value} option={option} />}
+      {(item: UiSelectOption) => <ComboboxOption key={item.value} option={item} {...optionProps} />}
     </Combobox.Collection>
   );
   if (group.value === '') {
@@ -635,18 +700,51 @@ function ComboboxGroup({ group }: { group: { value: string; items: UiSelectOptio
   );
 }
 
-function ComboboxOption({ option }: { option: UiSelectOption }) {
+interface ComboboxOptionProps {
+  option: UiSelectOption;
+  renderOption?: UiRenderOption | undefined;
+  onPick?: ((value: string) => void) | undefined;
+}
+
+function ComboboxOption({ option, renderOption, onPick }: ComboboxOptionProps) {
+  const pressedHere = useRef(false);
+  /*
+   * Deferred, so the caller hears the text change Base UI commits first and
+   * the choice second. The two presses mirror Base UI's own: a click, which
+   * Enter also sends, and a press begun elsewhere and released here.
+   */
+  const pick = () => {
+    if (onPick && !option.disabled) queueMicrotask(() => onPick(option.value));
+  };
+  const picking = onPick
+    ? {
+        onPointerDown: () => {
+          pressedHere.current = true;
+        },
+        onClick: pick,
+        onMouseUp: (event: React.MouseEvent<HTMLDivElement>) => {
+          const began = pressedHere.current;
+          pressedHere.current = false;
+          if (!began && event.button === 0 && event.currentTarget.hasAttribute('data-highlighted')) pick();
+        },
+      }
+    : {};
   return (
     <Combobox.Item
-      value={option.value}
+      // An autocomplete commits the option itself: its text is what lands in the field.
+      value={onPick ? option : option.value}
       className="mullion-select-item"
       {...(option.disabled ? { disabled: true } : {})}
+      {...(onPick ? { 'data-uncheckable': '' } : {})}
+      {...picking}
       {...focusableInset}
     >
-      <Combobox.ItemIndicator className="mullion-select-item-indicator">
-        <CheckIcon />
-      </Combobox.ItemIndicator>
-      <span className="mullion-select-item-text">{option.label}</span>
+      {!onPick && (
+        <Combobox.ItemIndicator className="mullion-select-item-indicator">
+          <CheckIcon />
+        </Combobox.ItemIndicator>
+      )}
+      <div className="mullion-select-item-text">{renderOption ? renderOption({ option }) : option.label}</div>
     </Combobox.Item>
   );
 }
@@ -670,6 +768,10 @@ export interface MultiSelectProps extends FieldShellProps, FieldStyleProps {
   container?: HTMLElement | null | undefined;
   /** Names the remove control on each chip. `{label}` is replaced by the value. */
   removeLabel?: string | undefined;
+  /** Adds a button that removes every chip. */
+  clearable?: boolean | undefined;
+  /** This and `removeLabel` default to the provider's `labels`. */
+  clearLabel?: string | undefined;
 }
 
 /**
@@ -686,6 +788,8 @@ export function MultiSelect(props: MultiSelectProps) {
 export interface TagsInputProps extends Omit<MultiSelectProps, 'data'> {
   /** Suggestions. A tags input accepts anything typed, with or without them. */
   data?: UiSelectData | undefined;
+  /** Typing or pasting one of these adds what came before it as a tag. */
+  splitChars?: readonly string[] | undefined;
 }
 
 /**
@@ -702,6 +806,7 @@ export function TagsInput({ data = [], ...rest }: TagsInputProps) {
 interface ChipComboboxProps extends Omit<MultiSelectProps, 'data'> {
   model: NormalisedData;
   creatable?: boolean | undefined;
+  splitChars?: readonly string[] | undefined;
 }
 
 function ChipCombobox({
@@ -717,7 +822,10 @@ function ChipCombobox({
   maxHeight,
   container,
   creatable,
-  removeLabel = 'Remove {label}',
+  splitChars,
+  removeLabel,
+  clearable,
+  clearLabel,
   label,
   description,
   error,
@@ -731,9 +839,11 @@ function ChipCombobox({
   style,
   ...rest
 }: ChipComboboxProps) {
+  const labels = useUiLabels();
   const { container: target, anchorRef } = useAnchorContainer(container);
   const inputId = useId();
   const labelId = useId();
+  const rowRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState('');
   /*
    * The component holds the value when the caller does not, so the chips and
@@ -775,12 +885,36 @@ function ChipCombobox({
     [creatable, query, current, commit],
   );
 
+  /**
+   * A split character turns everything before it into tags and keeps what
+   * follows as the query, so a pasted `a, b, c` arrives as three tags and
+   * typing `a,` adds one.
+   */
+  const onQueryChange = useCallback(
+    (next: string) => {
+      if (!creatable || !splitChars?.length || !splitChars.some((c) => next.includes(c))) {
+        setQuery(next);
+        return;
+      }
+      const parts = splitChars.reduce<string[]>((acc, c) => acc.flatMap((part) => part.split(c)), [next]);
+      const remainder = parts.pop() ?? '';
+      const added: string[] = [];
+      for (const part of parts) {
+        const tag = part.trim();
+        if (tag !== '' && !current.includes(tag) && !added.includes(tag)) added.push(tag);
+      }
+      if (added.length > 0) commit([...current, ...added]);
+      setQuery(remainder);
+    },
+    [creatable, splitChars, current, commit],
+  );
+
   return (
     <Combobox.Root<string, true, UiSelectOption>
       multiple
       items={model.collection}
       inputValue={query}
-      onInputValueChange={(next: string) => setQuery(next)}
+      onInputValueChange={onQueryChange}
       value={current}
       onValueChange={(next: string[]) => commit([...next])}
       {...(name !== undefined ? { name } : {})}
@@ -791,6 +925,7 @@ function ChipCombobox({
     >
       <FieldShell
         labelId={labelId}
+        controlRef={rowRef}
         // A label inside Field.Label's own <label> was invalid nesting (found in P80-F).
         labelFor={inputId}
         label={label}
@@ -812,11 +947,9 @@ function ChipCombobox({
               <span className="mullion-select-chip-label">{labelOf(entry)}</span>
               <Combobox.ChipRemove
                 className="mullion-select-chip-remove"
-                aria-label={removeLabel.replace('{label}', labelOf(entry))}
+                aria-label={formatUiLabel(removeLabel ?? labels.remove, { label: labelOf(entry) })}
               >
-                <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-                  <path d="M4.5 4.5 L11.5 11.5 M11.5 4.5 L4.5 11.5" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-                </svg>
+                <CrossIcon />
               </Combobox.ChipRemove>
             </Combobox.Chip>
           ))}
@@ -830,8 +963,18 @@ function ChipCombobox({
             {...rest}
           />
         </Combobox.Chips>
+        {clearable && (
+          <Combobox.Clear
+            className="mullion-select-clear"
+            aria-label={clearLabel ?? labels.clear}
+            {...focusableInset}
+          >
+            <CrossIcon />
+          </Combobox.Clear>
+        )}
       </FieldShell>
       <ComboboxPopup
+        anchor={rowRef}
         model={model}
         name={listboxNameFor(label, labelId, rest['aria-label'])}
         target={target}
@@ -840,5 +983,141 @@ function ChipCombobox({
         nothingFoundMessage={nothingFoundMessage}
       />
     </Combobox.Root>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Autocomplete
+// ---------------------------------------------------------------------------
+
+export interface AutocompleteProps extends FieldShellProps, FieldStyleProps {
+  /** Suggestions. */
+  data: UiSelectData;
+  /** The text in the field. */
+  value?: string | undefined;
+  defaultValue?: string | undefined;
+  /** Handed the text as it is typed, and an option's label when one is chosen. */
+  onChange?: ((value: string) => void) | undefined;
+  /** Handed the chosen option's value, after `onChange` has had its label. */
+  onOptionSubmit?: ((value: string) => void) | undefined;
+  /**
+   * Matches an option against the text. The default keeps options whose label
+   * contains it; `null` shows `data` as given, for a caller that filters or
+   * fetches its own.
+   */
+  filter?: ((option: UiSelectOption, query: string) => boolean) | null | undefined;
+  renderOption?: UiRenderOption | undefined;
+  nothingFoundMessage?: ReactNode | undefined;
+  placeholder?: string | undefined;
+  name?: string | undefined;
+  readOnly?: boolean | undefined;
+  'aria-label'?: string | undefined;
+  /** Focus leaving the field, for a caller that settles free text then. */
+  onBlur?: ((event: React.FocusEvent<HTMLInputElement>) => void) | undefined;
+  width?: UiSpacing | number | undefined;
+  maxHeight?: number | undefined;
+  container?: HTMLElement | null | undefined;
+}
+
+/**
+ * Base UI's root, typed by its props interface. Its two overloads split a flat
+ * list from a grouped one, and `data` may be either.
+ */
+const AutocompleteRoot = BaseAutocomplete.Root as (
+  props: BaseAutocomplete.Root.Props<UiSelectOption>,
+) => React.JSX.Element;
+
+/**
+ * Free text with suggestions. Choosing an option fills the field with its
+ * label and reports its value, so a caller that needs an identity (a user id,
+ * a company slug) gets one without the text standing in for it. The popup
+ * stays in the input's own root, as every form here does.
+ */
+export function Autocomplete({
+  data,
+  value,
+  defaultValue,
+  onChange,
+  onOptionSubmit,
+  filter,
+  renderOption,
+  nothingFoundMessage,
+  placeholder,
+  name,
+  readOnly,
+  width,
+  maxHeight,
+  container,
+  label,
+  description,
+  error,
+  required,
+  disabled,
+  size,
+  radius,
+  leftSection,
+  rightSection,
+  className,
+  style,
+  ...rest
+}: AutocompleteProps) {
+  const model = useMemo(() => prepare(data), [data]);
+  const { container: target, anchorRef } = useAnchorContainer(container);
+  const labelId = useId();
+  const rowRef = useRef<HTMLDivElement>(null);
+  const groups = useMemo(() => model.groups.map((g) => ({ value: g.group ?? '', items: g.items })), [model]);
+  const pick = useCallback((picked: string) => onOptionSubmit?.(picked), [onOptionSubmit]);
+
+  return (
+    <AutocompleteRoot
+      items={model.grouped ? groups : model.flat}
+      itemToStringValue={(option: UiSelectOption) => option.label}
+      {...(value !== undefined ? { value } : {})}
+      {...(defaultValue !== undefined ? { defaultValue } : {})}
+      {...(onChange ? { onValueChange: (next: string) => onChange(next) } : {})}
+      {...(filter !== undefined ? { filter } : {})}
+      {...(name !== undefined ? { name } : {})}
+      {...(readOnly ? { readOnly: true } : {})}
+      {...(disabled ? { disabled: true } : {})}
+      {...(required ? { required: true } : {})}
+      openOnInputClick
+      modal={false}
+    >
+      <FieldShell
+        labelId={labelId}
+        controlRef={rowRef}
+        label={label}
+        description={description}
+        error={error}
+        required={required}
+        disabled={disabled}
+        size={size}
+        radius={radius}
+        leftSection={leftSection}
+        rightSection={rightSection}
+        className={className}
+        style={style}
+        variantClass="mullion-field-control-select"
+      >
+        <BaseAutocomplete.Input
+          ref={anchorRef}
+          className={cx('mullion-field-input', 'mullion-select-input')}
+          {...(placeholder !== undefined ? { placeholder } : {})}
+          {...focusableInset}
+          {...rest}
+        />
+      </FieldShell>
+      <ComboboxPopup
+        anchor={rowRef}
+        model={model}
+        name={listboxNameFor(label, labelId, rest['aria-label'])}
+        target={target}
+        width={width}
+        maxHeight={maxHeight}
+        nothingFoundMessage={nothingFoundMessage}
+        renderOption={renderOption}
+        onPick={pick}
+      />
+    </AutocompleteRoot>
   );
 }

@@ -3,7 +3,6 @@ import {
   Tabs,
   Loader,
   Table,
-  Select,
   Divider,
 } from '@mantine/core';
 import {
@@ -17,7 +16,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { SpaceAssetLibrary } from './SpaceAssetLibrary';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import type { FontLibraryEntry } from '@mullion/shared-utils';
-import { uiRem, Stack, Group, Text, Alert, Center, Badge, Button, ActionIcon, Switch, Checkbox, TextInput, confirm, VisuallyHidden, Tooltip } from '@/ui';
+import { uiRem, Stack, Group, Text, Alert, Center, Badge, Button, ActionIcon, Switch, Checkbox, TextInput, confirm, VisuallyHidden, Tooltip, Select } from '@/ui';
 
 interface SpaceGrant {
   userId: number;
@@ -519,7 +518,6 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                 onChange={(v) => setGrantRole(v ?? 'viewer')}
                 size="sm"
                 style={{ width: uiRem(7.5) }}
-                allowDeselect={false}
               />
               <Button
                 leftSection={<IconUserPlus size={14} />}

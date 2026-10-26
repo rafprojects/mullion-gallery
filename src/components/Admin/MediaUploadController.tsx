@@ -16,8 +16,7 @@
  * handles direct file uploads and direct image-URL registration.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { TagsInput } from '@mantine/core';
-import { Stack, Checkbox, notify } from '@/ui';
+import { Stack, Checkbox, notify, TagsInput } from '@/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { MediaAddModal } from './MediaAddModal';

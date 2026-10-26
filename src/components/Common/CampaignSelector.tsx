@@ -1,5 +1,5 @@
-import { Select } from '@mantine/core';
-import { Text } from '@/ui';
+
+import { Text, Select } from '@/ui';
 import type { CSSProperties } from 'react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 

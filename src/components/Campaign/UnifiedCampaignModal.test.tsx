@@ -1,5 +1,5 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor, within } from '../../test/test-utils';
+import { render, screen, fireEvent, waitFor, within, pickOption, shownOption } from '../../test/test-utils';
 import { UnifiedCampaignModal } from './UnifiedCampaignModal';
 import type { UnifiedCampaignModalHandle } from '@/hooks/useUnifiedCampaignModal';
 import { getAdapterSelectOptions } from '@/components/Galleries/Adapters/adapterRegistry';
@@ -183,7 +183,7 @@ describe('UnifiedCampaignModal', () => {
     render(<UnifiedCampaignModal modal={modal} />);
     expect(screen.getByDisplayValue('Test Campaign')).toBeInTheDocument();
     expect(screen.getByDisplayValue('A test campaign')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Acme Corp')).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Company' })).toHaveValue('Acme Corp');
   });
 
   it('fires updateForm when title changes', () => {
@@ -290,12 +290,12 @@ describe('UnifiedCampaignModal', () => {
     });
     render(<UnifiedCampaignModal modal={modal} />);
 
-    expect(screen.getByDisplayValue('Unified')).toBeInTheDocument();
-    expect(screen.getByLabelText('Desktop Unified Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Tablet Unified Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Mobile Unified Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.queryByLabelText('Desktop Image Gallery Adapter', { selector: 'input' })).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('Desktop Video Gallery Adapter', { selector: 'input' })).not.toBeInTheDocument();
+    expect(shownOption('Gallery Mode Override')).toBe('Unified');
+    expect(screen.getByRole('combobox', { name: 'Desktop Unified Gallery Adapter' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Tablet Unified Gallery Adapter' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Mobile Unified Gallery Adapter' })).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Desktop Image Gallery Adapter' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Desktop Video Gallery Adapter' })).not.toBeInTheDocument();
   });
 
   // ── B-6: contextual layout-template picker ──────────────────────────────────
@@ -367,14 +367,14 @@ describe('UnifiedCampaignModal', () => {
 
     render(<UnifiedCampaignModal modal={modal} galleryBehaviorSettings={galleryBehaviorSettings} />);
 
-    expect(screen.getByLabelText('Desktop Unified Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Tablet Unified Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Mobile Unified Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.queryByLabelText('Desktop Image Gallery Adapter', { selector: 'input' })).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('Desktop Video Gallery Adapter', { selector: 'input' })).not.toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Desktop Unified Gallery Adapter' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Tablet Unified Gallery Adapter' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Mobile Unified Gallery Adapter' })).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Desktop Image Gallery Adapter' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Desktop Video Gallery Adapter' })).not.toBeInTheDocument();
   });
 
-  it('updates a breakpoint-specific unified gallery override from the settings tab', () => {
+  it('updates a breakpoint-specific unified gallery override from the settings tab', async () => {
     const updateForm = vi.fn();
     const modal = makeMockModal({
       activeTab: 'settings',
@@ -399,8 +399,7 @@ describe('UnifiedCampaignModal', () => {
 
     render(<UnifiedCampaignModal modal={modal} />);
 
-    fireEvent.click(screen.getByLabelText('Tablet Unified Gallery Adapter', { selector: 'input' }));
-    fireEvent.click(screen.getByRole('option', { name: unifiedAdapterLabel ?? 'Classic' }));
+    await pickOption('Tablet Unified Gallery Adapter', unifiedAdapterLabel ?? 'Classic');
 
     expect(updateForm).toHaveBeenCalledWith(expect.objectContaining({
       galleryOverrides: expect.objectContaining({
@@ -451,14 +450,14 @@ describe('UnifiedCampaignModal', () => {
 
     render(<UnifiedCampaignModal modal={modal} />);
 
-    expect(screen.getByLabelText('Desktop Image Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Desktop Video Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Mobile Image Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Mobile Video Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.queryByLabelText('Desktop Unified Gallery Adapter', { selector: 'input' })).not.toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Desktop Image Gallery Adapter' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Desktop Video Gallery Adapter' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Mobile Image Gallery Adapter' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Mobile Video Gallery Adapter' })).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Desktop Unified Gallery Adapter' })).not.toBeInTheDocument();
   });
 
-  it('updates a breakpoint-specific per-type gallery override from the settings tab', () => {
+  it('updates a breakpoint-specific per-type gallery override from the settings tab', async () => {
     const updateForm = vi.fn();
     const perTypeAdapterLabel = getAdapterSelectOptions({ context: 'campaign-override', breakpoint: 'mobile' })
       .find((option) => option.value === 'masonry')?.label;
@@ -485,8 +484,7 @@ describe('UnifiedCampaignModal', () => {
 
     render(<UnifiedCampaignModal modal={modal} />);
 
-    fireEvent.click(screen.getByLabelText('Mobile Image Gallery Adapter', { selector: 'input' }));
-    fireEvent.click(screen.getByRole('option', { name: perTypeAdapterLabel ?? 'Masonry' }));
+    await pickOption('Mobile Image Gallery Adapter', perTypeAdapterLabel ?? 'Masonry');
 
     expect(updateForm).toHaveBeenCalledWith(expect.objectContaining({
       galleryOverrides: expect.objectContaining({

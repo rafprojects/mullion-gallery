@@ -82,13 +82,13 @@
     background: none;
   }
 
-  .mullion-color-swatches {
+  .mullion-color-picker-swatches {
     display: flex;
     flex-wrap: wrap;
     gap: calc(var(--mullion-spacing-xs) / 2);
   }
 
-  .mullion-color-swatch,
+  .mullion-color-picker-swatch,
   .mullion-color-preview {
     inline-size: 1.25rem;
     block-size: 1.25rem;
@@ -110,7 +110,7 @@
    * it, so a semi-transparent value reads as semi-transparent. Two layers on
    * one element: the colour as a gradient of itself, the board underneath.
    */
-  .mullion-color-swatch,
+  .mullion-color-picker-swatch,
   .mullion-color-preview {
     background-image:
       linear-gradient(var(--mullion-swatch, transparent), var(--mullion-swatch, transparent)),
@@ -134,6 +134,30 @@
   .mullion-color-dropper svg {
     inline-size: 1em;
     block-size: 1em;
+  }
+
+  /*
+   * Bands reaching out to 24px, rule 21, so the 20px swatches and dropper
+   * keep their size. Neither the field section nor the swatch row's gap is
+   * narrower than a band. A bordered swatch's band starts inside its border.
+   */
+  .mullion-color-picker-swatch,
+  .mullion-color-preview,
+  .mullion-color-dropper {
+    position: relative;
+  }
+
+  .mullion-color-picker-swatch::before,
+  .mullion-color-preview::before,
+  .mullion-color-dropper::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+  }
+
+  .mullion-color-picker-swatch::before,
+  .mullion-color-preview::before {
+    inset: -3px;
   }
 
   .mullion-color-text {

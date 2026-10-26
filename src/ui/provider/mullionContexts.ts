@@ -1,5 +1,5 @@
 /**
- * The three contexts `MullionProvider` publishes (P79-A). Kept apart from the
+ * The contexts `MullionProvider` publishes (P79-A). Kept apart from the
  * component for Fast Refresh, and apart from each other because they change
  * at different rates: the manager on a theme switch, the scope on a mode flip,
  * the portal container never after mount.
@@ -8,6 +8,7 @@
 import { createContext } from 'react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import type { MullionThemeEntry } from './registry';
+import { UI_LABELS_EN, type UiLabels } from './labels';
 
 /**
  * The switching API, owned by the root provider and passed through unchanged
@@ -52,3 +53,7 @@ setMullionDebugDisplayName(MullionScopeContext, 'MullionScopeContext');
 /** The element overlays portal into: it carries the nearest provider's tokens. */
 export const MullionPortalContext = createContext<HTMLElement | null>(null);
 setMullionDebugDisplayName(MullionPortalContext, 'MullionPortalContext');
+
+/** The framework's own control names (P81-A). English until a provider passes `labels`. */
+export const MullionLabelsContext = createContext<UiLabels>(UI_LABELS_EN);
+setMullionDebugDisplayName(MullionLabelsContext, 'MullionLabelsContext');

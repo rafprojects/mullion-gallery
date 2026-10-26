@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   Modal,
-  Select,
   Divider,
   Loader,
 } from '@mantine/core';
@@ -17,6 +16,7 @@ import {
   TextInput,
   Textarea,
   Tooltip,
+  Select,
 } from '@/ui';
 import { IconTrash, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';

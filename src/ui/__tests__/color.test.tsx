@@ -162,7 +162,7 @@ describe('ColorInput', () => {
     mount(
       <ColorInput label="Colour" value="#123456" format="rgba" swatches={['#ff0000']} onChange={onChange} />,
     );
-    await user.click(screen.getByRole('button', { name: /open the colour picker/i }));
+    await user.click(screen.getByRole('button', { name: /open the color picker/i }));
     await screen.findByRole('dialog');
     await user.click(screen.getByRole('button', { name: 'Use #ff0000' }));
     expect(onChange).toHaveBeenCalledWith('rgba(255, 0, 0, 1)');
@@ -172,7 +172,7 @@ describe('ColorInput', () => {
     // jsdom has no `EyeDropper`, so the control must be absent rather than
     // present and throwing when pressed.
     mount(<ColorInput label="Colour" value="#123456" withEyeDropper />);
-    expect(screen.queryByRole('button', { name: /pick a colour from the screen/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: /pick a color from the screen/i })).toBeNull();
   });
 });
 

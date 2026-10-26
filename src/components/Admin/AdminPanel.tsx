@@ -2,8 +2,8 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { ApiClient, CampaignTemplate } from '@/services/apiClient';
-import { Tabs, Loader, Select, Collapse } from '@mantine/core';
-import { Group, Title, Center, Box, Badge, Card, Button, ActionIcon, Chip, Switch, Menu, Text, Tooltip } from '@/ui';
+import { Tabs, Loader, Collapse } from '@mantine/core';
+import { Group, Title, Center, Box, Badge, Card, Button, ActionIcon, Chip, Switch, Menu, Text, Tooltip, Select } from '@/ui';
 import { useReloadSafeView } from '@/hooks/useReloadSafeView';
 import { IconPlus, IconArrowLeft, IconFileImport, IconKeyboard, IconSettings, IconDotsVertical, IconAdjustments, IconStack2 } from '@tabler/icons-react';
 import { useBreakpoint } from '@/hooks/useBreakpoint';

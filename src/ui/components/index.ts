@@ -238,12 +238,15 @@ export {
   type UiSegmentData,
 } from './tabs';
 export {
+  Autocomplete,
   MultiSelect,
   Select,
   TagsInput,
+  type AutocompleteProps,
   type MultiSelectProps,
   type SelectProps,
   type TagsInputProps,
+  type UiRenderOption,
   type UiSelectData,
   type UiSelectGroup,
   type UiSelectOption,

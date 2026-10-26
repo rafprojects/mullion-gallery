@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, useRef, memo } from 'react';
-import { Select, Table, Pagination, Skeleton, type Primitive } from '@mantine/core';
+import { Table, Pagination, Skeleton, type Primitive } from '@mantine/core';
 
 // Mantine's SegmentedControl calls setState inside its ref callbacks, which triggers
 // React's "maximum update depth" error when the component re-renders rapidly.
@@ -51,7 +51,7 @@ import { useMediaExternal } from '@/hooks/useMediaExternal';
 import { useMediaCrud } from '@/hooks/useMediaCrud';
 import { useMediaDisplay } from '@/hooks/useMediaDisplay';
 import styles from './MediaTab.module.scss';
-import { uiRem, Group, Text, Grid, Box, Button, Switch, SegmentedControl, Tooltip } from '@/ui';
+import { uiRem, Group, Text, Grid, Box, Button, Switch, SegmentedControl, Tooltip, Select } from '@/ui';
 
 // Position the DragOverlay so its top-center sits just below the cursor.
 // The overlay is 140 px wide; placing the cursor at (width/2, 12) gives a natural
@@ -341,7 +341,7 @@ export default function MediaTab({ campaignId, apiClient, onCampaignsUpdated }: 
             data={sortModeData}
             style={{ minWidth: 138 }}
             aria-label={t('admin_media_sort_mode', 'Media sort mode')}
-            comboboxProps={{ width: 160 }}
+            width={160}
           />
           <Tooltip label={t('admin_media_exclusive_tooltip', 'Show only items exclusive to this campaign')}>
             <Switch

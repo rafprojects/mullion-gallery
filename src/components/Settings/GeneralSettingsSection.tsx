@@ -1,11 +1,9 @@
 
 import { Accordion } from '@mantine/core';
-import { Stack, Switch, NumberInput, TextInput } from '@/ui';
+import { Stack, Switch, NumberInput, TextInput, ColorInput, Select } from '@/ui';
 import { useTranslation } from 'react-i18next';
 
 import { GradientEditor } from '@/components/Common/GradientEditor';
-import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
-import { ModalSelect } from '@/components/Common/ModalSelect';
 import { DimensionInput } from '@/components/Settings/DimensionInput';
 import { useLazyAccordion } from '@mullion/shared-utils';
 import { type GalleryBehaviorSettings } from '@/types';
@@ -56,7 +54,7 @@ export function GeneralSettingsSection({ settings, updateSetting, onThemeChange,
                 onChange={(checked) => updateSetting('applyThemeEverywhere', checked)}
               />
 
-              <ModalSelect
+              <Select
                 label={t('set_default_layout', 'Default Layout')}
                 description={t('set_default_layout_desc', 'Default layout for displaying gallery items.')}
                 value={settings.galleryLayout}
@@ -193,7 +191,7 @@ export function GeneralSettingsSection({ settings, updateSetting, onThemeChange,
         <Accordion.Panel>
           {mounted.has('gen-background') ? (
             <Stack gap="md">
-              <ModalSelect
+              <Select
                 label={t('set_bg_type', 'Page Background Type')}
                 description={t('set_bg_type_desc', 'Gallery container background style')}
                 data={[

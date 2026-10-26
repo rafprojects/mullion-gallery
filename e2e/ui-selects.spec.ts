@@ -230,6 +230,69 @@ test.describe('the painted result', () => {
    * Only a plain Select focuses its options; a searchable field keeps focus in
    * its input, so its rail is the only keyboard mark it has and must stay.
    */
+  /*
+   * [P81-A] One ring, on the field. The trigger and the search input carried
+   * the inset marker, and focus.css loads after the field sheet, so each drew
+   * a second ring inside the field's own.
+   */
+  for (const id of ['select-trigger', 'select-search'] as const) {
+    test(`a focused ${id === 'select-trigger' ? 'select' : 'search field'} draws one ring, on its field`, async ({
+      page,
+    }) => {
+      await open(page);
+      await page.keyboard.press('Shift');
+      await inline(page, id).focus();
+      const rings = await inline(page, id).evaluate((el) => {
+        const row = el.closest('.mullion-field-control')!;
+        return {
+          own: getComputedStyle(el).boxShadow,
+          ownOutline: getComputedStyle(el).outlineStyle,
+          row: getComputedStyle(row).outlineStyle,
+        };
+      });
+      expect(rings.own, 'the control drew a ring of its own inside the field').toBe('none');
+      expect(rings.ownOutline).toBe('none');
+      expect(rings.row, 'the field lost its ring').toBe('solid');
+    });
+  }
+
+  for (const id of ['select-trigger', 'select-search'] as const) {
+    test(`the ${id === 'select-trigger' ? 'select' : 'search field'}’s list lines up with its field, border and all`, async ({
+      page,
+    }) => {
+      // [P81-A] Anchored to the control inside the row's border, the list was 2px narrower than the
+      // field, and the fields under it showed a sliver of edge at its left.
+      await open(page);
+      await inline(page, id).click();
+      await page.getByRole('listbox').waitFor();
+      const edges = await inline(page, id).evaluate((el) => {
+        const row = el.closest('.mullion-field-control')!.getBoundingClientRect();
+        // The positioner, not the popup, which opens from 98% scale and would measure mid-transition.
+        const root = el.getRootNode() as Document | ShadowRoot;
+        const popup = root.querySelector('[role="listbox"]')!.closest('.mullion-overlay-positioner')!.getBoundingClientRect();
+        return { rowLeft: Math.round(row.left), popupLeft: Math.round(popup.left), rowWidth: Math.round(row.width), popupWidth: Math.round(popup.width) };
+      });
+      expect(edges.popupLeft).toBe(edges.rowLeft);
+      expect(edges.popupWidth).toBeGreaterThanOrEqual(edges.rowWidth);
+    });
+  }
+
+  test('a chosen option lines up with the others', async ({ page }) => {
+    // [P81-A] Base UI unmounts the check on every row but the chosen one, and a rule that read that
+    // as "no check column" moved every other row's text 26px left.
+    await open(page);
+    const trigger = inline(page, 'select-trigger');
+    await trigger.click();
+    await page.getByRole('option').nth(1).click();
+    await trigger.click();
+    await page.getByRole('listbox').waitFor();
+    const lefts = await page
+      .locator('.mullion-select-item-text')
+      .evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().left)));
+    expect(lefts.length).toBeGreaterThan(1);
+    expect(new Set(lefts).size, `option text starts at ${lefts.join(', ')}`).toBe(1);
+  });
+
   test('a plain Select option under the pointer takes the rail, no ring, and moves no ground', async ({
     page,
   }) => {

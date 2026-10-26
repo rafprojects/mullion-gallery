@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 import {
-  Combobox,
   ScrollArea,
-  Select,
   Skeleton,
   Table,
 } from '@mantine/core';
@@ -14,7 +12,7 @@ import { PendingRequestsPanel } from './PendingRequestsPanel';
 import type { ApiClient } from '@/services/apiClient';
 import type { AdminAccessState } from '@/hooks/useAdminAccessState';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Alert, Box, Center, Badge, Card, useMediaQuery, Button, Checkbox, SegmentedControl, TextInput, Tooltip } from '@/ui';
+import { uiRem, Group, Stack, Text, Alert, Box, Center, Badge, Card, useMediaQuery, Button, Checkbox, SegmentedControl, TextInput, Tooltip, Select } from '@/ui';
 
 type AccessViewMode = 'campaign' | 'company' | 'all';
 
@@ -346,26 +344,27 @@ export function AccessTab({
                     setAccessUserId('');
                   }}
                   loading={userSearchLoading}
-                >
-                  {userSearchResults.length === 0 && userSearchQuery.length >= 2 && !userSearchLoading && !/^\d+$/.test(userSearchQuery) && (
-                    <Combobox.Empty>{t('admin_access_no_users', 'No users found')}</Combobox.Empty>
-                  )}
-                  {/^\d+$/.test(userSearchQuery) && (
-                    <Combobox.Empty>{t('admin_access_using_id', 'Using User ID: {{id}}', { id: userSearchQuery })}</Combobox.Empty>
-                  )}
-                  {userSearchQuery.length < 2 && !/^\d+$/.test(userSearchQuery) && (
-                    <Combobox.Empty>{t('admin_access_type_hint', 'Type name/email or enter user ID')}</Combobox.Empty>
-                  )}
-                  {userSearchResults.map((user) => (
-                    <Combobox.Option key={user.id} value={String(user.id)}>
+                  options={userSearchResults.map((user) => ({ value: String(user.id), label: user.displayName }))}
+                  renderOption={({ option }) => {
+                    const user = userSearchResults.find((u) => String(u.id) === option.value);
+                    return (
                       <Group gap="xs">
-                        <Text size="sm" weight={500}>{user.displayName}</Text>
-                        <Text size="xs" tone="muted">{user.email}</Text>
-                        {user.isAdmin && <Badge tone="default" variant="filled" size="xs">{t('admin_access_admin_badge', 'Admin')}</Badge>}
+                        <Text size="sm" weight={500}>{option.label}</Text>
+                        {user && <Text size="xs" tone="muted">{user.email}</Text>}
+                        {user?.isAdmin && <Badge tone="default" variant="filled" size="xs">{t('admin_access_admin_badge', 'Admin')}</Badge>}
                       </Group>
-                    </Combobox.Option>
-                  ))}
-                </SearchableEntityInput>
+                    );
+                  }}
+                  emptyMessage={
+                    /^\d+$/.test(userSearchQuery)
+                      ? t('admin_access_using_id', 'Using User ID: {{id}}', { id: userSearchQuery })
+                      : userSearchQuery.length < 2
+                        ? t('admin_access_type_hint', 'Type name/email or enter user ID')
+                        : userSearchLoading
+                          ? undefined
+                          : t('admin_access_no_users', 'No users found')
+                  }
+                />
               </Box>
 
               {/* Campaign mode: show scope and action options */}

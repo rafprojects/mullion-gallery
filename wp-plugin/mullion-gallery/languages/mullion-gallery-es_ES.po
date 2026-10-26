@@ -10677,3 +10677,39 @@ msgstr "Solo exclusivos: mostrar solo los medios exclusivos de esta campaña"
 
 msgid "Edit tags for {{name}}. Tags: {{tags}}"
 msgstr "Editar las etiquetas de {{name}}. Etiquetas: {{tags}}"
+
+msgid "Clear"
+msgstr "Borrar"
+
+msgid "Show options"
+msgstr "Mostrar opciones"
+
+msgid "Remove {{label}}"
+msgstr "Quitar {{label}}"
+
+msgid "Show password"
+msgstr "Mostrar contraseña"
+
+msgid "Increment"
+msgstr "Aumentar"
+
+msgid "Decrement"
+msgstr "Disminuir"
+
+msgid "Open the color picker"
+msgstr "Abrir el selector de color"
+
+msgid "Pick a color from the screen"
+msgstr "Tomar un color de la pantalla"
+
+msgid "Use {{color}}"
+msgstr "Usar {{color}}"
+
+msgid "Saturation and brightness"
+msgstr "Saturación y brillo"
+
+msgid "Saturation {{saturation}}%, brightness {{brightness}}%"
+msgstr "Saturación {{saturation}} %, brillo {{brightness}} %"
+
+msgid "Page {{page}}"
+msgstr "Página {{page}}"

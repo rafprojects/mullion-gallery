@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { useRef } from 'react';
-import { render, screen, waitFor, fireEvent } from '../../test/test-utils';
+import { render, screen, waitFor, pickOption, shownOption } from '../../test/test-utils';
 import { MediaPanel } from './MediaPanel';
 import type { CampaignSelectItem } from '@/components/Common/CampaignSelector';
 import type { ApiClient } from '@/services/apiClient';
@@ -39,13 +39,14 @@ describe('MediaPanel (P72-E)', () => {
   it('default-selects the first campaign when active', async () => {
     render(<MediaPanel {...baseProps} active apiClient={makeApiClient()} />);
     // The campaign selector reflects the child-owned selection.
-    expect(await screen.findByDisplayValue('First Campaign')).toBeInTheDocument();
+    await waitFor(() => expect(shownOption(/campaign/i)).toBe('First Campaign'));
   });
 
   it('does not auto-select a campaign while inactive (gating preserved)', async () => {
     render(<MediaPanel {...baseProps} active={false} apiClient={makeApiClient()} />);
     await new Promise((r) => setTimeout(r, 50));
-    expect(screen.queryByDisplayValue('First Campaign')).not.toBeInTheDocument();
+    const shown = screen.queryAllByRole('combobox', { hidden: true }).map((el) => el.textContent ?? '');
+    expect(shown.some((text) => text.includes('First Campaign'))).toBe(false);
   });
 
   it('owns its selection state — updating it does not re-render the parent (option b isolation)', async () => {
@@ -63,21 +64,16 @@ describe('MediaPanel (P72-E)', () => {
 
     // The child's mount-time default-select drives the selection — proof its own
     // state changed at least once.
-    await waitFor(() => {
-      expect(screen.getByDisplayValue('First Campaign')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(shownOption(/campaign/i)).toBe('First Campaign'));
     const rendersAfterMount = parentRenders.count;
 
     // Now drive a *user-initiated* selection change through the child. This is
     // the assertion that actually discriminates option (b) from (a): had the
     // selection stayed lifted in AdminPanel, this change would run through a
     // parent-owned setter and bump the parent's render count.
-    fireEvent.click(screen.getByRole('combobox', { name: /campaign/i }));
-    fireEvent.click(screen.getByRole('option', { name: 'Second Campaign' }));
+    await pickOption(/campaign/i, 'Second Campaign');
 
-    await waitFor(() => {
-      expect(screen.getByDisplayValue('Second Campaign')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(shownOption(/campaign/i)).toBe('Second Campaign'));
     expect(parentRenders.count).toBe(rendersAfterMount);
     expect(parentRenders.count).toBe(1);
   });

@@ -1,9 +1,7 @@
 
 import { Accordion } from '@mantine/core';
-import { Stack, TextInput } from '@/ui';
+import { Stack, TextInput, ColorInput, Select } from '@/ui';
 import { useTranslation } from 'react-i18next';
-import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
-import { ModalSelect } from '@/components/Common/ModalSelect';
 import { getScopeGalleryCommonSetting, resolveGalleryConfig, setScopeGalleryCommonSetting } from '@/utils/galleryConfig';
 
 import type { GalleryBehaviorSettings, ViewportBgType } from '@/types';
@@ -38,7 +36,7 @@ function GalleryBackgroundFields({
   const { t } = useTranslation('mullion');
   return (
     <>
-      <ModalSelect
+      <Select
         label={label}
         description={description}
         value={bgType}

@@ -195,6 +195,30 @@ describe('framework component sheets', () => {
   });
 
   /*
+   * [P81-A] One owner per class. The colour picker's swatch buttons shared
+   * `.mullion-color-swatch` with the display `ColorSwatch`, and the later sheet
+   * repainted every display swatch as a 20px checkerboard. A rule may still
+   * reach another family's class through an ancestor or a state, as the
+   * select sheet does to the field's control row.
+   */
+  it('declare each bare class in one sheet only', () => {
+    const owners = new Map<string, Set<string>>();
+    for (const file of files) {
+      for (const [, selectors] of stripComments(readFileSync(file, 'utf8')).matchAll(/([^{}]+)\{/g)) {
+        for (const selector of selectors!.split(',').map((s) => s.trim())) {
+          const bare = /^\.(mullion-[\w-]+)$/.exec(selector)?.[1];
+          if (!bare) continue;
+          if (!owners.has(bare)) owners.set(bare, new Set());
+          owners.get(bare)!.add(path.relative(UI_DIR, file));
+        }
+      }
+    }
+    const shared = [...owners].filter(([, sheets]) => sheets.size > 1).map(([cls, sheets]) => `.${cls}: ${[...sheets].join(', ')}`);
+    expect(shared, 'two sheets declare the same class, so the later one repaints the other family').toEqual([]);
+    expect(owners.get('mullion-color-swatch'), 'the scan found the display swatch').toEqual(new Set([path.join('components', 'display.css')]));
+  });
+
+  /*
    * [P80-B] Rule 4. Two classes of `--mullion-*` name are legitimate: a token
    * the engine emits, and a component-local property something sets. The
    * second class is mostly set INLINE from TSX through `customProperties`

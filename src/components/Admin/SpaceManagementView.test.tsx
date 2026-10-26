@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import userEvent from '@testing-library/user-event';
 import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
 import { SpaceManagementView } from './SpaceManagementView';
 import type { ApiClient } from '@/services/apiClient';
@@ -282,8 +283,8 @@ describe('SpaceManagementView — Access tab role display (P75-I)', () => {
     await selectSpace('Delegated Space');
     await clickTab('Access');
 
-    fireEvent.click(await screen.findByLabelText('Role', { selector: 'input' }));
-    expect(screen.getByRole('option', { name: 'Viewer' })).toBeInTheDocument();
+    await userEvent.setup().click(await screen.findByRole('combobox', { name: 'Role' }));
+    expect(await screen.findByRole('option', { name: 'Viewer' })).toBeInTheDocument();
     expect(screen.queryByRole('option', { name: 'Editor' })).not.toBeInTheDocument();
     expect(screen.queryByRole('option', { name: 'Owner' })).not.toBeInTheDocument();
   });

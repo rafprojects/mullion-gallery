@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Combobox } from '@mantine/core';
-import type { MantineSize } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
+import type { UiSelectOption } from '@/ui';
 import type { CompanyInfo } from '@/services/adminQuery';
-import { SearchableEntityInput } from './SearchableEntityInput';
+import { SearchableEntityInput, type SearchableEntityInputProps } from './SearchableEntityInput';
 
 export interface CompanyComboboxProps {
   /** Company slug (for existing) or name (for new/freeform). */
@@ -13,7 +12,7 @@ export interface CompanyComboboxProps {
   loading?: boolean;
   label?: string | undefined;
   required?: boolean | undefined;
-  size?: MantineSize | undefined;
+  size?: SearchableEntityInputProps['size'];
   placeholder?: string | undefined;
 }
 
@@ -56,6 +55,13 @@ export function CompanyCombobox({
     return companies.some((c) => c.name.toLowerCase() === q || c.slug.toLowerCase() === q);
   }, [companies, inputValue]);
 
+  const options = useMemo<UiSelectOption[]>(() => {
+    const typed = inputValue.trim();
+    const list = filtered.map((c) => ({ value: c.slug, label: c.name }));
+    if (!exactMatch && typed) list.push({ value: typed, label: t('cc_create', '+ Create “{{name}}”', { name: typed }) });
+    return list;
+  }, [filtered, exactMatch, inputValue, t]);
+
   const handleOptionSubmit = (optionValue: string) => {
     const match = companies.find((c) => c.slug === optionValue);
     setInputValue(match ? match.name : optionValue);
@@ -91,20 +97,8 @@ export function CompanyCombobox({
       required={required}
       size={size}
       placeholder={resolvedPlaceholder}
-    >
-      {filtered.map((company) => (
-        <Combobox.Option key={company.slug} value={company.slug}>
-          {company.name}
-        </Combobox.Option>
-      ))}
-      {!exactMatch && inputValue.trim() && (
-        <Combobox.Option value={inputValue.trim()}>
-          {t('cc_create', '+ Create “{{name}}”', { name: inputValue.trim() })}
-        </Combobox.Option>
-      )}
-      {filtered.length === 0 && !inputValue.trim() && (
-        <Combobox.Empty>{t('cc_no_companies', 'No companies found')}</Combobox.Empty>
-      )}
-    </SearchableEntityInput>
+      options={options}
+      emptyMessage={t('cc_no_companies', 'No companies found')}
+    />
   );
 }

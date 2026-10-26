@@ -2900,6 +2900,23 @@ class Mullion_Frontend_Strings {
             'app_session_expired' => __('Session expired. Please sign in again.', 'mullion-gallery'),
             'app_loading_campaigns' => __('Loading campaigns...', 'mullion-gallery'),
             'app_loading_page' => __(' (page {{completed}} of {{total}})', 'mullion-gallery'),
+            'ui_clear' => __('Clear', 'mullion-gallery'),
+            'ui_show_options' => __('Show options', 'mullion-gallery'),
+            'ui_remove_item' => __('Remove {{label}}', 'mullion-gallery'),
+            'ui_show_password' => __('Show password', 'mullion-gallery'),
+            'ui_increment' => __('Increment', 'mullion-gallery'),
+            'ui_decrement' => __('Decrement', 'mullion-gallery'),
+            'ui_open_color_picker' => __('Open the color picker', 'mullion-gallery'),
+            'ui_pick_from_screen' => __('Pick a color from the screen', 'mullion-gallery'),
+            'ui_use_color' => __('Use {{color}}', 'mullion-gallery'),
+            'ui_color_surface' => __('Saturation and brightness', 'mullion-gallery'),
+            'ui_color_surface_value' => __('Saturation {{saturation}}%, brightness {{brightness}}%', 'mullion-gallery'),
+            'ui_hue' => __('Hue', 'mullion-gallery'),
+            'ui_opacity' => __('Opacity', 'mullion-gallery'),
+            'ui_pagination' => __('Pagination', 'mullion-gallery'),
+            'ui_previous_page' => __('Previous page', 'mullion-gallery'),
+            'ui_next_page' => __('Next page', 'mullion-gallery'),
+            'ui_page' => __('Page {{page}}', 'mullion-gallery'),
         ];
     }
 }

@@ -1,8 +1,7 @@
 
 import { Accordion, Divider } from '@mantine/core';
-import { Stack, Switch, NumberInput } from '@/ui';
+import { Stack, Switch, NumberInput, Select } from '@/ui';
 import { useTranslation } from 'react-i18next';
-import { ModalSelect } from '@/components/Common/ModalSelect';
 import { DimensionInput } from '@/components/Settings/DimensionInput';
 import { DEFAULT_GALLERY_BEHAVIOR_SETTINGS, type GalleryBehaviorSettings, type GalleryCommonSettings } from '@/types';
 import { CSS_HEIGHT_UNITS, CSS_OFFSET_UNITS, CSS_SPACING_UNITS, CSS_WIDTH_UNITS } from '@mullion/shared-utils';
@@ -136,7 +135,7 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
                     checked={getAdapterSettingValue('carouselAutoplayPauseOnHover')}
                     onChange={(checked) => updateAdapterSetting('carouselAutoplayPauseOnHover', checked)}
                   />
-                  <ModalSelect
+                  <Select
                     label={t('set_ld_autoplay_dir_label', 'Autoplay Direction')}
                     description={t('set_ld_autoplay_dir_desc', 'Direction autoplay advances slides.')}
                     value={getAdapterSettingValue('carouselAutoplayDirection')}
@@ -204,7 +203,7 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
               max={600}
               step={50}
             />
-            <ModalSelect
+            <Select
               label={t('set_ld_height_mode_label', 'Section Height Mode')}
               description={t('set_ld_height_mode_desc', 'How section height is determined. Auto = content-driven (recommended for masonry/justified).')}
               data={[
@@ -250,7 +249,7 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
               decimalScale={2}
             />
             <Divider label={t('set_ld_section_align_divider', 'Section Content Alignment')} labelPosition="center" />
-            <ModalSelect
+            <Select
               label={t('set_ld_content_halign_label', 'Content Horizontal Alignment')}
               description={t('set_ld_content_halign_desc', 'Horizontal alignment of adapter content within each gallery section.')}
               data={[
@@ -261,7 +260,7 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
               value={settings.gallerySectionContentAlignX || 'center'}
               onChange={(value) => updateSetting('gallerySectionContentAlignX', (value || 'center') as GalleryBehaviorSettings['gallerySectionContentAlignX'])}
             />
-            <ModalSelect
+            <Select
               label={t('set_ld_content_valign_label', 'Content Vertical Alignment')}
               description={t('set_ld_content_valign_desc', 'Vertical alignment of adapter content within each gallery section.')}
               data={[
@@ -324,7 +323,7 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
               max={24}
               step={4}
             />
-            <ModalSelect
+            <Select
               label={t('set_ld_modal_content_valign_label', 'Content Vertical Alignment')}
               description={t('set_ld_modal_content_valign_desc', 'Vertical alignment of content within the modal.')}
               data={[
@@ -336,7 +335,7 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
               onChange={(value) => updateSetting('modalContentVerticalAlign', (value || 'top') as GalleryBehaviorSettings['modalContentVerticalAlign'])}
             />
             <Divider label={t('set_ld_gallery_spacing_divider', 'Gallery Spacing')} labelPosition="center" />
-            <ModalSelect
+            <Select
               label={t('set_ld_shell_valign_label', 'Gallery Shell Vertical Alignment')}
               description={t('set_ld_shell_valign_desc', 'Vertical alignment of the gallery sections within the viewer shell.')}
               data={[
@@ -400,7 +399,7 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
         <Accordion.Control>{t('set_ld_adapter_title', 'Adapter Sizing')}</Accordion.Control>
         <Accordion.Panel>
           {(!mountedPanels || mountedPanels.has('adapter-sizing')) && <Stack gap="md">
-            <ModalSelect
+            <Select
               label={t('set_ld_adapter_mode_label', 'Adapter Sizing Mode')}
               description={t('set_ld_adapter_mode_desc', 'How adapters fill their gallery section. Fill = 100% of section, Manual = custom percentage.')}
               data={[
@@ -443,7 +442,7 @@ export function GalleryLayoutDetailSections({ settings, updateSetting, mountedPa
               max={64}
               step={4}
             />
-            <ModalSelect
+            <Select
               label={t('set_ld_adapter_justify_label', 'Adapter Justification')}
               description={t('set_ld_adapter_justify_desc', 'How adapter items distribute within the container (Compact Grid, Circular).')}
               data={[

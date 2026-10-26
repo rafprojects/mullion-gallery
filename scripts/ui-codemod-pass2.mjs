@@ -227,6 +227,30 @@ const DIALOG_PROPS = {
   overlayProps: debugOnly,
   scrollAreaComponent: () => ({ replace: '' }),
 };
+/**
+ * Mantine's `comboboxProps`. The framework's list always mounts in its trigger's
+ * root (P80-B), so the portal switch goes; a width is the framework's own prop.
+ */
+const selectCombobox = (attr) => {
+  const e = attr.initializer && ts.isJsxExpression(attr.initializer) ? attr.initializer.expression : undefined;
+  if (!e || !ts.isObjectLiteralExpression(e)) return { blocked: 'comboboxProps is not a literal' };
+  let width;
+  for (const p of e.properties) {
+    const key = p.name?.getText();
+    if (ts.isPropertyAssignment(p) && key === 'withinPortal') continue;
+    if (ts.isPropertyAssignment(p) && key === 'width') width = p.initializer.getText();
+    else return { blocked: `comboboxProps.${key ?? p.getText()} has no rule` };
+  }
+  return { replace: width === undefined ? '' : `width={${width}}` };
+};
+const SELECT_UNSUPPORTED = [
+  ...FIELD_UNSUPPORTED, 'checkIconPosition', 'limit', 'filter', 'selectFirstOptionOnChange', 'hiddenInputProps',
+  'chevronColor', 'searchValue', 'onSearchChange', 'onDropdownOpen', 'onDropdownClose', 'withScrollArea',
+  'clearButtonProps', 'onClear', 'autoSelectOnBlur', 'scrollAreaProps', 'withAlignedLabels',
+];
+/** The select family's popup and field props (P81-A). */
+const SELECT_PROPS = { variant: fieldVariant, comboboxProps: selectCombobox };
+
 const TOGGLE_UNSUPPORTED = ['color', 'radius', 'labelPosition', 'icon', 'iconColor', 'variant', 'classNames', 'styles', 'unstyled', 'wrapperProps'];
 
 const RULES = {
@@ -327,6 +351,38 @@ const RULES = {
       variant: (attr) => (literal(attr) === 'dot' ? { replace: 'variant="outline"' } : null),
     },
   },
+  // [P81-A] The select family. Clicking the chosen option never clears it on the framework, so
+  // `allowDeselect={false}` states the default; the check mark is how a selection is shown, so it stays.
+  Select: {
+    rename: { maxDropdownHeight: 'maxHeight' },
+    unsupported: SELECT_UNSUPPORTED,
+    props: {
+      ...SELECT_PROPS,
+      allowDeselect: (attr) => (literal(attr) === false ? { replace: '' } : { blocked: 'deselecting by clicking the chosen option is gone' }),
+      withCheckIcon: () => ({ replace: '', review: 'the check mark stays: it is how a selection is shown' }),
+    },
+  },
+  // Always typeable, so `searchable` says nothing.
+  MultiSelect: {
+    rename: { maxDropdownHeight: 'maxHeight' },
+    unsupported: [...SELECT_UNSUPPORTED, 'hidePickedOptions', 'maxValues'],
+    props: { ...SELECT_PROPS, searchable: () => ({ replace: '' }) },
+  },
+  TagsInput: {
+    rename: { maxDropdownHeight: 'maxHeight' },
+    unsupported: [...SELECT_UNSUPPORTED, 'maxTags', 'allowDuplicates', 'acceptValueOnBlur', 'onDuplicate'],
+    props: SELECT_PROPS,
+  },
+  // The picker sits in a popover that mounts where the framework's popovers do (P80-F).
+  ColorInput: {
+    rename: {},
+    unsupported: [
+      ...FIELD_UNSUPPORTED, 'withPicker', 'withPreview', 'closeOnColorSwatchClick', 'fixOnBlur', 'eyeDropperIcon',
+      'eyeDropperButtonProps', 'swatchesPerRow', 'disallowInput', 'popoverProps',
+    ],
+    props: { variant: fieldVariant },
+  },
+  ColorSwatch: { rename: {}, unsupported: ['withShadow', 'component'] },
   Paper: { rename: PADDING, unsupported: ['variant', 'mod', 'classNames', 'styles', 'unstyled'] },
   Card: { rename: PADDING, unsupported: ['variant', 'orientation', 'mod', 'classNames', 'styles', 'unstyled'] },
   'Card.Section': { rename: PADDING, unsupported: ['inheritPadding', 'mod', 'classNames', 'styles', 'unstyled'] },
@@ -382,6 +438,11 @@ function* walk(dir) {
 
 const report = { files: new Set(), edits: 0, imports: [], review: [], blocked: [] };
 
+/** Files whose flipped names stay on Mantine for now, and why. Reported, never skipped silently. */
+const STAYS_ON_MANTINE = {
+  'src/components/Common/UnitScrubField.tsx': 'P81-B rewrites it onto the unit slot with the Typography redesign',
+};
+
 for (const file of [...walk('src'), ...walk('packages')]) {
   if (file.split(path.sep).slice(0, 2).join('/') === 'src/ui') continue;
   const text = fs.readFileSync(file, 'utf8');
@@ -413,6 +474,11 @@ for (const file of [...walk('src'), ...walk('packages')]) {
       if (from === '@mantine/core') moved.push(el);
     }
     if (moved.length === 0) continue;
+    if (STAYS_ON_MANTINE[file]) {
+      report.blocked.push(`${file}: ${moved.map((m) => m.getText()).join(', ')} stays on Mantine (${STAYS_ON_MANTINE[file]})`);
+      for (const m of moved) local.delete(m.name.text);
+      continue;
+    }
     if (file.startsWith('packages/shared-ui/')) {
       // That package cannot import `@/ui` (P78 Decision J); batch zero rehomes it.
       report.blocked.push(`${file}: ${moved.map((m) => m.getText()).join(', ')} stays on Mantine until batch zero`);

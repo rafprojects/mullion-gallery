@@ -3,13 +3,12 @@ import DOMPurify from 'dompurify';
 import {
   Modal,
   Progress,
-  Select,
 } from '@mantine/core';
 import { IconUpload, IconX, IconFile, IconVideo } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { OEmbedResponse } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Card, Paper, ActionIcon, Button, FileButton, TextInput, Textarea } from '@/ui';
+import { uiRem, Group, Stack, Text, Card, Paper, ActionIcon, Button, FileButton, TextInput, Textarea, Select } from '@/ui';
 
 interface MediaAddModalProps {
   opened: boolean;
@@ -145,7 +144,6 @@ export function MediaAddModal({
               data={targetOptions}
               value={targetValue ?? null}
               onChange={(value) => onTargetChange?.(value)}
-              allowDeselect={false}
             />
             {targetExtra}
           </Stack>

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { act, render, screen, waitFor, fireEvent, within } from '@/test/test-utils';
+import { act, render, screen, waitFor, fireEvent, pickOption } from '@/test/test-utils';
 import { SettingsPanel } from './SettingsPanel';
 import type { ApiClient } from '@/services/apiClient';
 import { DEFAULT_GALLERY_BEHAVIOR_SETTINGS, type GalleryConfig } from '@/types';
@@ -1156,9 +1156,9 @@ describe('SettingsPanel', () => {
     await screen.findByText('Gallery Adapters');
 
     expect(screen.queryByText('Gallery Selection Mode')).not.toBeInTheDocument();
-    expect(screen.getByLabelText('Desktop Image Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Tablet Video Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Mobile Image Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Desktop Image Gallery Adapter' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Tablet Video Gallery Adapter' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Mobile Image Gallery Adapter' })).toBeInTheDocument();
   });
 
   it('updates carousel settings visibility from nested gallery config adapter changes', async () => {
@@ -1202,9 +1202,8 @@ describe('SettingsPanel', () => {
       'Tablet Unified Gallery Adapter',
       'Mobile Unified Gallery Adapter',
     ]) {
-      fireEvent.click(screen.getByLabelText(label, { selector: 'input' }));
-      // Capability badges are appended to the option accessible name; match by prefix.
-      fireEvent.click(screen.getByRole('option', { name: new RegExp(`^${masonryLabel ?? 'Masonry'}`, 'i') }));
+            // Capability badges are appended to the option accessible name; match by prefix.
+    await pickOption(label, new RegExp(`^${masonryLabel ?? 'Masonry'}`, 'i'));
     }
 
     await waitFor(() => {
@@ -1235,11 +1234,10 @@ describe('SettingsPanel', () => {
     fireEvent.click(screen.getByRole('tab', { name: /Gallery Layout/i }));
     await screen.findByText('Gallery Adapters');
 
-    expect(screen.getByLabelText('Desktop Unified Gallery Adapter', { selector: 'input' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Desktop Unified Gallery Adapter' })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByLabelText('Desktop Unified Gallery Adapter', { selector: 'input' }));
     const escapedClassicLabel = (unifiedClassicLabel ?? 'Classic').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    fireEvent.click(screen.getByRole('option', { name: new RegExp(`^${escapedClassicLabel}`, 'i') }));
+    await pickOption('Desktop Unified Gallery Adapter', new RegExp(`^${escapedClassicLabel}`, 'i'));
 
     const { value } = await openResponsiveConfigEditor();
 
@@ -1258,8 +1256,7 @@ describe('SettingsPanel', () => {
     fireEvent.click(screen.getByRole('tab', { name: /Gallery Layout/i }));
     await screen.findByText('Gallery Adapters');
 
-    fireEvent.click(screen.getByLabelText('Mobile Image Gallery Adapter', { selector: 'input' }));
-    fireEvent.click(screen.getByRole('option', { name: new RegExp(`^${masonryLabel ?? 'Masonry'}`, 'i') }));
+    await pickOption('Mobile Image Gallery Adapter', new RegExp(`^${masonryLabel ?? 'Masonry'}`, 'i'));
 
     const { value } = await openResponsiveConfigEditor();
 
@@ -2013,8 +2010,8 @@ describe('SettingsPanel', () => {
     expect(screen.getByLabelText('Video Border Radius')).toHaveValue('18');
 
     await clickTabAndWait('Gallery Navigation', 'Arrow Vertical Position');
-    const navArrowPositionInputs = await screen.findAllByLabelText('Arrow Vertical Position', { selector: 'input' });
-    expect(navArrowPositionInputs[0]).toHaveValue('Bottom');
+    const navArrowPositionInputs = await screen.findAllByRole('combobox', { name: 'Arrow Vertical Position' });
+    expect(navArrowPositionInputs[0]).toHaveTextContent('Bottom');
   });
 
   it('stores inline adapter setting edits only in nested galleryConfig', async () => {
@@ -2037,9 +2034,8 @@ describe('SettingsPanel', () => {
     });
 
     await clickTabAndWait('Gallery Navigation', 'Arrow Vertical Position');
-    const navArrowPositionInputs = await screen.findAllByLabelText('Arrow Vertical Position', { selector: 'input' });
-    fireEvent.click(navArrowPositionInputs[0]);
-    fireEvent.click(within(await screen.findByRole('listbox')).getByText('Bottom'));
+    const navArrowPositionInputs = await screen.findAllByRole('combobox', { name: 'Arrow Vertical Position' });
+    await pickOption(navArrowPositionInputs[0]!, 'Bottom');
 
     fireEvent.click(screen.getByRole('button', { name: 'Save Changes' }));
 
@@ -2081,8 +2077,7 @@ describe('SettingsPanel', () => {
     );
 
     await clickTabAndWait('Gallery Style', 'Enable Lightbox');
-    fireEvent.click(screen.getByLabelText('Height Constraint', { selector: 'input' }));
-    fireEvent.click(screen.getByRole('option', { name: 'Manually control height' }));
+    await pickOption('Height Constraint', 'Manually control height');
     fireEvent.change(await screen.findByLabelText('Manual Gallery Height', { selector: 'input' }), {
       target: { value: '80vh' },
     });
@@ -2147,8 +2142,7 @@ describe('SettingsPanel', () => {
 
     fireEvent.click(screen.getByText('Viewport Backgrounds'));
 
-    fireEvent.click(screen.getByLabelText('Image Gallery Background', { selector: 'input' }));
-    fireEvent.click(within(await screen.findByRole('listbox')).getByText('Background Image'));
+    await pickOption('Image Gallery Background', 'Background Image');
 
     fireEvent.change(await screen.findByLabelText('Background Image URL'), {
       target: { value: 'https://example.com/panel-bg.jpg' },

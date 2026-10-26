@@ -31,6 +31,7 @@ export {
 export {
   ActionIcon,
   Alert,
+  Autocomplete,
   Badge,
   Box,
   Button,
@@ -39,6 +40,8 @@ export {
   Checkbox,
   Chip,
   CloseButton,
+  ColorInput,
+  ColorSwatch,
   Confirmations,
   confirm,
   Container,
@@ -47,6 +50,7 @@ export {
   Grid,
   Group,
   Menu,
+  MultiSelect,
   Notifications,
   notify,
   NumberInput,
@@ -54,10 +58,12 @@ export {
   Popover,
   PasswordInput,
   SegmentedControl,
+  Select,
   SimpleGrid,
   Slider,
   Stack,
   Switch,
+  TagsInput,
   Text,
   Textarea,
   TextInput,
@@ -65,6 +71,12 @@ export {
   Tooltip,
   UnstyledButton,
   type ActionIconProps,
+  type AutocompleteProps,
+  type ColorInputProps,
+  type SelectProps,
+  type UiRenderOption,
+  type UiSelectData,
+  type UiSelectOption,
   type UiConfirmOptions,
   type UiNotifyOptions,
   type UiDialogTransition,
@@ -84,16 +96,6 @@ export {
   type TitleProps,
 } from './components';
 
-// ── Inputs and controls ────────────────────────────────────────────────────
-export {
-  ColorInput,
-  Combobox,
-  MultiSelect,
-  Select,
-  TagsInput,
-  useCombobox,
-} from '@mantine/core';
-
 // ── Overlays and navigation ────────────────────────────────────────────────
 export {
   Accordion,
@@ -106,7 +108,6 @@ export {
 
 // ── Feedback and data display ──────────────────────────────────────────────
 export {
-  ColorSwatch,
   Image,
   Kbd,
   Loader,
@@ -127,10 +128,8 @@ export {
 
 // ── Component types ────────────────────────────────────────────────────────
 export type {
-  ColorInputProps,
   DrawerProps,
   NumberInputProps,
-  SelectProps,
 } from '@mantine/core';
 
 /**
@@ -169,7 +168,9 @@ export {
   type MullionMode,
   type MullionPersistence,
 } from './provider/MullionProvider';
-export { useMullionTheme, useMullionScope, useMullionPortal } from './provider/hooks';
+export { useMullionTheme, useMullionScope, useMullionPortal, useUiLabels } from './provider/hooks';
+// [P81-A] The framework's own control names; a root provider takes them translated.
+export { UI_LABELS_EN, type UiLabels } from './provider/labels';
 export { usePageHost } from './components/pageHost';
 export type { MullionThemeManager, MullionScopeValue, MullionScopeMode } from './provider/mullionContexts';
 export {

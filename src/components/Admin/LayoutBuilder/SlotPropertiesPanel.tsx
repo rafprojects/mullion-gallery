@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Select,
   Accordion,
 } from '@mantine/core';
 import { BuilderColorInput as ColorInput } from './BuilderColorInput';
@@ -31,7 +30,7 @@ import type {
 } from '@/types';
 import { buildSlotEntranceCss, REVEAL_CLASS } from '@/utils/slotEntrance';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Box, ActionIcon, Button, SegmentedControl, Slider, NumberInput, TextInput, Popover, Tooltip } from '@/ui';
+import { uiRem, Stack, Group, Text, Box, ActionIcon, Button, SegmentedControl, Slider, NumberInput, TextInput, Popover, Tooltip, Select } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -239,7 +238,7 @@ function ShadowSection({ slot, onUpdate }: EffectSectionProps) {
           </PropRow>
           <PropRow label={t('lb_slot_color', 'Color')}>
             <ColorInput value={sh.color} onChange={(v) => setSh({ color: v })}
-              size="xs" format="rgba" variant="filled" />
+              size="xs" format="rgba" />
           </PropRow>
         </>
       )}
@@ -357,7 +356,7 @@ function EntranceSection({ slot, onUpdate }: EffectSectionProps) {
             if (!val || val === 'none') { onUpdate({ entranceAnimation: undefined }); return; }
             onUpdate({ entranceAnimation: { ...(anim ?? {}), type: val as SlotEntranceType } });
           }}
-          size="xs" variant="filled"
+          size="xs"
           aria-label={t('lb_slot_ent_type_aria', 'Entrance animation type')}
         />
       </PropRow>
@@ -375,7 +374,7 @@ function EntranceSection({ slot, onUpdate }: EffectSectionProps) {
                 ]}
                 value={anim.direction ?? 'up'}
                 onChange={(val) => val && setAnim({ direction: val as SlotEntranceDirection })}
-                size="xs" variant="filled"
+                size="xs"
                 aria-label={t('lb_slot_slide_dir_aria', 'Slide direction')}
               />
             </PropRow>
@@ -632,7 +631,6 @@ export function SlotPropertiesPanel({
                 value={slot.shape}
                 onChange={(val) => val && onUpdate({ shape: val as LayoutSlotShape })}
                 size="xs"
-                variant="filled"
               />
             </PropRow>
             {slot.shape === 'custom' && (
@@ -680,7 +678,6 @@ export function SlotPropertiesPanel({
                   val && onUpdate({ objectFit: val as LayoutSlot['objectFit'] })
                 }
                 size="xs"
-                variant="filled"
               />
             </PropRow>
 
@@ -773,7 +770,7 @@ export function SlotPropertiesPanel({
                 <ColorInput
                   value={slot.borderColor}
                   onChange={(val) => onUpdate({ borderColor: val })}
-                  size="xs" format="hex" variant="filled"
+                  size="xs" format="hex"
                 />
               </PropRow>
             </Group>
@@ -798,7 +795,7 @@ export function SlotPropertiesPanel({
             <SectionHeader label={t('lb_slot_sh_blend', 'Blend')} />
             <PropRow label={t('lb_slot_mode', 'Mode')}>
               <Select
-                size="xs" variant="filled"
+                size="xs"
                 data={blendOptions}
                 value={slot.blendMode ?? 'normal'}
                 onChange={(v) => onUpdate({ blendMode: (v ?? 'normal') as SlotBlendMode })}
@@ -902,7 +899,7 @@ export function SlotPropertiesPanel({
                   <ColorInput
                     value={slot.glowColor || '#1ad1c4'}
                     onChange={(v) => onUpdate({ glowColor: v })}
-                    size="xs" format="hex" variant="filled"
+                    size="xs" format="hex"
                   />
                 </PropRow>
                 <PropRow label={t('lb_slot_spread', 'Spread')}>

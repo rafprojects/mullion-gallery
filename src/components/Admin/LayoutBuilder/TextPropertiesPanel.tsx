@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Select,
   Divider,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -12,7 +11,7 @@ import {
 import type { LayoutTextLayer, LayoutTextSemanticTag, LayoutTextAlign, TypographyOverride } from '@/types';
 import { TypographyEditor } from '@/components/Common/TypographyEditor';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text, Button, ActionIcon, SegmentedControl, Slider, TextInput, Textarea, NumberInput, Tooltip } from '@/ui';
+import { uiRem, Stack, Group, Text, Button, ActionIcon, SegmentedControl, Slider, TextInput, Textarea, NumberInput, Tooltip, Select } from '@/ui';
 
 export interface TextPropertiesPanelProps {
   text: LayoutTextLayer;
@@ -94,8 +93,6 @@ export function TextPropertiesPanel({
         value={text.semanticTag}
         onChange={(v) => v && set({ semanticTag: v as LayoutTextSemanticTag })}
         data={semanticTagOptions}
-        allowDeselect={false}
-        comboboxProps={{ withinPortal: false }}
       />
       <div>
         <Text size="xs" tone="muted" style={{ marginBottom: uiRem(0.25) }}>{t('lb_text_alignment', 'Alignment')}</Text>

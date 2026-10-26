@@ -1,7 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
-import { Combobox } from '@mantine/core';
-import { render, screen, fireEvent, act } from '@/test/test-utils';
+import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
+import type { UiSelectOption } from '@/ui';
 import { SearchableEntityInput } from './SearchableEntityInput';
+
+const OPTIONS: UiSelectOption[] = [
+  { value: 'opt-a', label: 'Option A' },
+  { value: 'opt-b', label: 'Option B' },
+];
 
 function SimpleInput({
   onInputChange = vi.fn(),
@@ -11,15 +17,10 @@ function SimpleInput({
   hasSelection = false,
   loading = false,
   displayValue = '',
-}: Partial<{
-  onInputChange: (v: string) => void;
-  onOptionSubmit: (v: string) => void;
-  onBlur: () => void;
-  onClear: () => void;
-  hasSelection: boolean;
-  loading: boolean;
-  displayValue: string;
-}>) {
+  options = [...OPTIONS, ...(hasSelection ? [] : [{ value: 'create', label: '+ Create new' }])],
+  emptyMessage,
+  renderOption,
+}: Partial<React.ComponentProps<typeof SearchableEntityInput>>) {
   return (
     <SearchableEntityInput
       displayValue={displayValue}
@@ -31,25 +32,25 @@ function SimpleInput({
       loading={loading}
       placeholder="Search..."
       label="Entity"
-    >
-      <Combobox.Option value="opt-a">Option A</Combobox.Option>
-      <Combobox.Option value="opt-b">Option B</Combobox.Option>
-      {!hasSelection && <Combobox.Option value="create">+ Create new</Combobox.Option>}
-    </SearchableEntityInput>
+      options={options}
+      emptyMessage={emptyMessage}
+      renderOption={renderOption}
+    />
   );
 }
+
+const input = () => screen.getByRole('combobox', { name: 'Entity' });
 
 describe('SearchableEntityInput', () => {
   describe('display resolution', () => {
     it('renders the displayValue in the input', () => {
       render(<SimpleInput displayValue="Acme Corp" />);
-      expect(screen.getByDisplayValue('Acme Corp')).toBeInTheDocument();
+      expect(input()).toHaveValue('Acme Corp');
     });
 
     it('renders empty string when displayValue is empty', () => {
       render(<SimpleInput displayValue="" />);
-      const input = screen.getByRole('textbox');
-      expect(input).toHaveValue('');
+      expect(input()).toHaveValue('');
     });
   });
 
@@ -57,73 +58,93 @@ describe('SearchableEntityInput', () => {
     it('calls onInputChange when typing', () => {
       const onInputChange = vi.fn();
       render(<SimpleInput onInputChange={onInputChange} />);
-      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'abc' } });
+      fireEvent.change(input(), { target: { value: 'abc' } });
       expect(onInputChange).toHaveBeenCalledWith('abc');
     });
 
     it('calls onInputChange for each keystroke', () => {
       const onInputChange = vi.fn();
       render(<SimpleInput onInputChange={onInputChange} />);
-      const input = screen.getByRole('textbox');
-      fireEvent.change(input, { target: { value: 'a' } });
-      fireEvent.change(input, { target: { value: 'ab' } });
+      fireEvent.change(input(), { target: { value: 'a' } });
+      fireEvent.change(input(), { target: { value: 'ab' } });
       expect(onInputChange).toHaveBeenCalledTimes(2);
       expect(onInputChange).toHaveBeenLastCalledWith('ab');
     });
 
-    it('opens the dropdown on focus', async () => {
+    it('opens the list on click', async () => {
+      const user = userEvent.setup();
       render(<SimpleInput />);
-      fireEvent.focus(screen.getByRole('textbox'));
+      await user.click(input());
       expect(await screen.findByRole('option', { name: 'Option A' })).toBeInTheDocument();
+    });
+
+    it('shows the options as given, whatever the text, because the caller filters', async () => {
+      const user = userEvent.setup();
+      render(<SimpleInput displayValue="zzz" />);
+      await user.click(input());
+      expect(await screen.findAllByRole('option')).toHaveLength(3);
+    });
+
+    it('says so when there are no options', async () => {
+      const user = userEvent.setup();
+      render(<SimpleInput options={[]} emptyMessage="No companies found" />);
+      await user.click(input());
+      expect(await screen.findByText('No companies found')).toBeInTheDocument();
+    });
+
+    it('draws an option with the caller\'s renderer', async () => {
+      const user = userEvent.setup();
+      render(<SimpleInput renderOption={({ option }) => <em data-testid="row">{option.label} (row)</em>} />);
+      await user.click(input());
+      expect(await screen.findByRole('option', { name: 'Option A (row)' })).toBeInTheDocument();
     });
   });
 
   describe('freeform create affordance', () => {
     it('renders a consumer-provided create option', async () => {
+      const user = userEvent.setup();
       render(<SimpleInput />);
-      fireEvent.focus(screen.getByRole('textbox'));
+      await user.click(input());
       expect(await screen.findByRole('option', { name: '+ Create new' })).toBeInTheDocument();
     });
 
     it('calls onOptionSubmit with the create option value when clicked', async () => {
+      const user = userEvent.setup();
       const onOptionSubmit = vi.fn();
       render(<SimpleInput onOptionSubmit={onOptionSubmit} />);
-      fireEvent.focus(screen.getByRole('textbox'));
-      const createOption = await screen.findByRole('option', { name: '+ Create new' });
-      fireEvent.click(createOption);
-      expect(onOptionSubmit).toHaveBeenCalledWith('create');
+      await user.click(input());
+      await user.click(await screen.findByRole('option', { name: '+ Create new' }));
+      await waitFor(() => expect(onOptionSubmit).toHaveBeenCalledWith('create'));
     });
 
     it('calls onOptionSubmit with the correct value for a regular option', async () => {
+      const user = userEvent.setup();
       const onOptionSubmit = vi.fn();
       render(<SimpleInput onOptionSubmit={onOptionSubmit} />);
-      fireEvent.focus(screen.getByRole('textbox'));
-      const optA = await screen.findByRole('option', { name: 'Option A' });
-      fireEvent.click(optA);
-      expect(onOptionSubmit).toHaveBeenCalledWith('opt-a');
+      await user.click(input());
+      await user.click(await screen.findByRole('option', { name: 'Option A' }));
+      await waitFor(() => expect(onOptionSubmit).toHaveBeenCalledWith('opt-a'));
     });
   });
 
   describe('focus/blur lifecycle', () => {
-    it('calls onBlur after blur when no option was selected', async () => {
+    it('calls onBlur after blur when no option was selected', () => {
       const onBlur = vi.fn();
       render(<SimpleInput onBlur={onBlur} />);
-      const input = screen.getByRole('textbox');
-      fireEvent.focus(input);
-      fireEvent.blur(input);
-      await act(async () => { await new Promise((r) => setTimeout(r, 200)); });
+      fireEvent.focus(input());
+      fireEvent.blur(input());
       expect(onBlur).toHaveBeenCalledTimes(1);
     });
 
     it('does not call onBlur after an option is selected', async () => {
+      const user = userEvent.setup();
       const onBlur = vi.fn();
-      render(<SimpleInput onBlur={onBlur} />);
-      const input = screen.getByRole('textbox');
-      fireEvent.focus(input);
-      const optA = await screen.findByRole('option', { name: 'Option A' });
-      fireEvent.click(optA);
-      fireEvent.blur(input);
-      await act(async () => { await new Promise((r) => setTimeout(r, 200)); });
+      const onOptionSubmit = vi.fn();
+      render(<SimpleInput onBlur={onBlur} onOptionSubmit={onOptionSubmit} />);
+      await user.click(input());
+      await user.click(await screen.findByRole('option', { name: 'Option A' }));
+      await waitFor(() => expect(onOptionSubmit).toHaveBeenCalled());
+      fireEvent.blur(input());
       expect(onBlur).not.toHaveBeenCalled();
     });
 
@@ -141,7 +162,6 @@ describe('SearchableEntityInput', () => {
 
     it('shows search icon when not loading and no selection', () => {
       render(<SimpleInput />);
-      // IconSearch is rendered via tabler — verify the clear button is absent
       expect(screen.queryByRole('button', { name: /clear selection/i })).not.toBeInTheDocument();
     });
   });

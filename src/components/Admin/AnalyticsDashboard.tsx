@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Loader,
   ScrollArea,
-  Select,
   Table,
 } from '@mantine/core';
 import {
@@ -19,6 +18,7 @@ import {
   ActionIcon,
   SegmentedControl,
   Tooltip,
+  Select,
 } from '@/ui';
 import {
   CartesianGrid,

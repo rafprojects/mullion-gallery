@@ -113,6 +113,51 @@ test.describe('portal mode: overlay-root under a hostile host page', () => {
     await expect(dialog).toBeHidden();
   });
 
+  test('a select in the drawer works from the keyboard across the shadow boundary', async ({ page }) => {
+    // P81-A: the defect Phase 80 recorded. Mantine put the list in a second shadow root, where the
+    // trigger's aria-controls named nothing; the framework's list mounts in its trigger's own root.
+    await installHostileHost(page);
+    await page.goto('/?portal=overlay-root');
+    await page.getByRole('button', { name: 'Admin menu' }).click();
+    await page.getByRole('button', { name: /^Settings$/ }).click();
+    const dialog = page.getByRole('dialog', { name: /^Settings/ });
+    await expect(dialog.getByRole('tab', { name: 'Appearance' })).toBeVisible();
+
+    const trigger = dialog.locator('.mullion-select-trigger').first();
+    await expect(trigger).toBeVisible();
+    await trigger.focus();
+    await page.keyboard.press('ArrowDown');
+    const wiring = await trigger.evaluate((el) => {
+      const root = el.getRootNode() as ShadowRoot;
+      const id = el.getAttribute('aria-controls');
+      const list = id ? root.getElementById(id) : null;
+      const options = list ? [...list.querySelectorAll('[role="option"]')] : [];
+      return {
+        inOverlay: !!root.host?.hasAttribute('data-mullion-overlay-root'),
+        resolves: !!list?.matches('[role="listbox"], [role="listbox"] *, :has([role="listbox"])'),
+        count: options.length,
+        selected: options.findIndex((o) => o.getAttribute('aria-selected') === 'true'),
+        labels: options.map((o) => o.textContent?.trim() ?? ''),
+      };
+    });
+    expect(wiring.inOverlay, 'the drawer is in the overlay root, so this is the shipped configuration').toBe(true);
+    expect(wiring.resolves, 'aria-controls names the list in the trigger’s own root').toBe(true);
+    expect(wiring.count).toBeGreaterThan(1);
+
+    // Move to whichever end is not already chosen, so the commit is a real change.
+    const toLast = wiring.selected !== wiring.count - 1;
+    const before = (await trigger.textContent())?.trim() ?? '';
+    await page.keyboard.press(toLast ? 'End' : 'Home');
+    await page.keyboard.press('Enter');
+    await expect(trigger).not.toHaveText(before);
+    // The field reads the label; a rendered option may carry more, such as a theme's description.
+    const after = (await trigger.textContent())?.trim() ?? '';
+    expect(wiring.labels[toLast ? wiring.count - 1 : 0]!.startsWith(after) && after !== '').toBe(true);
+    await expect
+      .poll(() => trigger.evaluate((el) => (el.getRootNode() as ShadowRoot).activeElement === el))
+      .toBe(true);
+  });
+
   test('light mount ignores the portal mode and keeps overlays in the document', async ({ page }) => {
     await installHostileHost(page);
     await page.goto('/?shadow=0&portal=overlay-root');

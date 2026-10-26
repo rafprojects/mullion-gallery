@@ -1,29 +1,42 @@
-import { useEffect, useRef } from 'react';
-import { Combobox, Loader, useCombobox } from '@mantine/core';
-import { ActionIcon, TextInput } from '@/ui';
-import type { MantineSize } from '@mantine/core';
+import { useRef, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ActionIcon, Autocomplete, Loader, type AutocompleteProps, type UiRenderOption, type UiSelectOption } from '@/ui';
 import { IconSearch, IconTrash } from '@tabler/icons-react';
 
 export interface SearchableEntityInputProps {
   displayValue: string;
   onInputChange: (value: string) => void;
   onOptionSubmit: (value: string) => void;
-  children: React.ReactNode;
+  /** The suggestions, already filtered or fetched: they are shown as given. */
+  options: UiSelectOption[];
+  /** Draws an option; its label is still what lands in the field. */
+  renderOption?: UiRenderOption | undefined;
+  /** Shown in the list when there are no options. */
+  emptyMessage?: ReactNode | undefined;
   hasSelection?: boolean | undefined;
   onClear?: (() => void) | undefined;
   loading?: boolean | undefined;
   onBlur?: (() => void) | undefined;
-  label?: React.ReactNode | undefined;
+  label?: ReactNode | undefined;
   placeholder?: string | undefined;
   required?: boolean | undefined;
-  size?: MantineSize | undefined;
+  size?: AutocompleteProps['size'];
 }
 
+/**
+ * A search field whose text is free and whose options carry an identity: a
+ * user id, a company slug. [P81-A] On the framework's `Autocomplete`, whose
+ * list stays in the input's own root, so the keyboard reaches it inside a
+ * shadow-mounted gallery. The blur delay that kept Mantine's options
+ * clickable is gone: pressing an option no longer takes focus from the input.
+ */
 export function SearchableEntityInput({
   displayValue,
   onInputChange,
   onOptionSubmit,
-  children,
+  options,
+  renderOption,
+  emptyMessage,
   hasSelection,
   onClear,
   loading,
@@ -33,75 +46,43 @@ export function SearchableEntityInput({
   required,
   size,
 }: SearchableEntityInputProps) {
-  const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() });
-  const blurTimeoutRef = useRef<number | null>(null);
-  // Prevents onBlur from firing after an option was committed via selection.
+  const { t } = useTranslation('mullion');
+  // A blur straight after a pick is not the free-text blur a caller settles on.
   const committedRef = useRef(false);
-
-  useEffect(() => {
-    return () => {
-      if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
-    };
-  }, []);
-
-  const handleOptionSubmit = (val: string) => {
-    committedRef.current = true;
-    combobox.closeDropdown();
-    onOptionSubmit(val);
-  };
-
   return (
-    <Combobox store={combobox} onOptionSubmit={handleOptionSubmit}>
-      <Combobox.Target>
-        <TextInput
-          label={label}
-          placeholder={placeholder}
-          required={required ?? false}
-          {...(size !== undefined && { size })}
-          value={displayValue}
-          rightSection={
-            hasSelection ? (
-              <ActionIcon
-                size="sm"
-                variant="subtle"
-                aria-label="Clear selection"
-                onClick={onClear}
-              >
-                <IconTrash size={14} />
-              </ActionIcon>
-            ) : loading ? (
-              <Loader size={16} />
-            ) : (
-              <IconSearch size={16} />
-            )
-          }
-          onChange={(e) => {
-            committedRef.current = false;
-            onInputChange(e.currentTarget.value);
-            combobox.openDropdown();
-            combobox.updateSelectedOptionIndex();
-          }}
-          onClick={() => combobox.openDropdown()}
-          onFocus={() => combobox.openDropdown()}
-          onBlur={() => {
-            // Call consumer's onBlur synchronously so blur-resolution logic
-            // (e.g. CompanyCombobox slug resolution) fires without a delay.
-            if (!committedRef.current) onBlur?.();
-            committedRef.current = false;
-            // Delay dropdown close to avoid interfering with Combobox.Option
-            // mousedown events in environments where blur fires first.
-            if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
-            blurTimeoutRef.current = window.setTimeout(() => {
-              combobox.closeDropdown();
-              blurTimeoutRef.current = null;
-            }, 150);
-          }}
-        />
-      </Combobox.Target>
-
-      <Combobox.Dropdown>
-        <Combobox.Options>{children}</Combobox.Options>
-      </Combobox.Dropdown>
-    </Combobox>
+    <Autocomplete
+      label={label}
+      placeholder={placeholder}
+      required={required ?? false}
+      {...(size !== undefined && { size })}
+      value={displayValue}
+      onChange={(next) => {
+        committedRef.current = false;
+        onInputChange(next);
+      }}
+      onOptionSubmit={(picked) => {
+        committedRef.current = true;
+        onOptionSubmit(picked);
+      }}
+      onBlur={() => {
+        if (!committedRef.current) onBlur?.();
+        committedRef.current = false;
+      }}
+      data={options}
+      filter={null}
+      renderOption={renderOption}
+      nothingFoundMessage={emptyMessage}
+      rightSection={
+        hasSelection ? (
+          <ActionIcon size="sm" variant="subtle" aria-label={t('admin_clear_selection', 'Clear selection')} onClick={onClear}>
+            <IconTrash size={14} />
+          </ActionIcon>
+        ) : loading ? (
+          <Loader size={16} />
+        ) : (
+          <IconSearch size={16} aria-hidden />
+        )
+      }
+    />
   );
 }

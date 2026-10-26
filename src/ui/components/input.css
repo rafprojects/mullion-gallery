@@ -188,10 +188,11 @@
   /*
    * The ring is drawn on the control row rather than on the bare input, so it
    * follows the field's shape and does not cut the sections off from it. The
-   * input's own outline is suppressed because focus.css would otherwise draw
-   * a second one inside the border.
+   * input's own ring is suppressed, and with the row in the selector, because
+   * focus.css loads last and its inset ring otherwise won on a select's
+   * trigger and search input, drawing a second ring inside the first (P81-A).
    */
-  .mullion-field-input:focus-visible {
+  .mullion-field-control .mullion-field-input:is(:focus-visible, [data-focus-visible]) {
     outline: none;
     box-shadow: none;
   }

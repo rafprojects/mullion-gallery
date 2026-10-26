@@ -34,6 +34,7 @@ import {
 } from 'react';
 import type { ThemeDefinition, ThemeExtension } from '@mullion/theme-engine';
 import {
+  MullionLabelsContext,
   MullionPortalContext,
   MullionScopeContext,
   MullionThemeContext,
@@ -41,6 +42,7 @@ import {
   type MullionScopeValue,
   type MullionThemeManager,
 } from './mullionContexts';
+import type { UiLabels } from './labels';
 import {
   BRAND_THEME_ID,
   defineTheme,
@@ -112,6 +114,11 @@ export interface MullionProviderProps {
   themeCandidates?: (() => Array<string | null | undefined>) | undefined;
   /** Scopes the generated scope id. For the storage key, see `persistence.scope`. */
   instanceId?: string | undefined;
+  /**
+   * The framework's own control names in the page's language, merged over the
+   * parent's. A root passes the translated set and nested providers inherit it.
+   */
+  labels?: Partial<UiLabels> | undefined;
   children?: ReactNode;
 }
 
@@ -135,9 +142,11 @@ export function MullionProvider({
   persistence,
   instanceId,
   themeCandidates,
+  labels,
   children,
 }: MullionProviderProps) {
   const parentManager = useContext(MullionThemeContext);
+  const parentLabels = useContext(MullionLabelsContext);
   const parentScope = useContext(MullionScopeContext);
   const parentPortal = useContext(MullionPortalContext);
   const isRoot = parentManager === null;
@@ -335,6 +344,11 @@ export function MullionProvider({
     [],
   );
 
+  const ownLabels = useMemo(
+    () => (labels ? { ...parentLabels, ...labels } : parentLabels),
+    [parentLabels, labels],
+  );
+
   const scopeValue = useMemo<MullionScopeValue>(
     () => ({ scopeId, selector, themeId: paintedId, colorScheme: entry.colorScheme, mode: scopeMode }),
     [scopeId, selector, paintedId, entry.colorScheme, scopeMode],
@@ -344,13 +358,15 @@ export function MullionProvider({
     <MullionThemeContext.Provider value={manager}>
       <MullionScopeContext.Provider value={scopeValue}>
         <MullionPortalContext.Provider value={container}>
-          {scope === undefined ? (
-            <div ref={wrapperRef} data-mullion-scope={scopeId} style={WRAPPER_STYLE}>
-              {children}
-            </div>
-          ) : (
-            children
-          )}
+          <MullionLabelsContext.Provider value={ownLabels}>
+            {scope === undefined ? (
+              <div ref={wrapperRef} data-mullion-scope={scopeId} style={WRAPPER_STYLE}>
+                {children}
+              </div>
+            ) : (
+              children
+            )}
+          </MullionLabelsContext.Provider>
         </MullionPortalContext.Provider>
       </MullionScopeContext.Provider>
     </MullionThemeContext.Provider>

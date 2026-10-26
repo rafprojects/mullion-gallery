@@ -10677,3 +10677,39 @@ msgstr "Только эксклюзивные: показывать только
 
 msgid "Edit tags for {{name}}. Tags: {{tags}}"
 msgstr "Редактировать метки для {{name}}. Метки: {{tags}}"
+
+msgid "Clear"
+msgstr "Очистить"
+
+msgid "Show options"
+msgstr "Показать варианты"
+
+msgid "Remove {{label}}"
+msgstr "Удалить {{label}}"
+
+msgid "Show password"
+msgstr "Показать пароль"
+
+msgid "Increment"
+msgstr "Увеличить"
+
+msgid "Decrement"
+msgstr "Уменьшить"
+
+msgid "Open the color picker"
+msgstr "Открыть выбор цвета"
+
+msgid "Pick a color from the screen"
+msgstr "Взять цвет с экрана"
+
+msgid "Use {{color}}"
+msgstr "Использовать {{color}}"
+
+msgid "Saturation and brightness"
+msgstr "Насыщенность и яркость"
+
+msgid "Saturation {{saturation}}%, brightness {{brightness}}%"
+msgstr "Насыщенность {{saturation}}%, яркость {{brightness}}%"
+
+msgid "Page {{page}}"
+msgstr "Страница {{page}}"

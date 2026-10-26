@@ -10677,3 +10677,39 @@ msgstr "Exclusifs uniquement : afficher uniquement les médias exclusifs à cett
 
 msgid "Edit tags for {{name}}. Tags: {{tags}}"
 msgstr "Modifier les étiquettes de {{name}}. Étiquettes : {{tags}}"
+
+msgid "Clear"
+msgstr "Effacer"
+
+msgid "Show options"
+msgstr "Afficher les options"
+
+msgid "Remove {{label}}"
+msgstr "Retirer {{label}}"
+
+msgid "Show password"
+msgstr "Afficher le mot de passe"
+
+msgid "Increment"
+msgstr "Augmenter"
+
+msgid "Decrement"
+msgstr "Diminuer"
+
+msgid "Open the color picker"
+msgstr "Ouvrir le sélecteur de couleur"
+
+msgid "Pick a color from the screen"
+msgstr "Prélever une couleur à l’écran"
+
+msgid "Use {{color}}"
+msgstr "Utiliser {{color}}"
+
+msgid "Saturation and brightness"
+msgstr "Saturation et luminosité"
+
+msgid "Saturation {{saturation}}%, brightness {{brightness}}%"
+msgstr "Saturation {{saturation}} %, luminosité {{brightness}} %"
+
+msgid "Page {{page}}"
+msgstr "Page {{page}}"

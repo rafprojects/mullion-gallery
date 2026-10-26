@@ -35,6 +35,7 @@ import { Loader } from './feedback';
 import { uiRem } from '../styles/rootScale';
 import { CheckMark, resolveRoleGlyph } from './roleGlyph';
 import { customProperties, radiusValue, type UiRadius, type UiScaleStep } from './scale';
+import { useUiLabels } from '../provider/hooks';
 
 export type UiControlVariant = 'filled' | 'light' | 'outline' | 'subtle' | 'default' | 'transparent';
 
@@ -203,10 +204,11 @@ export interface CloseButtonProps extends Omit<ActionIconProps, 'children'> {
  * control's own colour.
  */
 export function CloseButton({ className, ...rest }: CloseButtonProps) {
+  const labels = useUiLabels();
   return (
     <ActionIcon
       className={cx('mullion-close-button', className)}
-      aria-label={rest['aria-label'] ?? 'Close'}
+      aria-label={rest['aria-label'] ?? labels.close}
       {...rest}
     />
   );

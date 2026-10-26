@@ -2872,5 +2872,22 @@
   "set_discarded_message": "Unsaved settings discarded.",
   "app_session_expired": "Session expired. Please sign in again.",
   "app_loading_campaigns": "Loading campaigns...",
-  "app_loading_page": " (page {{completed}} of {{total}})"
+  "app_loading_page": " (page {{completed}} of {{total}})",
+  "ui_clear": "Clear",
+  "ui_show_options": "Show options",
+  "ui_remove_item": "Remove {{label}}",
+  "ui_show_password": "Show password",
+  "ui_increment": "Increment",
+  "ui_decrement": "Decrement",
+  "ui_open_color_picker": "Open the color picker",
+  "ui_pick_from_screen": "Pick a color from the screen",
+  "ui_use_color": "Use {{color}}",
+  "ui_color_surface": "Saturation and brightness",
+  "ui_color_surface_value": "Saturation {{saturation}}%, brightness {{brightness}}%",
+  "ui_hue": "Hue",
+  "ui_opacity": "Opacity",
+  "ui_pagination": "Pagination",
+  "ui_previous_page": "Previous page",
+  "ui_next_page": "Next page",
+  "ui_page": "Page {{page}}"
 }

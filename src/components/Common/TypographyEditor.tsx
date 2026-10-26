@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import {
   Accordion,
-  Select,
 } from '@mantine/core';
 import {
   Group,
@@ -10,10 +9,11 @@ import {
   Badge,
   ActionIcon,
   NumberInput,
+  ColorInput,
+  Select,
 } from '@/ui';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { CssValueInput } from '@/components/Common/CssValueInput';
 import type { TypographyOverride } from '@/types';
 import {

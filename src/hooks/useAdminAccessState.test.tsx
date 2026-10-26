@@ -9,32 +9,6 @@ vi.mock('@mantine/hooks', () => ({
   useDebouncedValue: (value: unknown) => [value],
 }));
 
-// Mock useCombobox from @mantine/core.
-// Without MantineProvider, useCombobox's internal store subscriptions re-run
-// on every render, creating a new object → effect dep-array change → infinite
-// rerender loop → V8 OOM crash. A stable mock object breaks the cycle.
-vi.mock('@mantine/core', () => ({
-  useCombobox: () => ({
-    dropdownOpened: false,
-    selectedOptionIndex: -1,
-    focusedIndex: -1,
-    openDropdown: vi.fn(),
-    closeDropdown: vi.fn(),
-    toggleDropdown: vi.fn(),
-    selectOption: vi.fn(),
-    selectFirstOption: vi.fn(),
-    selectNextOption: vi.fn(),
-    selectPreviousOption: vi.fn(),
-    resetSelectedOption: vi.fn(),
-    clickSelectedOption: vi.fn(),
-    updateSelectedOptionIndex: vi.fn(),
-    listId: '',
-    setListId: vi.fn(),
-    getSelectedOptionIndex: vi.fn().mockReturnValue(-1),
-    onInputKeydown: vi.fn(),
-  }),
-}));
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function makeApiClient(overrides: Partial<ApiClient> = {}): ApiClient {

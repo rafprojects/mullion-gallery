@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-26T21:37:24+00:00\n"
+"POT-Creation-Date: 2026-10-26T22:50:12+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: mullion-gallery\n"
@@ -3493,6 +3493,7 @@ msgid "Minimum height for each card. 0 = no minimum."
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:814
+#: includes/i18n/class-mullion-frontend-strings.php:2916
 msgid "Pagination"
 msgstr ""
 
@@ -7455,6 +7456,7 @@ msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2045
 #: includes/i18n/class-mullion-frontend-strings.php:2065
+#: includes/i18n/class-mullion-frontend-strings.php:2914
 msgid "Hue"
 msgstr ""
 
@@ -7683,6 +7685,7 @@ msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2116
 #: includes/i18n/class-mullion-frontend-strings.php:2180
+#: includes/i18n/class-mullion-frontend-strings.php:2915
 msgid "Opacity"
 msgstr ""
 
@@ -9711,10 +9714,12 @@ msgid "Card gallery page {{current}} of {{total}}"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2736
+#: includes/i18n/class-mullion-frontend-strings.php:2917
 msgid "Previous page"
 msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2737
+#: includes/i18n/class-mullion-frontend-strings.php:2918
 msgid "Next page"
 msgstr ""
 
@@ -10275,6 +10280,54 @@ msgstr ""
 
 #: includes/i18n/class-mullion-frontend-strings.php:2902
 msgid " (page {{completed}} of {{total}})"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2903
+msgid "Clear"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2904
+msgid "Show options"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2905
+msgid "Remove {{label}}"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2906
+msgid "Show password"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2907
+msgid "Increment"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2908
+msgid "Decrement"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2909
+msgid "Open the color picker"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2910
+msgid "Pick a color from the screen"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2911
+msgid "Use {{color}}"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2912
+msgid "Saturation and brightness"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2913
+msgid "Saturation {{saturation}}%, brightness {{brightness}}%"
+msgstr ""
+
+#: includes/i18n/class-mullion-frontend-strings.php:2919
+msgid "Page {{page}}"
 msgstr ""
 
 #: includes/settings/class-mullion-settings-core-fields.php:23

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act, within } from '../../test/test-utils';
+import { render, screen, fireEvent, waitFor, act, within, pickOption } from '../../test/test-utils';
 import MediaTab from './MediaTab';
 import { notify } from '@/ui';
 
@@ -868,7 +868,7 @@ describe('MediaTab', () => {
     apiClient.get.mockResolvedValueOnce([]);
     render(<MediaTab campaignId="101" apiClient={apiClient as any} />);
     const select = await screen.findByRole('combobox', { name: /sort mode/i });
-    expect(select).toHaveValue('Order');
+    expect(select).toHaveTextContent('Order');
   });
 
   it('sorts media by title when "Title A–Z" is selected', async () => {
@@ -881,9 +881,7 @@ describe('MediaTab', () => {
     await screen.findByText('Zebra');
 
     // Open the sort select and choose Title A–Z
-    const select = screen.getByRole('combobox', { name: /sort mode/i });
-    fireEvent.click(select);
-    fireEvent.click(await screen.findByRole('option', { name: 'Title A–Z' }));
+    await pickOption(/sort mode/i, 'Title A–Z');
 
     // After re-sort, Apple should precede Zebra in the DOM
     await waitFor(() => {
@@ -913,9 +911,7 @@ describe('MediaTab', () => {
     );
 
     // Switch to title sort — drag handles should disappear
-    const select = screen.getByRole('combobox', { name: /sort mode/i });
-    fireEvent.click(select);
-    fireEvent.click(await screen.findByRole('option', { name: 'Title A–Z' }));
+    await pickOption(/sort mode/i, 'Title A–Z');
 
     await waitFor(() =>
       expect(screen.queryAllByLabelText('Drag media to reorder')).toHaveLength(0),
@@ -941,9 +937,7 @@ describe('MediaTab', () => {
     );
 
     // Switch to title sort — handles should disappear from card grid too
-    const select = screen.getByRole('combobox', { name: /sort mode/i });
-    fireEvent.click(select);
-    fireEvent.click(await screen.findByRole('option', { name: 'Title A–Z' }));
+    await pickOption(/sort mode/i, 'Title A–Z');
 
     await waitFor(() =>
       expect(screen.queryAllByLabelText('Drag media to reorder')).toHaveLength(0),

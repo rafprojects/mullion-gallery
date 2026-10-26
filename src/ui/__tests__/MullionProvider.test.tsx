@@ -16,6 +16,8 @@ import { BRAND_THEME_ID, getThemeEntry } from '../provider/registry';
 import { TOKEN_SHEET_ATTR } from '../provider/tokenSheet';
 import { SCOPE_ATTR } from '../provider/scope';
 import { UI_STYLES_ATTR, hasAdoptedUiStyles } from '../styles/uiStyles';
+import { ColorPicker, MultiSelect, NumberInput, PasswordInput } from '../components';
+import { formatUiLabel } from '../provider/labels';
 
 const bg = (id: string) => `--mullion-color-background: ${getThemeEntry(id).resolved.background};`;
 
@@ -642,5 +644,70 @@ describe('MullionProvider hooks and teardown', () => {
     expect(sheetsIn(shadow)).toHaveLength(1);
     expect(document.body.querySelectorAll('[data-mullion-portal]')).toHaveLength(1);
     host.remove();
+  });
+});
+
+describe('labels (P81-A)', () => {
+  // The framework names its own controls; until this, in English in every locale.
+  const GERMAN = { remove: '{label} entfernen', showPassword: 'Passwort anzeigen', clear: 'Leeren' };
+
+  it('names a framework control in English with no labels at all', () => {
+    render(
+      <MullionProvider>
+        <PasswordInput label="Password" />
+      </MullionProvider>,
+    );
+    expect(screen.getByRole('button', { name: 'Show password' })).toBeTruthy();
+  });
+
+  it('takes a root provider\'s labels, slots filled', () => {
+    render(
+      <MullionProvider labels={GERMAN}>
+        <PasswordInput label="Passwort" />
+        <MultiSelect label="Obst" data={['Apfel']} value={['Apfel']} clearable />
+      </MullionProvider>,
+    );
+    expect(screen.getByRole('button', { name: 'Passwort anzeigen' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Apfel entfernen' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Leeren' })).toBeTruthy();
+  });
+
+  it('reaches through a nested provider, which may replace one name', () => {
+    render(
+      <MullionProvider labels={GERMAN}>
+        <MullionProvider labels={{ clear: 'Alles leeren' }}>
+          <PasswordInput label="Passwort" />
+          <MultiSelect label="Obst" data={['Apfel']} value={['Apfel']} clearable />
+        </MullionProvider>
+      </MullionProvider>,
+    );
+    expect(screen.getByRole('button', { name: 'Passwort anzeigen' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Alles leeren' })).toBeTruthy();
+  });
+
+  it('yields to a call site that names the control itself', () => {
+    render(
+      <MullionProvider labels={GERMAN}>
+        <PasswordInput label="PIN" revealLabel="PIN anzeigen" />
+        <NumberInput label="Anzahl" controls="flank" incrementLabel="Mehr" />
+      </MullionProvider>,
+    );
+    expect(screen.getByRole('button', { name: 'PIN anzeigen' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Mehr' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Decrement' })).toBeTruthy();
+  });
+
+  it('speaks a colour surface\'s position in the page\'s language', () => {
+    render(
+      <MullionProvider labels={{ colorSurface: 'Sättigung und Helligkeit', colorSurfaceValue: 'Sättigung {saturation} %, Helligkeit {brightness} %' }}>
+        <ColorPicker value="#ff0000" />
+      </MullionProvider>,
+    );
+    const surface = screen.getByRole('slider', { name: 'Sättigung und Helligkeit' });
+    expect(surface.getAttribute('aria-valuetext')).toBe('Sättigung 100 %, Helligkeit 100 %');
+  });
+
+  it('fills a template\'s slots and leaves one it was not given', () => {
+    expect(formatUiLabel('Page {page} of {total}', { page: 2 })).toBe('Page 2 of {total}');
   });
 });

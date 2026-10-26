@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, Select } from '@mantine/core';
+import { Table } from '@mantine/core';
 import { IconEdit, IconCopy, IconDownload, IconFileZip, IconArchive, IconArchiveOff, IconLayoutGrid, IconTrash, IconChevronDown, IconArrowsExchange, IconPhotoPlus } from '@tabler/icons-react';
 import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignCategoryEntry } from '@/services/apiClient';
@@ -9,7 +9,7 @@ import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { CompanyCombobox } from '@/components/Common/CompanyCombobox';
 import type { ApiClient } from '@/services/apiClient';
-import { uiRem, Group, Text, Box, Badge, Button, Checkbox, Menu, notify, VisuallyHidden, Tooltip } from '@/ui';
+import { uiRem, Group, Text, Box, Badge, Button, Checkbox, Menu, notify, VisuallyHidden, Tooltip, Select } from '@/ui';
 
 function toSlug(name: string): string {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -109,7 +109,6 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
             <Group gap="3xs" wrap="nowrap" align="center">
               <Select
                 size="xs"
-                variant="filled"
                 data={statusOptions}
                 value={c.status}
                 onChange={(v) => {
@@ -120,9 +119,8 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                     { onError: () => notify.show({ message: t('admin_camprow_fail_status', 'Failed to update status.'), color: 'red', autoClose: 3000 }) },
                   );
                 }}
-                styles={{ input: { minWidth: 90 } }}
-                comboboxProps={{ width: 120 }}
-                withCheckIcon={false}
+                style={{ minWidth: 90 }}
+                width={120}
                 aria-label={t('admin_camprow_status_aria', 'Status for {{title}}', { title: c.title })}
               />
               {sched && <Badge variant="light" tone={sched.tone} size="xs">{sched.text}</Badge>}
@@ -131,7 +129,6 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
           <Table.Td>
             <Select
               size="xs"
-              variant="filled"
               data={visibilityOptions}
               value={c.visibility}
               onChange={(v) => {
@@ -142,8 +139,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                   { onError: () => notify.show({ message: t('admin_camprow_fail_visibility', 'Failed to update visibility.'), color: 'red', autoClose: 3000 }) },
                 );
               }}
-              styles={{ input: { minWidth: 80 } }}
-              withCheckIcon={false}
+              style={{ minWidth: 80 }}
               aria-label={t('admin_camprow_visibility_aria', 'Visibility for {{title}}', { title: c.title })}
             />
           </Table.Td>

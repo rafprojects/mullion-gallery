@@ -1,18 +1,15 @@
 import { type ReactNode } from 'react';
-import { type SelectProps } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { useGalleryAdapterSettingsIO } from '@/hooks/useGalleryAdapterSettingsIO';
 import { IconRefresh } from '@tabler/icons-react';
-import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import type { GalleryBehaviorSettings, GalleryConfig, GalleryConfigBreakpoint, GalleryConfigScope } from '@/types';
 import type { AdapterCapability, AdapterSettingFieldAppliesTo, AdapterSettingGroupDefinition } from '@/components/Galleries/Adapters/GalleryAdapter';
 import { anyAdapterUsesSettingGroup, getActiveSettingGroupDefinitions, getAdapterRegistration, getAdapterSelectOptions, getSettingGroupFieldDefinitions } from '@/components/Galleries/Adapters/adapterRegistry';
 import { tFieldLabel, tFieldDescription, tFieldPlaceholder, tFieldOptions } from '@/utils/adapterSchemaI18n';
-import { ModalSelect } from '@/components/Common/ModalSelect';
 import { cloneGalleryConfig, collectGalleryAdapterSettingValues, GALLERY_BREAKPOINTS, getGalleryConfigScopeAdapterIds, resolveGalleryConfig, setGalleryAdapterSetting } from '@/utils/galleryConfig';
 import { DimensionInput } from './DimensionInput';
-import { uiRem, Group, Stack, Text, Box, SimpleGrid, ActionIcon, Button, Switch, NumberInput, TextInput, Tooltip } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, SimpleGrid, ActionIcon, Button, Switch, NumberInput, TextInput, Tooltip, ColorInput, Select, type UiRenderOption } from '@/ui';
 
 export type UpdateGallerySetting = <K extends keyof GalleryBehaviorSettings>(
   key: K,
@@ -62,7 +59,7 @@ function translateCapability(cap: AdapterCapability): string {
   return i18n.t(CAPABILITY_I18N_KEYS[cap], fallback, { ns: 'mullion' });
 }
 
-const renderAdapterOption: NonNullable<SelectProps['renderOption']> = ({ option }) => {
+const renderAdapterOption: UiRenderOption = ({ option }) => {
   const reg = getAdapterRegistration(option.value);
   const caps = reg?.capabilities ?? [];
   return (
@@ -213,7 +210,7 @@ function renderSettingFields(
       if (field.control === 'boolean') {
         const reset = () => updateSetting(field.key, field.fallback as GalleryBehaviorSettings[typeof field.key]);
         return (
-          <ModalSelect
+          <Select
             key={`${group}-${String(field.key)}`}
             label={fieldLabel(tFieldLabel(group, field), reset)}
             description={tFieldDescription(group, field)}
@@ -261,7 +258,7 @@ function renderSettingFields(
         : undefined;
       const reset = () => updateSetting(field.key, field.fallback as GalleryBehaviorSettings[typeof field.key]);
       return (
-        <ModalSelect
+        <Select
           key={`${group}-${String(field.key)}`}
           label={fieldLabel(tFieldLabel(group, field), reset)}
           description={tFieldDescription(group, field)}
@@ -415,7 +412,7 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
                   <Text size="sm" weight={500} style={{ display: 'flex', alignItems: 'center' }}>
                     {bpLabel(breakpoint)}
                   </Text>
-                  <ModalSelect
+                  <Select
                     size="xs"
                     label={t('set_ad_unified_adapter_label', '{{bp}} Unified Gallery Adapter', { bp: bpLabel(breakpoint) })}
                     aria-label={t('set_ad_unified_adapter_label', '{{bp}} Unified Gallery Adapter', { bp: bpLabel(breakpoint) })}
@@ -462,7 +459,7 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
                   <Text size="sm" weight={500} style={{ display: 'flex', alignItems: 'center' }}>
                     {bpLabel(breakpoint)}
                   </Text>
-                  <ModalSelect
+                  <Select
                     size="xs"
                     label={t('set_ad_image_adapter_label', '{{bp}} Image Gallery Adapter', { bp: bpLabel(breakpoint) })}
                     aria-label={t('set_ad_image_adapter_label', '{{bp}} Image Gallery Adapter', { bp: bpLabel(breakpoint) })}
@@ -471,7 +468,7 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
                     data={adapterOptions}
                     renderOption={renderAdapterOption}
                   />
-                  <ModalSelect
+                  <Select
                     size="xs"
                     label={t('set_ad_video_adapter_label', '{{bp}} Video Gallery Adapter', { bp: bpLabel(breakpoint) })}
                     aria-label={t('set_ad_video_adapter_label', '{{bp}} Video Gallery Adapter', { bp: bpLabel(breakpoint) })}

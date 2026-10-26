@@ -20,13 +20,19 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/hooks/useTheme';
 import {
+  groupThemes,
+  themeSwatches,
+  useMullionTheme,
+  Group,
+  Stack,
+  Text,
   Select,
   ColorSwatch,
   type SelectProps,
-} from '@mantine/core';
-import { useTheme } from '@/hooks/useTheme';
-import { groupThemes, themeSwatches, useMullionTheme, Group, Stack, Text } from '@/ui';
+  type UiRenderOption,
+} from '@/ui';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 
 // ---------------------------------------------------------------------------
@@ -59,7 +65,6 @@ export function ThemeSelector({
   const { themeId, setPreviewTheme } = useTheme();
   const { themes } = useMullionTheme();
   const resolvedValue = value ?? themeId;
-  const { comboboxProps, ...restSelectProps } = selectProps ?? {};
 
   // Local state ensures the dropdown reflects the selection immediately,
   // even if the MantineProvider re-render introduced by setPreviewTheme
@@ -76,7 +81,7 @@ export function ThemeSelector({
     }))
     .filter((g) => g.items.length > 0);
 
-  const renderOption: SelectProps['renderOption'] = ({ option }) => {
+  const renderOption: UiRenderOption = ({ option }) => {
     const swatches = themeSwatches(option.value);
     const meta = themes.find((m) => m.id === option.value);
     // Catalogue-backed description; a runtime theme falls back to a scheme hint
@@ -115,11 +120,7 @@ export function ThemeSelector({
       }}
       data={data}
       renderOption={renderOption}
-      allowDeselect={false}
-      // Keep the dropdown in the same tree as the shadow-root modal so
-      // preview updates and styling stay scoped to the active gallery instance.
-      comboboxProps={{ ...comboboxProps, withinPortal: false }}
-      {...restSelectProps}
+      {...selectProps}
     />
   );
 }

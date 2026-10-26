@@ -28,7 +28,7 @@ import { MullionProvider } from '@/ui';
 import { expectNoA11yViolations } from '@/test/axe';
 import { PORTAL_ATTR, SCOPE_ATTR } from '../provider/scope';
 import { uiStylesText } from '../styles/uiStyles';
-import { MultiSelect, Select, TagsInput } from '../components';
+import { Autocomplete, MultiSelect, Select, TagsInput } from '../components';
 
 const FRUIT = [
   { value: 'gala', label: 'Gala' },
@@ -89,6 +89,29 @@ describe('Select', () => {
   });
 });
 
+describe('renderOption (P81-A)', () => {
+  const render = ({ option }: { option: { value: string; label: string } }) => (
+    <span data-testid={`row-${option.value}`}>{option.label} row</span>
+  );
+
+  it.each([
+    ['Select', false],
+    ['Select searchable', true],
+  ])('%s draws the content and keeps the check mark', async (_name, searchable) => {
+    const user = userEvent.setup();
+    mount(<Select label="Apple" data={FRUIT} value="fuji" searchable={searchable} renderOption={render} />);
+    const list = await open(user);
+    const selected = within(list).getByRole('option', { name: /Fuji row/ });
+    expect(within(selected).getByTestId('row-fuji')).toBeTruthy();
+    expect(selected.querySelector('.mullion-select-item-indicator')).not.toBeNull();
+  });
+
+  it('leaves the closed field reading the label', () => {
+    mount(<Select label="Apple" data={FRUIT} value="fuji" renderOption={render} />);
+    expect(control().textContent).toBe('Fuji');
+  });
+});
+
 describe('a searchable field', () => {
   it('shows the label of the selected value, not the value', async () => {
     /*
@@ -133,6 +156,14 @@ describe('names (P80-F)', () => {
     expect(container.ownerDocument.querySelector('label label'), 'a label nested in a label').toBeNull();
     await user.click(screen.getByText('Fruit'));
     expect(document.activeElement).toBe(screen.getByRole('combobox', { name: 'Fruit' }));
+  });
+
+  it('a plain select\'s label points at its trigger', () => {
+    // Base UI's field aimed the label's `for` at an id nothing rendered (P81-A).
+    mount(<Select label="Fruit" data={FRUIT} />);
+    const label = screen.getByText('Fruit').closest('label')!;
+    expect(document.getElementById(label.htmlFor)).toBe(control());
+    expect(screen.getByLabelText('Fruit')).toBe(control());
   });
 
   it('a searchable field has one control with the field\'s name, not two', () => {
@@ -294,6 +325,24 @@ describe('MultiSelect', () => {
   });
 });
 
+describe('clearing a chip field (P81-A)', () => {
+  it.each([
+    ['MultiSelect', (onChange: (v: string[]) => void) => <MultiSelect label="Apples" data={FRUIT} value={['fuji', 'gala']} onChange={onChange} clearable />],
+    ['TagsInput', (onChange: (v: string[]) => void) => <TagsInput label="Tags" value={['a', 'b']} onChange={onChange} clearable />],
+  ])('%s empties itself through one named control', async (_name, ui) => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    mount(ui(onChange));
+    await user.click(screen.getByRole('button', { name: 'Clear' }));
+    expect(onChange).toHaveBeenLastCalledWith([]);
+  });
+
+  it('offers nothing to clear when there are no chips', () => {
+    mount(<MultiSelect label="Apples" data={FRUIT} value={[]} clearable />);
+    expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull();
+  });
+});
+
 describe('TagsInput', () => {
   it('adds what was typed on Enter, which is the one behaviour the primitive lacks', async () => {
     const user = userEvent.setup();
@@ -320,6 +369,28 @@ describe('TagsInput', () => {
     expect(screen.getByRole('button', { name: 'Remove portrait' })).toBeTruthy();
   });
 
+  it('turns what comes before a split character into tags', async () => {
+    const user = userEvent.setup();
+    function Harness() {
+      const [tags, setTags] = useState<string[]>(['portrait']);
+      return <TagsInput label="Tags" value={tags} onChange={setTags} splitChars={[',']} />;
+    }
+    mount(<Harness />);
+    await user.click(control());
+    await user.keyboard('landscape,');
+    expect(await screen.findByRole('button', { name: 'Remove landscape' })).toBeTruthy();
+    expect((control() as HTMLInputElement).value).toBe('');
+    // A paste arrives whole: every complete part is a tag, a duplicate is not, and the tail stays typed.
+    // `hidden`, because Base UI hides the field's other contents from assistive tech while its list is open.
+    await user.paste('macro, portrait,, night, sk');
+    const chips = () =>
+      screen.getAllByRole('button', { name: /^Remove /, hidden: true }).map((b) => b.getAttribute('aria-label'));
+    await waitFor(() =>
+      expect(chips()).toEqual(['Remove portrait', 'Remove landscape', 'Remove macro', 'Remove night']),
+    );
+    expect((control() as HTMLInputElement).value).toBe(' sk');
+  });
+
   it('does not add a blank tag', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
@@ -330,6 +401,103 @@ describe('TagsInput', () => {
   });
 });
 
+describe('Autocomplete (P81-A)', () => {
+  /** A caller holding the text, as the two call sites do, with every call recorded in order. */
+  function Harness({ calls, ...props }: { calls: string[] } & Partial<React.ComponentProps<typeof Autocomplete>>) {
+    const [text, setText] = useState('');
+    return (
+      <Autocomplete
+        label="Company"
+        data={FRUIT}
+        value={text}
+        onChange={(next) => {
+          calls.push(`change:${next}`);
+          setText(next);
+        }}
+        onOptionSubmit={(picked) => calls.push(`submit:${picked}`)}
+        {...props}
+      />
+    );
+  }
+
+  it('filters on the label by default', async () => {
+    const user = userEvent.setup();
+    mount(<Harness calls={[]} />);
+    await user.click(control());
+    await user.keyboard('pink');
+    await waitFor(() => expect(screen.getAllByRole('option')).toHaveLength(1));
+    expect(screen.getByRole('option').textContent).toBe('Pink Lady');
+  });
+
+  it('shows data as given when the caller filters', async () => {
+    const user = userEvent.setup();
+    mount(<Harness calls={[]} filter={null} />);
+    await user.click(control());
+    await user.keyboard('zzz');
+    await waitFor(() => expect(screen.getAllByRole('option')).toHaveLength(3));
+  });
+
+  it.each([
+    ['a click', async (user: ReturnType<typeof userEvent.setup>) => user.click(screen.getByRole('option', { name: 'Fuji' }))],
+    ['the keyboard', async (user: ReturnType<typeof userEvent.setup>) => user.keyboard('{ArrowDown}{Enter}')],
+  ])('reports the text and then the option chosen by %s', async (_how, choose) => {
+    /*
+     * The order is the contract both call sites rely on: the text change
+     * first, which clears their selection, and the choice second, which sets
+     * it. Reversed, the user search would drop the user it had just picked.
+     */
+    const user = userEvent.setup();
+    const calls: string[] = [];
+    mount(<Harness calls={calls} />);
+    await user.click(control());
+    await user.keyboard('fu');
+    await waitFor(() => expect(screen.getAllByRole('option')).toHaveLength(1));
+    calls.length = 0;
+    await choose(user);
+    await waitFor(() => expect(calls).toEqual(['change:Fuji', 'submit:fuji']));
+    expect((control() as HTMLInputElement).value).toBe('Fuji');
+  });
+
+  it('reports the option even when the text already reads its label', async () => {
+    const user = userEvent.setup();
+    const calls: string[] = [];
+    mount(<Harness calls={calls} />);
+    await user.click(control());
+    await user.keyboard('Fuji');
+    calls.length = 0;
+    await user.click(await screen.findByRole('option', { name: 'Fuji' }));
+    await waitFor(() => expect(calls).toContain('submit:fuji'));
+  });
+
+  it('says so when nothing matches', async () => {
+    const user = userEvent.setup();
+    mount(<Harness calls={[]} data={[]} nothingFoundMessage="No companies found" />);
+    await user.click(control());
+    await user.keyboard('a');
+    expect(await screen.findByText('No companies found')).toBeTruthy();
+  });
+
+  it('keeps its list where the input\'s aria-controls can find it', async () => {
+    const user = userEvent.setup();
+    mount(<Harness calls={[]} />);
+    await user.click(control());
+    const list = await screen.findByRole('listbox', { name: 'Company' });
+    const id = control().getAttribute('aria-controls');
+    expect(id).toBeTruthy();
+    expect((control().getRootNode() as Document).getElementById(id!)).not.toBeNull();
+    expect(list.getRootNode()).toBe(control().getRootNode());
+  });
+
+  it('draws a rendered option with no check column', async () => {
+    const user = userEvent.setup();
+    mount(<Harness calls={[]} renderOption={({ option }) => <b>{option.label}</b>} />);
+    await user.click(control());
+    const option = (await screen.findAllByRole('option'))[0]!;
+    expect(option.querySelector('.mullion-select-item-indicator')).toBeNull();
+    expect(option.querySelector('.mullion-select-item-text b')).not.toBeNull();
+  });
+});
+
 describe('the structural axe gate', () => {
   it('every form in the family passes with a label, a description and an error', async () => {
     const { container } = mount(
@@ -337,8 +505,9 @@ describe('the structural axe gate', () => {
         <Select label="Apple" data={FRUIT} description="Pick the one you want" />
         <Select label="Pear" data={FRUIT} error="Required" />
         <Select label="Search" data={FRUIT} searchable />
-        <MultiSelect label="Apples" data={FRUIT} value={['fuji']} />
+        <MultiSelect label="Apples" data={FRUIT} value={['fuji']} clearable />
         <TagsInput label="Tags" value={['landscape']} />
+        <Autocomplete label="Company" data={FRUIT} />
       </>,
     );
     await expectNoA11yViolations(container);

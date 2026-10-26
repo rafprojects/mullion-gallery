@@ -250,7 +250,8 @@ test.describe('style delivery contract', () => {
 
   // P77-C: the rules moved out of global.scss must not only be present in the
   // document, they must paint. The Theme select's checked option and the
-  // drawer's active tab are the two parts a reader can see.
+  // drawer's active tab are the two parts a reader can see. P81-A: the select
+  // is the framework's now, so its chosen row is painted by the framework sheet.
   test('shadow mount: the moved state rules paint on portaled chrome', async ({ page }) => {
     await installAdminSession(page);
     await page.goto('/');
@@ -275,20 +276,26 @@ test.describe('style delivery contract', () => {
     expect(tab.borderBottomColor).toBe(hexToRgb(tab.tabsColor));
 
     await dialog.getByRole('combobox', { name: 'Theme' }).click();
-    const checked = page.locator('.mullion-mantine-select-option[data-checked]').first();
-    await expect(checked).toBeVisible();
-    const option = await checked.evaluate((el) => {
-      const cs = getComputedStyle(el);
+    const chosen = page.locator('.mullion-select-item[data-selected]').first();
+    await expect(chosen).toBeVisible();
+    const option = await chosen.evaluate((el) => {
+      // The token resolved in the option's own tree, through a probe, so the two colours compare as
+      // computed. The fallback keeps a missing token from inheriting the row's colour and passing.
+      const probe = document.createElement('span');
+      probe.style.color = 'var(--mullion-primary-text, rgb(1, 2, 3))';
+      el.appendChild(probe);
+      const expected = getComputedStyle(probe).color;
+      probe.remove();
       return {
-        background: cs.backgroundColor,
-        color: cs.color,
-        bgVar: cs.getPropertyValue('--mullion-select-option-checked-bg').trim(),
-        colorVar: cs.getPropertyValue('--mullion-select-option-checked-color').trim(),
+        inOverlay: el.getRootNode() === document.querySelector('[data-mullion-overlay-root]')?.shadowRoot,
+        color: getComputedStyle(el).color,
+        expected,
+        checked: !!el.querySelector('.mullion-select-item-indicator'),
       };
     });
-    expect(option.bgVar, 'the adapter must put the checked pair on the dropdown').toMatch(/^#/);
-    expect(option.background).toBe(hexToRgb(option.bgVar));
-    expect(option.color).toBe(hexToRgb(option.colorVar));
+    expect(option.inOverlay, 'the list must render inside the overlay root, beside its trigger').toBe(true);
+    expect(option.color, 'the framework sheet must paint the chosen row in primary-text').toBe(option.expected);
+    expect(option.checked, 'the chosen row carries the check, so it is not colour alone').toBe(true);
   });
 
   test('light mount: chrome-portable and global.scss both reach the document', async ({ page }) => {

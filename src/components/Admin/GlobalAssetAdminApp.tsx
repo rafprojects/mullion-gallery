@@ -4,6 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { Confirmations, MullionProvider, Notifications, notify } from '@/ui';
 import i18n from '@/i18n';
+import { frameworkLabels } from '@/frameworkLabels';
 
 import { ApiClient } from '@/services/apiClient';
 import { getWpNonce, setWpNonce, WP_NONCE_PATH } from '@/services/wpNonce';
@@ -47,7 +48,7 @@ export function mountGlobalAssets(host: HTMLElement): void {
           * wp-admin app gets a provider scoped to its host. The light default
           * matches the Mantine default theme this page has always rendered in.
           */}
-        <MullionProvider theme="default-light" scope={host} instanceId="assets-admin">
+        <MullionProvider theme="default-light" scope={host} instanceId="assets-admin" labels={frameworkLabels()}>
           <MantineProvider>
             <Notifications label={i18n.t('common_notifications', 'Notifications')} closeButtonLabel={i18n.t('common_close', 'Close')} />
             <Confirmations />

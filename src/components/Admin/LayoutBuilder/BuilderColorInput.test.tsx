@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@/test/test-utils';
 import { BuilderColorInput } from './BuilderColorInput';
@@ -11,6 +12,12 @@ vi.mock('./BuilderDockContext', () => ({
   }),
 }));
 
+/** A parent that holds the value, as every builder panel does: the field is controlled. */
+function Holder({ initial, onChangeEnd }: { initial: string; onChangeEnd?: (value: string) => void }) {
+  const [value, setValue] = useState(initial);
+  return <BuilderColorInput value={value} onChange={setValue} onChangeEnd={onChangeEnd} />;
+}
+
 describe('BuilderColorInput (P57-C)', () => {
   it('renders without crashing', () => {
     render(<BuilderColorInput value="#123456" onChange={vi.fn()} />);
@@ -19,7 +26,7 @@ describe('BuilderColorInput (P57-C)', () => {
 
   it('calls addSwatch via onChangeEnd when a non-empty color is committed', () => {
     const onChangeEnd = vi.fn();
-    render(<BuilderColorInput value="" onChange={vi.fn()} onChangeEnd={onChangeEnd} />);
+    render(<Holder initial="" onChangeEnd={onChangeEnd} />);
 
     const input = screen.getByRole('textbox');
     // blur the input to trigger onChangeEnd
@@ -27,11 +34,12 @@ describe('BuilderColorInput (P57-C)', () => {
     fireEvent.blur(input);
 
     expect(mockAddSwatch).toHaveBeenCalledWith('#abcdef');
+    expect(onChangeEnd).toHaveBeenCalledWith('#abcdef');
   });
 
   it('does not call addSwatch when the committed value is empty', () => {
     mockAddSwatch.mockClear();
-    render(<BuilderColorInput value="#123" onChange={vi.fn()} />);
+    render(<Holder initial="#123" />);
 
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: '' } });

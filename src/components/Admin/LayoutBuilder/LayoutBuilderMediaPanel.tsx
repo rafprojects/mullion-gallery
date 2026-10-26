@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Select,
   Accordion,
 } from '@mantine/core';
 import { IconUpload } from '@tabler/icons-react';
@@ -12,7 +11,7 @@ import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { MediaUploadController, GENERAL_LIBRARY_TARGET } from '../MediaUploadController';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useRootId } from '@mullion/shared-ui';
-import { uiRem, Group, Text, Box, Button } from '@/ui';
+import { uiRem, Group, Text, Box, Button, Select } from '@/ui';
 
 export function LayoutBuilderMediaPanel(_props: IDockviewPanelProps) {
   const { t } = useTranslation('mullion');

@@ -1,9 +1,7 @@
 import { useMemo } from 'react';
 import { Accordion, Divider } from '@mantine/core';
-import { Stack, Text, Slider, Switch, NumberInput, TextInput } from '@/ui';
+import { Stack, Text, Slider, Switch, NumberInput, TextInput, ColorInput, Select } from '@/ui';
 import { useTranslation } from 'react-i18next';
-import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
-import { ModalSelect } from '@/components/Common/ModalSelect';
 import { DimensionInput } from '@/components/Settings/DimensionInput';
 
 import type { CardBreakpointOverrides, CardConfigBreakpoint, GalleryBehaviorSettings } from '@/types';
@@ -174,7 +172,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
               step={1}
             />
             <ResetLink fieldKey="cardBorderWidth" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
-            <ModalSelect
+            <Select
               label={t('set_card_border_mode', 'Border Color Mode')}
               description={desc(t('set_card_border_mode_desc', 'How card accent border colors are determined'), 'cardBorderMode')}
               data={[
@@ -195,7 +193,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
               />
             )}
             {resolvedBorderMode === 'single' && <ResetLink fieldKey="cardBorderColor" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />}
-            <ModalSelect
+            <Select
               label={t('set_card_shadow', 'Card Shadow')}
               description={desc(t('set_card_shadow_desc', 'Depth effect for campaign cards'), 'cardShadowPreset')}
               data={[
@@ -220,7 +218,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
               step={10}
             />
             <ResetLink fieldKey="cardThumbnailHeight" unitKey="cardThumbnailHeightUnit" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
-            <ModalSelect
+            <Select
               label={t('set_card_thumb_fit', 'Thumbnail Fit')}
               description={desc(t('set_card_thumb_fit_desc', 'How the thumbnail image fills the card'), 'cardThumbnailFit')}
               data={[
@@ -298,7 +296,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
         <Accordion.Control>{t('set_card_grid_pag', 'Card Grid & Pagination')}</Accordion.Control>
         <Accordion.Panel>
           <Stack gap="md">
-            <ModalSelect
+            <Select
               label={t('set_card_per_row', 'Cards Per Row')}
               description={desc(t('set_card_per_row_desc', 'Number of columns in the card grid (Auto = responsive)'), 'cardGridColumns')}
               data={[
@@ -380,7 +378,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
             />
             <ResetLink fieldKey="cardScale" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
 
-            <ModalSelect
+            <Select
               label={t('set_card_justify', 'Card Justification')}
               description={desc(t('set_card_justify_desc', 'How cards distribute when a row does not fill the full available width.'), 'cardJustifyContent')}
               data={[
@@ -395,7 +393,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
             />
             <ResetLink fieldKey="cardJustifyContent" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
 
-            <ModalSelect
+            <Select
               label={t('set_card_valign', 'Vertical Alignment')}
               description={desc(t('set_card_valign_desc', 'How the card grid aligns vertically when minimum height exceeds content height.'), 'cardGalleryVerticalAlign')}
               data={[
@@ -464,7 +462,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
             />
             <ResetLink fieldKey="cardGalleryOffsetY" unitKey="cardGalleryOffsetYUnit" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
 
-            <ModalSelect
+            <Select
               label={t('set_card_aspect', 'Card Aspect Ratio')}
               description={desc(t('set_card_aspect_desc', 'Lock cards to a fixed aspect ratio'), 'cardAspectRatio')}
               data={[
@@ -497,7 +495,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
             <ResetLink fieldKey="cardMinHeight" unitKey="cardMinHeightUnit" hasOverride={hasOverride} onReset={handleReset} label={resetLinkLabel} />
 
             <Divider label={t('set_card_pagination', 'Pagination')} labelPosition="left" />
-            <ModalSelect
+            <Select
               label={t('set_card_display_mode', 'Display Mode')}
               description={desc(t('set_card_display_mode_desc', 'How cards are displayed: all at once, progressively loaded, or paginated with arrows'), 'cardDisplayMode')}
               data={[
@@ -650,14 +648,14 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
             <Text size="xs" tone="muted">
               {t('set_card_listing_intro', 'Choose the layout adapter used to render the public campaign listing. Adapter-specific knobs (gap, columns, target row height) are shared with per-campaign galleries in Phase 1.')}
             </Text>
-            <ModalSelect
+            <Select
               label={t('set_card_listing_desktop', 'Listing Layout (Desktop)')}
               description={t('set_card_listing_desktop_desc', 'Layout adapter for the campaign listing on desktop.')}
               data={getListingAdapterSelectOptions('desktop')}
               value={settings.campaignListingAdapterId ?? 'compact-grid'}
               onChange={(value) => updateSetting('campaignListingAdapterId', value ?? 'compact-grid')}
             />
-            <ModalSelect
+            <Select
               label={t('set_card_listing_tablet', 'Listing Layout (Tablet)')}
               description={t('set_card_listing_override_desc', 'Optional override for tablet. Leave unset to inherit the desktop selection.')}
               data={[
@@ -669,7 +667,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
                 updateSetting('campaignListingAdapterIdTablet', value ?? '')
               }
             />
-            <ModalSelect
+            <Select
               label={t('set_card_listing_mobile', 'Listing Layout (Mobile)')}
               description={t('set_card_listing_override_mobile_desc', 'Optional override for mobile. Leave unset to inherit the desktop selection.')}
               data={[
@@ -685,7 +683,7 @@ export function CampaignCardSettingsSection({ settings, updateSetting, activeBre
             {(settings.campaignListingAdapterId === 'layout-builder' ||
               settings.campaignListingAdapterIdTablet === 'layout-builder' ||
               settings.campaignListingAdapterIdMobile === 'layout-builder') && (
-              <ModalSelect
+              <Select
                 label={t('set_card_listing_template', 'Listing Layout Template')}
                 description={t('set_card_listing_template_desc', 'The template whose slots define the positioned containers for campaign cards.')}
                 data={[

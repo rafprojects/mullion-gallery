@@ -1,8 +1,5 @@
 import { useState } from 'react';
 import {
-  Select,
-} from '@mantine/core';
-import {
   Stack,
   Group,
   Text,
@@ -12,8 +9,9 @@ import {
   SegmentedControl,
   NumberInput,
   Tooltip,
+  ColorInput,
+  Select,
 } from '@/ui';
-import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import type { GradientStop, GradientDirection, GradientType, RadialShape, RadialSize } from '@/types';
 import { buildGradientCss, DEFAULT_GRADIENT_STOPS, type GradientOptions } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';

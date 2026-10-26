@@ -1,7 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import {
   Modal,
-  Select,
 } from '@mantine/core';
 import {
   Group,
@@ -12,6 +11,7 @@ import {
   Button,
   Checkbox,
   TextInput,
+  Select,
 } from '@/ui';
 import { IconUserPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';

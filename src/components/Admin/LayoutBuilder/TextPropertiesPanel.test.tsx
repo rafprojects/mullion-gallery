@@ -3,7 +3,7 @@
  * z-order, remove, rename, and that the shared TypographyEditor is wired in.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@/test/test-utils';
+import { render, screen, fireEvent, shownOption } from '@/test/test-utils';
 import userEvent from '@testing-library/user-event';
 import { TextPropertiesPanel, type TextPropertiesPanelProps } from './TextPropertiesPanel';
 import type { LayoutTextLayer } from '@/types';
@@ -90,7 +90,7 @@ describe('TextPropertiesPanel', () => {
   it('renders the semantic-role select bound to the current value', () => {
     render(<TextPropertiesPanel {...makeProps()} />);
     // The role Select is bound to semanticTag='heading' → displays "Heading (H2)".
-    expect(screen.getByDisplayValue('Heading (H2)')).toBeInTheDocument();
+    expect(shownOption('Style')).toBe('Heading (H2)');
   });
 
   it('changing the alignment calls onUpdate', () => {
