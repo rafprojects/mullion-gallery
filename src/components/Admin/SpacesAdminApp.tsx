@@ -4,6 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { Notifications, notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
+import { MullionProvider } from '@/ui';
 
 import { ApiClient } from '@/services/apiClient';
 import { getWpNonce, setWpNonce, WP_NONCE_PATH } from '@/services/wpNonce';
@@ -41,19 +42,26 @@ export function mountSpacesAdmin(host: HTMLElement): void {
   createRoot(host).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <MantineProvider>
-          <Notifications />
-          <ModalsProvider>
-            <SpaceManagementView
-              apiClient={apiClient}
-              onNotify={notify}
-              onSpacesChanged={() => { /* standalone page: useSpaces refetches itself */ }}
-              // P53-A: the WP-admin "Gallery Spaces" page is registered with the
-              // manage_options capability, so only a System Admin can load it.
-              isSystemAdmin
-            />
-          </ModalsProvider>
-        </MantineProvider>
+        {/*
+          * P81-A: the framework's components need tokens and sheets, so the
+          * wp-admin app gets a provider scoped to its host. The light default
+          * matches the Mantine default theme this page has always rendered in.
+          */}
+        <MullionProvider theme="default-light" scope={host} instanceId="spaces-admin">
+          <MantineProvider>
+            <Notifications />
+            <ModalsProvider>
+              <SpaceManagementView
+                apiClient={apiClient}
+                onNotify={notify}
+                onSpacesChanged={() => { /* standalone page: useSpaces refetches itself */ }}
+                // P53-A: the WP-admin "Gallery Spaces" page is registered with the
+                // manage_options capability, so only a System Admin can load it.
+                isSystemAdmin
+              />
+            </ModalsProvider>
+          </MantineProvider>
+        </MullionProvider>
       </QueryClientProvider>
     </StrictMode>,
   );

@@ -4,6 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
 import { Notifications, notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
+import { MullionProvider } from '@/ui';
 
 import { ApiClient } from '@/services/apiClient';
 import { getWpNonce, setWpNonce, WP_NONCE_PATH } from '@/services/wpNonce';
@@ -42,12 +43,19 @@ export function mountGlobalAssets(host: HTMLElement): void {
   createRoot(host).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <MantineProvider>
-          <Notifications />
-          <ModalsProvider>
-            <GlobalAssetManager apiClient={apiClient} onNotify={notify} />
-          </ModalsProvider>
-        </MantineProvider>
+        {/*
+          * P81-A: the framework's components need tokens and sheets, so the
+          * wp-admin app gets a provider scoped to its host. The light default
+          * matches the Mantine default theme this page has always rendered in.
+          */}
+        <MullionProvider theme="default-light" scope={host} instanceId="assets-admin">
+          <MantineProvider>
+            <Notifications />
+            <ModalsProvider>
+              <GlobalAssetManager apiClient={apiClient} onNotify={notify} />
+            </ModalsProvider>
+          </MantineProvider>
+        </MullionProvider>
       </QueryClientProvider>
     </StrictMode>,
   );
