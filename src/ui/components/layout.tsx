@@ -10,7 +10,7 @@
  * responsive object form migrate to `className` in Phase 81.
  */
 
-import type { ReactNode } from 'react';
+import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import { renderElement, cx, type UiElementProps } from './element';
 import {
   customProperties,
@@ -22,16 +22,18 @@ import {
 } from './scale';
 import { uiRem } from '../styles/rootScale';
 
-type Align = 'stretch' | 'center' | 'flex-start' | 'flex-end' | 'baseline';
-type Justify =
-  | 'flex-start'
-  | 'center'
-  | 'flex-end'
-  | 'space-between'
-  | 'space-around'
-  | 'space-evenly';
+// Passed straight to CSS, so any value CSS accepts (`left`, `start`) is valid.
+type Align = NonNullable<CSSProperties['alignItems']>;
+type Justify = NonNullable<CSSProperties['justifyContent']>;
 
-interface FlexProps extends UiElementProps, UiPaddingProps {
+/**
+ * The ordinary attributes of the element a layout primitive renders. Each one
+ * already reached the DOM through the rest props; this lets a caller type
+ * `role`, `draggable` or a drag handler without a cast (P81-A).
+ */
+export type UiDivAttributes = Omit<HTMLAttributes<HTMLDivElement>, 'style' | 'className' | 'children' | 'color'>;
+
+interface FlexProps extends UiElementProps, UiPaddingProps, UiDivAttributes {
   gap?: UiSpacing | undefined;
   align?: Align | undefined;
   justify?: Justify | undefined;
@@ -58,7 +60,7 @@ function flexProps<T extends FlexProps>(
 // Box
 // ---------------------------------------------------------------------------
 
-export interface BoxProps extends UiElementProps, UiPaddingProps {
+export interface BoxProps extends UiElementProps, UiPaddingProps, UiDivAttributes {
   children?: ReactNode;
 }
 
@@ -156,7 +158,7 @@ export function Center({ className, style, render, children, inline, ...props }:
 // Container
 // ---------------------------------------------------------------------------
 
-export interface ContainerProps extends UiElementProps, UiPaddingProps {
+export interface ContainerProps extends UiElementProps, UiPaddingProps, UiDivAttributes {
   /** Maximum content width: a scale step, a number of pixels, or any CSS length. */
   size?: UiSpacing | undefined;
   /** Fill the available width, ignoring `size`. */
@@ -209,12 +211,12 @@ export function Container({
 // Grid
 // ---------------------------------------------------------------------------
 
-export interface GridProps extends UiElementProps, UiPaddingProps {
+export interface GridProps extends UiElementProps, UiPaddingProps, UiDivAttributes {
   gap?: UiSpacing | undefined;
   children?: ReactNode;
 }
 
-export interface GridColProps extends UiElementProps {
+export interface GridColProps extends UiElementProps, UiDivAttributes {
   /** Columns spanned, out of twelve. */
   span?: number | undefined;
   children?: ReactNode;
@@ -264,7 +266,7 @@ export const Grid = Object.assign(GridRoot, { Col: GridCol });
  */
 export type UiResponsiveCols = number | Partial<Record<'base' | 'sm' | 'md' | 'lg' | 'xl', number>>;
 
-export interface SimpleGridProps extends UiElementProps, UiPaddingProps {
+export interface SimpleGridProps extends UiElementProps, UiPaddingProps, UiDivAttributes {
   /** A column count, or one per breakpoint. */
   cols?: UiResponsiveCols | undefined;
   spacing?: UiSpacing | undefined;

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Stack, Text, ScrollArea, ActionIcon, Tooltip } from '@mantine/core';
+import { Text, ScrollArea, ActionIcon, Tooltip } from '@mantine/core';
 import { IconChevronDown, IconChevronRight, IconLayersLinked, IconLayersOff } from '@tabler/icons-react';
 import { buildLayerList, getLayerName, type GroupLayerItem } from '@/utils/layerList';
 import { LayerRow } from './LayerRow';
 import type { LayoutTemplate } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Stack } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -297,7 +297,7 @@ export function LayerPanel({
         tabIndex={0}
         style={{ maxHeight: uiRem(28.75), outline: 'none' }}
       >
-        <Stack gap={0} py={4}>
+        <Stack gap={0} paddingBlock={4}>
           {displayedLayers.map((item) => {
             // ── Hide items whose ancestor group is collapsed ──────────
             // (skip collapse-hide when a filter is active — matches should always show)

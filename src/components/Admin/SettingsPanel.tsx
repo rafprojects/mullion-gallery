@@ -7,8 +7,6 @@ import {
   Box,
   Button,
   Drawer,
-  Group,
-  Stack,
   Loader,
   Center,
   Text,
@@ -40,7 +38,7 @@ import {
   type SettingsData,
   type SettingsDataInput,
 } from '@/contexts/SettingsStore';
-import { uiLayer } from '@/ui';
+import { uiLayer, Group, Stack } from '@/ui';
 import { SettingTooltip } from './SettingTooltip';
 import type { CustomFontEntry } from '../Common/TypographyEditor';
 import type { UpdateGallerySetting } from '../Settings/GalleryAdapterSettingsSection';

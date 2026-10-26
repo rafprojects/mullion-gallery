@@ -5,19 +5,21 @@ import {
   Alert,
   Badge,
   Center,
-  Group,
   Loader,
   Paper,
   ScrollArea,
   SegmentedControl,
   Select,
   SimpleGrid,
-  Stack,
   Table,
   Text,
   Title,
   Tooltip,
 } from '@mantine/core';
+import {
+  Group,
+  Stack,
+} from '@/ui';
 import {
   CartesianGrid,
   Legend,
@@ -90,7 +92,7 @@ function StatCard({
 }) {
   return (
     <Paper withBorder p="md" radius="md">
-      <Stack gap={4} style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
+      <Stack gap="3xs" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
         {icon}
         <Text size="sm" c="dimmed" fw={500}>
           {label}

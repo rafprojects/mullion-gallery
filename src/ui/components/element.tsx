@@ -16,8 +16,12 @@
 
 import { cloneElement, isValidElement, createElement, type CSSProperties, type ReactElement } from 'react';
 
-/** A style object that may also carry `--mullion-*` custom properties. */
-export type UiStyle = CSSProperties & Record<`--${string}`, string | number | undefined>;
+/**
+ * A style object that may also carry `--mullion-*` custom properties. A union
+ * rather than the bare intersection so a caller's `CSSProperties` value is
+ * accepted as it is: an interface has no index signature for the second half.
+ */
+export type UiStyle = CSSProperties | (CSSProperties & Record<`--${string}`, string | number | undefined>);
 
 export interface UiRenderProps {
   className?: string | undefined;

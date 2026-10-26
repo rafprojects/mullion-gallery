@@ -2,8 +2,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getHotkeyHandler, useElementSize, useMergedRef } from '@mantine/hooks';
 import {
-  Box, Group, Text, NumberInput, Switch, Slider,
-  Button, Divider, ActionIcon, Tooltip, SegmentedControl, Alert,
+  Box,
+  Text,
+  NumberInput,
+  Switch,
+  Slider,
+  Button,
+  Divider,
+  ActionIcon,
+  Tooltip,
+  SegmentedControl,
+  Alert,
 } from '@mantine/core';
 import type { ResponsiveBreakpoint } from '@/types';
 import { IconHandGrab, IconArrowsMaximize, IconSeparatorVertical, IconSeparatorHorizontal } from '@tabler/icons-react';
@@ -18,7 +27,7 @@ import { safeLocalStorage, fitRectsIntoBand } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem } from '@/ui';
+import { uiRem, Group } from '@/ui';
 
 // ── P30-C: Device preview presets ────────────────────────────────────────────
 
@@ -504,7 +513,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
             }}
           >
             <Group gap="md" justify="center" wrap="nowrap">
-              <Group gap={4} wrap="nowrap">
+              <Group gap="3xs" wrap="nowrap">
                 <Text size="xs" c="dimmed">{tr('lb_canvas_max_width', 'Max width:')}</Text>
                 <NumberInput
                   value={builder.template.canvasMaxWidth || 0}
@@ -541,7 +550,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
               <Divider orientation="vertical" />
 
               {/* ── Snap mode selector ──────────────────────────── */}
-              <Group gap={6} wrap="nowrap" align="center">
+              <Group gap="2xs" wrap="nowrap" align="center">
                 <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>{tr('lb_canvas_snap', 'Snap:')}</Text>
                 <SegmentedControl
                   data={SNAP_MODE_DATA}
@@ -572,7 +581,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
               <Divider orientation="vertical" />
 
               {/* ── Grid overlay ────────────────────────────────── */}
-              <Group gap={6} wrap="nowrap" align="center">
+              <Group gap="2xs" wrap="nowrap" align="center">
                 <Switch
                   label={tr('lb_canvas_grid', 'Grid')}
                   size="xs"
@@ -597,7 +606,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
               <Divider orientation="vertical" />
 
               {/* ── Rulers & measurements ───────────────────────── */}
-              <Group gap={6} wrap="nowrap">
+              <Group gap="2xs" wrap="nowrap">
                 <Switch
                   label={tr('lb_canvas_rulers', 'Rulers')}
                   size="xs"
@@ -616,7 +625,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
               <Divider orientation="vertical" />
 
               {/* ── Persistent guides (P57-E) ──────────────────── */}
-              <Group gap={4} wrap="nowrap" align="center">
+              <Group gap="3xs" wrap="nowrap" align="center">
                 <Text size="xs" c="dimmed">{tr('lb_canvas_guides', 'Guides:')}</Text>
                 <Tooltip label={tr('lb_canvas_add_vguide', 'Add vertical guide')}>
                   <ActionIcon size="sm" variant="subtle" onClick={() => addGuide('x')} aria-label={tr('lb_canvas_add_vguide', 'Add vertical guide')}>
@@ -639,7 +648,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
                   still upsells expired/unlicensed installs. */}
               {__MULLION_PREMIUM__ && (
                 <>
-                  <Group gap={6} wrap="nowrap" align="center">
+                  <Group gap="2xs" wrap="nowrap" align="center">
                     <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>{tr('lb_canvas_breakpoint', 'Breakpoint:')}</Text>
                     <SegmentedControl
                       data={breakpointEditData}
@@ -695,7 +704,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
               />
               <Divider orientation="vertical" />
               {/* ── Zoom controls ────────────────────────────────── */}
-              <Group gap={4} wrap="nowrap">
+              <Group gap="3xs" wrap="nowrap">
                 <Tooltip label={isHandTool ? tr('lb_canvas_select_tool', 'Switch to select tool') : tr('lb_canvas_hand_tool_tt', 'Hand tool — pan canvas (H)')}>
                   <ActionIcon
                     variant={isHandTool ? 'filled' : 'subtle'}
@@ -784,7 +793,7 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
               )}
               <Divider orientation="vertical" />
               {/* Zoom controls visible in preview mode too */}
-              <Group gap={4} wrap="nowrap">
+              <Group gap="3xs" wrap="nowrap">
                 <Tooltip label={tr('lb_canvas_fit_cv_f', 'Fit canvas to viewport (F)')}>
                   <ActionIcon
                     variant="subtle"

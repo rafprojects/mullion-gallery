@@ -6,7 +6,6 @@ import {
   Accordion,
   Box,
   Button,
-  Group,
 } from '@mantine/core';
 import { IconUpload } from '@tabler/icons-react';
 import type { IDockviewPanelProps } from 'dockview';
@@ -16,7 +15,7 @@ import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { MediaUploadController, GENERAL_LIBRARY_TARGET } from '../MediaUploadController';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useRootId } from '@mullion/shared-ui';
-import { uiRem } from '@/ui';
+import { uiRem, Group } from '@/ui';
 
 export function LayoutBuilderMediaPanel(_props: IDockviewPanelProps) {
   const { t } = useTranslation('mullion');

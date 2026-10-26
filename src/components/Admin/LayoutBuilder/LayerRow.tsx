@@ -1,13 +1,15 @@
 import { useRef, useState, type KeyboardEvent, type DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Group,
   Text,
   ActionIcon,
   Tooltip,
   TextInput,
   Menu,
 } from '@mantine/core';
+import {
+  Group,
+} from '@/ui';
 import {
   IconPhoto,
   IconStack2,
@@ -137,8 +139,8 @@ export function LayerRow({
 
   return (
     <Group
-      gap={4}
-      py={4}
+      gap="3xs"
+      paddingBlock={4}
       data-layer-id={item.id}
       draggable={!isNonInteractive}
       onDragStart={(e) => onDragStart(e as DragEvent<HTMLDivElement>, item.id)}

@@ -1,5 +1,6 @@
 import { memo } from 'react';
-import { Accordion, Box, SegmentedControl, Stack, Text } from '@mantine/core';
+import { Accordion, Box, SegmentedControl, Text } from '@mantine/core';
+import { Stack } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
 import type { CardConfigBreakpoint } from '@/types';

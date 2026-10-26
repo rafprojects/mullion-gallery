@@ -1,7 +1,20 @@
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Tabs, Stack, Group, Text, Badge, Button, TextInput, Switch,
-  Alert, Loader, Center, Table, ActionIcon, Tooltip, Select, Divider, Checkbox,
+  Tabs,
+  Text,
+  Badge,
+  Button,
+  TextInput,
+  Switch,
+  Alert,
+  Loader,
+  Center,
+  Table,
+  ActionIcon,
+  Tooltip,
+  Select,
+  Divider,
+  Checkbox,
 } from '@mantine/core';
 import {
   IconPlus, IconTrash, IconAlertCircle, IconUserPlus, IconSettings, IconInfoCircle,
@@ -15,7 +28,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { SpaceAssetLibrary } from './SpaceAssetLibrary';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import type { FontLibraryEntry } from '@mullion/shared-utils';
-import { uiRem } from '@/ui';
+import { uiRem, Stack, Group } from '@/ui';
 
 interface SpaceGrant {
   userId: number;

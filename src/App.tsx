@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Container, Alert, Loader, Center, Stack, Modal, Button } from '@mantine/core';
+import { Container, Alert, Loader, Center, Modal, Button } from '@mantine/core';
+import { Stack } from '@/ui';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { CardGallery } from './components/CampaignGallery/CardGallery';
@@ -468,7 +469,7 @@ function AppContent({
           <Center py={120}>
             <Stack align="center">
               <Loader />
-              <Stack gap={2} align="center">
+              <Stack gap="4xs" align="center">
                 <Container size="sm" px={0}>
                   <Alert color="blue" variant="light" role="status" aria-live="polite">
                     {/* [P68-D] Only show the page counter when the listing

@@ -1,4 +1,5 @@
-import { Badge, Button, Card, Center, Group, Image, Loader, SimpleGrid, Stack, Text, TextInput } from '@mantine/core';
+import { Badge, Button, Card, Center, Image, Loader, SimpleGrid, Text, TextInput } from '@mantine/core';
+import { Group, Stack } from '@/ui';
 import { IconPhoto } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
@@ -93,7 +94,7 @@ export function MediaLibraryPicker({
                     alt={item.caption || t('admin_camp_media_alt', 'Media')}
                     fallbackSrc={FALLBACK_IMAGE_SRC}
                   />
-                  <Stack gap={2} p={4}>
+                  <Stack gap="4xs" padding={4}>
                     <Badge size="xs" variant="light">
                       {item.type}
                     </Badge>

@@ -1,10 +1,11 @@
-import { Button, Group, ScrollArea, Skeleton, Table, Text, TextInput } from '@mantine/core';
+
+import { Button, ScrollArea, Skeleton, Table, Text, TextInput } from '@mantine/core';
 import { useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import type { AuditEntry, AuditFilters } from '@/services/adminQuery';
 import { AuditEventRow } from './AuditEventRow';
-import { uiRem } from '@/ui';
+import { uiRem, Group } from '@/ui';
 
 type GlobalFilters = AuditFilters & { campaignId?: string };
 

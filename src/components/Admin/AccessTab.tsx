@@ -8,12 +8,10 @@ import {
   Center,
   Checkbox,
   Combobox,
-  Group,
   ScrollArea,
   SegmentedControl,
   Select,
   Skeleton,
-  Stack,
   Table,
   Text,
   TextInput,
@@ -27,7 +25,7 @@ import { PendingRequestsPanel } from './PendingRequestsPanel';
 import type { ApiClient } from '@/services/apiClient';
 import type { AdminAccessState } from '@/hooks/useAdminAccessState';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Group, Stack } from '@/ui';
 
 type AccessViewMode = 'campaign' | 'company' | 'all';
 
@@ -171,7 +169,7 @@ export function AccessTab({
           {/* Context info */}
           <Group gap="md" wrap="wrap">
             {accessViewMode === 'campaign' && selectedCampaign && (
-              <Stack gap={2}>
+              <Stack gap="4xs">
                 <Group gap="xs">
                   <Text size="sm" c="dimmed">{t('admin_access_company_label', 'Company:')}</Text>
                   <Badge variant="light">{selectedCampaign.companyId || t('admin_access_none', 'None')}</Badge>
@@ -188,7 +186,7 @@ export function AccessTab({
               </Stack>
             )}
             {(accessViewMode === 'company' || accessViewMode === 'all') && selectedCompany && (
-              <Stack gap={2}>
+              <Stack gap="4xs">
                 <Group gap="xs">
                   <Text size="sm" c="dimmed">{t('admin_access_campaigns_label', 'Campaigns:')}</Text>
                   <Badge variant="light" color="green">{t('admin_access_n_active', '{{count}} active', { count: selectedCompany.activeCampaigns })}</Badge>

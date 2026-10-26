@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconPhoto, IconPlayerPlay, IconZoomIn } from '@tabler/icons-react';
-import { Stack, ActionIcon, Image, Text, Box } from '@mantine/core';
+import { ActionIcon, Image, Text, Box } from '@mantine/core';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import type { GalleryAdapterProps, ListingItem } from './GalleryAdapter';
@@ -36,7 +36,7 @@ import {
   shouldLoopCarousel,
   shouldUseSyntheticCarouselLoop,
 } from './carouselBehavior';
-import { uiRem } from '@/ui';
+import { uiRem, Stack } from '@/ui';
 
 type GalleryRuntimeCommonSettings = ReturnType<typeof resolveGalleryComponentCommonSettings>;
 
@@ -855,7 +855,7 @@ function CampaignListingCarousel({ items, renderItem, settings }: CampaignListin
 
       {/* Dot navigator below the carousel */}
       {items.length > 1 && settings.cardPageDotNav && (
-        <Stack align="center" gap={4} style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
+        <Stack align="center" gap="3xs" style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           <DotNavigator
             total={items.length}
             currentIndex={selectedIndex}

@@ -17,7 +17,8 @@
  */
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Stack } from '@mantine/core';
+import { Box } from '@mantine/core';
+import { Stack } from '@/ui';
 import { IconLayoutGrid, IconZoomIn, IconPlayerPlay } from '@tabler/icons-react';
 import { OVERLAY_BG, OVERLAY_TEXT } from '../_shared/overlayStyles';
 import type {

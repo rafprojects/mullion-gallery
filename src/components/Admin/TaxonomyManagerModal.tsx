@@ -3,9 +3,7 @@ import {
   ActionIcon,
   Badge,
   Button,
-  Group,
   Modal,
-  Stack,
   Tabs,
   Text,
   TextInput,
@@ -23,7 +21,7 @@ import {
   useMediaTags,
 } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Group, Stack } from '@/ui';
 
 interface TaxonomyManagerModalProps {
   opened: boolean;
@@ -108,7 +106,7 @@ function CategoryRow({ cat, depth, parentName, apiClient, onNotify, onMutate }: 
         {parentName && <Badge size="xs" variant="light" color="gray">{parentName}</Badge>}
         {cat.count > 0 && <Badge size="xs" variant="light">{cat.count}</Badge>}
       </Group>
-      <Group gap={4}>
+      <Group gap="3xs">
         <ActionIcon size="sm" variant="subtle" onClick={() => setEditing(true)} aria-label={t('admin_tax_rename_name', 'Rename {{name}}', { name: cat.name })}>
           <IconPencil size={14} />
         </ActionIcon>

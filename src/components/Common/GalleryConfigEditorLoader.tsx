@@ -1,6 +1,7 @@
-import { Center, Loader, Stack, Text } from '@mantine/core';
+
+import { Center, Loader, Text } from '@mantine/core';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Stack } from '@/ui';
 
 interface GalleryConfigEditorLoaderProps {
   minHeight?: number;

@@ -1,6 +1,7 @@
 import { Component, type ReactNode } from 'react';
 import i18n from 'i18next';
-import { Alert, Button, Stack, Text } from '@mantine/core';
+import { Alert, Button, Text } from '@mantine/core';
+import { Stack } from '@/ui';
 import { IconAlertTriangle } from '@tabler/icons-react';
 import { isDebugEnabled } from '../utils/debug';
 

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Stack, Text, Box, ActionIcon, Tooltip, Group, ScrollArea, UnstyledButton } from '@mantine/core';
+import { Text, Box, ActionIcon, Tooltip, ScrollArea, UnstyledButton } from '@mantine/core';
+import { Stack, Group } from '@/ui';
 import { IconClockHour4, IconTrash } from '@tabler/icons-react';
 import type { IDockviewPanelProps } from 'dockview';
 import { useBuilderDock } from './BuilderDockContext';
@@ -50,11 +51,11 @@ export function BuilderHistoryPanel(_props: IDockviewPanelProps) {
   return (
     <Box style={{ height: '100%', display: 'flex', flexDirection: 'column' }} p="xs">
       {/* Header */}
-      <Group justify="space-between" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} px={4}>
+      <Group justify="space-between" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} paddingInline={4}>
         <Text size="xs" fw={600} c="dimmed" tt="uppercase">
           {t('lb_hist_title', 'History ({{count}})', { count: historyEntries.length })}
         </Text>
-        <Group gap={4}>
+        <Group gap="3xs">
           <Tooltip label={t('lb_hist_undo_tt', 'Undo (Ctrl+Z)')}>
             <ActionIcon
               size="sm"

@@ -11,10 +11,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Stack,
   Text,
   Button,
-  Group,
   ScrollArea,
   Badge,
   UnstyledButton,
@@ -38,7 +36,7 @@ import {
 } from '@tabler/icons-react';
 import type { LayoutSlot, LayoutTemplate, MediaItem } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Stack, Group } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -223,7 +221,7 @@ export function MediaPickerSidebar({
       </Group>
 
       {/* Search + view toggle */}
-      <Group gap={4} wrap="nowrap">
+      <Group gap="3xs" wrap="nowrap">
         <TextInput
           placeholder={t('lb_mps_search_ph', 'Search media…')}
           value={searchQuery}
@@ -273,12 +271,12 @@ export function MediaPickerSidebar({
           <Text size="xs" fw={500} style={{ marginTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
             {t('lb_mps_assignments', 'Assignments')}
           </Text>
-          <Stack gap={2}>
+          <Stack gap="4xs">
             {template.slots.map((slot, idx) => {
               if (!slot.mediaId) return null;
               const mediaItem = media.find((m) => m.id === slot.mediaId);
               return (
-                <Group key={slot.id} gap={4} wrap="nowrap">
+                <Group key={slot.id} gap="3xs" wrap="nowrap">
                   <Badge size="xs" variant="light" style={{ width: uiRem(3.125), flexShrink: 0 }}>
                     {t('lb_mps_slot_n', 'Slot {{n}}', { n: idx + 1 })}
                   </Badge>
@@ -304,7 +302,7 @@ export function MediaPickerSidebar({
       {/* Media items scroll area */}
       <ScrollArea style={{ flex: 1 }} offsetScrollbars>
         {viewMode === 'list' ? (
-          <Stack gap={4}>
+          <Stack gap="3xs">
             {filteredMedia.map((item) => {
               const assignedToSlots = mediaSlotMap.get(item.id);
               return (

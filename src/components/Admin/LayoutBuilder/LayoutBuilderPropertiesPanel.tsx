@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Box, Text, Button, Stack, Divider, SegmentedControl, NumberInput, Group } from '@mantine/core';
+import { Box, Text, Button, Divider, SegmentedControl, NumberInput } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { IDockviewPanelProps } from 'dockview';
@@ -10,7 +10,7 @@ import { MaskPropertiesPanel } from './MaskPropertiesPanel';
 import { BackgroundPropertiesPanel } from './BackgroundPropertiesPanel';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
-import { uiRem } from '@/ui';
+import { uiRem, Stack, Group } from '@/ui';
 
 // P62-G: gate the Pro text editor behind the build flag so the free WP.org build
 // dead-code-eliminates TextPropertiesPanel (and its heavyweight TypographyEditor).
@@ -192,7 +192,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
         </Box>
         <Box>
           <Text size="xs" c="dimmed" style={{ marginBottom: uiRem(0.25) }}>{t('lb_props_height_mode', 'Height mode')}</Text>
-          <Group gap={6} wrap="nowrap">
+          <Group gap="2xs" wrap="nowrap">
             <SegmentedControl
               size="xs"
               value={builder.template.canvasHeightMode || 'aspect-ratio'}

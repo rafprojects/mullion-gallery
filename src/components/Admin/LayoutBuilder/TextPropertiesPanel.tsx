@@ -1,8 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Stack, TextInput, Textarea, Select, SegmentedControl, Divider, Group,
-  NumberInput, Slider, Button, Text, ActionIcon, Tooltip,
+  TextInput,
+  Textarea,
+  Select,
+  SegmentedControl,
+  Divider,
+  NumberInput,
+  Slider,
+  Button,
+  Text,
+  ActionIcon,
+  Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -12,7 +21,7 @@ import {
 import type { LayoutTextLayer, LayoutTextSemanticTag, LayoutTextAlign, TypographyOverride } from '@/types';
 import { TypographyEditor } from '@/components/Common/TypographyEditor';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Stack, Group } from '@/ui';
 
 export interface TextPropertiesPanelProps {
   text: LayoutTextLayer;
@@ -62,7 +71,7 @@ export function TextPropertiesPanel({
   }
 
   return (
-    <Stack gap="sm" p="xs">
+    <Stack gap="sm" padding="xs">
       {/* ── Name ── */}
       <TextInput
         label={t('lb_text_name', 'Name')}
@@ -144,7 +153,7 @@ export function TextPropertiesPanel({
 
       {/* ── Stacking ── */}
       <Divider label={t('lb_gl_stacking', 'Stacking')} labelPosition="left" />
-      <Group gap={4} justify="center">
+      <Group gap="3xs" justify="center">
         <Tooltip label={t('lb_text_send_back', 'Send to Back')}><ActionIcon size="sm" variant="subtle" onClick={() => onSendToBack(text.id)} aria-label={t('lb_slot_send_back_aria', 'Send to back')}><IconArrowBigDownLine size={16} /></ActionIcon></Tooltip>
         <Tooltip label={t('lb_text_send_bwd', 'Send Backward')}><ActionIcon size="sm" variant="subtle" onClick={() => onSendBackward(text.id)} aria-label={t('lb_slot_send_bwd_aria', 'Send backward')}><IconArrowDown size={16} /></ActionIcon></Tooltip>
         <Tooltip label={t('lb_text_bring_fwd', 'Bring Forward')}><ActionIcon size="sm" variant="subtle" onClick={() => onBringForward(text.id)} aria-label={t('lb_slot_bring_fwd_aria', 'Bring forward')}><IconArrowUp size={16} /></ActionIcon></Tooltip>
@@ -154,9 +163,9 @@ export function TextPropertiesPanel({
       {/* ── Remove ── */}
       <Divider label={t('lb_gl_danger_zone', 'Danger zone')} labelPosition="left" />
       {confirmOpen ? (
-        <Stack gap={4}>
+        <Stack gap="3xs">
           <Text size="xs" c="dimmed">{t('lb_text_remove_confirm', 'Remove this text layer?')}</Text>
-          <Group gap={4}>
+          <Group gap="3xs">
             <Button size="xs" variant="subtle" onClick={closeConfirm} style={{ flex: 1 }}>{t('lb_gl_cancel', 'Cancel')}</Button>
             <Button size="xs" color="red" onClick={() => { closeConfirm(); onRemove(text.id); }} leftSection={<IconTrash size={12} />} style={{ flex: 1 }} aria-label={t('lb_gl_confirm_remove', 'Confirm remove')}>{t('lb_gl_remove', 'Remove')}</Button>
           </Group>

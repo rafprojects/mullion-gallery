@@ -6,7 +6,8 @@
  * campaign names. A count of 0 is highlighted in red (orphaned media).
  */
 import { useState } from 'react';
-import { Badge, Popover, Stack, Text, Anchor, Loader, Alert } from '@mantine/core';
+import { Badge, Popover, Text, Anchor, Loader, Alert } from '@mantine/core';
+import { Stack } from '@/ui';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
@@ -31,7 +32,7 @@ function MediaUsageBadgeContent({ loading, error, detail }: MediaUsageBadgeConte
   const { t } = useTranslation('mullion');
   if (loading) {
     return (
-      <Stack {...getMullionDebugProps('MediaUsageBadge', 'loading')} align="center" py="xs">
+      <Stack {...getMullionDebugProps('MediaUsageBadge', 'loading')} align="center" paddingBlock="xs">
         <Loader size="xs" />
       </Stack>
     );

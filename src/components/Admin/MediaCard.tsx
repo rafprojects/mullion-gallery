@@ -1,12 +1,12 @@
 import { forwardRef, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react';
-import { Card, Image, Text, Group, Box, ActionIcon, Badge } from '@mantine/core';
+import { Card, Image, Text, Box, ActionIcon, Badge } from '@mantine/core';
 import { IconPhoto, IconTrash, IconGripVertical } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
 import { FALLBACK_IMAGE_SRC } from '@/utils/fallback';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import styles from './MediaCard.module.scss';
-import { uiRem } from '@/ui';
+import { uiRem, Group } from '@/ui';
 
 interface MediaCardProps {
   item: MediaItem;
@@ -96,7 +96,7 @@ export const MediaCard = forwardRef<HTMLDivElement, MediaCardProps>(
                   overflow: 'hidden',
                 }}
               >
-                <Group gap={4} wrap="nowrap" align="center" style={{ pointerEvents: 'none' }}>
+                <Group gap="3xs" wrap="nowrap" align="center" style={{ pointerEvents: 'none' }}>
                   <Badge size="xs" variant="filled" color={mediaTypeColor}>{mediaTypeLabel}</Badge>
                   <Badge size="xs" variant="light" color={sourceColor}>{sourceLabel}</Badge>
                 </Group>
@@ -134,7 +134,7 @@ export const MediaCard = forwardRef<HTMLDivElement, MediaCardProps>(
                   </Text>
                 )}
               </Box>
-              <Group gap={4} wrap="nowrap">
+              <Group gap="3xs" wrap="nowrap">
                 {dragHandleProps !== undefined && (
                   <ActionIcon
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -151,7 +151,7 @@ export const MediaCard = forwardRef<HTMLDivElement, MediaCardProps>(
               </Group>
             </Group>
           ) : (
-            <Group justify="center" style={{ marginTop: uiRem(0.25) }} gap={4}>
+            <Group justify="center" style={{ marginTop: uiRem(0.25) }} gap="3xs">
               {dragHandleProps !== undefined && (
                 <ActionIcon
                   size="sm"

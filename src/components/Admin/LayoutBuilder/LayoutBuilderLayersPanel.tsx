@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Group, Tooltip, ActionIcon, Divider, TextInput } from '@mantine/core';
+import { Tooltip, ActionIcon, Divider, TextInput } from '@mantine/core';
+import { Group } from '@/ui';
 import { IconSearch, IconX } from '@tabler/icons-react';
 import {
   IconPlus, IconTrash, IconCopy, IconMask, IconLetterT,
@@ -205,9 +206,9 @@ export function LayoutBuilderLayersPanel(_props: IDockviewPanelProps) {
       {/* Slot toolbar */}
       {!builder.isPreview && (
         <Group
-          gap={4}
-          px={6}
-          py={4}
+          gap="3xs"
+          paddingInline={6}
+          paddingBlock={4}
           style={{
             borderBottom: '1px solid var(--mullion-builder-border)',
             flexShrink: 0,
@@ -297,9 +298,9 @@ export function LayoutBuilderLayersPanel(_props: IDockviewPanelProps) {
       {/* Alignment toolbar — shown when 2+ slots selected */}
       {!builder.isPreview && builder.selectedSlotIds.size >= 2 && (
         <Group
-          gap={2}
-          px={6}
-          py={3}
+          gap="4xs"
+          paddingInline={6}
+          paddingBlock={3}
           style={{
             borderBottom: '1px solid var(--mullion-builder-border)',
             flexShrink: 0,

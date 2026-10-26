@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { Accordion, Divider, Group, NumberInput, Slider, Stack, Switch, Text, TextInput } from '@mantine/core';
+import { Accordion, Divider, NumberInput, Slider, Switch, Text, TextInput } from '@mantine/core';
+import { Group, Stack } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { usePersistentAccordion } from '@/hooks/usePersistentAccordion';

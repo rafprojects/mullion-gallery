@@ -1,4 +1,5 @@
-import { Alert, Box, Checkbox, ScrollArea, Stack, Text } from '@mantine/core';
+import { Alert, Box, Checkbox, ScrollArea, Text } from '@mantine/core';
+import { Stack } from '@/ui';
 import { Trans, useTranslation } from 'react-i18next';
 import { ConfirmModal } from '@/components/Common/ConfirmModal';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
@@ -61,7 +62,7 @@ export function ArchiveCompanyModal({
         <Box {...getMullionDebugProps('ArchiveCompanyModal', 'campaign-list')}>
           <Text size="sm" fw={500} style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('admin_archco_list_heading', 'Campaigns to be archived:')}</Text>
           <ScrollArea {...getMullionDebugProps('ArchiveCompanyModal', 'campaign-scroll')} style={{ maxHeight: 150 }}>
-            <Stack gap={4}>
+            <Stack gap="3xs">
               {campaignsToArchive.map((c) => (
                 <Text key={c.id} size="sm" c="dimmed">• {c.title}</Text>
               ))}

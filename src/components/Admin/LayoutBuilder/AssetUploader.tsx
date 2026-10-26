@@ -14,9 +14,11 @@ import {
   Button,
   FileButton,
   Loader,
-  Stack,
   TextInput,
 } from '@mantine/core';
+import {
+  Stack,
+} from '@/ui';
 import { IconUpload } from '@tabler/icons-react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 
@@ -84,7 +86,7 @@ export function AssetUploader({
   }
 
   return (
-    <Stack gap={4}>
+    <Stack gap="3xs">
       <FileButton
         accept={accept}
         onChange={handleFileChange}

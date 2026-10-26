@@ -1,7 +1,8 @@
-import { Modal, Table, Text, Kbd, Group, Stack } from '@mantine/core';
+
+import { Modal, Table, Text, Kbd } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Group, Stack } from '@/ui';
 
 interface BuilderKeyboardShortcutsModalProps {
   opened: boolean;
@@ -103,7 +104,7 @@ export function BuilderKeyboardShortcutsModal({
                 {section.rows.map((row) => (
                   <Table.Tr key={row.description}>
                     <Table.Td style={{ width: '50%' }}>
-                      <Group gap={4} wrap="nowrap">
+                      <Group gap="3xs" wrap="nowrap">
                         {row.keys.map((k, i) => (
                           <span key={i}>
                             <Kbd>{k}</Kbd>

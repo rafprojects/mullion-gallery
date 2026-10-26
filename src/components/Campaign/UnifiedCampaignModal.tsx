@@ -1,7 +1,24 @@
 import { Suspense, lazy, useCallback, useEffect, useState, type ReactElement } from 'react';
 import {
-  ActionIcon, Badge, Box, Button, Card, Center, FileButton, Group, Image, Loader,
-  Modal, MultiSelect, Progress, SimpleGrid, Stack, Tabs, TagsInput, Text, TextInput, Textarea, Tooltip,
+  ActionIcon,
+  Badge,
+  Box,
+  Button,
+  Card,
+  Center,
+  FileButton,
+  Image,
+  Loader,
+  Modal,
+  MultiSelect,
+  Progress,
+  SimpleGrid,
+  Tabs,
+  TagsInput,
+  Text,
+  TextInput,
+  Textarea,
+  Tooltip,
 } from '@mantine/core';
 import type { CampaignCategoryEntry } from '@/services/apiClient';
 import type { TagEntry } from '@/services/api/campaignsApi';
@@ -30,7 +47,7 @@ import {
   setCampaignBreakpointScopeAdapterOverride,
   syncCampaignGalleryOverrideMode,
 } from '@/utils/campaignGalleryOverrides';
-import { uiRem } from '@/ui';
+import { uiRem, Group, Stack } from '@/ui';
 
 
 const LazyGalleryConfigEditorModal = lazy(() =>
@@ -455,7 +472,7 @@ const UnifiedCampaignSettingsPanel: NamedComponent<UnifiedCampaignSettingsPanelP
               {t('admin_camp_edit_responsive', 'Edit Responsive Config')}
             </Button>
           </Group>
-          <Stack gap={6}>
+          <Stack gap="2xs">
             <Group gap="xs" wrap="wrap">
               <Badge color={hasCustomGalleryOverrides ? 'grape' : 'gray'} variant={hasCustomGalleryOverrides ? 'light' : 'outline'}>
                 {hasCustomGalleryOverrides ? t('admin_camp_custom_overrides', 'Custom gallery overrides') : t('admin_camp_inheriting', 'Inheriting global gallery settings')}
@@ -865,14 +882,14 @@ function MediaTabContent({
             )}
           </FileButton>
           {uploadFiles.length > 0 && (
-            <Stack gap={4}>
+            <Stack gap="3xs">
               {uploadFiles.map((file, index) => {
                 const progress = uploadProgresses?.[index] ?? null;
                 const error = uploadErrors[index] ?? null;
                 const identity = `${file.name}-${file.size}-${file.lastModified}`;
 
                 return (
-                  <Stack key={identity} gap={4}>
+                  <Stack key={identity} gap="3xs">
                     <Group justify="space-between" wrap="nowrap" gap="sm">
                       <Text size="sm" lineClamp={1}>{file.name}</Text>
                       <Text size="xs" c={error ? 'red' : 'dimmed'}>

@@ -18,17 +18,19 @@ import {
   Box,
   Button,
   Divider,
-  Group,
   NumberInput,
   Select,
   SegmentedControl,
   Slider,
-  Stack,
   Switch,
   Text,
   TextInput,
   Tooltip,
 } from '@mantine/core';
+import {
+  Group,
+  Stack,
+} from '@/ui';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconArrowBigDownLine,
@@ -111,7 +113,7 @@ function FilterEffectsControls({
 }) {
   const { t } = useTranslation('mullion');
   return (
-    <Stack gap={4}>
+    <Stack gap="3xs">
       <Text size="xs" c="dimmed">{t('lb_gl_brightness', 'Brightness')}</Text>
       <Slider value={effects.brightness ?? 100} onChange={(v) => set({ brightness: v })}
         min={0} max={200} step={1} size="xs" label={(v) => `${v}%`} aria-label={t('lb_gl_brightness', 'Brightness')} />
@@ -147,7 +149,7 @@ function ShadowControls({
   const sh = shadow ?? { offsetX: 0, offsetY: 4, blur: 8, color: 'rgba(0,0,0,0.5)' };
   const enabled = Boolean(shadow);
   return (
-    <Stack gap={4}>
+    <Stack gap="3xs">
       <SegmentedControl
         size="xs" fullWidth
         data={[{ label: t('lb_slot_off', 'Off'), value: 'off' }, { label: t('lb_slot_on', 'On'), value: 'on' }]}
@@ -157,7 +159,7 @@ function ShadowControls({
       />
       {enabled && (
         <>
-          <Group grow gap={6}>
+          <Group grow gap="2xs">
             <NumberInput label={t('lb_slot_offx', 'Off X')} value={sh.offsetX} onChange={(v) => set({ offsetX: Number(v) || 0 })}
               min={-50} max={50} size="xs" suffix=" px" />
             <NumberInput label={t('lb_slot_offy', 'Off Y')} value={sh.offsetY} onChange={(v) => set({ offsetY: Number(v) || 0 })}
@@ -212,7 +214,7 @@ export function GraphicLayerPropertiesPanel({
   const mask = overlay.maskLayer;
 
   return (
-    <Stack gap="sm" p="xs">
+    <Stack gap="sm" padding="xs">
 
       {/* ── Name ── */}
       <TextInput
@@ -513,7 +515,7 @@ export function GraphicLayerPropertiesPanel({
 
       {/* ── Stacking ── */}
       <Divider label={t('lb_gl_stacking', 'Stacking')} labelPosition="left" />
-      <Group gap={4} justify="center">
+      <Group gap="3xs" justify="center">
         <Tooltip label={t('lb_slot_send_back_tt', 'Send to Back (Shift+[)')}>
           <ActionIcon
             size="sm"
@@ -559,9 +561,9 @@ export function GraphicLayerPropertiesPanel({
       {/* ── Remove ── */}
       <Divider label={t('lb_gl_danger_zone', 'Danger zone')} labelPosition="left" />
       {confirmOpen ? (
-        <Stack gap={4}>
+        <Stack gap="3xs">
           <Text size="xs" c="dimmed">{t('lb_gl_remove_confirm', 'Remove this graphic layer?')}</Text>
-          <Group gap={4}>
+          <Group gap="3xs">
             <Button size="xs" variant="subtle" onClick={closeConfirm} style={{ flex: 1 }}>
               {t('lb_gl_cancel', 'Cancel')}
             </Button>

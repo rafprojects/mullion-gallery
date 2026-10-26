@@ -15,7 +15,8 @@
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Center, Stack, Text } from '@mantine/core';
+import { Button, Center, Text } from '@mantine/core';
+import { Stack } from '@/ui';
 import { OverlayArrows } from '@/components/Galleries/Shared/OverlayArrows';
 import { DotNavigator } from '@/components/Galleries/Shared/DotNavigator';
 import { Box } from '@mantine/core';
@@ -203,7 +204,7 @@ export function CardGalleryHostPagination({
 
       {/* Dot navigator + page indicator for paginated mode */}
       {displayMode === 'paginated' && totalPages > 1 && (
-        <Stack align="center" gap={4} style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
+        <Stack align="center" gap="3xs" style={{ marginTop: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
           {settings.cardPageDotNav && (
             <DotNavigator
               total={totalPages}

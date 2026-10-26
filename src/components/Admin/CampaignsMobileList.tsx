@@ -1,7 +1,16 @@
 import { useMemo } from 'react';
 import {
-  Badge, Box, Button, Card, Center, Checkbox, Group, Loader, Menu,
-  Pagination, Stack, Text, Tooltip,
+  Badge,
+  Box,
+  Button,
+  Card,
+  Center,
+  Checkbox,
+  Loader,
+  Menu,
+  Pagination,
+  Text,
+  Tooltip,
 } from '@mantine/core';
 import {
   IconArchive, IconArchiveOff, IconChevronDown, IconCopy, IconDownload, IconEdit,
@@ -12,7 +21,7 @@ import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Group, Stack } from '@/ui';
 
 // Returns an i18next key + English default so the caller can translate in render.
 function scheduleLabel(publishAt?: string, unpublishAt?: string): { key: string; text: string; color: string } | null {
@@ -83,10 +92,10 @@ export function CampaignsMobileList({
           data-selected={isSelected || undefined}
           style={{ borderColor: isSelected ? 'var(--mantine-color-blue-5)' : undefined }}
         >
-          <Stack gap={6}>
+          <Stack gap="2xs">
             {/* Title row */}
-            <Group gap={6} justify="space-between" wrap="nowrap">
-              <Group gap={6} style={{ flex: 1, minWidth: 0 }}>
+            <Group gap="2xs" justify="space-between" wrap="nowrap">
+              <Group gap="2xs" style={{ flex: 1, minWidth: 0 }}>
                 <Checkbox
                   checked={isSelected}
                   onChange={() => handleToggleCampaignSelect(cid)}
@@ -110,7 +119,7 @@ export function CampaignsMobileList({
             )}
 
             {/* Badges */}
-            <Group gap={4} wrap="wrap">
+            <Group gap="3xs" wrap="wrap">
               <Badge size="xs" color={c.status === 'active' ? 'teal' : c.status === 'archived' ? 'gray' : 'yellow'}>
                 {c.status}
               </Badge>

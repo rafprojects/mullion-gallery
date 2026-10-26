@@ -12,14 +12,13 @@ import {
   Box,
   Popover,
   ScrollArea,
-  Stack,
   Text,
   Tooltip,
   UnstyledButton,
 } from '@mantine/core';
 import { IconClockHour4, IconTrash } from '@tabler/icons-react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Stack } from '@/ui';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -114,7 +113,7 @@ export function BuilderHistoryDropdown({
           </Box>
         ) : (
           <ScrollArea style={{ maxHeight: 300 }} type="auto">
-            <Stack gap={0} py={4}>
+            <Stack gap={0} paddingBlock={4}>
               {/* Entries in reverse order (newest first) */}
               {[...historyEntries].reverse().map((entry, reversedIdx) => {
                 const entryIdx = historyEntries.length - 1 - reversedIdx;

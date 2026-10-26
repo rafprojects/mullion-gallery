@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { ActionIcon, Box, Button, Group, NumberInput, SimpleGrid, Stack, Switch, Text, TextInput, Tooltip, type SelectProps } from '@mantine/core';
+import { ActionIcon, Box, Button, NumberInput, SimpleGrid, Switch, Text, TextInput, Tooltip, type SelectProps } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { useGalleryAdapterSettingsIO } from '@/hooks/useGalleryAdapterSettingsIO';
@@ -12,7 +12,7 @@ import { tFieldLabel, tFieldDescription, tFieldPlaceholder, tFieldOptions } from
 import { ModalSelect } from '@/components/Common/ModalSelect';
 import { cloneGalleryConfig, collectGalleryAdapterSettingValues, GALLERY_BREAKPOINTS, getGalleryConfigScopeAdapterIds, resolveGalleryConfig, setGalleryAdapterSetting } from '@/utils/galleryConfig';
 import { DimensionInput } from './DimensionInput';
-import { uiRem } from '@/ui';
+import { uiRem, Group, Stack } from '@/ui';
 
 export type UpdateGallerySetting = <K extends keyof GalleryBehaviorSettings>(
   key: K,
@@ -543,7 +543,7 @@ export function GalleryAdapterSettingsSection({ settings, updateSetting }: Galle
 
       {sectionSettingGroups.map((groupDefinition) => renderSettingGroup(groupDefinition, resolvedAdapterSettings, settings, updateConfiguredAdapterSetting, imageAdapterIds, videoAdapterIds, isUnifiedMode, batchUpdateAdapterSettings))}
 
-      <Stack gap={4}>
+      <Stack gap="3xs">
         <Text size="xs" c="dimmed">
           {t('set_ad_export_note', 'Exports adapter configuration and carousel/media settings. Global navigation, breakpoint, and presentation settings are not included.')}
         </Text>

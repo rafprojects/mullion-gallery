@@ -1,4 +1,5 @@
-import { Button, Group, Modal, Stack, Text } from '@mantine/core';
+import { Button, Modal, Text } from '@mantine/core';
+import { Group, Stack } from '@/ui';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';

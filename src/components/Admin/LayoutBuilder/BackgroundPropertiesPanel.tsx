@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Box,
   Text,
-  Stack,
-  Group,
   Button,
   Select,
   Slider,
@@ -28,13 +26,13 @@ import { useBuilderDock } from './BuilderDockContext';
 import { AssetUploader } from './AssetUploader';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Stack, Group } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────
 
 function GRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <Group gap={6} align="center" wrap="nowrap">
+    <Group gap="2xs" align="center" wrap="nowrap">
       <Text size="xs" c="dimmed" style={{ width: 40, flexShrink: 0 }}>{label}</Text>
       {children}
     </Group>
@@ -79,7 +77,7 @@ export function BackgroundPropertiesPanel() {
   const mode = builder.template.backgroundMode ?? 'color';
 
   return (
-    <Stack gap={4} p={4}>
+    <Stack gap="3xs" padding={4}>
       {/* ── Mode selector ── */}
       <SegmentedControl
         size="xs"
@@ -147,7 +145,7 @@ function BackgroundModeControls({
 
   if (mode === 'color') {
     return (
-      <Stack gap={6}>
+      <Stack gap="2xs">
         <GRow label={t('lb_slot_color', 'Color')}>
           <ColorInput
             size="xs"
@@ -190,7 +188,7 @@ function BackgroundModeControls({
     const previewCss = buildGradientCss(templateToGradientOpts(builder.template)) ?? 'transparent';
 
     return (
-      <Stack gap={6}>
+      <Stack gap="2xs">
         <Box style={{ height: 28, borderRadius: 4, background: previewCss, border: '1px solid var(--mantine-color-default-border)' }} />
 
         <GRow label={t('lb_slot_type', 'Type')}>
@@ -215,7 +213,7 @@ function BackgroundModeControls({
         {gradType === 'linear' && (
           <>
             <GRow label={t('lb_bg_dir', 'Dir')}>
-              <Group gap={3}>
+              <Group gap="3xs">
                 {GRADIENT_DIRECTIONS.map((d) => (
                   <Tooltip key={d.value} label={t(`lb_bg_dir_${d.value}`, d.label)} position="top">
                     <ActionIcon
@@ -292,7 +290,7 @@ function BackgroundModeControls({
         {stops.map((stop, i) => {
           const stopLabel = i === 0 ? t('lb_bg_start', 'Start') : i === stops.length - 1 ? t('lb_bg_end', 'End') : t('lb_bg_mid', 'Mid');
           return (
-            <Stack key={i} gap={4}>
+            <Stack key={i} gap="3xs">
               <GRow label={stopLabel}>
                 <ColorInput size="xs" value={stop.color} onChange={(val) => updateStop(i, { color: val })} format="rgba" style={{ flex: 1 }} />
               </GRow>
@@ -308,7 +306,7 @@ function BackgroundModeControls({
 
   // mode === 'image'
   return (
-    <Stack gap={6}>
+    <Stack gap="2xs">
       {builder.template.backgroundImage ? (
         <Box>
           <div style={{ background: 'var(--mantine-color-default)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4, overflow: 'hidden', marginBottom: 4 }}>
@@ -332,7 +330,7 @@ function BackgroundModeControls({
 
       {builder.template.backgroundImage && (
         <>
-          <Group gap={6} align="center" wrap="nowrap">
+          <Group gap="2xs" align="center" wrap="nowrap">
             <Text size="xs" c="dimmed" style={{ width: 40, flexShrink: 0 }}>{t('lb_slot_fit', 'Fit')}</Text>
             <Select
               size="xs"
@@ -342,7 +340,7 @@ function BackgroundModeControls({
               style={{ flex: 1 }}
             />
           </Group>
-          <Group gap={6} align="center" wrap="nowrap">
+          <Group gap="2xs" align="center" wrap="nowrap">
             <Text size="xs" c="dimmed" style={{ width: 40, flexShrink: 0 }}>{t('lb_bg_alpha', 'Alpha')}</Text>
             <Box style={{ flex: 1 }}>
               <Slider value={builder.template.backgroundImageOpacity ?? 1} onChange={(val) => builder.setTemplateField('backgroundImageOpacity', val)} min={0} max={1} step={0.05} size="xs" label={(v) => `${Math.round(v * 100)}%`} />

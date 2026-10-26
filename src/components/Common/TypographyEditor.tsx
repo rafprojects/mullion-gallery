@@ -1,14 +1,16 @@
 import { useCallback, useMemo } from 'react';
 import {
   Accordion,
-  Group,
   NumberInput,
   Select,
-  Stack,
   ActionIcon,
   Text,
   Badge,
 } from '@mantine/core';
+import {
+  Group,
+  Stack,
+} from '@/ui';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
@@ -272,7 +274,7 @@ export function TypographyEditor({ value, onChange, customFonts }: TypographyEdi
 
       {/* ── Fallback Chain (shown when a primary font is selected) ── */}
       {primaryLabel && GOOGLE_FONT_NAMES.has(primaryLabel) && (
-        <Stack gap={4}>
+        <Stack gap="3xs">
           {isFailed && (
             <Badge color="orange" variant="light" size="sm" radius="sm" style={{ alignSelf: 'flex-start' }}>
               {t('typo_font_failed', '⚠ Font failed to load — first available fallback will be used')}

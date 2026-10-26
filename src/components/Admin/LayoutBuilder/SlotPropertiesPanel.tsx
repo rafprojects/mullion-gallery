@@ -1,11 +1,9 @@
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Stack,
   Text,
   NumberInput,
   Select,
-  Group,
   SegmentedControl,
   TextInput,
   ActionIcon,
@@ -42,7 +40,7 @@ import type {
 } from '@/types';
 import { buildSlotEntranceCss, REVEAL_CLASS } from '@/utils/slotEntrance';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Stack, Group } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -129,8 +127,8 @@ const FOCAL_PRESETS: Array<{ pos: string; label: string; dotX: string; dotY: str
 function PropRow({ label, children, tooltip }: { label: string; children: React.ReactNode; tooltip?: string }) {
   const { t } = useTranslation('mullion');
   return (
-    <Group gap={6} align="center" wrap="nowrap" style={{ minHeight: 28 }}>
-      <Group gap={2} align="center" wrap="nowrap" style={{ width: 70, flexShrink: 0 }}>
+    <Group gap="2xs" align="center" wrap="nowrap" style={{ minHeight: 28 }}>
+      <Group gap="4xs" align="center" wrap="nowrap" style={{ width: 70, flexShrink: 0 }}>
         <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
         {tooltip && (
           <Tooltip label={tooltip} multiline style={{ width: uiRem(15) }} position="left" withArrow>
@@ -173,7 +171,7 @@ function FilterEffectsSection({ slot, onUpdate }: EffectSectionProps) {
   const setFe = (patch: Partial<SlotFilterEffects>) =>
     onUpdate({ filterEffects: { ...fe, ...patch } });
   return (
-    <Stack gap={4}>
+    <Stack gap="3xs">
       <PropRow label={t('lb_slot_bright', 'Bright')}>
         <Slider value={fe.brightness ?? 100} onChange={(v) => setFe({ brightness: v })}
           min={0} max={200} step={1} size="xs" label={(v) => `${v}%`} />
@@ -217,7 +215,7 @@ function ShadowSection({ slot, onUpdate }: EffectSectionProps) {
   const setSh = (patch: Partial<SlotShadow>) =>
     onUpdate({ shadow: { ...sh, ...patch } });
   return (
-    <Stack gap={4}>
+    <Stack gap="3xs">
       <PropRow label={t('lb_slot_enable', 'Enable')}>
         <SegmentedControl
           size="xs" fullWidth
@@ -230,7 +228,7 @@ function ShadowSection({ slot, onUpdate }: EffectSectionProps) {
       </PropRow>
       {hasShadow && (
         <>
-          <Group grow gap={6}>
+          <Group grow gap="2xs">
             <PropRow label={t('lb_slot_offx', 'Off X')}>
               <NumberInput value={sh.offsetX} onChange={(v) => setSh({ offsetX: Number(v) || 0 })}
                 min={-50} max={50} size="xs" variant="filled" suffix=" px" />
@@ -260,7 +258,7 @@ function OverlayEffectSection({ slot, onUpdate }: EffectSectionProps) {
   const setOv = (patch: Partial<SlotOverlayEffect>) =>
     onUpdate({ overlayEffect: { ...ov, ...patch } });
   return (
-    <Stack gap={4}>
+    <Stack gap="3xs">
       <PropRow label={t('lb_slot_mode', 'Mode')}>
         <SegmentedControl
           size="xs" fullWidth
@@ -299,7 +297,7 @@ function TiltEffectSection({ slot, onUpdate }: EffectSectionProps) {
   const setTilt = (patch: Partial<SlotTiltEffect>) =>
     onUpdate({ tilt: { ...tilt, ...patch } });
   return (
-    <Stack gap={4}>
+    <Stack gap="3xs">
       <PropRow label={t('lb_slot_enable', 'Enable')}>
         <SegmentedControl
           size="xs" fullWidth
@@ -350,7 +348,7 @@ function EntranceSection({ slot, onUpdate }: EffectSectionProps) {
     : `${playNonce}`;
 
   return (
-    <Stack gap={4}>
+    <Stack gap="3xs">
       <PropRow label={t('lb_slot_type', 'Type')}>
         <Select
           data={[
@@ -403,7 +401,7 @@ function EntranceSection({ slot, onUpdate }: EffectSectionProps) {
               aria-label={t('lb_slot_ent_delay_aria', 'Entrance delay')}
             />
           </PropRow>
-          <Group gap={8} align="center" style={{ marginTop: uiRem(0.125) }}>
+          <Group gap="xs" align="center" style={{ marginTop: uiRem(0.125) }}>
             <Box
               style={{
                 width: 64, height: 40, position: 'relative', overflow: 'hidden',
@@ -500,7 +498,7 @@ export function SlotPropertiesPanel({
           <Text size="xs" fw={600} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_acc_layout', 'Layout')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
-          <Stack gap={4}>
+          <Stack gap="3xs">
             <PropRow label={t('lb_slot_name', 'Name')}>
               <TextInput
                 value={slot.name ?? ''}
@@ -512,7 +510,7 @@ export function SlotPropertiesPanel({
             </PropRow>
 
             <SectionHeader label={t('lb_slot_sh_position', 'Position')} />
-            <Group grow gap={6}>
+            <Group grow gap="2xs">
               <PropRow label={t('lb_slot_x', 'X %')}>
                 <NumberInput
                   value={slot.x}
@@ -530,7 +528,7 @@ export function SlotPropertiesPanel({
             </Group>
 
             <SectionHeader label={t('lb_slot_sh_size', 'Size')} />
-            <Group gap={4} align="center" wrap="nowrap">
+            <Group gap="3xs" align="center" wrap="nowrap">
               <Box style={{ flex: 1 }}>
                 <NumberInput
                   value={slot.width}
@@ -600,7 +598,7 @@ export function SlotPropertiesPanel({
             >
               <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_rotation', 'Rotation')}</Text>
             </div>
-            <Group gap={6} align="center" wrap="nowrap">
+            <Group gap="2xs" align="center" wrap="nowrap">
               <NumberInput
                 value={slot.rotation ?? 0}
                 onChange={(val) => {
@@ -680,7 +678,7 @@ export function SlotPropertiesPanel({
           <Text size="xs" fw={600} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_acc_image', 'Image')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
-          <Stack gap={4}>
+          <Stack gap="3xs">
             <PropRow label={t('lb_slot_fit', 'Fit')}>
               <Select
                 data={fitOptions}
@@ -770,7 +768,7 @@ export function SlotPropertiesPanel({
                 />
               </PropRow>
             )}
-            <Group grow gap={6}>
+            <Group grow gap="2xs">
               <PropRow label={t('lb_slot_bwidth', 'Width')}>
                 <NumberInput
                   value={slot.borderWidth}
@@ -798,7 +796,7 @@ export function SlotPropertiesPanel({
           <Text size="xs" fw={600} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_acc_effects', 'Effects')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
-          <Stack gap={4}>
+          <Stack gap="3xs">
             <SectionHeader label={t('lb_slot_sh_filters', 'Filters')} />
             <FilterEffectsSection slot={slot} onUpdate={onUpdate} />
 
@@ -833,9 +831,9 @@ export function SlotPropertiesPanel({
           <Text size="xs" fw={600} tt="uppercase" c="dimmed" style={{ letterSpacing: uiRem(0.05) }}>{t('lb_slot_acc_stacking', 'Stacking & Interaction')}</Text>
         </Accordion.Control>
         <Accordion.Panel>
-          <Stack gap={4}>
+          <Stack gap="3xs">
             <SectionHeader label={t('lb_slot_sh_stacking', 'Stacking')} />
-            <Group gap={6} align="center" wrap="nowrap">
+            <Group gap="2xs" align="center" wrap="nowrap">
               <PropRow label={t('lb_slot_zindex', 'Z-Index')}>
                 <NumberInput
                   value={slot.zIndex}
@@ -843,7 +841,7 @@ export function SlotPropertiesPanel({
                   min={0} max={100} size="xs" variant="filled"
                 />
               </PropRow>
-              <Group gap={2} style={{ flexShrink: 0 }}>
+              <Group gap="4xs" style={{ flexShrink: 0 }}>
                 <Tooltip label={t('lb_slot_send_back_tt', 'Send to Back (Shift+[)')}>
                   <ActionIcon size="xs" variant="subtle" onClick={onSendToBack} aria-label={t('lb_slot_send_back_aria', 'Send to back')}>
                     <IconArrowBigDownLine size={14} />

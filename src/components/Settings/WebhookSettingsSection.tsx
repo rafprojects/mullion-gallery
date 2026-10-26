@@ -9,16 +9,18 @@ import {
   Checkbox,
   CopyButton,
   Divider,
-  Group,
   Loader,
   Modal,
   MultiSelect,
-  Stack,
   Switch,
   Text,
   TextInput,
   Tooltip,
 } from '@mantine/core';
+import {
+  Group,
+  Stack,
+} from '@/ui';
 import { IconCopy, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient, WebhookEndpoint } from '@/services/apiClient';

@@ -1,4 +1,5 @@
-import { Modal, Group, Text } from '@mantine/core';
+import { Modal, Text } from '@mantine/core';
+import { Group } from '@/ui';
 import { IconStack2 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';

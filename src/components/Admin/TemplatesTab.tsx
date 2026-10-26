@@ -1,8 +1,23 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Stack, Group, Button, Text, Badge, ActionIcon, Tooltip,
-  Modal, TextInput, Select, Title, Divider, Loader, Center, Textarea,
+  Button,
+  Text,
+  Badge,
+  ActionIcon,
+  Tooltip,
+  Modal,
+  TextInput,
+  Select,
+  Title,
+  Divider,
+  Loader,
+  Center,
+  Textarea,
 } from '@mantine/core';
+import {
+  Stack,
+  Group,
+} from '@/ui';
 import { IconTrash, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient, CampaignTemplate } from '@/services/apiClient';
@@ -170,8 +185,8 @@ function TemplateRow({
 }) {
   const { t } = useTranslation('mullion');
   return (
-    <Group justify="space-between" wrap="wrap" px="xs" py={4}>
-      <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
+    <Group justify="space-between" wrap="wrap" paddingInline="xs" paddingBlock={4}>
+      <Stack gap="4xs" style={{ flex: 1, minWidth: 0 }}>
         <Group gap="xs" wrap="nowrap">
           <Text size="sm" fw={500} truncate>{tpl.name}</Text>
           <Badge size="xs" variant="light" color={tpl.source === 'builtin' ? 'blue' : 'gray'}>

@@ -5,12 +5,10 @@ import {
   Button,
   Card,
   FileButton,
-  Group,
   Modal,
   Paper,
   Progress,
   Select,
-  Stack,
   Text,
   TextInput,
   Textarea,
@@ -19,7 +17,7 @@ import { IconUpload, IconX, IconFile, IconVideo } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { OEmbedResponse } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Group, Stack } from '@/ui';
 
 interface MediaAddModalProps {
   opened: boolean;
@@ -149,7 +147,7 @@ export function MediaAddModal({
     >
       <Stack gap="md">
         {showTargetSelect && (
-          <Stack gap={6}>
+          <Stack gap="2xs">
             <Select
               label={targetLabel ?? t('admin_media_add_to', 'Add to')}
               data={targetOptions}

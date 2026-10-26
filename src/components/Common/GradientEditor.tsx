@@ -2,8 +2,6 @@ import { useState } from 'react';
 import {
   Box,
   Text,
-  Stack,
-  Group,
   Select,
   Slider,
   NumberInput,
@@ -11,6 +9,10 @@ import {
   ActionIcon,
   Tooltip,
 } from '@mantine/core';
+import {
+  Stack,
+  Group,
+} from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import type { GradientStop, GradientDirection, GradientType, RadialShape, RadialSize } from '@/types';
 import { buildGradientCss, DEFAULT_GRADIENT_STOPS, type GradientOptions } from '@mullion/shared-utils';
@@ -23,7 +25,7 @@ interface GradientEditorProps {
 
 function GRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <Group gap={6} align="center" wrap="nowrap">
+    <Group gap="2xs" align="center" wrap="nowrap">
       <Text size="xs" c="dimmed" style={{ width: 40, flexShrink: 0 }}>{label}</Text>
       {children}
     </Group>
@@ -71,7 +73,7 @@ export function GradientEditor({ value, onChange }: GradientEditorProps) {
   const previewCss = buildGradientCss(value) ?? 'transparent';
 
   return (
-    <Stack gap={6}>
+    <Stack gap="2xs">
       <Box style={{ height: 28, borderRadius: 4, background: previewCss, border: '1px solid var(--mantine-color-dark-4)' }} />
 
       <GRow label="Type">
@@ -91,7 +93,7 @@ export function GradientEditor({ value, onChange }: GradientEditorProps) {
       {gradType === 'linear' && (
         <>
           <GRow label="Dir">
-            <Group gap={3}>
+            <Group gap="3xs">
               {GRADIENT_DIRECTIONS.map((d) => (
                 <Tooltip key={d.value} label={d.label} position="top">
                   <ActionIcon
@@ -168,7 +170,7 @@ export function GradientEditor({ value, onChange }: GradientEditorProps) {
       {stops.map((stop, i) => {
         const stopLabel = i === 0 ? 'Start' : i === stops.length - 1 ? 'End' : 'Mid';
         return (
-          <Stack key={i} gap={4}>
+          <Stack key={i} gap="3xs">
             <GRow label={stopLabel}>
               <ColorInput size="xs" value={stop.color} onChange={(val) => updateStop(i, { color: val })} format="rgba" style={{ flex: 1 }} />
             </GRow>

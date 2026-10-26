@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { Table, Text, Stack, Tooltip, Badge, ActionIcon, Group } from '@mantine/core';
+import { Table, Text, Tooltip, Badge, ActionIcon } from '@mantine/core';
+import { Stack, Group } from '@/ui';
 import { modals } from '@mantine/modals';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -96,7 +97,7 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
         >
           <Table.Td>
             {a.user ? (
-              <Stack gap={2}>
+              <Stack gap="4xs">
                 <Text size="sm" fw={500}>{a.user.displayName}</Text>
                 <Text size="xs" c="dimmed">{a.user.email}</Text>
               </Stack>
@@ -105,7 +106,7 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
             )}
           </Table.Td>
           <Table.Td>
-            <Stack gap={2}>
+            <Stack gap="4xs">
               <Tooltip label={a.source === 'company' ? t('accessrow_src_company_tip', 'Company-wide access') : t('accessrow_src_campaign_tip', 'Direct campaign access')}>
                 <Badge variant="light" color={a.source === 'company' ? 'blue' : 'green'}>
                   {a.source === 'company' ? t('accessrow_src_company', '🏢 Company') : t('accessrow_src_campaign', '📋 Campaign')}
@@ -138,7 +139,7 @@ export function useAccessRows({ accessEntries, accessViewMode, onRevokeAccess }:
             </Group>
           </Table.Td>
           <Table.Td>
-            <Stack gap={2}>
+            <Stack gap="4xs">
               <Text size="xs">{a.grantedAt ? new Date(a.grantedAt).toLocaleString() : '—'}</Text>
               {a.expires_at && (
                 <Tooltip label={isExpired ? t('accessrow_expires_tip_expired', 'This grant has expired') : t('accessrow_expires_tip_active', 'Grant expires at this time')}>

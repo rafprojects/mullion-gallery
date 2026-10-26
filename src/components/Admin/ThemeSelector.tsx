@@ -22,14 +22,12 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Select,
-  Group,
   Text,
   ColorSwatch,
-  Stack,
   type SelectProps,
 } from '@mantine/core';
 import { useTheme } from '@/hooks/useTheme';
-import { groupThemes, themeSwatches, useMullionTheme } from '@/ui';
+import { groupThemes, themeSwatches, useMullionTheme, Group, Stack } from '@/ui';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 
 // ---------------------------------------------------------------------------
@@ -87,7 +85,7 @@ export function ThemeSelector({
 
     return (
       <Group gap="sm" wrap="nowrap">
-        <Group gap={4} style={{ flexShrink: 0 }}>
+        <Group gap="3xs" style={{ flexShrink: 0 }}>
           {swatches.map((color, i) => (
             <ColorSwatch key={i} color={color} size={14} />
           ))}

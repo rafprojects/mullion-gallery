@@ -1,5 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
-import { Modal, SimpleGrid, Card, Text, Badge, Stack, Group, Loader, Center } from '@mantine/core';
+import { Modal, SimpleGrid, Card, Text, Badge, Loader, Center } from '@mantine/core';
+import { Stack, Group } from '@/ui';
 import { IconLayoutGrid } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient, CampaignTemplate } from '@/services/apiClient';
@@ -62,7 +63,7 @@ export function TemplatePickerModal({ opened, onClose, apiClient, onSelect }: Pr
             style={buildTemplateCardStyle('var(--mantine-color-gray-6)')}
             onClick={() => pick(null)}
           >
-            <Stack gap={4}>
+            <Stack gap="3xs">
               <Group gap="xs" wrap="nowrap">
                 <IconLayoutGrid size={16} />
                 <Text fw={600} size="sm" truncate>{t('admin_tpick_start_blank', 'Start Blank')}</Text>
@@ -86,7 +87,7 @@ export function TemplatePickerModal({ opened, onClose, apiClient, onSelect }: Pr
                 style={buildTemplateCardStyle(glowColor)}
                 onClick={() => pick(tpl)}
               >
-                <Stack gap={4}>
+                <Stack gap="3xs">
                   <Group gap="xs" wrap="nowrap" justify="space-between">
                     <Text fw={600} size="sm" truncate style={{ flex: 1 }}>{tpl.name}</Text>
                     <Badge size="xs" variant="light" color={tpl.source === 'builtin' ? 'blue' : 'gray'}>

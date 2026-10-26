@@ -1,5 +1,5 @@
 import { type CSSProperties, type KeyboardEventHandler } from 'react';
-import { Image, Text, Group, Badge, Table, ActionIcon, Grid, Box, Skeleton } from '@mantine/core';
+import { Image, Text, Badge, Table, ActionIcon, Grid, Box, Skeleton } from '@mantine/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { IconGripVertical, IconPhoto, IconTrash } from '@tabler/icons-react';
@@ -9,7 +9,7 @@ import { MediaUsageBadge } from './MediaUsageBadge';
 import { FALLBACK_IMAGE_SRC } from '@/utils/fallback';
 import type { ApiClient } from '@/services/apiClient';
 import type { MediaItem } from '@/types';
-import { uiRem } from '@/ui';
+import { uiRem, Group } from '@/ui';
 
 export type SharedSortableProps = {
   item: MediaItem;
@@ -85,7 +85,7 @@ export function SortableListRow({
       </Table.Td>
       <Table.Td>
         <Text size="sm" lineClamp={1}>{item.caption || '—'}</Text>
-        <Group gap={4} style={{ marginTop: uiRem(0.25) }}>
+        <Group gap="3xs" style={{ marginTop: uiRem(0.25) }}>
           <Badge size="xs" variant="filled" color={mediaTypeColor}>{mediaTypeLabel}</Badge>
           <Badge size="xs" variant="light" color={sourceColor}>{sourceLabel}</Badge>
         </Group>
@@ -99,7 +99,7 @@ export function SortableListRow({
           : <MediaUsageBadge count={usageSummary[item.id] ?? 0} mediaId={item.id} apiClient={apiClient} />}
       </Table.Td>
       <Table.Td>
-        <Group gap={4}>
+        <Group gap="3xs">
           {!dragDisabled && (
             <ActionIcon
               variant="subtle"

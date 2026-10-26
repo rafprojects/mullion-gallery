@@ -1,15 +1,10 @@
-/**
- * P15-J.2: Preset Template Gallery — "Start from Template" picker.
- *
- * Shows a visual grid of premade layout presets. Clicking a preset
- * creates a new template pre-populated with its slot definitions.
- */
-import { Modal, SimpleGrid, Card, Text, Group, Badge, Box } from '@mantine/core';
+
+import { Modal, SimpleGrid, Card, Text, Badge, Box } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { IconLayoutDashboard } from '@tabler/icons-react';
 import { LAYOUT_PRESETS, type LayoutPreset } from '@/data/layoutPresets';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Group } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -120,7 +115,7 @@ export function PresetGalleryModal({
             <Text size="xs" c="dimmed" ta="center" lineClamp={2}>
               {preset.description}
             </Text>
-            <Group gap={4} style={{ marginTop: uiRem(0.25) }} justify="center">
+            <Group gap="3xs" style={{ marginTop: uiRem(0.25) }} justify="center">
               <Badge size="xs" variant="light">
                 {t('lb_preset_n_slots', '{{count}} slots', { count: preset.slots.length })}
               </Badge>

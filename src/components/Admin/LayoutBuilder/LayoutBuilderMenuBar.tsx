@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Menu, Button, Divider, Group } from '@mantine/core';
+import { Menu, Button, Divider } from '@mantine/core';
 import {
   IconChevronDown,
   IconDeviceFloppy,
@@ -23,7 +23,7 @@ import {
 } from '@tabler/icons-react';
 import type { DockviewApi } from 'dockview';
 import type { LayoutScope } from '@/hooks/useBuilderWorkspacePrefs';
-import { uiRem } from '@/ui';
+import { uiRem, Group } from '@/ui';
 
 // The four panel ids used in the default layout.
 const SIDE_PANELS = ['layers', 'media', 'properties'] as const;
@@ -207,7 +207,7 @@ export function LayoutBuilderMenuBar({
   }, [dockApiRef, layoutScope, rootId, templateId, panelTitle, t]);
 
   return (
-    <Group gap={2} wrap="nowrap">
+    <Group gap="4xs" wrap="nowrap">
       {/* ── File ── */}
       <MenuButton label={t('lb_menu_file', 'File')}>
         <Menu.Item leftSection={<IconDeviceFloppy size={14} />} onClick={onSave}>

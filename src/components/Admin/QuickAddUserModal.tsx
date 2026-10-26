@@ -4,14 +4,16 @@ import {
   Box,
   Button,
   Checkbox,
-  Group,
   Modal,
   Select,
-  Stack,
   Text,
   TextInput,
   Tooltip,
 } from '@mantine/core';
+import {
+  Group,
+  Stack,
+} from '@/ui';
 import { IconAlertCircle, IconUserPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';

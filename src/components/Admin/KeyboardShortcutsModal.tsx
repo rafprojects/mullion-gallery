@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
-import { Modal, Table, Text, Stack, Badge, Group, Button, ActionIcon, Tooltip, TextInput } from '@mantine/core';
+import { Modal, Table, Text, Badge, Button, ActionIcon, Tooltip, TextInput } from '@mantine/core';
 import { IconEdit, IconCheck, IconX, IconRotateClockwise } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { ACTION_IDS, ACTION_DEFAULTS, type ShortcutActionId, type ShortcutConfigHandle } from '@/hooks/useShortcutConfig';
-import { uiRem } from '@/ui';
+import { uiRem, Stack, Group } from '@/ui';
 
 // ── Key display helpers ───────────────────────────────────────────────────────
 
@@ -35,7 +35,7 @@ function recordKeyFromEvent(e: React.KeyboardEvent): string | null {
 
 function Keys({ keys }: { keys: string[] }) {
   return (
-    <Group gap={4} wrap="nowrap">
+    <Group gap="3xs" wrap="nowrap">
       {keys.map((k, i) => (
         <span key={i}>
           <kbd
@@ -115,7 +115,7 @@ function EditRow({ id, currentKey, defaultKey, config }: EditRowProps) {
     <Table.Tr>
       <Table.Td style={{ width: uiRem(11.25) }}>
         {recording ? (
-          <Stack gap={4}>
+          <Stack gap="3xs">
             <TextInput
               ref={inputRef}
               value={pendingKey ? formatKeyParts(pendingKey).join('+') : ''}
@@ -148,7 +148,7 @@ function EditRow({ id, currentKey, defaultKey, config }: EditRowProps) {
             <Text size="xs" c="dimmed">{t('admin_ksc_press_hint', 'Press any key combo, then ✓ to confirm')}</Text>
           </Stack>
         ) : (
-          <Group gap={6} wrap="nowrap">
+          <Group gap="2xs" wrap="nowrap">
             <Keys keys={formatKeyParts(currentKey)} />
             {isCustomized && (
               <Badge size="xs" variant="dot" color="blue">{t('admin_ksc_custom', 'custom')}</Badge>
@@ -160,7 +160,7 @@ function EditRow({ id, currentKey, defaultKey, config }: EditRowProps) {
         <Text size="sm">{ACTION_DEFAULTS[id].label}</Text>
       </Table.Td>
       <Table.Td style={{ width: uiRem(5) }}>
-        <Group gap={4} wrap="nowrap">
+        <Group gap="3xs" wrap="nowrap">
           {!recording && (
             <Tooltip label={t('admin_ksc_remap', 'Remap')} withArrow>
               <ActionIcon size="xs" variant="subtle" onClick={startRecording} aria-label={t('admin_ksc_remap_name', 'Remap {{name}}', { name: ACTION_DEFAULTS[id].label })}>

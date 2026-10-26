@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, Text, Box, Group, Badge, Tooltip, Button, Checkbox, Select, Menu } from '@mantine/core';
+import { Table, Text, Box, Badge, Tooltip, Button, Checkbox, Select, Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconEdit, IconCopy, IconDownload, IconFileZip, IconArchive, IconArchiveOff, IconLayoutGrid, IconTrash, IconChevronDown, IconArrowsExchange, IconPhotoPlus } from '@tabler/icons-react';
 import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
@@ -10,7 +10,7 @@ import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { CompanyCombobox } from '@/components/Common/CompanyCombobox';
 import type { ApiClient } from '@/services/apiClient';
-import { uiRem } from '@/ui';
+import { uiRem, Group } from '@/ui';
 
 function toSlug(name: string): string {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -88,7 +88,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
           </Table.Td>
           <Table.Td>
             <Box>
-              <Group gap={6}>
+              <Group gap="2xs">
                 <Text fw={700}>{c.title}</Text>
                 {hasCampaignGalleryOverrides(c) && (
                   <Tooltip label={t('admin_custom_gallery', 'Custom gallery: {{summary}}', { summary: overrideText })} withArrow>
@@ -107,7 +107,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
             </Box>
           </Table.Td>
           <Table.Td>
-            <Group gap={4} wrap="nowrap" align="center">
+            <Group gap="3xs" wrap="nowrap" align="center">
               <Select
                 size="xs"
                 variant="filled"
@@ -168,7 +168,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
           </Table.Td>
           <Table.Td>
             {summary !== undefined ? (
-              <Group gap={4} wrap="nowrap">
+              <Group gap="3xs" wrap="nowrap">
                 <Tooltip label={t('admin_camprow_grants_tt', '{{count}} active grant', { count: summary.grantCount })} withArrow>
                   <Badge variant="light" color="blue" size="sm">{summary.grantCount}</Badge>
                 </Tooltip>
@@ -184,7 +184,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
           </Table.Td>
           <Table.Td>
             {c.tags.length > 0 ? (
-              <Group gap={4} wrap="wrap">
+              <Group gap="3xs" wrap="wrap">
                 {c.tags.map((tag) => (
                   <Badge key={tag} size="xs" variant="light">{tag}</Badge>
                 ))}
@@ -195,7 +195,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
           </Table.Td>
           <Table.Td>
             {(c.categories ?? []).length > 0 ? (
-              <Group gap={4} wrap="wrap">
+              <Group gap="3xs" wrap="wrap">
                 {(c.categories ?? []).map((id) => (
                   <Badge key={id} size="xs" variant="outline">{catMap.get(id) ?? id}</Badge>
                 ))}

@@ -113,10 +113,10 @@ test.describe('size basis (P81-F)', () => {
       await serve(page, root, false);
       await page.goto('/');
       await page.waitForFunction(() =>
-        [...document.querySelectorAll('*')].some((el) => el.shadowRoot?.querySelector('.mantine-Group-root')),
+        [...document.querySelectorAll('*')].some((el) => el.shadowRoot?.querySelector('.mullion-group')),
       );
       expect(await rootPx(page)).toBe(root === null ? 16 : 10);
-      sizes.push(await measure(page, '.mantine-Group-root, .mantine-Stack-root', '.mantine-Button-root, .mantine-Chip-label'));
+      sizes.push(await measure(page, '.mullion-group, .mullion-stack', '.mantine-Button-root, .mantine-Chip-label'));
       await page.close();
     }
     expectSameSize(sizes[0]!, sizes[1]!);

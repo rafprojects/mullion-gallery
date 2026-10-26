@@ -17,11 +17,9 @@ import {
   Card,
   Center,
   FileButton,
-  Group,
   Menu,
   SegmentedControl,
   Skeleton,
-  Stack,
   Table,
   Text,
   TextInput,
@@ -67,7 +65,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useBuilderDeepLink } from '@mullion/shared-utils';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem } from '@/ui';
+import { uiRem, Group, Stack } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -505,7 +503,7 @@ export function LayoutTemplateList({ apiClient, onNotify, initialTemplateId, spa
                     <Text size="sm" c="dimmed">{shortDate(t.updatedAt)}</Text>
                   </Table.Td>
                   <Table.Td>
-                    <Group gap={4}>
+                    <Group gap="3xs">
                       {t.tags.slice(0, 3).map((tag) => (
                         <Badge key={tag} size="xs" variant="outline">{tag}</Badge>
                       ))}

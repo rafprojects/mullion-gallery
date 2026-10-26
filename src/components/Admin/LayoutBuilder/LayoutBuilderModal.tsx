@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { useTranslation } from 'react-i18next';
 import {
   Modal,
-  Group,
   Button,
   TextInput,
   ActionIcon,
@@ -31,7 +30,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useGetSettings } from '@/services/settingsQuery';
 import { AdminChromeProvider } from '@/components/Admin/AdminChromeProvider';
 import { adminChromeAttributes, adminChromeClassNames, adminChromeStyles, resolveChromeThemeId } from '@/themes/chromeTheme';
-import { getThemeEntry } from '@/ui';
+import { getThemeEntry, Group } from '@/ui';
 import { useLatestRef } from '@mullion/shared-utils';
 import { DockviewReact, DockviewDefaultTab } from 'dockview';
 import { debugGroup, debugLog, debugGroupEnd } from '@/utils/debug';
@@ -537,7 +536,7 @@ export function LayoutBuilderModal({
           <Group justify="space-between" wrap="nowrap">
             {/* Left: name + undo/redo */}
             <Group gap="sm" wrap="nowrap">
-              <Group gap={4} wrap="nowrap" align="center">
+              <Group gap="3xs" wrap="nowrap" align="center">
                 {builder.isDirty && (
                   <Box
                     style={{

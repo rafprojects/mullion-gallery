@@ -10,7 +10,8 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Stack, Text } from '@mantine/core';
+import { Box, Text } from '@mantine/core';
+import { Stack } from '@/ui';
 import { IconPlayerPlay, IconZoomIn } from '@tabler/icons-react';
 import type {
   GalleryBehaviorSettings,

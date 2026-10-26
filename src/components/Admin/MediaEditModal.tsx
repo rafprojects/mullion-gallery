@@ -1,4 +1,5 @@
-import { Button, Group, Modal, Stack, TextInput, Textarea } from '@mantine/core';
+import { Button, Modal, TextInput, Textarea } from '@mantine/core';
+import { Group, Stack } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { useDirtyGuard } from '@mullion/shared-utils';
 import { ConfirmModal } from '@/components/Common/ConfirmModal';

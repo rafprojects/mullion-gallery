@@ -13,7 +13,8 @@
  */
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Chip, Group, Select, Stack } from '@mantine/core';
+import { Box, Chip, Select } from '@mantine/core';
+import { Group, Stack } from '@/ui';
 import { IconLayoutGrid, IconPlayerPlay, IconZoomIn } from '@tabler/icons-react';
 import { OVERLAY_BG, OVERLAY_TEXT } from '../_shared/overlayStyles';
 import type {
@@ -175,7 +176,7 @@ export function IsotopeAdapter({ media, settings, runtime }: IsotopeAdapterProps
       <Group gap="sm" wrap="wrap" align="center">
         {showFilter && (
           <Chip.Group value={activeFilter} onChange={handleFilterChange}>
-            <Group gap={6}>
+            <Group gap="2xs">
               <Chip value="all" size="xs" variant="filled">{t('filter_all', 'All')}</Chip>
               {filterValues.map((type) => (
                 <Chip key={type} value={type} size="xs" variant="filled">

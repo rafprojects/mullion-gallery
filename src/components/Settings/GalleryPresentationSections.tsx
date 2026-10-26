@@ -1,4 +1,5 @@
-import { Accordion, Stack, TextInput } from '@mantine/core';
+import { Accordion, TextInput } from '@mantine/core';
+import { Stack } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { ModalSelect } from '@/components/Common/ModalSelect';

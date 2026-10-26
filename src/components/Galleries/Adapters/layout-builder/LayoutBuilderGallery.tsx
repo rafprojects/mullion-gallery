@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
 import type { ListingItem } from '@/components/Galleries/Adapters/GalleryAdapter';
 import { useRecordAnalyticsEvent } from '@/hooks/useRecordAnalyticsEvent';
-import { Box, Center, Loader, Text, Stack } from '@mantine/core';
+import { Box, Center, Loader, Text } from '@mantine/core';
 import { IconLayoutDashboard, IconAlertTriangle, IconInfoCircle } from '@tabler/icons-react';
 import type {
   GalleryBehaviorSettings,
@@ -50,7 +50,7 @@ import { useViewportHeight } from '@mullion/shared-utils';
 import { sanitizeCssUrl, toCssOrNumber } from '@mullion/shared-utils';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { resolveAdapterShellStyle, resolveGalleryComponentCommonSettings, resolveGalleryHeading } from '../_shared/runtimeCommon';
-import { uiRem } from '@/ui';
+import { uiRem, Stack } from '@/ui';
 
 // ── TiltWrapper: applies mouse-reactive 3D tilt to children ──────────────────
 
@@ -490,7 +490,7 @@ export function LayoutBuilderGallery({
 
   if (error || !template) {
     return (
-      <Stack align="center" gap="xs" py="xl">
+      <Stack align="center" gap="xs" paddingBlock="xl">
         <IconAlertTriangle size={32} color="var(--mantine-color-yellow-6)" />
         <Text size="sm" c="dimmed">
           {error ?? t('layout_not_found', 'Layout template not found')}

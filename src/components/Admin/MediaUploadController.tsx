@@ -16,7 +16,8 @@
  * handles direct file uploads and direct image-URL registration.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Checkbox, Stack, TagsInput } from '@mantine/core';
+import { Checkbox, TagsInput } from '@mantine/core';
+import { Stack } from '@/ui';
 import { notifications } from '@mantine/notifications';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -295,7 +296,7 @@ export function MediaUploadController({
       onTargetChange={(value) => setTarget(value ?? initialTarget)}
       targetExtra={
         isGeneral ? (
-          <Stack gap={6}>
+          <Stack gap="2xs">
             <Checkbox
               size="xs"
               label={t('admin_upload_universal', 'Make available to all spaces (universal)')}

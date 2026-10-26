@@ -12,7 +12,8 @@
  *   DELETE /admin/asset-library/{id}   — delete (409 in-use guard from P52-A5c)
  */
 import { useCallback, useState } from 'react';
-import { Center, Group, Loader, Title } from '@mantine/core';
+import { Center, Loader, Title } from '@mantine/core';
+import { Group } from '@/ui';
 import { modals } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
 

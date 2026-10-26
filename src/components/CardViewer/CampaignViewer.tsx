@@ -1,7 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconCalendar, IconTag } from '@tabler/icons-react';
-import { Modal, Image, Badge, Group, Stack, Title, Text, Paper, SimpleGrid, Box, Center, Loader, Switch } from '@mantine/core';
+import { Modal, Image, Badge, Title, Text, Paper, SimpleGrid, Box, Center, Loader, Switch } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import type { Campaign, GalleryBehaviorSettings, GalleryConfig } from '@/types';
 import type { ApiClient } from '@/services/apiClient';
@@ -27,7 +27,7 @@ import {
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { UnifiedGallerySection } from './UnifiedGallerySection';
 import { PerTypeGallerySection } from './PerTypeGallerySection';
-import { uiRem } from '@/ui';
+import { uiRem, Group, Stack } from '@/ui';
 
 const LazyGalleryConfigEditorModal = lazy(() =>
   import('@/components/Common/GalleryConfigEditorModal').then((module) => ({
@@ -113,7 +113,7 @@ function CampaignViewerCoverHeader({
           style={{ position: 'absolute', top: uiRem(1), left: uiRem(1), backgroundColor: displayedCampaign.company.brandColor }}
           size="lg"
         >
-          <Group gap={8}>
+          <Group gap="xs">
             <CompanyLogo logo={displayedCampaign.company.logo} companyName={displayedCampaign.company.name} />
             <span>{displayedCampaign.company.name}</span>
           </Group>
@@ -126,7 +126,7 @@ function CampaignViewerCoverHeader({
         </Title>
         {settings.showCampaignDate !== false && (
           <Group gap="lg" wrap="wrap">
-            <Group gap={4}>
+            <Group gap="3xs">
               <IconCalendar size={16} color="var(--mullion-color-text-muted)" />
               <Text size="sm" c="dimmed" style={campaignDateStyle}>
                 {new Date(displayedCampaign.createdAt).toLocaleDateString('en-US', {
@@ -137,7 +137,7 @@ function CampaignViewerCoverHeader({
               </Text>
             </Group>
             {settings.showCampaignTags !== false && (
-              <Group gap={4}>
+              <Group gap="3xs">
                 <IconTag size={16} color="var(--mullion-color-text-muted)" />
                 <Text size="sm" c="dimmed">
                   {displayedCampaign.tags.join(', ')}

@@ -4,13 +4,15 @@ import {
   Badge,
   Box,
   Button,
-  Group,
   Loader,
-  Stack,
   Table,
   Text,
   Title,
 } from '@mantine/core';
+import {
+  Group,
+  Stack,
+} from '@/ui';
 import { IconAlertCircle, IconCheck, IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';

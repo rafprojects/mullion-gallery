@@ -10,14 +10,14 @@
  * is presentational + local filter state only.
  */
 import { useMemo, useState } from 'react';
-import { Box, Text, TextInput, Group, Button, Chip, Badge, Center, Loader } from '@mantine/core';
+import { Box, Text, TextInput, Button, Chip, Badge, Center, Loader } from '@mantine/core';
 import { IconSearch, IconCheck } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import { CHECKERED_BG } from '@/utils/checkeredBg';
 import { getAssetFileType } from '@/utils/assetFileType';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Group } from '@/ui';
 
 export interface SpaceAssetLibraryProps {
   assets: AssetLibraryItem[];
@@ -107,7 +107,7 @@ export function SpaceAssetLibrary({
 
       {allTags.length > 0 && (
         <Chip.Group multiple value={activeTags} onChange={setActiveTags}>
-          <Group gap={4} style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} wrap="wrap">
+          <Group gap="3xs" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} wrap="wrap">
             {allTags.map((tag) => (
               <Chip key={tag} value={tag} size="xs" variant="outline">{tag}</Chip>
             ))}

@@ -1,4 +1,5 @@
-import { Button, Group, Image, Modal, Stack, Text, Badge } from '@mantine/core';
+import { Button, Image, Modal, Text, Badge } from '@mantine/core';
+import { Group, Stack } from '@/ui';
 import { Trans, useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import type { UploadDuplicateCampaign } from '@/types';
@@ -65,7 +66,7 @@ export function NearDuplicateWarning({
         </Text>
 
         <Group align="flex-start" gap="md">
-          <Stack gap={6} style={{ flex: 1, minWidth: 0 }}>
+          <Stack gap="2xs" style={{ flex: 1, minWidth: 0 }}>
             <Text size="xs" c="dimmed">{t('ndw_existing_image', 'Existing image')}</Text>
             <Image
               {...getMullionDebugProps('NearDuplicateWarning', 'similar-image')}
@@ -76,7 +77,7 @@ export function NearDuplicateWarning({
               radius="sm"
               fallbackSrc="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect width='120' height='120' fill='%23eee'/%3E%3C/svg%3E"
             />
-            <Stack gap={2}>
+            <Stack gap="4xs">
               {originalName ? (
                 <Text size="xs" c="dimmed">
                   <strong>{t('ndw_original_label', 'Original:')}</strong> {originalName}

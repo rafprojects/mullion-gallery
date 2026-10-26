@@ -5,7 +5,8 @@
  * its own GallerySectionWrapper. Supports optional equal-height
  * side-by-side layout via SimpleGrid at tablet+.
  */
-import { SimpleGrid, Stack } from '@mantine/core';
+import { SimpleGrid } from '@mantine/core';
+import { Stack } from '@/ui';
 import type { Campaign, GalleryBehaviorSettings } from '@/types';
 import type { Breakpoint } from '@/hooks/useBreakpoint';
 import type { ApiClient } from '@/services/apiClient';

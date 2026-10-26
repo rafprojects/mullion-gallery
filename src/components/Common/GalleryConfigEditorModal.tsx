@@ -1,5 +1,6 @@
 import type { DrawerProps } from '@mantine/core';
-import { Accordion, Button, Drawer, Group, Menu, NumberInput, Stack, Tabs, Text, TextInput } from '@mantine/core';
+import { Accordion, Button, Drawer, Menu, NumberInput, Tabs, Text, TextInput } from '@mantine/core';
+import { Group, Stack } from '@/ui';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useEffect, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';

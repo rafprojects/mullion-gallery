@@ -2,8 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Modal,
   Button,
-  Group,
-  Stack,
   Select,
   Text,
   Alert,
@@ -12,7 +10,7 @@ import { IconArrowsExchange, IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { AdminCampaign, SpaceInfo } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Group, Stack } from '@/ui';
 
 export interface CampaignMoveSpaceModalProps {
   /** Campaign to move; null when modal is closed. */

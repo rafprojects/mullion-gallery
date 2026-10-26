@@ -2,10 +2,8 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ASSET_MIME } from './DesignAssetsGrid';
 import {
-  Stack,
   Text,
   NumberInput,
-  Group,
   SegmentedControl,
   FileButton,
   Button,
@@ -25,7 +23,7 @@ import { DEFAULT_MASK_LAYER } from '@/types';
 import type { AssetLibraryItem } from './BuilderDockContext';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Stack, Group } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -43,8 +41,8 @@ export interface MaskPropertiesPanelProps {
 function PropRow({ label, children, tooltip }: { label: string; children: React.ReactNode; tooltip?: string }) {
   const { t } = useTranslation('mullion');
   return (
-    <Group gap={6} align="center" wrap="nowrap" style={{ minHeight: 28 }}>
-      <Group gap={2} align="center" wrap="nowrap" style={{ width: 70, flexShrink: 0 }}>
+    <Group gap="2xs" align="center" wrap="nowrap" style={{ minHeight: 28 }}>
+      <Group gap="4xs" align="center" wrap="nowrap" style={{ width: 70, flexShrink: 0 }}>
         <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>{label}</Text>
         {tooltip && (
           <Tooltip label={tooltip} multiline style={{ width: uiRem(15) }} position="left" withArrow>
@@ -95,7 +93,7 @@ export function MaskPropertiesPanel({
 
   if (!hasMask) {
     return (
-      <Stack gap={8} p={4}>
+      <Stack gap="xs" padding={4}>
         <Text size="xs" c="dimmed">
           {t('lb_mask_no_mask', 'No mask layer on this slot. Add a mask from the Layers panel first.')}
         </Text>
@@ -137,7 +135,7 @@ export function MaskPropertiesPanel({
   };
 
   return (
-    <Stack gap={4} p={4}>
+    <Stack gap="3xs" padding={4}>
       {/* Preview thumbnail / drop-zone */}
       <Box
         onDragOver={handlePanelDragOver}
@@ -183,7 +181,7 @@ export function MaskPropertiesPanel({
         <>
           {/* ── Position ── */}
           <SectionHeader label={t('lb_gl_position', 'Position')} />
-          <Group grow gap={6}>
+          <Group grow gap="2xs">
             <PropRow label={t('lb_slot_x', 'X %')}>
               <NumberInput
                 value={ml.x}
@@ -206,7 +204,7 @@ export function MaskPropertiesPanel({
 
           {/* ── Scale ── */}
           <SectionHeader label={t('lb_mask_scale', 'Scale')} />
-          <Group grow gap={6}>
+          <Group grow gap="2xs">
             <PropRow label={t('lb_gl_w', 'W %')}>
               <NumberInput
                 value={ml.width}
@@ -273,7 +271,7 @@ export function MaskPropertiesPanel({
 
       {/* ── Image actions ── */}
       <SectionHeader label={t('lb_mask_mask_image', 'Mask Image')} />
-      <Group gap={4} grow>
+      <Group gap="3xs" grow>
         {onUploadMask && (
           <FileButton
             accept="image/png,image/svg+xml"

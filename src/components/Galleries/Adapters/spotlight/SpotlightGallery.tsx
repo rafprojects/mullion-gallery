@@ -17,7 +17,8 @@
  */
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Stack } from '@mantine/core';
+import { Box } from '@mantine/core';
+import { Stack } from '@/ui';
 import { IconPlayerPlay, IconZoomIn, IconPhoto } from '@tabler/icons-react';
 import type {
   GalleryBehaviorSettings,

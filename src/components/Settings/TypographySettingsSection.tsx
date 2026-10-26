@@ -1,4 +1,5 @@
-import { Accordion, Button, Divider, Stack, Text } from '@mantine/core';
+import { Accordion, Button, Divider, Text } from '@mantine/core';
+import { Stack } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { usePersistentAccordion } from '@/hooks/usePersistentAccordion';
 

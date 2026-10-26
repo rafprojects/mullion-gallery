@@ -4,11 +4,13 @@ import {
   Badge,
   FileButton,
   Button,
-  Group,
   Loader,
-  Stack,
   Text,
 } from '@mantine/core';
+import {
+  Group,
+  Stack,
+} from '@/ui';
 import { IconTrash, IconUpload, IconWorld, IconWorldOff } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
@@ -102,7 +104,7 @@ export function FontLibraryManager({ apiClient, onFontsChange, isSystemAdmin = f
       </Text>
 
       {fonts.length > 0 && (
-        <Stack gap={4}>
+        <Stack gap="3xs">
           {fonts.map((f) => (
             <Group key={f.id} justify="space-between" wrap="nowrap" gap="xs">
               <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
@@ -112,7 +114,7 @@ export function FontLibraryManager({ apiClient, onFontsChange, isSystemAdmin = f
                   <Badge size="xs" variant="light" color="blue">{t('admin_font_all_spaces', 'All spaces')}</Badge>
                 )}
               </Group>
-              <Group gap={2} wrap="nowrap">
+              <Group gap="4xs" wrap="nowrap">
                 <ActionIcon
                   variant="subtle"
                   color={f.isUniversal ? 'blue' : 'gray'}
