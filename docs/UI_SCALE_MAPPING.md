@@ -125,10 +125,12 @@ Three rungs join the spacing scale below `xs`: `4xs` 2px, `3xs` 4px, `2xs` 6px. 
 | Name | Flipped | Sites | Notes |
 |---|---|---|---|
 | `Stack`, `Group` | 2026-10-25 | 303 edits in 105 files | Every numeric gap but the nine zeros folded onto a rung; 6 listed for review (3px to `3xs` twice, 8px to `xs` four times); after review the company badge and the section heading took `2xs`. `packages/shared-ui`'s five files stay on Mantine until batch zero, with the last two numeric gaps (`AuthBarMinimal.tsx:74` and `:84`). |
+| `Text`, `Title` | 2026-10-26 | 642 edits in 95 files | Colour names to tones by the table above; 6 sites listed (five sub-token sizes floored to `xs`, one `c="blue"` to `info`); 7 by hand (two conditional colours, `orange.4`, `inherit`, two `c="white"`, one drop-zone hint). The only photographed change is `dimmed` text taking the `muted` rung. |
 
 **Checks every flip carries**, both found on the first one:
 
 - **Per-instance custom properties inherit.** A component that reads `var(--mullion-x, default)` and was given no `x` reads its nearest ancestor's instead. The layout family now resets what it reads (`layout.css`); before a family flips, its sheet is checked for the same leak, keeping deliberate inheritance such as `Card.Section` reading its card's padding. `e2e/layout-nesting.spec.ts` is the pattern for the test.
 - **Behaviour the defaults do not show.** `Group grow` columns stay equal whatever their content, as Mantine's did (designer, 2026-10-26): `flex: 1 1 0` with `min-width: 0`, so a wide child is squeezed rather than wrapping or widening its column. Asserted by `e2e/layout-nesting.spec.ts`.
 - **A review's options are the adjacent rungs.** An off-scale site that reads wrong moves to the rung above or below; it goes back to a literal only after a conversation with the designer.
+- **What one component inherits from another of its kind.** `Text` keeps Mantine's reading: size and line height flow from an enclosing `Text`, weight resets to regular, transform inherits as the property does. Mantine's line height follows the size step (1.4 for `xs` to 1.65 for `xl`); the framework now carries the same rungs as constants, which it had fixed at 1.55.
 

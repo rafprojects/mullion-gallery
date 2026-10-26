@@ -149,3 +149,10 @@
   background-color: var(--mullion-select-option-checked-bg, var(--mantine-primary-color-filled));
   color: var(--mullion-select-option-checked-color, var(--mantine-primary-color-contrast, #ffffff));
 }
+
+// [P81-A] A toned Text inside the checked option takes the option's on-fill ink:
+// a muted rung is measured against plain surfaces, never against this fill, so
+// tinting the ground and colouring the ink at once failed. Goes with this file.
+.mullion-mantine-select-option[data-checked] .mullion-text[data-mullion-tone] {
+  color: inherit;
+}
