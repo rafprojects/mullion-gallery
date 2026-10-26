@@ -13,7 +13,9 @@
    * custom properties inherit, so a primitive that set none used to read its
    * nearest ancestor's: a bare Group inside a spaced-out one spread its
    * children. Each primitive resets what it reads; an inline value still wins,
-   * because inline style beats every layer.
+   * because inline style beats every layer. One inheritance is deliberate and
+   * must survive any family's reset: `.mullion-card-section` reads its card's
+   * `--mullion-pad` to bleed to the card's edges (surface.css).
    */
   .mullion-stack,
   .mullion-group,
@@ -69,8 +71,12 @@
     flex-wrap: var(--mullion-wrap, wrap);
   }
 
+  /* Equal columns whatever their content, as Mantine's were: a panel's rows
+     have to agree on where the columns are, so a wide child is squeezed rather
+     than widening its column or wrapping (designer, 2026-10-26). */
   .mullion-group[data-grow] > * {
     flex: 1 1 0;
+    min-width: 0;
     max-width: 100%;
   }
 

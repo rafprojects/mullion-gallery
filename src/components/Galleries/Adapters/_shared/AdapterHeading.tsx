@@ -33,7 +33,7 @@ export function AdapterHeading({ common, heading, icon, titleStyle }: AdapterHea
   return (
     <Title order={3} size="h5" ta={justify} style={titleStyle}>
       {icon !== undefined ? (
-        <Group gap="xs" render={<span />} justify={justify}>
+        <Group gap="2xs" render={<span />} justify={justify}>
           {common.showGalleryLabelIcon && icon}
           {heading.label}
         </Group>

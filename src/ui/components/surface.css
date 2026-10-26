@@ -32,8 +32,8 @@
 
   /*
    * A section bleeds to the card's edges. The inset is the card's own padding
-   * custom property rather than a repeated length, so a card with unusual
-   * padding keeps its sections aligned.
+   * custom property, inherited on purpose, so a card with unusual padding keeps
+   * its sections aligned; a per-instance reset must leave `--mullion-pad` alone here.
    */
   .mullion-card-section {
     margin-inline: calc(-1 * var(--mullion-pad-inline, var(--mullion-pad, 0)));

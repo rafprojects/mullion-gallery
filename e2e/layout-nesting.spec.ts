@@ -50,5 +50,15 @@ for (const mount of ['shadow', 'light'] as const) {
     const stack = await read('inline-nest-inner-stack');
     expect(stack).toMatchObject({ justify: 'flex-start', align: 'stretch', padding: '0px' });
     expect(stack.gap).toBeCloseTo(16, 0);
+
+    // A grow row splits into equal columns whatever their content: a property
+    // panel's rows have to agree on where the columns are (designer, 2026-10-26).
+    // Both on one line, too: a long child that wrapped onto its own line would
+    // also measure "equal", each filling a whole line.
+    const boxes = await page
+      .getByTestId('inline-nest-grow')
+      .evaluate((el) => [...el.children].map((k) => k.getBoundingClientRect()).map((r) => ({ top: r.top, width: r.width })));
+    expect(boxes[0]!.top).toBe(boxes[1]!.top);
+    expect(boxes[0]!.width).toBeCloseTo(boxes[1]!.width, 0);
   });
 }

@@ -113,7 +113,7 @@ function CampaignViewerCoverHeader({
           style={{ position: 'absolute', top: uiRem(1), left: uiRem(1), backgroundColor: displayedCampaign.company.brandColor }}
           size="lg"
         >
-          <Group gap="xs">
+          <Group gap="2xs">
             <CompanyLogo logo={displayedCampaign.company.logo} companyName={displayedCampaign.company.name} />
             <span>{displayedCampaign.company.name}</span>
           </Group>

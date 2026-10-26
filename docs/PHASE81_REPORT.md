@@ -107,6 +107,17 @@ The designer answered every open row of the mapping (`designer-answers-ui-scale-
 
 **Verified.** After the fix, one capture matched the original on all 16 snapshots and the other differed only at the known flaky popup corners. Lint, typecheck, vitest (278 files, 4,478 tests) and the full Playwright suite (210) pass. `Group grow` behaves differently from Mantine's when a child's content is wider than its share (37 sites, none photographed); that question went to the designer with the six review sites in `pass-two-begins-2026-10-25.md`.
 
+### Pass 2 review round (2026-10-26)
+
+The designer answered `pass-two-begins` the same night (`designer-answers-pass-two-2026-10-26.md`).
+
+- **`Group grow` keeps equal columns whatever their content**, Mantine's behaviour: a panel's rows have to agree on where the columns are, and a field's width should not depend on its label. The framework's `flex: 1 1 0` let a wide child's minimum width wrap it onto its own line. `min-width: 0` fixes it. The nesting test's first version passed before the fix, because two wrapped children each fill a line and so measure "equal"; it now also asserts they share a line, and failed before the fix. Stacking a grow row that is too narrow for its fields is a P81-B panel rule, not this one.
+- **A review's options are the adjacent rungs, never the old literal.** A literal needs a conversation.
+- **The two sites the designer wanted looked at both take `2xs`,** the icon-and-label rung. Measured on the dev site with the gap switched inline: the campaign cover's company badge (logo then name) read detached at `xs` and crowded at `3xs`, and at `2xs` it now matches the campaign card's company badge. The section heading, with an 18px icon stood in for the one the site has switched off, read detached at `xs` and not cramped at `2xs`.
+- **The deliberate inheritance is written down where the reset lives:** `layout.css`'s reset comment and `surface.css`'s `Card.Section` rule both name it.
+
+**The wp-admin pages, checked on the redeployed plugin.** Gallery Spaces and Asset Library mount under the new provider with all 11 framework layout elements rendering as flex with token gaps, no Mantine `Group` or `Stack` left, and WordPress's chrome untouched. wp-admin's root is 16px and the user default is 16px, so the size basis there is exactly 1, which settles P81-F's open point about it. The only console errors were the service worker refusing the dev site's self-signed certificate in the test browser. The check found one unrelated defect, the `{{NAME}} (DEFAULT)` badge, filed under P81-E.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.
@@ -247,7 +258,7 @@ Found while answering P81-A's question about numbers. The designer's reply (`doc
 
 ### Fix
 
-The provider measures the document's root font size at mount and sets a scale on its scope that brings one step back to design size, and the token sheet multiplies every rem token by it, as Mantine's `rem() * var(--mantine-scale)` does. Until P81-D removes Mantine, the same value goes to `--mantine-scale`, so both libraries keep agreeing (P81-A's pass 1 relies on that). Open points to settle in the track: whether to re-measure when the root changes after mount, and whether the wp-admin apps, which have no provider until P81-B, need it at all; that depends on wp-admin's root font size, which has not been measured.
+The provider measures the document's root font size at mount and sets a scale on its scope that brings one step back to design size, and the token sheet multiplies every rem token by it, as Mantine's `rem() * var(--mantine-scale)` does. Until P81-D removes Mantine, the same value goes to `--mantine-scale`, so both libraries keep agreeing (P81-A's pass 1 relies on that). Open points to settle in the track: whether to re-measure when the root changes after mount, and whether the wp-admin apps need it at all. The second was settled on 2026-10-26: wp-admin's root measures 16px, so its scale is 1.
 
 ### Implementation (2026-10-25)
 
@@ -298,6 +309,7 @@ The user's partial pass of `ACCESSIBILITY_MANUAL_AUDIT.md` on 2026-10-25, and th
 | **Alt text is lost on campaign export and import** | The gallery's alt text is each media item's `caption`, and neither the JSON nor the ZIP export writes it, nor does `Mullion_Campaign_IO::import_entry` read it. A round trip silently drops every image's alt text. |
 | **The gallery ignores WordPress's attachment alt text** | Alt is `caption`, falling back to `title`. Alt text set in the Media Library never reaches the gallery. Decide whether an upload's caption defaults from the attachment's alt, or alt becomes its own field. |
 | **Most `wp mullion` subcommands are unreachable** | `@subcommand campaign list` and its siblings contain a space, which WP-CLI does not support, so each group collapses to its last registered command. `campaign list`, `archive`, `restore`, `duplicate`, `export` and `media list` cannot be run, and the documented `wp mullion campaign import file.zip` reads the word `import` as the file name. |
+| **The Default space's badge reads `{{NAME}} (DEFAULT)`** in wp-admin's Gallery Spaces table | Cause found 2026-10-26. One key, `admin_space_default`, has two meanings: `AdminPanel.tsx:202` uses it as "{{name}} (default)" with a `name`, `SpaceManagementView.tsx:339` as plain "default" without one. The generated catalogue keeps the first, so the badge prints the raw placeholder. Since P60-I. Give the badge its own key. |
 | **Three layout faults in the Settings and Admin panels** | The `px` unit slot spills out of its number field (Campaign Viewer, Fullscreen Content Max Width); a wrapped label ("Desktop Image Gallery Adapter") pushes its select out of line with its neighbour in Per-Type Breakpoint Adapters; and `Add Media` is filled and flush, already in P81-B's carried table. |
 
 ### Fix

@@ -318,6 +318,10 @@ function Nesting({ prefix }: { prefix: string }) {
         </Group>
         <span>end</span>
       </Group>
+      <Group grow gap="sm" data-testid={`${prefix}-nest-grow`} style={{ width: '20rem' }}>
+        <span style={{ whiteSpace: 'nowrap' }}>a label far wider than its equal share of the row</span>
+        <span>short</span>
+      </Group>
     </Stack>
   );
 }
