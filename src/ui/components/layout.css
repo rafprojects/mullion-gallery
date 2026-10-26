@@ -8,6 +8,38 @@
  * over all of it without a specificity contest (study 3.4).
  */
 @layer mullion.components {
+  /*
+   * [P81-A] Every per-instance value arrives as an inline custom property, and
+   * custom properties inherit, so a primitive that set none used to read its
+   * nearest ancestor's: a bare Group inside a spaced-out one spread its
+   * children. Each primitive resets what it reads; an inline value still wins,
+   * because inline style beats every layer.
+   */
+  .mullion-stack,
+  .mullion-group,
+  .mullion-center,
+  .mullion-container,
+  .mullion-grid,
+  .mullion-simple-grid {
+    --mullion-gap: initial;
+    --mullion-align: initial;
+    --mullion-justify: initial;
+    --mullion-wrap: initial;
+    --mullion-pad: initial;
+    --mullion-pad-block: initial;
+    --mullion-pad-inline: initial;
+    --mullion-container-size: initial;
+    --mullion-cols: initial;
+    --mullion-cols-sm: initial;
+    --mullion-cols-md: initial;
+    --mullion-cols-lg: initial;
+    --mullion-cols-xl: initial;
+  }
+
+  .mullion-grid-col {
+    --mullion-grid-span: initial;
+  }
+
   .mullion-stack,
   .mullion-group,
   .mullion-center,

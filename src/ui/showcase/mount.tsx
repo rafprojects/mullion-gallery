@@ -111,6 +111,8 @@ const withChoice = withKeyboard || params.get('choice') === '1';
  * twice and make each one a strict-mode violation to query.
  */
 const withManagers = withKeyboard || params.get('managers') === '1';
+/** P81-A: layout primitives nested inside ones that set every property, for the inheritance test. */
+const withNesting = params.get('nesting') === '1';
 /** `?host=hostile` reproduces the P77-B probe around the whole fixture. */
 const hostileHost = params.get('host') === 'hostile';
 
@@ -239,6 +241,7 @@ function Gallery({ prefix }: { prefix: string }) {
       {withChoice && <Choices prefix={prefix} />}
       {withChoice && <Toggles prefix={prefix} />}
       {withChoice && <Gaps prefix={prefix} />}
+      {withNesting && <Nesting prefix={prefix} />}
       {withKeyboard && <KeyboardExtras prefix={prefix} />}
     </Stack>
   );
@@ -296,6 +299,29 @@ function Choices({ prefix }: { prefix: string }) {
  * pointer-and-rect code of ours, so a browser is the only place its geometry
  * means anything.
  */
+/**
+ * An outer row and column that set every layout property, each holding an
+ * inner one that sets none. Custom properties inherit, so an inner primitive
+ * that read its parent's would spread its children or take its padding.
+ */
+function Nesting({ prefix }: { prefix: string }) {
+  return (
+    <Stack gap="xl" align="flex-end" padding="xl" data-testid={`${prefix}-nest-outer-stack`}>
+      <Stack data-testid={`${prefix}-nest-inner-stack`}>
+        <span>one</span>
+        <span>two</span>
+      </Stack>
+      <Group justify="space-between" align="flex-end" wrap="nowrap" gap="xl" padding="lg" style={{ width: '40rem' }}>
+        <Group data-testid={`${prefix}-nest-inner-group`} style={{ flex: '1 1 auto' }}>
+          <span>one</span>
+          <span>two</span>
+        </Group>
+        <span>end</span>
+      </Group>
+    </Stack>
+  );
+}
+
 function Gaps({ prefix }: { prefix: string }) {
   const [page, setPage] = useState(4);
   const [colour, setColour] = useState('rgba(18, 52, 86, 0.5)');
