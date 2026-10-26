@@ -22,9 +22,7 @@
 // ── Layout and typography ──────────────────────────────────────────────────
 export {
   Anchor,
-  Card,
   Divider,
-  Paper,
 } from '@mantine/core';
 
 // [P81-A] Flipped to the framework, with their consumers' props rewritten by
@@ -34,10 +32,12 @@ export {
   Alert,
   Badge,
   Box,
+  Card,
   Center,
   Container,
   Grid,
   Group,
+  Paper,
   SimpleGrid,
   Stack,
   Text,
@@ -45,10 +45,12 @@ export {
   type AlertProps,
   type BadgeProps,
   type BoxProps,
+  type CardProps,
   type CenterProps,
   type ContainerProps,
   type GridProps,
   type GroupProps,
+  type PaperProps,
   type SimpleGridProps,
   type StackProps,
   type TextProps,

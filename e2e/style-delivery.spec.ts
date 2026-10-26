@@ -234,10 +234,12 @@ test.describe('style delivery contract', () => {
 
     const dialog = page.getByRole('dialog', { name: /starting point/i });
     await expect(dialog).toBeVisible();
-    const card = dialog.locator('.mantine-Card-root').first();
+    // P81-A: a stable attribute of ours, not the component library's class (Decision D).
+    const card = dialog.getByTestId('template-picker-card').first();
     const painted = await card.evaluate((el) => ({
       inOverlay: el.getRootNode() === document.querySelector('[data-mullion-overlay-root]')?.shadowRoot,
-      moduleClass: /card/.test(el.className),
+      // The module's own class, not the framework card's `mullion-card`, which also says "card".
+      moduleClass: [...el.classList].some((c) => c !== 'mullion-card' && /card/.test(c)),
       transitionProperty: getComputedStyle(el).transitionProperty,
     }));
     expect(painted.inOverlay, 'the picker must render inside the overlay root').toBe(true);

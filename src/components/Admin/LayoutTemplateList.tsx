@@ -12,7 +12,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   ActionIcon,
   Button,
-  Card,
   FileButton,
   Menu,
   SegmentedControl,
@@ -61,7 +60,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useBuilderDeepLink } from '@mullion/shared-utils';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group, Stack, Text, Box, Center, Badge } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, Badge, Card } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

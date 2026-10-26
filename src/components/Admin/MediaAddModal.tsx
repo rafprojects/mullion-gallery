@@ -3,10 +3,8 @@ import DOMPurify from 'dompurify';
 import {
   ActionIcon,
   Button,
-  Card,
   FileButton,
   Modal,
-  Paper,
   Progress,
   Select,
   TextInput,
@@ -16,7 +14,7 @@ import { IconUpload, IconX, IconFile, IconVideo } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { OEmbedResponse } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text } from '@/ui';
+import { uiRem, Group, Stack, Text, Card, Paper } from '@/ui';
 
 interface MediaAddModalProps {
   opened: boolean;
@@ -159,7 +157,7 @@ export function MediaAddModal({
         )}
         <Paper
           ref={dropRef}
-          p="md"
+          padding="md"
           role="region"
           aria-label={t('admin_media_dropzone_aria', 'File drop zone')}
           onDragEnter={handleDragEnter}

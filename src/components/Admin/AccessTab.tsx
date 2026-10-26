@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import {
   Button,
-  Card,
   Checkbox,
   Combobox,
   ScrollArea,
@@ -20,7 +19,7 @@ import { PendingRequestsPanel } from './PendingRequestsPanel';
 import type { ApiClient } from '@/services/apiClient';
 import type { AdminAccessState } from '@/hooks/useAdminAccessState';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Alert, Box, Center, Badge } from '@/ui';
+import { uiRem, Group, Stack, Text, Alert, Box, Center, Badge, Card, useMediaQuery } from '@/ui';
 
 type AccessViewMode = 'campaign' | 'company' | 'all';
 
@@ -90,6 +89,8 @@ export function AccessTab({
   isMobile = false,
   isSystemAdmin = false,
 }: AccessTabProps) {
+  // Mantine's responsive card padding: sm, then md from its md breakpoint (P81-A).
+  const wide = useMediaQuery('(min-width: 62em)');
   const { t } = useTranslation('mullion');
   const {
     userSearchResults,
@@ -119,7 +120,7 @@ export function AccessTab({
   return (
     <>
       {/* View Mode Toggle */}
-      <Card shadow="sm" withBorder style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} p={{ base: 'sm', md: 'md' }}>
+      <Card shadow="sm" withBorder style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} padding={wide ? 'md' : 'sm'}>
         <Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
           <Group align="flex-end" gap="md" wrap="wrap">
             {/* P53-A: Company / All are system-admin only; editors see campaign access only. */}
@@ -224,7 +225,7 @@ export function AccessTab({
       ) : (
         <>
           {/* Current Access - Show this first and prominently */}
-          <Card shadow="sm" withBorder style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} p={{ base: 'sm', md: 'md' }}>
+          <Card shadow="sm" withBorder style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} padding={wide ? 'md' : 'sm'}>
             <Group justify="space-between" style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }} wrap="wrap" gap="sm">
               <Text weight={600} size="lg">
                 {accessViewMode === 'campaign' ? t('admin_access_current', 'Current Access') :
@@ -304,7 +305,7 @@ export function AccessTab({
 
           {/* P18-I: Access Request Workflow */}
           {accessViewMode === 'campaign' && accessCampaignId && apiClient && (
-            <Card shadow="sm" withBorder style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} p={{ base: 'sm', md: 'md' }}>
+            <Card shadow="sm" withBorder style={{ marginBottom: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }} padding={wide ? 'md' : 'sm'}>
               <PendingRequestsPanel
                 campaignId={accessCampaignId}
                 apiClient={apiClient}
@@ -313,7 +314,7 @@ export function AccessTab({
           )}
 
           {/* Grant Access Form - Unified and compact */}
-          <Card shadow="sm" withBorder p={{ base: 'sm', md: 'md' }}>
+          <Card shadow="sm" withBorder padding={wide ? 'md' : 'sm'}>
             <Text weight={600} size="lg" style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }}>
               {accessViewMode === 'campaign' ? t('admin_access_grant_new', 'Grant New Access') : t('admin_access_grant_company', 'Grant Company-Wide Access')}
             </Text>

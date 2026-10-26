@@ -9,7 +9,7 @@
  */
 
 import type { ReactNode } from 'react';
-import { renderElement, cx, type UiElementProps } from './element';
+import { renderElement, cx, type UiAttributes, type UiElementProps } from './element';
 import {
   customProperties,
   splitPadding,
@@ -20,7 +20,7 @@ import {
   type UiSpacing,
 } from './scale';
 
-export interface PaperProps extends UiElementProps, UiPaddingProps {
+export interface PaperProps extends UiElementProps, UiPaddingProps, UiAttributes<HTMLDivElement> {
   radius?: UiRadius | undefined;
   shadow?: UiSpacing | undefined;
   withBorder?: boolean | undefined;
@@ -57,7 +57,7 @@ export interface CardProps extends PaperProps {
   children?: ReactNode;
 }
 
-export interface CardSectionProps extends UiElementProps, UiPaddingProps {
+export interface CardSectionProps extends UiElementProps, UiPaddingProps, UiAttributes<HTMLDivElement> {
   /** Draw a separator below the section. */
   withBorder?: boolean | undefined;
   children?: ReactNode;

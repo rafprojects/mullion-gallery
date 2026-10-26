@@ -1,6 +1,6 @@
 import { memo, type ReactNode } from 'react';
-import { Paper, Select } from '@mantine/core';
-import { Stack, Text } from '@/ui';
+import { Select } from '@mantine/core';
+import { Stack, Text, Paper } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import type { ApiClient } from '@/services/apiClient';
@@ -34,7 +34,7 @@ function MagicLinkPageSelector({
   ];
 
   return (
-    <Paper withBorder p="md" radius="md">
+    <Paper withBorder padding="md" radius="md">
       <Stack gap="xs">
         <Text size="sm" weight={600}>{t('set_sys_magic_title', 'Access Request Magic-Link')}</Text>
         <Text size="xs" tone="muted">

@@ -155,6 +155,9 @@ const RULES = {
       variant: (attr) => (literal(attr) === 'dot' ? { replace: 'variant="outline"' } : null),
     },
   },
+  Paper: { rename: PADDING, unsupported: ['variant', 'mod', 'classNames', 'styles', 'unstyled'] },
+  Card: { rename: PADDING, unsupported: ['variant', 'orientation', 'mod', 'classNames', 'styles', 'unstyled'] },
+  'Card.Section': { rename: PADDING, unsupported: ['inheritPadding', 'mod', 'classNames', 'styles', 'unstyled'] },
   Container: { rename: PADDING, unsupported: ['strategy', 'mod', 'classNames', 'styles', 'unstyled'] },
   Box: { rename: PADDING, unsupported: ['variant', 'mod', 'classNames', 'styles', 'unstyled'] },
   Center: { rename: PADDING, unsupported: ['mod', 'classNames', 'styles', 'unstyled'] },
@@ -276,8 +279,10 @@ for (const file of [...walk('src'), ...walk('packages')]) {
   if (local.size === 0) continue;
 
   const visit = (node) => {
-    if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) && local.has(node.tagName.getText())) {
-      const comp = local.get(node.tagName.getText());
+    // A compound tag (`Card.Section`) takes its parent's import and its own rules.
+    const [tagHead, ...tagTail] = (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) ? node.tagName.getText().split('.') : [];
+    const comp = tagHead && local.has(tagHead) ? [local.get(tagHead), ...tagTail].join('.') : undefined;
+    if (comp && RULES[comp]) {
       const rule = RULES[comp];
       if (rule.element) {
         const element = ts.isJsxOpeningElement(node) ? node.parent : node;

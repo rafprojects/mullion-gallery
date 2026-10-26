@@ -58,3 +58,13 @@
   }
 }
 
+// [P81-A] The thumbnail band's height, which Mantine set with a responsive `h`
+// from the card settings: the values arrive inline, the breakpoint (sm, 48em) lives here.
+.thumbSection {
+  height: var(--cc-thumb-h);
+
+  @media (min-width: 48em) {
+    height: var(--cc-thumb-h-sm, var(--cc-thumb-h));
+  }
+}
+

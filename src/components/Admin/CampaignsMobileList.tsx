@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import {
   Button,
-  Card,
   Checkbox,
   Loader,
   Menu,
@@ -17,7 +16,7 @@ import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text, Box, Center, Badge } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, Badge, Card } from '@/ui';
 
 // Returns an i18next key + English default so the caller can translate in render.
 function scheduleLabel(publishAt?: string, unpublishAt?: string): { key: string; text: string; tone: 'info' | 'warning' | 'danger' } | null {
@@ -84,7 +83,7 @@ export function CampaignsMobileList({
           key={c.id}
           withBorder
           radius="md"
-          p="sm"
+          padding="sm"
           data-selected={isSelected || undefined}
           style={{ borderColor: isSelected ? 'var(--mantine-color-blue-5)' : undefined }}
         >

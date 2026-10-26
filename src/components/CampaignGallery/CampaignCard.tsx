@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { IconLock, IconEye } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Card, Image, UnstyledButton } from '@mantine/core';
+import { Image, UnstyledButton } from '@mantine/core';
 import type { Campaign, GalleryBehaviorSettings } from '@/types';
 import { DEFAULT_GALLERY_BEHAVIOR_SETTINGS } from '@/types';
 import type { ApiClient } from '@/services/apiClient';
@@ -11,7 +11,11 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { RequestAccessForm } from './RequestAccessForm';
 import { CompanyLogo } from '@/components/Common/CompanyLogo';
 import styles from './CampaignCard.module.scss';
-import { uiRem, Group, Stack, Text, Box, Badge } from '@/ui';
+
+import { uiRem, Group, Stack, Text, Box, Badge, Card } from '@/ui';
+
+/** A settings length in the size basis: a number is pixels, as Mantine's `h` read it. */
+const thumbLength = (value: string | number): string => (typeof value === 'number' ? uiRem(value / 16) : value);
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -100,9 +104,17 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
         >
           {/* Thumbnail Section */}
           <Card.Section
-            h={showInfo ? { base: toCssOrNumber(Math.round(scaledThumbHeight * 0.8), thumbHeightUnit), sm: toCssOrNumber(scaledThumbHeight, thumbHeightUnit) } : undefined}
-            style={{ position: 'relative', ...(!showInfo ? { flex: 1, overflow: 'hidden' } : undefined) }}
-            component="div"
+            {...(showInfo && styles.thumbSection ? { className: styles.thumbSection } : {})}
+            style={{
+              position: 'relative',
+              ...(showInfo
+                ? {
+                    '--cc-thumb-h': thumbLength(toCssOrNumber(Math.round(scaledThumbHeight * 0.8), thumbHeightUnit)),
+                    '--cc-thumb-h-sm': thumbLength(toCssOrNumber(scaledThumbHeight, thumbHeightUnit)),
+                  }
+                : { flex: 1, overflow: 'hidden' }),
+            }}
+            render={<div />}
           >
             <Image
               src={campaign.thumbnail}
@@ -186,7 +198,7 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
 
           {/* Content Section */}
           {showInfo && (
-            <Card.Section p="md">
+            <Card.Section padding="md">
               <Stack gap="sm">
                 {settings?.showCardTitle !== false && (
                   <Text weight={600} size="lg" lineClamp={1} style={cardTitleStyle}>

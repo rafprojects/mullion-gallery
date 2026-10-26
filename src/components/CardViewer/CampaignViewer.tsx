@@ -1,7 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconCalendar, IconTag } from '@tabler/icons-react';
-import { Modal, Image, Paper, Loader, Switch } from '@mantine/core';
+import { Modal, Image, Loader, Switch } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import type { Campaign, GalleryBehaviorSettings, GalleryConfig } from '@/types';
 import type { ApiClient } from '@/services/apiClient';
@@ -27,7 +27,7 @@ import {
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { UnifiedGallerySection } from './UnifiedGallerySection';
 import { PerTypeGallerySection } from './PerTypeGallerySection';
-import { uiRem, Group, Stack, Title, Text, SimpleGrid, Box, Center, Badge } from '@/ui';
+import { uiRem, Group, Stack, Title, Text, SimpleGrid, Box, Center, Badge, Paper, Alert } from '@/ui';
 import styles from './CampaignViewer.module.scss';
 
 /** A settings length in the size basis: a number is pixels, as Mantine's `h` read it. */
@@ -256,19 +256,19 @@ function CampaignViewerStatsSection({
       </InContextEditor>
       <Title order={3} size={6} style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }} id="campaign-stats-heading" className="mullion-sr-only">{t('cv_stats_heading', 'Campaign Statistics')}</Title>
       <SimpleGrid className={styles.stats} cols={{ base: 2, sm: 4 }} paddingBlock="sm" style={{ borderTopWidth: 1, borderTopColor: 'var(--mullion-color-border)' }}>
-        <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
+        <Paper padding="md" radius="md" withBorder style={{ textAlign: 'center' }}>
           <Text size="xl" weight={600} style={campaignStatsValueStyle}>{displayedCampaign.videos.length}</Text>
           <Text size="sm" tone="muted" style={campaignStatsLabelStyle}>{t('cv_videos', 'Videos')}</Text>
         </Paper>
-        <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
+        <Paper padding="md" radius="md" withBorder style={{ textAlign: 'center' }}>
           <Text size="xl" weight={600} style={campaignStatsValueStyle}>{displayedCampaign.images.length}</Text>
           <Text size="sm" tone="muted" style={campaignStatsLabelStyle}>{t('cv_images', 'Images')}</Text>
         </Paper>
-        <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
+        <Paper padding="md" radius="md" withBorder style={{ textAlign: 'center' }}>
           <Text size="xl" weight={600} style={campaignStatsValueStyle}>{displayedCampaign.tags.length}</Text>
           <Text size="sm" tone="muted" style={campaignStatsLabelStyle}>{t('cv_tags', 'Tags')}</Text>
         </Paper>
-        <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
+        <Paper padding="md" radius="md" withBorder style={{ textAlign: 'center' }}>
           <Text size="xl" weight={600} style={campaignStatsValueStyle}>
             {displayedCampaign.visibility === 'public' ? '🌐' : '🔒'}
           </Text>
@@ -558,11 +558,11 @@ export function CampaignViewer({
 
           {/* Access notice */}
           {!hasAccess && (
-            <Paper p="md" radius="md" bg="red.9" withBorder role="alert" aria-live="assertive">
+            <Alert tone="danger" variant="filled" aria-live="assertive">
               <Text size="sm" weight={600}>
                 {t('cv_private_notice', 'This campaign is private. Sign in or request access to view media.')}
               </Text>
-            </Paper>
+            </Alert>
           )}
 
           <CampaignViewerGalleryContent

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import {
   ActionIcon,
   Loader,
-  Paper,
   ScrollArea,
   SegmentedControl,
   Select,
@@ -19,6 +18,7 @@ import {
   Center,
   SimpleGrid,
   Badge,
+  Paper,
 } from '@/ui';
 import {
   CartesianGrid,
@@ -91,7 +91,7 @@ function StatCard({
   icon: React.ReactNode;
 }) {
   return (
-    <Paper withBorder p="md" radius="md">
+    <Paper withBorder padding="md" radius="md">
       <Stack gap="3xs" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>
         {icon}
         <Text size="sm" tone="muted" weight={500}>
@@ -296,7 +296,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
           )}
 
           {!isLoading && !error && chartData.length === 0 && (
-            <Paper withBorder p="xl" radius="md">
+            <Paper withBorder padding="xl" radius="md">
               <Center>
                 <Stack align="center" gap="xs">
                   <IconChartLine size={32} color="var(--mantine-color-dimmed)" />
@@ -312,7 +312,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
           )}
 
           {!isLoading && !error && chartData.length > 0 && (
-            <Paper withBorder p="md" radius="md">
+            <Paper withBorder padding="md" radius="md">
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-default-border)" />
@@ -361,7 +361,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
           )}
 
           {/* ── Media Performance table ──────────────────────────────────── */}
-          <Paper withBorder p="md" radius="md">
+          <Paper withBorder padding="md" radius="md">
             <Stack gap="sm">
               <Title order={5} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <IconPhoto size={16} />
@@ -410,7 +410,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
 
           {/* ── Top campaigns table (system-admin only, P53-A) ────────────── */}
           {isSystemAdmin && (summaryData?.topCampaigns?.length ?? 0) > 0 && (
-            <Paper withBorder p="md" radius="md">
+            <Paper withBorder padding="md" radius="md">
               <Stack gap="sm">
                 <Title order={5} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <IconChartLine size={16} />

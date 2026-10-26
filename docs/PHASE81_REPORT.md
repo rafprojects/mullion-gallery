@@ -170,6 +170,18 @@ The designer answered `pass-two-begins` the same night (`designer-answers-pass-t
 
 **Verified.** The badge flip moved nothing on the photographed surfaces, which carry no badges; the one differing snapshot was the theme select's four rounded corners, the antialiasing flake that snapshot has shown before. The space-badge unit test was rewritten for the neutral badge. Lint, the allow-list check (163), vitest (4,485, one unhandled teardown error from a Mantine transition timer that did not recur in two further runs) and the full Playwright suite (210) pass.
 
+### Pass 2: Paper, Card and Card.Section, neutral first (2026-10-26)
+
+**Split in two.** Rule 13 changes how surfaces look, and which `Paper` or `Card` counts as raised depends on its context, so the flip went first and painted exactly what Mantine did; the refresh goes after the designer has drawn the line between a panel and a raised panel (`badges-moved-surfaces-next-2026-10-26.md`).
+
+**Framework parity, found by reading Mantine's sheet.** `Card` is padded md by default and is a positioning context; the framework's was neither, so un-propped cards would have lost 16px and absolutely positioned children (the campaign card's badges) would have positioned against the wrong ancestor. `Card.Section` conflated two values: it bled by its own padding rather than the card's and took the card's padding as its own, where Mantine's bleeds by the card's padding and has none. The card now publishes `--mullion-card-pad-*` for its sections, which nothing resets, and the "deliberate inheritance" exception recorded in the badge round is gone with the shared property. The surfaces also had the family leak (a `Paper` in a padded card took the card's padding, radius and ground) and now reset what they read. The nesting spec measured the card at 32px, the outer stack's `xl`, before the fix.
+
+**One visible change on its own.** A bordered `Paper` used Mantine's fixed `gray-3` or `dark-4`, because the adapter set only the card's border; it now draws the theme's `border`, like the card.
+
+**By hand.** `AccessTab`'s four responsive card paddings use the `useMediaQuery` hook at Mantine's md breakpoint, since that file has no registered stylesheet and an unregistered module would not reach the shadow root. The campaign card's responsive thumbnail band took the viewer-cover pattern in `CampaignCard.module.scss`. The campaign viewer's private notice was a `Paper` on Mantine's fixed `red.9` carrying the theme's text, dark on dark red on light themes; it is an assertive status message, now a filled danger `Alert`.
+
+**Verified.** Photographed surfaces: only the theme selector's two corner flakes. `style-delivery.spec.ts` found the template-picker card by `.mantine-Card-root` and now finds it by a `data-testid` of ours (Decision D); its module-class assertion was tightened, because the framework's own `mullion-card` would have satisfied `/card/` alone. Lint, the allow-list check (163), vitest (4,485) and the full Playwright suite pass. The campaign card is visitor-facing and not photographed (the local data has no campaigns); it gets a look on the dev site at the next deploy.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.

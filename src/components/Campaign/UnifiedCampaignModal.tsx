@@ -2,7 +2,6 @@ import { Suspense, lazy, useCallback, useEffect, useState, type ReactElement } f
 import {
   ActionIcon,
   Button,
-  Card,
   FileButton,
   Image,
   Loader,
@@ -42,7 +41,7 @@ import {
   setCampaignBreakpointScopeAdapterOverride,
   syncCampaignGalleryOverrideMode,
 } from '@/utils/campaignGalleryOverrides';
-import { uiRem, Group, Stack, Text, Box, Center, SimpleGrid, Badge } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, SimpleGrid, Badge, Card } from '@/ui';
 
 
 const LazyGalleryConfigEditorModal = lazy(() =>

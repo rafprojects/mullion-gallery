@@ -1,6 +1,6 @@
 
-import { Button, Paper, ActionIcon, Tooltip } from '@mantine/core';
-import { Group, Text } from '@/ui';
+import { Button, ActionIcon, Tooltip } from '@mantine/core';
+import { Group, Text, Paper } from '@/ui';
 import { IconX, IconArchive, IconArchiveOff, IconFileZip, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
@@ -38,7 +38,7 @@ export function BulkActionsBar({
   return (
     <Paper
       shadow="sm"
-      p="xs"
+      padding="xs"
       radius="md"
       withBorder
       style={{
