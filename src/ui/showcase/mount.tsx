@@ -404,6 +404,17 @@ function ControlSizes({ prefix }: { prefix: string }) {
           <span aria-hidden>+</span>
         </ActionIcon>
       </Group>
+      <Group gap="sm">
+        <Button disabled data-testid={`${prefix}-btn-disabled`}>
+          disabled
+        </Button>
+        <ActionIcon disabled variant="subtle" tone="danger" aria-label="icon disabled" data-testid={`${prefix}-ai-disabled`}>
+          <span aria-hidden>+</span>
+        </ActionIcon>
+        <Button loading data-testid={`${prefix}-btn-loading`}>
+          loading
+        </Button>
+      </Group>
     </Stack>
   );
 }

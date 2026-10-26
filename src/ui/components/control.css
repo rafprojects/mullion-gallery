@@ -63,10 +63,23 @@
       color var(--mullion-duration-fast) ease;
   }
 
-  .mullion-button:disabled,
-  .mullion-action-icon:disabled {
+  /*
+   * A disabled control is recessed one rung, the same in every variant and
+   * tone: the page's ground, the theme's border and `borderStrong` ink, which
+   * reads but sits visibly under live text (designer, 2026-10-26). No opacity,
+   * so it does not depend on what is behind it. A loading control keeps its look.
+   */
+  .mullion-button:disabled:not([data-loading]),
+  .mullion-action-icon:disabled:not([data-loading]) {
     cursor: not-allowed;
-    opacity: 0.55;
+    border-color: var(--mullion-color-border);
+    background-color: var(--mullion-color-background);
+    color: var(--mullion-color-border-strong);
+  }
+
+  .mullion-button[data-loading],
+  .mullion-action-icon[data-loading] {
+    cursor: progress;
   }
 
   .mullion-button {
@@ -319,9 +332,16 @@
     cursor: pointer;
   }
 
+  /* Recessed, as every disabled control is. */
   .mullion-chip[data-disabled] {
     cursor: not-allowed;
-    opacity: 0.55;
+  }
+
+  .mullion-chip[data-disabled] .mullion-chip-label,
+  .mullion-chip[data-disabled] .mullion-chip-input:checked + .mullion-chip-label {
+    border-color: var(--mullion-color-border);
+    background-color: var(--mullion-color-background);
+    color: var(--mullion-color-border-strong);
   }
 
   /*

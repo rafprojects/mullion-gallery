@@ -58,3 +58,49 @@ test('controls keep Mantine geometry', async ({ page }) => {
   expect.soft((await box('inline-ai-default')).w, 'action icon default md').toBeCloseTo(28, 0);
   expect.soft((await box('inline-ai-14')).w, 'numeric size in the basis').toBeCloseTo(14, 0);
 });
+
+// [P81-A] A disabled control is recessed one rung, the same in every variant
+// and tone: `background` ground, `border` edge, `borderStrong` ink, no opacity
+// (designer, 2026-10-26). A loading control keeps its own look.
+for (const theme of ['default-light', 'default-dark'] as const) {
+  test(`disabled controls are recessed (${theme})`, async ({ page }) => {
+    test.setTimeout(90_000);
+    await serveShowcase(page);
+    await page.goto(`/ui-showcase?mount=shadow&controls=1&theme=${theme}&chrome=follow`);
+    await page.getByTestId('inline-btn-disabled').waitFor();
+    const read = (id: string) =>
+      page.getByTestId(id).evaluate((el) => {
+        const cs = getComputedStyle(el);
+        const token = (name: string) => {
+          const probe = document.createElement('div');
+          probe.style.color = `var(${name})`;
+          el.parentElement!.appendChild(probe);
+          const value = getComputedStyle(probe).color;
+          probe.remove();
+          return value;
+        };
+        return {
+          ground: cs.backgroundColor,
+          edge: cs.borderTopColor,
+          ink: cs.color,
+          opacity: cs.opacity,
+          tabbable: el.matches(':disabled') ? 'disabled' : 'enabled',
+          background: token('--mullion-color-background'),
+          border: token('--mullion-color-border'),
+          borderStrong: token('--mullion-color-border-strong'),
+        };
+      });
+    for (const id of ['inline-btn-disabled', 'inline-ai-disabled']) {
+      const c = await read(id);
+      expect.soft(c.ground, `${id} ground`).toBe(c.background);
+      expect.soft(c.edge, `${id} edge`).toBe(c.border);
+      expect.soft(c.ink, `${id} ink`).toBe(c.borderStrong);
+      expect.soft(c.opacity, `${id} opacity`).toBe('1');
+      expect.soft(c.tabbable, `${id} out of the tab order`).toBe('disabled');
+    }
+    const loading = await read('inline-btn-loading');
+    expect(loading.ground, 'a loading button keeps its fill').not.toBe(loading.background);
+    expect(loading.opacity).toBe('1');
+  });
+}
+
