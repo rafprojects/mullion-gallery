@@ -388,8 +388,10 @@ export function LayoutBuilderModal({
   }, [builder, media, announce, tr]);
 
   // ── Keyboard shortcuts ──
+  const [keyboardScope, setKeyboardScope] = useState<HTMLDivElement | null>(null);
   useLayoutBuilderKeyboardHandlers({
     opened,
+    scope: keyboardScope,
     builder,
     announce,
     handleClose,
@@ -510,6 +512,7 @@ export function LayoutBuilderModal({
         }
       >
       <div
+        ref={setKeyboardScope}
         data-testid="builder-keyboard-handler"
         style={{
           ...builderShellVars,

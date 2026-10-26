@@ -135,7 +135,7 @@ export const Drawers: Story = {
           <Stack gap="sm">
             <Text size="sm">
               The panel slides out of the edge it is anchored to. The scrim colour is the
-              theme&rsquo;s `overlay-bg` token; only the blur is a prop.
+              theme&rsquo;s `backdrop` token; only the blur is a prop.
             </Text>
             <Button variant="subtle" onClick={() => setSide(null)}>
               Close

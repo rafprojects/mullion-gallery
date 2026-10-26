@@ -242,6 +242,8 @@ Rules 18 and 19 are from
 [`designer-answers-toggles-fields-2026-10-26.md`](correspondences/designer-answers-toggles-fields-2026-10-26.md),
 with the switch's states in rule 18 from
 [`designer-signoff-fields-2026-10-26.md`](correspondences/designer-signoff-fields-2026-10-26.md).
+Rule 20 is from
+[`designer-answers-overlays-2026-10-26.md`](correspondences/designer-answers-overlays-2026-10-26.md).
 
 ### Grounds and inks
 
@@ -411,6 +413,28 @@ the field's border. A field edited in place, such as the layout builder's title,
 
 Number steppers are stacked chevrons in `textMuted` with a `border` divider, out of the tab order
 (arrow keys are the keyboard path), with a subtle icon button's hover, and rule 16 when disabled.
+*(2026-10-26.)*
+
+### Overlays
+
+**20. One backdrop, and floating surfaces by rule 13.** Every dialog and drawer dims the page with
+`--mullion-backdrop`, black at 0.60, the same opacity as the fixed caption scrim (rule 15). A
+theme-tinted scrim leaves a light dialog ΔE00 1.77 from a white page under it, so the dimmed page,
+which is a dialog's elevation, is not there; the visitor lightbox's 0.93 is a separate job. A
+dialog's edge is `raised-bd` (the hairline on light, nothing on dark), with no `border` outline and
+no exception for drawers; a full-screen dialog has no page beside it and takes no edge. Its header
+shows a `border` divider only once the body has scrolled under it. Dialogs take the medium shadow
+raised surfaces use, and an 18px, 600 title at the heading line height, which grows the header
+rather than clipping when it wraps.
+
+| part | rule |
+|---|---|
+| accordion (settings sections) | Mantine's metrics; the label 16px at 500, one step above the 14px field labels inside it; a neutral `surface2` hover, never the primary wash; the chevron carries open and closed |
+| tabs | 400 at rest and 600 selected, each tab reserving its 600 width; 16px padding and no gap, so targets touch; an ink-only hover; the inset ring (rule 8) |
+| tooltip | 12px (`xs`) at 1.4, 8px corners, wrapping at 288px |
+| arrows | none, on tooltips, menus or popovers |
+| motion | the two animation settings users choose, and `prefers-reduced-motion`, under which an overlay appears without sliding or scaling |
+
 *(2026-10-26.)*
 
 ---

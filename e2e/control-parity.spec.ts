@@ -745,3 +745,70 @@ test('a dialog takes a transition kind and duration, and reports its exit', asyn
   await expect(dialog).toBeHidden();
   await expect(page.getByTestId('inline-dialogs')).toHaveAttribute('data-exits', '1');
 });
+
+// [P81-A] The designer's dialog (2026-10-26): one backdrop, black at 0.60, as
+// `--mullion-backdrop`; the edge is `raised-bd` by rule 13; the medium shadow;
+// an 18px, 600 title at the heading line height; and a divider under the
+// header only once the body has scrolled under it.
+for (const theme of ['default-light', 'default-dark'] as const) {
+  test(`a dialog follows the designer's answers (${theme})`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await serveShowcase(page);
+    await page.goto(`/ui-showcase?mount=shadow&dialogs=1&theme=${theme}&chrome=follow`);
+    await page.getByTestId('inline-open-long').click();
+    const dialog = page.getByTestId('inline-dialog-long');
+    await dialog.waitFor();
+    await settle(page);
+    const read = () =>
+      dialog.evaluate((el) => {
+        const token = (name: string) => {
+          const probe = document.createElement('div');
+          probe.style.color = `var(${name})`;
+          el.appendChild(probe);
+          const value = getComputedStyle(probe).color;
+          probe.remove();
+          return value;
+        };
+        const header = el.querySelector('.mullion-overlay-header')!;
+        const title = el.querySelector('.mullion-overlay-title')!;
+        const backdrop = el.getRootNode() instanceof ShadowRoot
+          ? (el.getRootNode() as ShadowRoot).querySelector('.mullion-overlay-backdrop')!
+          : document.querySelector('.mullion-overlay-backdrop')!;
+        const shadowProbe = document.createElement('div');
+        shadowProbe.style.boxShadow = 'var(--mullion-shadow-md)';
+        el.appendChild(shadowProbe);
+        const shadowMd = getComputedStyle(shadowProbe).boxShadow;
+        shadowProbe.remove();
+        return {
+          edge: getComputedStyle(el).borderTopColor,
+          edgeWidth: getComputedStyle(el).borderTopWidth,
+          shadow: getComputedStyle(el).boxShadow,
+          shadowMd,
+          titleSize: getComputedStyle(title).fontSize,
+          titleWeight: getComputedStyle(title).fontWeight,
+          titleLine: parseFloat(getComputedStyle(title).lineHeight) / parseFloat(getComputedStyle(title).fontSize),
+          divider: getComputedStyle(header).borderBottomStyle,
+          dividerInk: getComputedStyle(header).borderBottomColor,
+          backdrop: getComputedStyle(backdrop).backgroundColor,
+          backdropToken: getComputedStyle(backdrop).getPropertyValue('--mullion-backdrop').trim(),
+          raisedBd: token('--mullion-raised-bd'),
+          border: token('--mullion-color-border'),
+        };
+      });
+    const rest = await read();
+    expect.soft(rest.edgeWidth, 'edge width').toBe('1px');
+    expect.soft(rest.edge, 'edge is raised-bd').toBe(rest.raisedBd);
+    expect.soft(rest.shadow, 'the medium shadow').toBe(rest.shadowMd);
+    expect.soft(rest.titleSize).toBe('18px');
+    expect.soft(rest.titleWeight).toBe('600');
+    expect.soft(rest.titleLine, 'heading line height, not 1').toBeGreaterThan(1.3);
+    expect.soft(rest.backdrop, 'black at 0.60').toBe('rgba(0, 0, 0, 0.6)');
+    expect.soft(rest.backdropToken, 'one token').not.toBe('');
+    // The edge is reserved and transparent at rest, so the body does not move when it appears.
+    expect.soft(rest.dividerInk, 'no divider at rest').toBe('rgba(0, 0, 0, 0)');
+
+    await dialog.locator('.mullion-overlay-body').evaluate((body) => body.scrollTo(0, 200));
+    await expect.poll(async () => (await read()).dividerInk, { message: 'a divider once scrolled' }).toBe(rest.border);
+  });
+}
+

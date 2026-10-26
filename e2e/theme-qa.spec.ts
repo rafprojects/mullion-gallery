@@ -311,6 +311,9 @@ test.describe('focus ring colour', () => {
         const rings: Ring[] = [];
         for (let i = 0; i < 45; i++) {
           await page.keyboard.press('Tab');
+          // [P81-A] The framework drawer contains focus by redirecting from a guard over a frame
+          // or two (see ui-overlays.spec.ts); back-to-back presses outrun it and leave the drawer.
+          await page.waitForTimeout(120);
           const found = await page.evaluate(() => {
             const deepActive = (): Element | null => {
               let a: Element | null = document.activeElement;

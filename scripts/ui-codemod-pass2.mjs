@@ -216,6 +216,17 @@ const FIELD_UNSUPPORTED = [
   'errorProps', 'wrapperProps', 'inputContainer', 'pointer', 'rightSectionPointerEvents', 'rightSectionWidth',
   'leftSectionPointerEvents', 'leftSectionWidth',
 ];
+const DIALOG_UNSUPPORTED = ['transitionProps', 'classNames', 'styles', 'attributes', 'portalProps', 'lockScroll', 'trapFocus', 'returnFocus', 'keepMounted', 'xOffset', 'yOffset', 'shadow', 'removeScrollProps'];
+const debugOnly = (attr) => {
+  const text = attr.initializer?.getText() ?? '';
+  return /^\{getMullionDebugProps\([^)]*\)\}$/.test(text) ? { replace: '' } : { blocked: 'not only debug props' };
+};
+const DIALOG_PROPS = {
+  withinPortal: () => ({ replace: '' }),
+  closeButtonProps: debugOnly,
+  overlayProps: debugOnly,
+  scrollAreaComponent: () => ({ replace: '' }),
+};
 const TOGGLE_UNSUPPORTED = ['color', 'radius', 'labelPosition', 'icon', 'iconColor', 'variant', 'classNames', 'styles', 'unstyled', 'wrapperProps'];
 
 const RULES = {
@@ -283,6 +294,10 @@ const RULES = {
       allowDecimal: (attr) => (literal(attr) === false ? { replace: 'decimalScale={0}' } : { blocked: 'allowDecimal is not false' }),
     },
   },
+  // [P81-A] Dialogs portal into their provider's overlay root (P80-F), so `withinPortal` goes; a
+  // debug-only `closeButtonProps` goes too. Anything carrying behaviour is listed for a hand fix.
+  Modal: { rename: {}, unsupported: DIALOG_UNSUPPORTED, props: DIALOG_PROPS },
+  Drawer: { rename: {}, unsupported: DIALOG_UNSUPPORTED, props: DIALOG_PROPS },
   Checkbox: { rename: {}, unsupported: TOGGLE_UNSUPPORTED, props: { onChange: toggleOnChange } },
   Switch: { rename: {}, unsupported: [...TOGGLE_UNSUPPORTED, 'onLabel', 'offLabel', 'thumbIcon'], props: { onChange: toggleOnChange } },
   Slider: {

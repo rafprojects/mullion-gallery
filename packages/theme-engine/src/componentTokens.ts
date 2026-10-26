@@ -38,6 +38,13 @@ import type { ResolvedColors } from './types';
  * `control-height-*` is the exception and is marked below: it has no role
  * token to derive from, so it carries Mantine's measured scale as a default.
  */
+/**
+ * Black over the page, in one number (designer, 2026-10-26): the dialogs'
+ * `backdrop` and the fixed caption scrim on photos are both 0.60. The visitor
+ * lightbox's 0.93 is a different job and stays separate.
+ */
+export const BLACK_SCRIM_OPACITY = 0.6;
+
 export const COMPONENT_TOKEN_DERIVATIONS = {
   // Inputs. Lifted from the adapter's `Input.vars` block, which writes these
   // as variables rather than inline styles so the focus rule can win (P76-I).
@@ -79,14 +86,12 @@ export const COMPONENT_TOKEN_DERIVATIONS = {
   'tooltip-color': (rc) => rc.text,
   'tooltip-bd': (rc) => rc.border,
 
-  // [P80-A] The modal and drawer scrim. NOT role-derived, and the second
-  // documented exception after `control-height-*`. Mantine's `Overlay`
-  // defaults to black at `backgroundOpacity`, the two call sites that set one
-  // both pass 0.6, and that is what ships today on all 23 themes. Deriving it
-  // from a role would make the scrim white on a light theme, which is a
-  // redesign rather than a lift and a worse scrim. A theme that wants its own
-  // can still override the token.
-  'overlay-bg': () => withAlpha('#000000', 0.6),
+  // [P81-A] The one dialog backdrop, modals and drawers alike: black at 0.60,
+  // NOT role-derived (designer, 2026-10-26). Mantine gave the drawers this and
+  // the modals the theme's `background` at 0.75, which on a light theme left a
+  // dialog ΔE00 1.77 from a white page under it: no elevation at all. A theme
+  // that wants its own can still override the token.
+  backdrop: () => withAlpha('#000000', BLACK_SCRIM_OPACITY),
 
   // Menu item hover. NOT a lift: the adapter has no menu hover derivation and
   // Mantine's default supplies it today. The surface ladder cannot express it

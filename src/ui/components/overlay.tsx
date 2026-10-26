@@ -26,7 +26,7 @@ import { Popover as BasePopover } from '@base-ui/react/popover';
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { Separator as BaseSeparator } from '@base-ui/react/separator';
-import { createContext, useCallback, useContext, useMemo, type ReactElement, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactElement, type ReactNode } from 'react';
 import { useAnchorContainer, type AnchorContainer } from './anchor';
 import { registerModal } from './modalStack';
 import { cx, focusableInset, type UiElementProps } from './element';
@@ -156,7 +156,7 @@ interface DialogCommonProps extends OverlayStyleProps, PortalProps {
   /**
    * Pixels of backdrop blur. The Settings drawer and the gallery config
    * editor both drive this from a saved user setting, so it is a prop rather
-   * than a constant. The scrim's colour and opacity are the `overlay-bg`
+   * than a constant. The scrim's colour and opacity are the `backdrop`
    * token and are the theme's.
    */
   overlayBlur?: number | undefined;
@@ -171,6 +171,12 @@ interface DialogCommonProps extends OverlayStyleProps, PortalProps {
   transitionDuration?: number | undefined;
   /** Called once the dialog has finished closing, as Mantine's was. */
   onExitTransitionEnd?: (() => void) | undefined;
+  /**
+   * `false` for content that manages its own scrolling, such as a panel with a
+   * fixed bar above a scrolled region: the body becomes a column that clips
+   * rather than a scroll container.
+   */
+  scrollBody?: boolean | undefined;
   children?: ReactNode;
 }
 
@@ -215,6 +221,7 @@ function DialogShell({
   transition,
   transitionDuration,
   onExitTransitionEnd,
+  scrollBody = true,
   container,
   className,
   style,
@@ -231,6 +238,7 @@ function DialogShell({
   dataAttrs?: Record<string, string | boolean | undefined>;
 }) {
   const target = usePortalContainer(container);
+  const [scrolled, setScrolled] = useState(false);
   const duration = customProperties({
     '--mullion-dialog-duration': transitionDuration !== undefined ? `${transitionDuration}ms` : undefined,
   });
@@ -289,7 +297,7 @@ function DialogShell({
           {(title !== undefined || withCloseButton) && (
             // A div, not a <header>: outside a sectioning element that is a banner
             // landmark, and a screen reader announced one inside every dialog (P80-D).
-            <div className="mullion-overlay-header">
+            <div className="mullion-overlay-header" {...(scrolled ? { 'data-scrolled': '' } : {})}>
               {title !== undefined ? (
                 <Dialog.Title className="mullion-overlay-title">{title}</Dialog.Title>
               ) : (
@@ -307,7 +315,13 @@ function DialogShell({
               )}
             </div>
           )}
-          <div className="mullion-overlay-body">{children}</div>
+          <div
+            className="mullion-overlay-body"
+            {...(scrollBody ? {} : { 'data-static': '' })}
+            onScroll={(event) => setScrolled(event.currentTarget.scrollTop > 0)}
+          >
+            {children}
+          </div>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>

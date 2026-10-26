@@ -16,7 +16,7 @@
  * docs/guides/PRO_FEATURES.md / the P62-H track.
  */
 import { resolveColors } from './colorGen';
-import { captionScrimGround, deriveComponentTokens, type ComponentTokenKey } from './componentTokens';
+import { BLACK_SCRIM_OPACITY, captionScrimGround, deriveComponentTokens, type ComponentTokenKey } from './componentTokens';
 import { contrastRatio } from './validation';
 import type { ThemeColors } from './types';
 
@@ -118,7 +118,7 @@ function captionScrimCheck(text: string, background: string, scrim: string, minR
  * backdrop over the host page. Both carry white text. `contrastAudit.test.ts`
  * checks the source still paints these opacities.
  */
-export const OVERLAY_SCRIM_OPACITY = 0.6;
+export const OVERLAY_SCRIM_OPACITY = BLACK_SCRIM_OPACITY;
 export const LIGHTBOX_BACKDROP_OPACITY = 0.93;
 
 export function fixedOverlayChecks(minRatio: number = AA_NORMAL_TEXT): ContrastCheck[] {

@@ -294,6 +294,34 @@ describe('LayoutBuilderModal — keyboard shortcuts (P19-A)', () => {
     expect(preventDefaultSpy).toHaveBeenCalled();
   });
 
+  // [P81-A] A key event's `target` is retargeted to the host past a shadow root, so typing in a
+  // field must be judged by the event's real origin, and widgets that own the arrows keep them.
+  it('Backspace typed in a field inside the builder deletes nothing', () => {
+    mockSelectedSlotIds.add('slot-1');
+    renderModal();
+    const builderDiv = document.body.querySelector('[data-testid="builder-keyboard-handler"]') as HTMLElement;
+    const field = document.createElement('input');
+    builderDiv.appendChild(field);
+    fireEvent.keyDown(field, { key: 'Backspace', bubbles: true, composed: true });
+    expect(mockBuilderReturn.removeSlots).not.toHaveBeenCalled();
+    field.remove();
+    mockSelectedSlotIds.delete('slot-1');
+  });
+
+  it('an arrow on a slider inside the builder does not nudge the selection', () => {
+    mockSelectedSlotIds.add('slot-1');
+    renderModal();
+    const builderDiv = document.body.querySelector('[data-testid="builder-keyboard-handler"]') as HTMLElement;
+    const slider = document.createElement('span');
+    slider.setAttribute('role', 'slider');
+    slider.tabIndex = 0;
+    builderDiv.appendChild(slider);
+    fireEvent.keyDown(slider, { key: 'ArrowLeft', bubbles: true, composed: true });
+    expect(mockBuilderReturn.nudgeSlots).not.toHaveBeenCalled();
+    slider.remove();
+    mockSelectedSlotIds.delete('slot-1');
+  });
+
   it('Delete calls builder.removeSlots for selected slots', () => {
     mockSelectedSlotIds.add('slot-1');
     renderModal();

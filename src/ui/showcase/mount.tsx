@@ -687,7 +687,7 @@ function DialogSizes({ prefix }: { prefix: string }) {
   return (
     <Stack gap="sm" data-testid={`${prefix}-dialogs`} data-exits={exits}>
       <Group gap="xs">
-        {[...sizes, 'default', 'centered', 'drawer', 'drawer-lg', 'fade'].map((key) => (
+        {[...sizes, 'default', 'centered', 'drawer', 'drawer-lg', 'fade', 'long'].map((key) => (
           <Button key={key} size="xs" variant="default" data-testid={`${prefix}-open-${key}`} onClick={() => setOpen(key)}>
             {key}
           </Button>
@@ -710,6 +710,15 @@ function DialogSizes({ prefix }: { prefix: string }) {
       <Drawer opened={open === 'drawer-lg'} onClose={() => setOpen(null)} size="lg" title="drawer lg" data-testid={`${prefix}-dialog-drawer-lg`}>
         <Text size="sm">body</Text>
       </Drawer>
+      <Modal opened={open === 'long'} onClose={() => setOpen(null)} title="A long dialog" data-testid={`${prefix}-dialog-long`}>
+        <Stack gap="sm">
+          {Array.from({ length: 40 }, (_, i) => (
+            <Text key={i} size="sm">
+              Line {i + 1}
+            </Text>
+          ))}
+        </Stack>
+      </Modal>
       <Modal
         opened={open === 'fade'}
         onClose={() => setOpen(null)}

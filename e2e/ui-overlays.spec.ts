@@ -478,10 +478,10 @@ test.describe('the overlays read tokens, not fallbacks', () => {
       const el = root?.querySelector('.mullion-overlay-backdrop') as HTMLElement | null;
       if (!el) return null;
       const cs = getComputedStyle(el);
-      return { painted: cs.backgroundColor, token: cs.getPropertyValue('--mullion-overlay-bg').trim() };
+      return { painted: cs.backgroundColor, token: cs.getPropertyValue('--mullion-backdrop').trim() };
     });
     expect(backdrop).not.toBeNull();
-    expect(backdrop!.token, 'the overlay-bg token did not reach the backdrop').not.toBe('');
+    expect(backdrop!.token, 'the backdrop token did not reach the backdrop').not.toBe('');
     expect(backdrop!.painted).not.toBe('rgba(0, 0, 0, 0)');
   });
 

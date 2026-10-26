@@ -26,7 +26,7 @@
     position: fixed;
     inset: 0;
     z-index: var(--mullion-overlay-layer, var(--mullion-layer-overlay));
-    background-color: var(--mullion-overlay-bg);
+    background-color: var(--mullion-backdrop);
     backdrop-filter: blur(var(--mullion-overlay-blur, 0px));
     opacity: 1;
     transition: opacity var(--mullion-duration-base) ease;
@@ -48,7 +48,9 @@
     /* Every popup root sets its own type with its own ground: in the overlay root it would
        otherwise inherit the host page's body font (P80-G, the designer's §5). */
     font-family: var(--mullion-font-family);
-    box-shadow: var(--mullion-shadow-lg);
+    /* Rule 13 (designer, 2026-10-26): the hairline on light, nothing on dark, and the medium shadow raised surfaces use. */
+    border: 1px solid var(--mullion-raised-bd);
+    box-shadow: var(--mullion-shadow-md);
     /*
      * The popup is the scroll container for its own body, so a long dialog
      * scrolls inside itself rather than growing past the viewport.
@@ -64,6 +66,8 @@
     padding-block: var(--mullion-pad-block, var(--mullion-pad, var(--mullion-spacing-md)));
     padding-inline: var(--mullion-pad-inline, var(--mullion-pad, var(--mullion-spacing-md)));
     flex: none;
+    /* A divider only once the body has scrolled under the header; reserved so nothing moves when it shows. */
+    border-block-end: 1px solid transparent;
     /* Mantine's header: at least 60px, with the close button 5px nearer the edge. */
     min-block-size: 3.75rem;
     padding-inline-end: calc(var(--mullion-pad-inline, var(--mullion-pad, var(--mullion-spacing-md))) - 5px);
@@ -75,6 +79,19 @@
     font-weight: 600;
     line-height: var(--mullion-heading-line-height-h4);
     color: var(--mullion-color-text);
+  }
+
+  /* `scrollBody={false}`: the content scrolls itself, so the body is a column that clips. */
+  .mullion-overlay-body[data-static] {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Content that scrolls itself pads itself, so its scrollbar sits at the dialog's edge. */
+    padding: 0;
+  }
+
+  .mullion-overlay-header[data-scrolled] {
+    border-block-end-color: var(--mullion-color-border);
   }
 
   .mullion-overlay-body {
@@ -125,11 +142,13 @@
     margin-block: auto;
   }
 
+  /* A full-screen dialog has no page beside it to lift off, so it takes no edge. */
   .mullion-modal[data-full-screen] {
     inset: 0;
     inline-size: 100%;
-    max-block-size: 100vh;
+    max-block-size: 100dvh;
     margin: 0;
+    border: 0;
     border-radius: 0;
   }
 

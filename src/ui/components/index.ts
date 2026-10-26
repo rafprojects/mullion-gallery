@@ -286,6 +286,7 @@ export {
   type MenuItemProps,
   type MenuProps,
   type ModalProps,
+  type UiDialogTransition,
   type PopoverContentProps,
   type PopoverProps,
   type TooltipGroupProps,

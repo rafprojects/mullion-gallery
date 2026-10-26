@@ -7,6 +7,22 @@ import type { UseLayoutBuilderReturn } from './useLayoutBuilderState';
 // [P72-A] Module-level binding so a11y announcements are localizable outside JSX.
 const t = i18n.t.bind(i18n);
 
+/** Where typing belongs to the field, not the builder. */
+const EDITABLE = 'input, textarea, select, [contenteditable=""], [contenteditable="true"]';
+/** Widgets that own the arrow keys themselves, so an arrow there is not a nudge. */
+const ARROW_WIDGETS =
+  '[role="listbox"], [role="menu"], [role="menubar"], [role="radiogroup"], [role="slider"], [role="spinbutton"], [role="tablist"], [role="tree"], [role="grid"], [role="combobox"]';
+
+/**
+ * The element a key press really came from. Past a shadow root the event's
+ * `target` is retargeted to the host, so a check on `target` misses a field
+ * inside one; the builder now renders in the overlay root, a shadow root (P81-A).
+ */
+function keyOrigin(e: KeyboardEvent): Element | null {
+  const first = e.composedPath()[0];
+  return first instanceof Element ? first : e.target instanceof Element ? e.target : null;
+}
+
 export function useLayoutBuilderKeyboardHandlers({
   opened,
   builder,
@@ -18,6 +34,7 @@ export function useLayoutBuilderKeyboardHandlers({
   setSelectedOverlayId,
   setIsBackgroundSelected,
   setBuilderShortcutsOpen,
+  scope,
 }: {
   opened: boolean;
   builder: UseLayoutBuilderReturn;
@@ -29,15 +46,20 @@ export function useLayoutBuilderKeyboardHandlers({
   setSelectedOverlayId: Dispatch<SetStateAction<string | null>>;
   setIsBackgroundSelected: Dispatch<SetStateAction<boolean>>;
   setBuilderShortcutsOpen: Dispatch<SetStateAction<boolean>>;
+  /**
+   * An element inside the builder's dialog, held in state so the listener moves
+   * once it mounts. The listener goes on that dialog
+   * rather than on `document`, because the framework dialog stops the keys it
+   * handles itself (Escape, the arrows) before they reach the document (P81-A).
+   */
+  scope?: HTMLElement | null | undefined;
 }) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      // Don't capture when inside inputs
-      if (
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement
-      )
-        return;
+      // Typing in a field is the field's, wherever the field is (P80 follow-on, P81-A).
+      const origin = keyOrigin(e);
+      if (origin?.closest(EDITABLE) || (origin instanceof HTMLElement && origin.isContentEditable)) return;
+      if (e.key.startsWith('Arrow') && origin?.closest(ARROW_WIDGETS)) return;
 
       if (e.key === 'Delete' || e.key === 'Backspace') {
         handleDeleteSelected();
@@ -206,10 +228,13 @@ export function useLayoutBuilderKeyboardHandlers({
     [announce, builder, handleClose, handleDeleteSelected, handleDuplicateSelected, handleSave, setSelectedOverlayId, setIsBackgroundSelected, setBuilderShortcutsOpen],
   );
 
-  // Attach/detach the document-level listener whenever the modal opens/closes.
+  // Attach/detach the listener whenever the modal opens/closes: on the builder's dialog when there
+  // is one, so keys the dialog stops still arrive, and on the document otherwise.
   useEffect(() => {
     if (!opened) return;
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [opened, handleKeyDown]);
+    const target: EventTarget = scope?.closest('[role="dialog"]') ?? scope ?? document;
+    const listener = handleKeyDown as EventListener;
+    target.addEventListener('keydown', listener);
+    return () => target.removeEventListener('keydown', listener);
+  }, [opened, handleKeyDown, scope]);
 }

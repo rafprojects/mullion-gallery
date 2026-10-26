@@ -296,6 +296,21 @@ Fixed in the framework, each failing `e2e/control-parity.spec.ts` or `overlays.t
 
 The parity spec's `settle` now waits two frames and then for every shadow root's animations, since a dialog portals into the overlay root and a transition starts a frame after its starting style goes; without both, the widths read 97% of their value, mid-scale.
 
+### Pass 2: the dialogs, built and then set aside (2026-10-26)
+
+**Built in the framework and kept** (rule 20), each failing `e2e/control-parity.spec.ts` first: one backdrop token, `--mullion-backdrop`, black at 0.60 for modals and drawers alike (the engine's `overlay-bg` renamed, its opacity shared with the fixed caption scrim as `BLACK_SCRIM_OPACITY`, so "black over the page" is one number); a `raised-bd` edge on every dialog and none when full-screen; the medium shadow; a header divider only once the body has scrolled under it, on an edge reserved so nothing moves; and `scrollBody={false}` for content that scrolls itself, whose body then clips and drops its padding. `CloseButton` is now exported, and the codemod has rules for `Modal` and `Drawer`.
+
+**The flip was set aside, by user decision (2026-10-26).** Moving `Modal` and `Drawer` (83 codemod edits in 27 files, with the Settings drawer, config editor, Layout Builder and campaign viewer by hand) passed typecheck and most tests, and the failures that remained showed the order was wrong. Base UI makes everything outside an open dialog inert and hidden, and every Mantine overlay still portals out of it: the builder's discard prompt (`modals.openConfirmModal`), the config editor's Reset menu, the viewer's in-context popover, and the builder's menus, popovers and selects. In the browser a pointer still reaches them; keyboard focus and a screen reader do not. So the overlays that open inside dialogs move first (menus, popovers, the select family, the colour input, tooltips and the imperative confirm), and the dialogs after them. The whole flip is saved as `~/project_bak/mullion-p81a-pixels/dialogs-flip-full.patch`, to reapply.
+
+**What the attempt found, recorded for the reapply.**
+
+- **Base UI stops the keys a dialog handles (Escape, the arrows) before they reach `document`**, so the Layout Builder's shortcuts, which listened on `document`, would all have died. The hook now listens on the builder's own dialog, which works for Mantine's dialog today, and its guard judges a key by the event's real origin (`composedPath()[0]`), because past a shadow root `target` is the host. It skips text fields and widgets that own the arrows; that closes the P80 follow-on about arrows in builder fields (Layout Builder row of the batch table above). Two tests cover the guard, and the arrow test fails on the old code.
+- **The campaign viewer takes an "Edit campaign" action for admins** (user decision, 2026-10-26). Under Mantine an admin could open the floating Admin menu over the viewer and edit that campaign; a modal dialog rightly makes the page behind it unreachable, so the workflow moves into the viewer. Its placement goes to the designer when the dialogs return; two end-to-end flows change with it.
+- **Harness changes the flip needs**, to reapply with it: test wrappers that mount only Mantine's provider need `MullionProvider`; a dialog portals into its provider's overlay root, so "inside the render tree" becomes "under a provider scope"; a dialog opened over another hides the lower one, so a role query finds only the top; one test file resets its module registry and needs the provider from the same copy of `@/ui`; and synthetic key events need `composed: true`.
+- **The theme-qa focus-ring audit now paces its Tab presses**, as `ui-overlays.spec.ts` does: Base UI contains focus by redirecting from a guard over a frame or two, which back-to-back presses outrun.
+
+**The designer's crop** was captured from the current tree and from a worktree at the commit before, on the same light-theme page with three photo campaigns and the viewer open; it is in the correspondence folder as the preview of what the dialogs will change.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.
@@ -343,7 +358,7 @@ The Settings batch carries one piece of design work with it: the **Typography pa
 |-------|------|--------|
 | Settings | The panel is clipped about 20px on the right (above). | User report, 2026-09-14 |
 | Settings | `Show Title` and `Show Subtitle` in the Typography panel lose the focus ring's left edge. Same class as the menu row: a 6px outset ring inside a container that clips. Fix with the redesign the batch already carries. | P80 follow-on; held for this phase by user decision 2026-09-14 |
-| Layout Builder | `useLayoutBuilderKeyboardHandlers` handles ArrowUp and ArrowDown on `document` with no guard for an event from an `input`, `textarea` or `contenteditable`, so typing in any builder field moves the selected slots. | P80 follow-on |
+| Layout Builder | ~~`useLayoutBuilderKeyboardHandlers` handles ArrowUp and ArrowDown on `document` with no guard for an event from an `input`, `textarea` or `contenteditable`, so typing in any builder field moves the selected slots.~~ **Done 2026-10-26 (P81-A):** the guard reads the event's real origin and skips fields and arrow-owning widgets. | P80 follow-on |
 | Admin Panel | Three filled controls sit flush with their container, which standing rule 8 calls a layout defect: `Add Media` and `Rescan Types` (0px clearance) and the Media sort mode (3px). Give each 6px of clearance for the outset ring. | Designer, live Admin Panel, 2026-09-14 |
 | Gallery | Forward Tab moves backwards on screen: Typography icon, then Access Mode to its left, then the campaign filters further left. A WCAG 2.4.3 focus-order failure; fix the DOM order on the migrated surface rather than patching it twice. | P80-A manual pass, 2026-09-14 |
 | Any | `link-in-text-block`: P79-0's tone probe measures an `Anchor` inside muted `Text` at 1.11:1 against its surroundings with no underline. It may be fixture-only. Confirm on the first real surface that composes the two, and if it reproduces, fix it on `Anchor` rather than in the theme. | P79-0 |
