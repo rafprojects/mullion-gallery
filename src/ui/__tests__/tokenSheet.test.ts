@@ -33,6 +33,11 @@ describe('buildTokenSheet', () => {
     expect(css).toContain('--mullion-focus-ring-width: 2px;');
   });
 
+  it('emits the caption scrim each theme derives, through the sanitiser (P81-A)', () => {
+    expect(buildTokenSheet(getThemeEntry('default-dark'), ':host')).toContain('--mullion-caption-scrim: 60%;');
+    expect(buildTokenSheet(getThemeEntry('catppuccin-latte'), ':host')).toContain('--mullion-caption-scrim: 81%;');
+  });
+
   it('keys on :host for a shadow root and on :root for the document', () => {
     const entry = getThemeEntry('default-dark');
     expect(buildTokenSheet(entry, ':host')).toMatch(/^:host \{/);

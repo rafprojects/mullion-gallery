@@ -279,7 +279,17 @@ export function Lightbox({ isOpen, media, currentIndex, onPrev, onNext, onClose,
           {/* Caption & counter */}
           <Box
             p="lg"
-            style={{ position: 'absolute', bottom: '0', left: '0', right: '0', pointerEvents: 'none', paddingBottom: 'calc(var(--mantine-spacing-lg) + env(safe-area-inset-bottom, 0px))' }}
+            // The caption can overlap a wide image, so it sits on the black scrim every
+            // caption over an image uses (COLOR-SPEC rule 14), with white ink only.
+            style={{
+              position: 'absolute',
+              bottom: '0',
+              left: '0',
+              right: '0',
+              pointerEvents: 'none',
+              paddingBottom: 'calc(var(--mantine-spacing-lg) + env(safe-area-inset-bottom, 0px))',
+              background: 'linear-gradient(transparent, rgba(0,0,0,0.6) var(--mantine-spacing-lg))',
+            }}
           >
             <Stack gap="xs">
               {current.caption && (
@@ -287,7 +297,7 @@ export function Lightbox({ isOpen, media, currentIndex, onPrev, onNext, onClose,
                   {current.caption}
                 </Text>
               )}
-              <Text size="sm" c="gray.4" aria-live="polite" aria-atomic="true">
+              <Text size="sm" c="white" aria-live="polite" aria-atomic="true">
                 {t('lightbox_counter', '{{current}} / {{total}}', { current: currentIndex + 1, total: media.length })}
               </Text>
             </Stack>

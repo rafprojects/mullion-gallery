@@ -89,7 +89,7 @@ export function MediaLightboxModal({
               right: '0',
               color: 'var(--mullion-color-text)',
               background:
-                'linear-gradient(transparent, color-mix(in srgb, var(--mullion-color-background) var(--mullion-caption-scrim-opacity), transparent) var(--mullion-spacing-md))',
+                'linear-gradient(transparent, color-mix(in srgb, var(--mullion-color-background) var(--mullion-caption-scrim), transparent) var(--mullion-spacing-md))',
             }}
           >
             <Text size="sm">{currentItem.caption || t('admin_untitled', 'Untitled')}</Text>

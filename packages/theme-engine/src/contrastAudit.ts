@@ -15,9 +15,8 @@
  * and Shadow-DOM screen-reader exposure are a separate (human) part of AA — see
  * docs/guides/PRO_FEATURES.md / the P62-H track.
  */
-import chroma from 'chroma-js';
 import { resolveColors } from './colorGen';
-import { CAPTION_SCRIM_OPACITY } from './componentTokens';
+import { captionScrimGround, deriveComponentTokens, type ComponentTokenKey } from './componentTokens';
 import { contrastRatio } from './validation';
 import type { ThemeColors } from './types';
 
@@ -44,8 +43,10 @@ export function intendedContrastChecks(
   colors: ThemeColors,
   colorScheme: 'light' | 'dark',
   minRatio: number = AA_NORMAL_TEXT,
+  componentTokenOverrides: Partial<Record<ComponentTokenKey, string>> = {},
 ): ContrastCheck[] {
   const rc = resolveColors(colors, colorScheme);
+  const ct = deriveComponentTokens(rc, componentTokenOverrides);
 
   const checks: ContrastCheck[] = [
     // Primary text on every surface layer + the body background (Card/Paper/Modal
@@ -78,10 +79,9 @@ export function intendedContrastChecks(
     { label: 'textMuted2 on surface2', fg: rc.textMuted2, bg: rc.surface2, minRatio },
 
     // [P81-A] A caption over an image sits on the background at the scrim's
-    // opacity over whatever photo is behind it. Browsers blend each sRGB channel
-    // linearly and luminance rises with every channel, so an all-white or an
-    // all-black photo is the worst case; the check takes the weaker of the two.
-    captionScrimCheck(rc.text, rc.background, minRatio),
+    // opacity over whatever photo is behind it; the worst photo is all white or
+    // all black (`captionScrimGround`).
+    captionScrimCheck(rc.text, rc.background, ct['caption-scrim'], minRatio),
   ];
 
   // Primary filled Button label (Mantine autoContrast → black/white) on the
@@ -100,15 +100,42 @@ export function intendedContrastChecks(
   return checks;
 }
 
-function captionScrimCheck(text: string, background: string, minRatio: number): ContrastCheck {
-  const grounds = ['#ffffff', '#000000'].map((photo) => chroma.mix(photo, background, CAPTION_SCRIM_OPACITY, 'rgb').hex());
-  const worst = grounds.reduce((a, b) => ((contrastRatio(text, a) ?? 0) <= (contrastRatio(text, b) ?? 0) ? a : b));
+function captionScrimCheck(text: string, background: string, scrim: string, minRatio: number): ContrastCheck {
+  // The token as painted: a theme may override it, and then this audits the override.
+  const opacity = parseFloat(scrim) / 100;
   return {
-    label: `text on a caption scrim (background at ${CAPTION_SCRIM_OPACITY} over the worst photo)`,
+    label: `text on a caption scrim (background at ${scrim} over the worst photo)`,
     fg: text,
-    bg: worst,
+    bg: captionScrimGround(text, background, Number.isFinite(opacity) ? opacity : 0),
     minRatio,
   };
+}
+
+/**
+ * [P81-A] Inks on the two overlays no theme paints, so they hold on every
+ * theme at once: the black scrim under a caption on an image (the media
+ * picker's thumbnails, the visitor lightbox) and the visitor lightbox's
+ * backdrop over the host page. Both carry white text. `contrastAudit.test.ts`
+ * checks the source still paints these opacities.
+ */
+export const OVERLAY_SCRIM_OPACITY = 0.6;
+export const LIGHTBOX_BACKDROP_OPACITY = 0.93;
+
+export function fixedOverlayChecks(minRatio: number = AA_NORMAL_TEXT): ContrastCheck[] {
+  return [
+    {
+      label: `white on the black caption scrim (${OVERLAY_SCRIM_OPACITY} over the worst photo)`,
+      fg: '#ffffff',
+      bg: captionScrimGround('#ffffff', '#000000', OVERLAY_SCRIM_OPACITY),
+      minRatio,
+    },
+    {
+      label: `white on the lightbox backdrop (${LIGHTBOX_BACKDROP_OPACITY} black over the worst page)`,
+      fg: '#ffffff',
+      bg: captionScrimGround('#ffffff', '#000000', LIGHTBOX_BACKDROP_OPACITY),
+      minRatio,
+    },
+  ];
 }
 
 /**
@@ -119,9 +146,10 @@ export function auditThemeContrast(
   colors: ThemeColors,
   colorScheme: 'light' | 'dark',
   minRatio: number = AA_NORMAL_TEXT,
+  componentTokenOverrides: Partial<Record<ComponentTokenKey, string>> = {},
 ): ContrastFailure[] {
   const failures: ContrastFailure[] = [];
-  for (const check of intendedContrastChecks(colors, colorScheme, minRatio)) {
+  for (const check of intendedContrastChecks(colors, colorScheme, minRatio, componentTokenOverrides)) {
     const ratio = contrastRatio(check.fg, check.bg);
     if (ratio === null) {
       failures.push({ ...check, ratio: 0 });

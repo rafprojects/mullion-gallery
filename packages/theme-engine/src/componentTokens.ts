@@ -23,6 +23,7 @@
 
 import { generateColorScale, selectUiContrastIndex, withAlpha } from './colorGen';
 import chroma from 'chroma-js';
+import { contrastRatio } from './validation';
 import type { ResolvedColors } from './types';
 
 // ---------------------------------------------------------------------------
@@ -137,6 +138,47 @@ export const COMPONENT_TOKEN_DERIVATIONS = {
   'accent-on': (rc) => onColor(rc.accent),
 } as const satisfies Record<string, (rc: ResolvedColors) => string>;
 
+/**
+ * [P81-A] Component tokens derived per theme that are not colours. They sit
+ * apart from the colour derivations for the reason control heights do: every
+ * value in that map must parse as a colour, and these are measures.
+ */
+export const DERIVED_MEASURES = {
+  // The opacity of the scrim a caption over an image sits on: the theme's
+  // background at this strength, found like the other contrast tokens so it
+  // holds for a theme nobody here has seen. See `captionScrim`.
+  'caption-scrim': (rc) => `${Math.round(captionScrim(rc.text, rc.background) * 100)}%`,
+} as const satisfies Record<string, (rc: ResolvedColors) => string>;
+
+export type DerivedMeasureName = keyof typeof DERIVED_MEASURES;
+
+/** Below this a scrim reads as a smudge rather than a band (designer, 2026-10-26). */
+export const CAPTION_SCRIM_FLOOR = 0.6;
+
+/**
+ * The background over an image, at `opacity`, that a caption's text sits on in
+ * the worst case. Browsers blend each sRGB channel linearly and luminance rises
+ * with every channel, so an all-white or all-black photo bounds every image.
+ */
+export function captionScrimGround(text: string, background: string, opacity: number): string {
+  const grounds = ['#ffffff', '#000000'].map((photo) => chroma.mix(photo, background, opacity, 'rgb').hex());
+  return grounds.reduce((a, b) => ((contrastRatio(text, a) ?? 0) <= (contrastRatio(text, b) ?? 0) ? a : b));
+}
+
+/**
+ * The smallest opacity, in whole percent and at least the floor, at which the
+ * theme's text clears 4.5:1 on its scrim over the worst photo. A theme whose
+ * text needs more than its own background gets a solid band.
+ */
+function captionScrim(text: string, background: string): number {
+  for (let percent = CAPTION_SCRIM_FLOOR * 100; percent <= 100; percent++) {
+    if ((contrastRatio(text, captionScrimGround(text, background, percent / 100)) ?? 0) >= TEXT_CONTRAST_MIN) {
+      return percent / 100;
+    }
+  }
+  return 1;
+}
+
 /** Black or white, whichever reads better on `fill`. The same rule `primaryOnFill` uses. */
 function onColor(fill: string): string {
   return chroma.contrast('#ffffff', fill) >= chroma.contrast('#000000', fill) ? '#ffffff' : '#000000';
@@ -191,7 +233,7 @@ export const CONTROL_HEIGHTS = {
 export type ControlHeightName = keyof typeof CONTROL_HEIGHTS;
 
 /** Every name a theme may override in `ThemeDefinition.componentTokens`. */
-export type ComponentTokenKey = ComponentTokenName | ControlHeightName;
+export type ComponentTokenKey = ComponentTokenName | ControlHeightName | DerivedMeasureName;
 
 /**
  * Resolve the component-token tier for one theme. `overrides` comes from the
@@ -209,6 +251,9 @@ export function deriveComponentTokens(
   }
   for (const name of Object.keys(CONTROL_HEIGHTS) as ControlHeightName[]) {
     resolved[name] = overrides[name] ?? CONTROL_HEIGHTS[name];
+  }
+  for (const name of Object.keys(DERIVED_MEASURES) as DerivedMeasureName[]) {
+    resolved[name] = overrides[name] ?? DERIVED_MEASURES[name](rc);
   }
 
   return resolved;
@@ -249,15 +294,6 @@ const LAYER_STEPS = {
  * break every layer for a consumer that picked its own, and importing the
  * default from `cssVariables` would make the two modules a runtime cycle.
  */
-/**
- * The opacity a caption's scrim reaches at the caption line, as a fraction of
- * the theme's background (P81-A, designer 2026-10-26). 0.60 was the proposal;
- * measured over the worst photo, theme text needs up to 0.81 (Catppuccin
- * Latte), so 0.85 is the one value that clears every bundled theme. The text
- * audit reads this constant, so it checks what is painted.
- */
-export const CAPTION_SCRIM_OPACITY = 0.85;
-
 export function frameworkConstants(prefix: string): Record<string, string> {
   return {
     // P77-F: the ring is a pair, a 2px core with a 6px halo spread so 2px
@@ -282,9 +318,6 @@ export function frameworkConstants(prefix: string): Record<string, string> {
     'line-height-md': '1.55',
     'line-height-lg': '1.6',
     'line-height-xl': '1.65',
-
-    // A caption over an image sits on the theme's background at this opacity.
-    'caption-scrim-opacity': `${CAPTION_SCRIM_OPACITY * 100}%`,
 
     // `layer-host-offset` is deliberately NOT declared here. Every step reads
     // it through `var(..., 0)`, so a host that sets it above the gallery (the

@@ -171,7 +171,7 @@ drops below the bar fails CI rather than shipping.
 | textMuted on surface / surface3 | 7.31 / 6.37 |
 | textMuted2 on surface / surface2 | 9.45 / 8.89 |
 | white button label on primaryFill `#007870` | 5.36 |
-| text on a caption scrim (background at 0.85 over a white photo, the worst case here) | 11.28 |
+| text on a caption scrim (background at its derived 60% over a white photo, the worst case here) | 4.53 |
 
 **`auditUiContrast` — WCAG 1.4.11 non-text, 3:1.** Measured on `default-dark`:
 
@@ -230,7 +230,8 @@ which wrote them as an addendum for this file. They are what survived a week in 
 documents were exchanged and five of them reversed something. Rule 13 is from
 [`designer-answers-catching-up-2026-10-02.md`](correspondences/designer-answers-catching-up-2026-10-02.md),
 and rule 14 from
-[`designer-answers-text-title-2026-10-26.md`](correspondences/designer-answers-text-title-2026-10-26.md).
+[`designer-answers-text-title-2026-10-26.md`](correspondences/designer-answers-text-title-2026-10-26.md)
+as revised in [`designer-answers-badges-scrim-2026-10-26.md`](correspondences/designer-answers-badges-scrim-2026-10-26.md).
 
 ### Grounds and inks
 
@@ -249,13 +250,15 @@ why any new derived ground breaks immediately. This is a property to remember, n
 raising the target globally was priced and rejected.
 
 **14. A caption over an image sits on a scrim that reaches the audited opacity at the caption
-line, with the fade complete before the first glyph.** The scrim is black with white text where the
-surface is not themed (the media picker: 0.60, 5.74:1 over a white image), and the theme's
-`background` with the theme's `text` where it is (the lightbox). *(Designer, 2026-10-26, who
-proposed 0.60 for both. Measured over the worst photo, theme text needs up to 0.81 on the bundled
-themes, Catppuccin Latte the tightest, and 13 of 23 fail at 0.60; the themed scrim therefore
-reaches `CAPTION_SCRIM_OPACITY`, 0.85, which the text audit reads. Muted ink needs up to 0.99 and is
-never used on a scrim.)*
+line, with the fade complete before the first glyph.** Where the surface is not themed (the media
+picker's thumbnails, the visitor lightbox), the scrim is black at 0.60 with white text: 5.74:1 over
+a white image, on every theme. Where it is themed (the admin media preview), the scrim is the
+theme's `background` at `--mullion-caption-scrim` with the theme's `text`: the smallest opacity at
+which that text clears 4.5:1 over the worst photo, floored at 0.60, below which a scrim reads as a
+smudge rather than a band. Muted ink is never used on a scrim. *(Designer, 2026-10-26, in
+[`designer-answers-badges-scrim-2026-10-26.md`](correspondences/designer-answers-badges-scrim-2026-10-26.md).
+The first proposal was 0.60 for both; the CI row showed 13 of 23 themes' text failing at that
+opacity, which is why the themed scrim is derived. On the bundled themes it runs 0.60 to 0.81.)*
 
 ### Signals
 

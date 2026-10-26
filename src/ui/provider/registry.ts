@@ -85,7 +85,7 @@ function mergeOntoBase(base: PlainObject, extension: PlainObject): PlainObject {
 
 function auditIssues(def: ThemeDefinition): string[] {
   const issues: string[] = [];
-  for (const f of auditThemeContrast(def.colors, def.colorScheme)) {
+  for (const f of auditThemeContrast(def.colors, def.colorScheme, undefined, def.componentTokens ?? {})) {
     issues.push(`text contrast: ${f.label} is ${f.ratio.toFixed(2)}:1, needs ${f.minRatio}:1`);
   }
   for (const f of auditUiContrast(def.colors, def.colorScheme, undefined, def.componentTokens ?? {})) {
