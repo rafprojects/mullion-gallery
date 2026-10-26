@@ -400,16 +400,17 @@ function generateComponentOverrides(
       }),
     },
 
+    // A field's label is `text`, always (designer, 2026-10-26): muted, it read as its own description.
     NumberInput: {
       styles: () => ({
-        label: { color: rc.textMuted, fontWeight: FONT_WEIGHT_MEDIUM },
+        label: { color: rc.text, fontWeight: FONT_WEIGHT_MEDIUM },
         control: { borderColor: rc.borderStrong, color: rc.text },
       }),
     },
 
     ColorInput: {
       styles: () => ({
-        label: { color: rc.textMuted, fontWeight: FONT_WEIGHT_MEDIUM },
+        label: { color: rc.text, fontWeight: FONT_WEIGHT_MEDIUM },
         dropdown: {
           backgroundColor: rc.surfaceRaised,
           border: `1px solid ${rc.border}`,

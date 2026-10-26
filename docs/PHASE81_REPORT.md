@@ -236,6 +236,15 @@ The designer answered `pass-two-begins` the same night (`designer-answers-pass-t
 
 **A test-harness lesson.** Readings taken straight after load landed mid-transition once the fixture grew: colours ease in from their initial values when the component sheet is adopted. The parity spec now waits for the showcase's finite animations to finish before it reads anything.
 
+### Pass 2: the designer's toggle conditions, and the slider (2026-10-26)
+
+The designer approved the toggles with conditions and chose the framework's one slider (`COLOR-SPEC.md` rules 18 and 19). Each change below failed `e2e/control-parity.spec.ts` first.
+
+- **A checked switch's edge is `primaryStroke`.** The fill is 2.95:1 against `surface` on default-dark and the track is the switch's outline, so the edge takes the stroke and the fill stays the thumb's audited ground. The engine's 1.4.11 audit gained three named checks, `primaryStroke` on `surface`, `surface2` and `surfaceRaised`; all 23 themes pass, as they should, since the stroke is selected against those grounds, but a theme that overrides it now fails by name.
+- **Segments reserve their 600 width.** Each label carries a hidden 600-weight copy as generated content under `visibility: hidden`, so choosing a segment moves nothing and the copy is neither read out nor found by a text query.
+- **The "Items Per Page" label was muted** because the Mantine theme adapter painted `NumberInput` and `ColorInput` labels `textMuted`. Both are `text` now; the framework's labels already were.
+- **The slider moved, as one slider.** A 14px thumb on `surface` with a 2px `primaryStroke` ring, the filled track `primaryStroke` and the rest `border`, recessed when disabled (rule 16) rather than faded. Its 20px row gained a band 2px above and below it as a pseudo-element, so the drag target is WCAG 2.2's 24px and no panel moves; the spec checks both edges land on the control and fails without the band. Mark labels were already centred on their values, and there are no dots. The spec reads the hit test after scrolling the slider into view, because `elementFromPoint` sees only the viewport.
+
 ### Acceptance criteria
 
 - No file outside `src/ui/` uses a Mantine style prop.

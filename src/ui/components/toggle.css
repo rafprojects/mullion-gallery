@@ -178,8 +178,13 @@
       border-color var(--mullion-duration-fast) ease;
   }
 
+  /*
+   * The track is the switch's outline, so a checked edge is `primaryStroke`,
+   * which clears 3:1 on every ground where the fill does not (designer,
+   * 2026-10-26). The fill stays the ground the thumb's audited pair sits on.
+   */
   .mullion-switch[data-checked] {
-    border-color: var(--mullion-color-primary);
+    border-color: var(--mullion-color-primary-stroke);
     background-color: var(--mullion-color-primary);
   }
 
@@ -223,6 +228,7 @@
   }
 
   .mullion-slider-control {
+    position: relative;
     display: flex;
     align-items: center;
     block-size: 1.25rem;
@@ -230,19 +236,30 @@
     touch-action: none;
   }
 
+  /*
+   * WCAG 2.2's 24px target without a taller row (designer, 2026-10-26): the
+   * band reaches 2px past the 20px row each way, so no panel's layout moves.
+   */
+  .mullion-slider-control::before {
+    content: '';
+    position: absolute;
+    inset-block: -2px;
+    inset-inline: 0;
+  }
+
   .mullion-slider-track {
     position: relative;
     inline-size: 100%;
     block-size: 4px;
     border-radius: 999px;
-    background-color: var(--mullion-color-surface3);
+    background-color: var(--mullion-color-border);
   }
 
   .mullion-slider-indicator {
     position: absolute;
     inset-block: 0;
     border-radius: inherit;
-    background-color: var(--mullion-color-primary);
+    background-color: var(--mullion-color-primary-stroke);
   }
 
   /*
@@ -255,13 +272,22 @@
     display: block;
     inline-size: 0.875rem;
     block-size: 0.875rem;
-    border: 2px solid var(--mullion-color-primary);
+    border: 2px solid var(--mullion-color-primary-stroke);
     border-radius: 999px;
     background-color: var(--mullion-color-surface);
   }
 
+  /* Rule 16: recessed rather than faded. */
   .mullion-slider[data-disabled] {
-    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .mullion-slider[data-disabled] .mullion-slider-indicator {
+    background-color: var(--mullion-color-border-strong);
+  }
+
+  .mullion-slider[data-disabled] .mullion-slider-thumb {
+    border-color: var(--mullion-color-border-strong);
   }
 
   /*

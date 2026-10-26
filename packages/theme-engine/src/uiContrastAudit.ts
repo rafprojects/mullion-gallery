@@ -161,6 +161,18 @@ export function intendedUiContrastChecks(
      * no gate catching it.
      */
     ...washIconChecks(rc, ct, minRatio),
+    /*
+     * [P81-A] A checked switch's edge and a slider's thumb ring and filled
+     * track are drawn in `primaryStroke`, because a switch has no label inside
+     * it and the track is its outline (designer, 2026-10-26). They sit on any
+     * of the three grounds, so each is a named check, the way the halo is.
+     */
+    ...(['surface', 'surface2', 'surfaceRaised'] as const).map((ground) => ({
+      label: `primaryStroke on ${ground} (checked switch edge, slider ring and filled track)`,
+      fg: rc.primaryStroke,
+      bg: rc[ground],
+      minRatio,
+    })),
 
     /*
      * [P80-A] The ring pair on the menu's ground, which is where it paints on

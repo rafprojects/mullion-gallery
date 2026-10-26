@@ -90,6 +90,13 @@ describe('the audit reads component tokens (P78-C)', () => {
   const def = bundledThemeDefinitions.find((t) => t.id === 'default-dark')!;
   const colors = def.colors as ThemeColors;
 
+  it('names the checked switch edge and the slider on every ground (P81-A)', () => {
+    const labels = intendedUiContrastChecks(colors, def.colorScheme).map((c) => c.label);
+    for (const ground of ['surface', 'surface2', 'surfaceRaised']) {
+      expect(labels).toContain(`primaryStroke on ${ground} (checked switch edge, slider ring and filled track)`);
+    }
+  });
+
   it('names affordances by their component token', () => {
     const labels = intendedUiContrastChecks(colors, def.colorScheme).map((c) => c.label);
     for (const token of [

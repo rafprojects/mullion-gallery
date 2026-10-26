@@ -238,6 +238,8 @@ Rules 16 and 17 are from
 [`designer-answers-controls-2026-10-26.md`](correspondences/designer-answers-controls-2026-10-26.md),
 with rule 17's check weight and checked hover from
 [`designer-signoff-disabled-chips-2026-10-26.md`](correspondences/designer-signoff-disabled-chips-2026-10-26.md).
+Rules 18 and 19 are from
+[`designer-answers-toggles-fields-2026-10-26.md`](correspondences/designer-answers-toggles-fields-2026-10-26.md).
 
 ### Grounds and inks
 
@@ -369,6 +371,41 @@ ink is `text`, not the primary text rung, because the ground already carries the
 and P79-C holds on wash-strong. The check is the success glyph's path at a 2px stroke on the chip's
 12px icon (4 on the 24 grid), heavier than the success glyph's, because it has to carry the state
 alone for a reader who cannot see the edge's colour. *(2026-10-26.)*
+
+**18. Where a control's outline is drawn in the primary colour, it is `primaryStroke`, never the
+fill.** A checked switch keeps `primaryFill` as its ground, with a `primaryOnFill` thumb on it, and
+its edge takes `primaryStroke`: the track is the control's outline, and on default-dark the fill is
+2.95:1 against `surface`. The slider is one slider at every size:
+
+| part | paint |
+|---|---|
+| thumb | 14px, `surface` ground, 2px `primaryStroke` ring |
+| filled track | 4px, `primaryStroke` |
+| unfilled track | 4px, `border` (rule 14 keeps it visible; the thumb carries the value) |
+| keyboard focus | the standard ring, around the thumb |
+| disabled | rule 16: ring and filled track `borderStrong`, unfilled `border` |
+
+Its drag target is 24px tall, WCAG 2.2's minimum, without making its 20px row taller. Marks are
+labels centred on their values, with no dots on the track. `primaryStroke` is audited against
+`surface`, `surface2` and `surfaceRaised` on every theme, by name. *(2026-10-26.)*
+
+**19. A field has one look.** There is no `filled` variant: a grey ground with no border leaves a
+field's boundary to one rung step (ΔE00 2.80 on default-light), the quietest edge in the product on
+the control that says where to type. A dense panel takes its density from the `xs` size. A field's
+label is `text` at 500, never muted, and at 12px it is no smaller at any size; its description is
+`textMuted` at 400 and sits between label and input. A unit is `textMuted`, in its own slot inside
+the field's border. A field edited in place, such as the layout builder's title, is `bare`:
+
+| state | ground | edge | ink |
+|---|---|---|---|
+| rest | none | none, with the field's padding and radius reserved so nothing moves | `text`, in the title's type style |
+| hover | none | `border` | `text` |
+| focus | the field's own ground | the field's focus state | `text` |
+| empty | as above | as above | placeholder in `textMuted` |
+
+Number steppers are stacked chevrons in `textMuted` with a `border` divider, out of the tab order
+(arrow keys are the keyboard path), with a subtle icon button's hover, and rule 16 when disabled.
+*(2026-10-26.)*
 
 ---
 

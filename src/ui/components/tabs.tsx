@@ -312,7 +312,12 @@ export function SegmentedControl({
           {...(segment.disabled ? { disabled: true } : {})}
           {...focusableInset}
         >
-          <span className="mullion-segmented-item-label">{segment.label}</span>
+          <span
+            className="mullion-segmented-item-label"
+            {...(typeof segment.label === 'string' ? { 'data-text': segment.label } : {})}
+          >
+            {segment.label}
+          </span>
         </Radio.Root>
       ))}
     </RadioGroup>

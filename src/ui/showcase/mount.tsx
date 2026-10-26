@@ -426,6 +426,15 @@ function ControlSizes({ prefix }: { prefix: string }) {
           disabled
         </Chip>
       </Group>
+      <Group gap="md" grow>
+        <Slider
+          defaultValue={50}
+          marks={[{ value: 0, label: '0' }, { value: 50, label: '50' }, { value: 100, label: '100' }]}
+          aria-label="slider"
+          data-testid={`${prefix}-slider`}
+        />
+        <Slider defaultValue={50} disabled aria-label="slider disabled" data-testid={`${prefix}-slider-disabled`} />
+      </Group>
       {(['xs', 'sm'] as const).map((size) => (
         <Group key={size} gap="md" align="flex-start">
           <Checkbox size={size} label="Checkbox" description="Its description" data-testid={`${prefix}-checkbox-${size}`} />

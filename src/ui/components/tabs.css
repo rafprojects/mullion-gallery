@@ -278,7 +278,24 @@
     cursor: not-allowed;
   }
 
+  /*
+   * A checked segment is 600, so each label reserves its 600 width with a
+   * hidden copy and choosing a segment moves nothing (designer, 2026-10-26).
+   * The copy is generated content under `visibility: hidden`, so it is neither
+   * read out nor found by a text query.
+   */
   .mullion-segmented-item-label {
     position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mullion-segmented-item-label[data-text]::after {
+    content: attr(data-text);
+    block-size: 0;
+    overflow: hidden;
+    font-weight: 600;
+    visibility: hidden;
   }
 }

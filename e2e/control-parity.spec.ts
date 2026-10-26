@@ -295,3 +295,125 @@ test('a checked switch thumb mirrors its resting inset', async ({ page }) => {
   await expect.poll(async () => (await read()).end).toBeCloseTo(rest.start, 1);
 });
 
+
+// [P81-A] Sign-off, 2026-10-26: a checked switch keeps `primaryFill` as its
+// ground with a `primaryOnFill` thumb, and its edge takes `primaryStroke`,
+// because the track is the control's outline and the fill misses 3:1 on
+// default-dark. A segment reserves its 600 width, so choosing one moves nothing.
+for (const theme of ['default-light', 'default-dark'] as const) {
+  test(`a checked switch draws its edge in primaryStroke (${theme})`, async ({ page }) => {
+    await serveShowcase(page);
+    await page.goto(`/ui-showcase?mount=shadow&controls=1&theme=${theme}&chrome=follow`);
+    const sw = page.getByTestId('inline-switch-sm');
+    await sw.click();
+    await settle(page);
+    const got = await sw.evaluate((el) => {
+      const token = (name: string) => {
+        const probe = document.createElement('div');
+        probe.style.color = `var(${name})`;
+        el.parentElement!.appendChild(probe);
+        const value = getComputedStyle(probe).color;
+        probe.remove();
+        return value;
+      };
+      return {
+        edge: getComputedStyle(el).borderTopColor,
+        ground: getComputedStyle(el).backgroundColor,
+        thumb: getComputedStyle(el.querySelector('.mullion-switch-thumb')!).backgroundColor,
+        stroke: token('--mullion-color-primary-stroke'),
+        fill: token('--mullion-color-primary'),
+        on: token('--mullion-color-primary-on'),
+      };
+    });
+    expect.soft(got.edge, 'edge').toBe(got.stroke);
+    expect.soft(got.ground, 'ground').toBe(got.fill);
+    expect.soft(got.thumb, 'thumb').toBe(got.on);
+  });
+}
+
+test('choosing a segment does not move the others', async ({ page }) => {
+  await serveShowcase(page);
+  await page.goto('/ui-showcase?mount=shadow&controls=1&theme=default-light&chrome=follow');
+  const seg = page.getByTestId('inline-segmented-sm');
+  await settle(page);
+  const widths = () =>
+    seg.evaluate((el) => [...el.querySelectorAll('.mullion-segmented-item')].map((i) => i.getBoundingClientRect().width));
+  const before = await widths();
+  await seg.getByText('Two').click();
+  await settle(page);
+  const after = await widths();
+  for (const [i, w] of before.entries()) expect.soft(after[i], `segment ${i}`).toBeCloseTo(w, 1);
+});
+
+// [P81-A] The framework's one slider (designer, 2026-10-26): a 14px thumb on
+// `surface` with a 2px `primaryStroke` ring, the filled track in
+// `primaryStroke` and the rest in `border`, a 24px drag target inside the
+// 20px row, mark labels centred on their values, and rule 16 when disabled.
+for (const theme of ['default-light', 'default-dark'] as const) {
+  test(`the slider follows the designer's table (${theme})`, async ({ page }) => {
+    await serveShowcase(page);
+    await page.goto(`/ui-showcase?mount=shadow&controls=1&theme=${theme}&chrome=follow`);
+    // elementFromPoint only sees the viewport, so bring the slider into it.
+    await page.getByTestId('inline-slider').scrollIntoViewIfNeeded();
+    await settle(page);
+    const got = await page.evaluate(() => {
+      const root = document.getElementById('showcase')!.shadowRoot!;
+      const read = (id: string) => {
+        const s = root.querySelector(`[data-testid="${id}"]`)!;
+        const part = (c: string) => s.querySelector(`.mullion-slider-${c}`) as HTMLElement;
+        const thumb = getComputedStyle(part('thumb'));
+        return {
+          thumbSize: part('thumb').getBoundingClientRect().width,
+          ring: thumb.borderTopColor,
+          ringWidth: thumb.borderTopWidth,
+          thumbGround: thumb.backgroundColor,
+          filled: getComputedStyle(part('indicator')).backgroundColor,
+          unfilled: getComputedStyle(part('track')).backgroundColor,
+          opacity: getComputedStyle(s).opacity,
+        };
+      };
+      const token = (name: string) => {
+        const probe = document.createElement('div');
+        probe.style.color = `var(${name})`;
+        root.querySelector('[data-testid="inline-slider"]')!.appendChild(probe);
+        const value = getComputedStyle(probe).color;
+        probe.remove();
+        return value;
+      };
+      const slider = root.querySelector('[data-testid="inline-slider"]')!;
+      const control = slider.querySelector('.mullion-slider-control')!.getBoundingClientRect();
+      const thumb = slider.querySelector('.mullion-slider-thumb')!.getBoundingClientRect();
+      const mark = [...slider.querySelectorAll('.mullion-slider-mark')].find((m) => m.textContent === '50')!;
+      const markBox = mark.getBoundingClientRect();
+      // 1.5px outside the 20px row, away from the thumb, is still the control: the marks row below is not.
+      const onControl = (y: number) =>
+        root.elementFromPoint(control.left + 8, y)?.closest('.mullion-slider-control') === slider.querySelector('.mullion-slider-control');
+      return {
+        live: read('inline-slider'),
+        disabled: read('inline-slider-disabled'),
+        rowHeight: control.height,
+        above: onControl(control.top - 1.5),
+        below: onControl(control.bottom + 1.5),
+        markOffset: markBox.left + markBox.width / 2 - (thumb.left + thumb.width / 2),
+        stroke: token('--mullion-color-primary-stroke'),
+        surface: token('--mullion-color-surface'),
+        border: token('--mullion-color-border'),
+        strong: token('--mullion-color-border-strong'),
+      };
+    });
+    expect.soft(got.live.thumbSize, 'thumb').toBeCloseTo(14, 1);
+    expect.soft(got.live.ringWidth, 'ring width').toBe('2px');
+    expect.soft(got.live.ring, 'ring').toBe(got.stroke);
+    expect.soft(got.live.thumbGround, 'thumb ground').toBe(got.surface);
+    expect.soft(got.live.filled, 'filled track').toBe(got.stroke);
+    expect.soft(got.live.unfilled, 'unfilled track').toBe(got.border);
+    expect.soft(got.rowHeight, 'the row stays 20px').toBeCloseTo(20, 1);
+    expect.soft(got.above, 'drag target reaches above the row').toBe(true);
+    expect.soft(got.below, 'drag target reaches below the row').toBe(true);
+    expect.soft(got.markOffset, 'mark centred on its value').toBeCloseTo(0, 0);
+    expect.soft(got.disabled.ring, 'disabled ring').toBe(got.strong);
+    expect.soft(got.disabled.filled, 'disabled filled track').toBe(got.strong);
+    expect.soft(got.disabled.unfilled, 'disabled unfilled track').toBe(got.border);
+    expect.soft(got.disabled.opacity, 'disabled opacity').toBe('1');
+  });
+}
