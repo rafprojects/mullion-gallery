@@ -12,8 +12,8 @@
  *   DELETE /admin/asset-library/{id}   — delete (409 in-use guard from P52-A5c)
  */
 import { useCallback, useState } from 'react';
-import { Center, Loader } from '@mantine/core';
-import { Group, Title } from '@/ui';
+import { Loader } from '@mantine/core';
+import { Group, Title, Center } from '@/ui';
 import { modals } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
 
@@ -139,7 +139,7 @@ export function GlobalAssetManager({ apiClient, onNotify }: GlobalAssetManagerPr
       </Group>
 
       {isLoading ? (
-        <Center py="xl"><Loader size="sm" /></Center>
+        <Center paddingBlock="xl"><Loader size="sm" /></Center>
       ) : (
         <DesignAssetsGrid
           items={assets ?? []}

@@ -12,10 +12,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   ActionIcon,
   Badge,
-  Box,
   Button,
   Card,
-  Center,
   FileButton,
   Menu,
   SegmentedControl,
@@ -64,7 +62,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useBuilderDeepLink } from '@mullion/shared-utils';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group, Stack, Text } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -435,7 +433,7 @@ export function LayoutTemplateList({ apiClient, onNotify, initialTemplateId, spa
 
       {/* Empty state */}
       {!isLoading && filtered.length === 0 && (
-        <Center py="xl">
+        <Center paddingBlock="xl">
           <Stack align="center" gap="xs">
             <IconLayoutDashboard size={48} color="var(--mantine-color-dimmed)" />
             <Text tone="muted">

@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Button, Center, FileButton, Loader } from '@mantine/core';
-import { Group } from '@/ui';
+import { Button, FileButton, Loader } from '@mantine/core';
+import { Group, Center } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { ApiClient } from '@/services/apiClient';
@@ -131,7 +131,7 @@ export function MediaPanel({
         )}
       </Group>
       <ErrorBoundary isAdmin={true}>
-        <Suspense fallback={<Center py="md"><Loader /></Center>}>
+        <Suspense fallback={<Center paddingBlock="md"><Loader /></Center>}>
           <MediaTab campaignId={mediaCampaignId} apiClient={apiClient} onCampaignsUpdated={onCampaignsUpdated} />
         </Suspense>
       </ErrorBoundary>

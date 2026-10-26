@@ -22,8 +22,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RowsPhotoAlbum } from 'react-photo-album';
 import { OVERLAY_BG, OVERLAY_TEXT } from '../_shared/overlayStyles';
-import { Box } from '@mantine/core';
-import { Stack } from '@/ui';
+import { Stack, Box } from '@/ui';
 import { IconLayoutRows, IconZoomIn, IconPlayerPlay } from '@tabler/icons-react';
 import type {
   GalleryBehaviorSettings,

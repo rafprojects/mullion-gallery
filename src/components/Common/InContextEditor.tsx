@@ -1,9 +1,9 @@
 import { forwardRef, useCallback, type ReactNode } from 'react';
-import { ActionIcon, Popover, ScrollArea, Box } from '@mantine/core';
+import { ActionIcon, Popover, ScrollArea } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem } from '@/ui';
+import { uiRem, Box } from '@/ui';
 
 interface InContextEditorProps {
   /** Position relative to the nearest positioned parent. */

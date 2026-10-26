@@ -78,6 +78,11 @@
     color: inherit;
   }
 
+  .mullion-alert-close {
+    flex: 0 0 auto;
+    align-self: flex-start;
+  }
+
   .mullion-alert-body {
     min-width: 0;
   }

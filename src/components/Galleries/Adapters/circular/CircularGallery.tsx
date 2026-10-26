@@ -8,8 +8,7 @@
  */
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box } from '@mantine/core';
-import { Stack, Text } from '@/ui';
+import { Stack, Text, Box } from '@/ui';
 import { IconCircles, IconPlayerPlay, IconZoomIn } from '@tabler/icons-react';
 import { OVERLAY_BG, OVERLAY_TEXT } from '../_shared/overlayStyles';
 import type {
@@ -79,7 +78,7 @@ export function CircularGallery({ media, settings, runtime }: CircularGalleryPro
             <Box
               {...getMullionDebugProps('CircularGallery', 'card')}
               key={item.id}
-              component="button"
+              render={<button />}
               onClick={() => openAt(idx)}
               aria-label={label}
               className={`mullion-tile-${SCOPE}`}

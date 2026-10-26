@@ -1,3 +1,33 @@
-// CampaignViewer styles are now handled by Mantine Modal and related components
-// This file is retained for reference only and will be removed in a future cleanup pass
+// [P81-A] The viewer's responsive values, which the framework's layout props do
+// not take. Breakpoints are Mantine's: sm 48em, md 62em.
 
+// The cover's height comes from the site's settings, so the three values
+// arrive inline as custom properties and only the breakpoints live here.
+.cover {
+  height: var(--cv-cover-h-base);
+
+  @media (min-width: 48em) {
+    height: var(--cv-cover-h-sm, var(--cv-cover-h-base));
+  }
+
+  @media (min-width: 62em) {
+    height: var(--cv-cover-h-md, var(--cv-cover-h-sm, var(--cv-cover-h-base)));
+  }
+}
+
+.coverText {
+  padding: var(--mullion-spacing-md);
+
+  @media (min-width: 62em) {
+    padding: var(--mullion-spacing-lg);
+  }
+}
+
+// Read by the framework's SimpleGrid; unlayered, so it wins over the grid's reset.
+.stats {
+  --mullion-gap: var(--mullion-spacing-sm);
+
+  @media (min-width: 62em) {
+    --mullion-gap: var(--mullion-spacing-md);
+  }
+}

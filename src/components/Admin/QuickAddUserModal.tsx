@@ -1,7 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
 import {
-  Alert,
-  Box,
   Button,
   Checkbox,
   Modal,
@@ -13,6 +11,8 @@ import {
   Group,
   Stack,
   Text,
+  Alert,
+  Box,
 } from '@/ui';
 import { IconAlertCircle, IconUserPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -62,7 +62,7 @@ function QuickAddUserSuccessState({ quickAddResult, onClose, onNotify }: QuickAd
   return (
     <>
       <Alert
-        color={quickAddResult.success ? 'teal' : 'red'}
+        tone={quickAddResult.success ? 'success' : 'danger'}
         title={quickAddResult.success ? t('admin_qau_success', 'Success') : t('admin_qau_error', 'Error')}
         role={quickAddResult.success ? 'status' : 'alert'}
         aria-live={quickAddResult.success ? 'polite' : 'assertive'}

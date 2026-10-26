@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Box,
   Button,
   Select,
   Slider,
@@ -25,7 +24,7 @@ import { useBuilderDock } from './BuilderDockContext';
 import { AssetUploader } from './AssetUploader';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text } from '@/ui';
+import { uiRem, Stack, Group, Text, Box } from '@/ui';
 
 // ── Helpers ──────────────────────────────────────────────────
 

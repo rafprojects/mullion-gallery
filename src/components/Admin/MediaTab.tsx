@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, useRef, memo } from 'react';
-import { Button, Grid, Select, Table, Box, Tooltip, Pagination, Skeleton, Switch, type Primitive } from '@mantine/core';
+import { Button, Select, Table, Tooltip, Pagination, Skeleton, Switch, type Primitive } from '@mantine/core';
 import { SegmentedControl } from '@mantine/core';
 
 // Mantine's SegmentedControl calls setState inside its ref callbacks, which triggers
@@ -52,7 +52,7 @@ import { useMediaExternal } from '@/hooks/useMediaExternal';
 import { useMediaCrud } from '@/hooks/useMediaCrud';
 import { useMediaDisplay } from '@/hooks/useMediaDisplay';
 import styles from './MediaTab.module.scss';
-import { uiRem, Group, Text } from '@/ui';
+import { uiRem, Group, Text, Grid, Box } from '@/ui';
 
 // Position the DragOverlay so its top-center sits just below the cursor.
 // The overlay is 140 px wide; placing the cursor at (width/2, 12) gives a natural

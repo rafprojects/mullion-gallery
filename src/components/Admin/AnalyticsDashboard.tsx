@@ -2,15 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActionIcon,
-  Alert,
   Badge,
-  Center,
   Loader,
   Paper,
   ScrollArea,
   SegmentedControl,
   Select,
-  SimpleGrid,
   Table,
   Tooltip,
 } from '@mantine/core';
@@ -19,6 +16,9 @@ import {
   Stack,
   Text,
   Title,
+  Alert,
+  Center,
+  SimpleGrid,
 } from '@/ui';
 import {
   CartesianGrid,
@@ -276,7 +276,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
       </Stack>
 
       {!campaignId && (
-        <Alert icon={<IconInfoCircle size={16} />} color="blue">
+        <Alert icon={<IconInfoCircle size={16} />} tone="info">
           {t('admin_analytics_select_hint', 'Select a campaign to view per-campaign analytics.')}
         </Alert>
       )}
@@ -285,13 +285,13 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
         <>
           {/* ── Daily chart ───────────────────────────────────────────────── */}
           {isLoading && (
-            <Center py="xl">
+            <Center paddingBlock="xl">
               <Loader size="sm" />
             </Center>
           )}
 
           {error && (
-            <Alert icon={<IconInfoCircle size={16} />} color="red">
+            <Alert icon={<IconInfoCircle size={16} />} tone="danger">
               {t('admin_analytics_load_fail', 'Failed to load analytics data.')}
             </Alert>
           )}
@@ -369,7 +369,7 @@ export function AnalyticsDashboard({ apiClient, campaigns, isSystemAdmin = false
                 {t('admin_analytics_media_perf', 'Media Performance')}
               </Title>
               {mediaLoading && (
-                <Center py="md">
+                <Center paddingBlock="md">
                   <Loader size="xs" />
                 </Center>
               )}

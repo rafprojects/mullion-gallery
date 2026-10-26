@@ -1,10 +1,10 @@
 
-import { ActionIcon, Box, Image, Modal } from '@mantine/core';
+import { ActionIcon, Image, Modal } from '@mantine/core';
 import { IconChevronLeft, IconChevronRight, IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Text } from '@/ui';
+import { uiRem, Text, Box } from '@/ui';
 
 interface MediaLightboxModalProps {
   opened: boolean;
@@ -78,7 +78,7 @@ export function MediaLightboxModal({
             </>
           )}
           <Box
-            p="md"
+            padding="md"
             // Theme text on a scrim of the theme's background that reaches the audited
             // opacity at the caption line (contrastAudit.ts). Muted ink cannot clear on
             // a scrim over an arbitrary photo, so the counter takes text too.

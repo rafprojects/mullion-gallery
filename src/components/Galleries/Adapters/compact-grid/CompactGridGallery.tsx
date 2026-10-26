@@ -17,8 +17,7 @@
  */
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box } from '@mantine/core';
-import { Stack } from '@/ui';
+import { Stack, Box } from '@/ui';
 import { IconLayoutGrid, IconZoomIn, IconPlayerPlay } from '@tabler/icons-react';
 import { OVERLAY_BG, OVERLAY_TEXT } from '../_shared/overlayStyles';
 import type {
@@ -280,7 +279,7 @@ function GridCard({ item, index, aspectRatio, minHeight, borderRadius, onOpen }:
   return (
     <Box
       {...getMullionDebugProps('CompactGridGallery', 'card')}
-      component="button"
+      render={<button />}
       onClick={() => onOpen(index)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

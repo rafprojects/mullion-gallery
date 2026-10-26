@@ -7,7 +7,6 @@ import {
   TextInput,
   ActionIcon,
   Tooltip,
-  Box,
   Slider,
   Button,
   Accordion,
@@ -39,7 +38,7 @@ import type {
 } from '@/types';
 import { buildSlotEntranceCss, REVEAL_CLASS } from '@/utils/slotEntrance';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text } from '@/ui';
+import { uiRem, Stack, Group, Text, Box } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 

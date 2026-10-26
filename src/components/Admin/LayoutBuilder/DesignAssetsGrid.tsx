@@ -1,5 +1,6 @@
-import { Box, ActionIcon, Tooltip, Badge, Popover, TagsInput } from '@mantine/core';
-import { Text } from '@/ui';
+
+import { ActionIcon, Tooltip, Badge, Popover, TagsInput } from '@mantine/core';
+import { Text, Box } from '@/ui';
 import { useTranslation } from 'react-i18next';
 import { IconX, IconWorld, IconWorldOff, IconTag } from '@tabler/icons-react';
 import type { AssetLibraryItem } from './BuilderDockContext';

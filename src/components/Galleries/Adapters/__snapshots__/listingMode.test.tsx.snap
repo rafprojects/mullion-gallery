@@ -2,14 +2,12 @@
 
 exports[`CompactGridGallery listing mode (P35-D) > snapshot: responsive-grid structure at default settings with 4 items 1`] = `
 <div
-  class=""
   data-mullion-component="CompactGridGallery"
   data-mullion-slot="grid"
   data-testid="card-gallery-grid"
   style="display: flex; flex-wrap: wrap; gap: 16px 16px; justify-content: center; align-content: start; width: 100%;"
 >
   <div
-    class=""
     data-testid="card-responsive-wrapper"
     style="flex: 0 0 100%; max-width: 100%; min-width: 0;"
   >
@@ -21,7 +19,6 @@ exports[`CompactGridGallery listing mode (P35-D) > snapshot: responsive-grid str
     </div>
   </div>
   <div
-    class=""
     data-testid="card-responsive-wrapper"
     style="flex: 0 0 100%; max-width: 100%; min-width: 0;"
   >
@@ -33,7 +30,6 @@ exports[`CompactGridGallery listing mode (P35-D) > snapshot: responsive-grid str
     </div>
   </div>
   <div
-    class=""
     data-testid="card-responsive-wrapper"
     style="flex: 0 0 100%; max-width: 100%; min-width: 0;"
   >
@@ -45,7 +41,6 @@ exports[`CompactGridGallery listing mode (P35-D) > snapshot: responsive-grid str
     </div>
   </div>
   <div
-    class=""
     data-testid="card-responsive-wrapper"
     style="flex: 0 0 100%; max-width: 100%; min-width: 0;"
   >

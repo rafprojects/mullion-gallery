@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Box,
   Select,
   Slider,
   NumberInput,
@@ -12,6 +11,7 @@ import {
   Stack,
   Group,
   Text,
+  Box,
 } from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import type { GradientStop, GradientDirection, GradientType, RadialShape, RadialSize } from '@/types';

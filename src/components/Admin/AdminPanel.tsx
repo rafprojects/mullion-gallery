@@ -2,8 +2,8 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { ApiClient, CampaignTemplate } from '@/services/apiClient';
-import { Tabs, Button, Card, ActionIcon, Center, Loader, Chip, Tooltip, Select, Switch, Menu, Collapse, Badge, Box } from '@mantine/core';
-import { Group, Title } from '@/ui';
+import { Tabs, Button, Card, ActionIcon, Loader, Chip, Tooltip, Select, Switch, Menu, Collapse, Badge } from '@mantine/core';
+import { Group, Title, Center, Box } from '@/ui';
 import { useReloadSafeView } from '@/hooks/useReloadSafeView';
 import { IconPlus, IconArrowLeft, IconFileImport, IconKeyboard, IconSettings, IconDotsVertical, IconAdjustments, IconStack2 } from '@tabler/icons-react';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
@@ -507,7 +507,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
 
         {/* P52-B: global asset library management. */}
         <Tabs.Panel value="assets" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
-          <Suspense fallback={<Center py="xl"><Loader size="sm" /></Center>}>
+          <Suspense fallback={<Center paddingBlock="xl"><Loader size="sm" /></Center>}>
             <GlobalAssetTab apiClient={apiClient} onNotify={onNotify} />
           </Suspense>
         </Tabs.Panel>
@@ -563,7 +563,7 @@ export function AdminPanel({ apiClient, onClose, onCampaignsUpdated, onNotify, i
 
         <Tabs.Panel {...getMullionDebugProps('AdminPanel', 'analytics-panel')} value="analytics" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
           <ErrorBoundary isAdmin={true}>
-            <Suspense fallback={<Center py="xl"><Loader size="sm" /></Center>}>
+            <Suspense fallback={<Center paddingBlock="xl"><Loader size="sm" /></Center>}>
               <AnalyticsDashboard apiClient={apiClient} campaigns={campaignSelectData} isSystemAdmin={isSystemAdmin} />
             </Suspense>
           </ErrorBoundary>

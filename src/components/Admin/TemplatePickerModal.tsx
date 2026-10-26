@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
-import { Modal, SimpleGrid, Card, Badge, Loader, Center } from '@mantine/core';
-import { Stack, Group, Text } from '@/ui';
+import { Modal, Card, Badge, Loader } from '@mantine/core';
+import { Stack, Group, Text, SimpleGrid, Center } from '@/ui';
 import { IconLayoutGrid } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient, CampaignTemplate } from '@/services/apiClient';
@@ -51,7 +51,7 @@ export function TemplatePickerModal({ opened, onClose, apiClient, onSelect }: Pr
       centered
     >
       {loading ? (
-        <Center py="xl"><Loader size="sm" /></Center>
+        <Center paddingBlock="xl"><Loader size="sm" /></Center>
       ) : (
         <SimpleGrid cols={{ base: 1, xs: 2, sm: 3 }} spacing="sm">
           {/* Always-first "Start Blank" card */}

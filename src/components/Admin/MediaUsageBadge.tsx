@@ -6,8 +6,8 @@
  * campaign names. A count of 0 is highlighted in red (orphaned media).
  */
 import { useState } from 'react';
-import { Badge, Popover, Anchor, Loader, Alert } from '@mantine/core';
-import { Stack, Text } from '@/ui';
+import { Badge, Popover, Anchor, Loader } from '@mantine/core';
+import { Stack, Text, Alert } from '@/ui';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
@@ -40,7 +40,7 @@ function MediaUsageBadgeContent({ loading, error, detail }: MediaUsageBadgeConte
 
   if (error) {
     return (
-      <Alert color="red" icon={<IconInfoCircle size={14} />} py="xs">
+      <Alert tone="danger" icon={<IconInfoCircle size={14} />} paddingBlock="xs">
         {error}
       </Alert>
     );

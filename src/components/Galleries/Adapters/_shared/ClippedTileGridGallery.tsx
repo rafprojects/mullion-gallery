@@ -11,8 +11,7 @@
  */
 import { useState, useCallback, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box } from '@mantine/core';
-import { Stack, Text } from '@/ui';
+import { Stack, Text, Box } from '@/ui';
 import { IconPlayerPlay, IconZoomIn } from '@tabler/icons-react';
 import { OVERLAY_BG, OVERLAY_TEXT } from './overlayStyles';
 import type {
@@ -135,7 +134,7 @@ export function ClippedTileGridGallery({ media, settings, runtime, config }: Cli
                 return (
                   <Box
                     key={item.id}
-                    component="button"
+                    render={<button />}
                     onClick={() => openAt(globalIdx)}
                     aria-label={label}
                     className={`mullion-tile-${scope}`}

@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import {
-  Alert,
   Badge,
-  Box,
   Button,
   Loader,
   Table,
@@ -12,6 +10,8 @@ import {
   Stack,
   Text,
   Title,
+  Alert,
+  Box,
 } from '@/ui';
 import { IconAlertCircle, IconCheck, IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -90,13 +90,13 @@ export function PendingRequestsPanel({ campaignId, apiClient, onMutate }: Pendin
       </Group>
 
       {actionError && (
-        <Alert icon={<IconAlertCircle size={14} />} color="red" variant="light" onClose={() => setActionError(null)} withCloseButton>
+        <Alert icon={<IconAlertCircle size={14} />} tone="danger" variant="light" onClose={() => setActionError(null)} closeLabel={t('common_close', 'Close')}>
           {actionError}
         </Alert>
       )}
 
       {isLoading ? (
-        <Box style={{ textAlign: 'center' }} py="md">
+        <Box style={{ textAlign: 'center' }} paddingBlock="md">
           <Loader size="sm" />
         </Box>
       ) : pendingRequests.length === 0 && resolvedRequests.length === 0 ? (

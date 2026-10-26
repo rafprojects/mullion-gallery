@@ -15,7 +15,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Accordion,
   ActionIcon,
-  Box,
   Button,
   Divider,
   NumberInput,
@@ -30,6 +29,7 @@ import {
   Group,
   Stack,
   Text,
+  Box,
 } from '@/ui';
 import { useDisclosure } from '@mantine/hooks';
 import {

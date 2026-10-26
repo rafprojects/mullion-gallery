@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Accordion, Alert, Badge, Divider, Loader, NumberInput, Select, Slider, Switch, TextInput } from '@mantine/core';
-import { Group, Stack, Text } from '@/ui';
+import { Accordion, Badge, Divider, Loader, NumberInput, Select, Slider, Switch, TextInput } from '@mantine/core';
+import { Group, Stack, Text, Alert } from '@/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
@@ -395,7 +395,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
               <Stack gap="md">
                 {isHealthLoading && <Loader size="sm" />}
                 {isHealthError && (
-                  <Alert color="red" title={t('set_adv_health_unavail', 'Health data unavailable')}>
+                  <Alert tone="danger" title={t('set_adv_health_unavail', 'Health data unavailable')}>
                     {t('set_adv_health_unavail_body', 'Could not load object-cache status from the server.')}
                   </Alert>
                 )}
@@ -416,7 +416,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
                     </Group>
 
                     {!healthData.objectCache.persistent && (
-                      <Alert color="yellow" title={t('set_adv_no_cache', 'No persistent object cache')}>
+                      <Alert tone="warning" title={t('set_adv_no_cache', 'No persistent object cache')}>
                         {t('set_adv_no_cache_body', 'WordPress is using its default in-memory cache, which is discarded on every request. For higher-traffic deployments consider adding a Redis or Memcached drop-in. See docs/object-cache-setup.md for setup instructions.')}
                       </Alert>
                     )}
@@ -452,7 +452,7 @@ export function AdvancedSettingsSection({ settings, updateSetting, tooltipLabel,
           <Accordion.Panel>
             {mounted.has('danger-zone') ? (
               <Stack gap="md">
-                <Alert color="red" title={t('set_adv_irreversible', 'Irreversible data deletion')}>
+                <Alert tone="danger" title={t('set_adv_irreversible', 'Irreversible data deletion')}>
                   {t('set_adv_irreversible_body', 'When preservation is disabled, deleting this plugin permanently removes all campaigns, layout templates, overlay library, analytics events, access grants, and uploaded thumbnail files. This cannot be undone.')}
                 </Alert>
                 <Switch

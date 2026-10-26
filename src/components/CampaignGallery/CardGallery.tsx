@@ -13,8 +13,8 @@
  */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Container, Chip, SegmentedControl, Alert, Box, Center, Loader, TextInput, Switch, Select } from '@mantine/core';
-import { Group, Stack, Title, Text } from '@/ui';
+import { Container, Chip, SegmentedControl, Loader, TextInput, Switch, Select } from '@mantine/core';
+import { Group, Stack, Title, Text, Alert, Box, Center } from '@/ui';
 import { ModalColorInput as ColorInput } from '@/components/Common/ModalColorInput';
 import { IconSearch } from '@tabler/icons-react';
 import { CampaignCard } from './CampaignCard';
@@ -241,7 +241,7 @@ export function CardGallery({
 
   // ── Empty-state node ───────────────────────────────────────────────────────
   const emptyNode = filteredCampaigns.length === 0 ? (
-    <Center py={{ base: 60, md: 80 }} role="status" aria-live="polite">
+    <Center className={styles.emptyState} role="status" aria-live="polite">
       <Stack align="center" gap="md">
         <Text size="lg" tone="muted" align="center">
           {searchQuery.trim()
@@ -265,7 +265,7 @@ export function CardGallery({
   return (
     <Box {...(styles.gallery ? { className: styles.gallery } : {})} style={galleryStyle}>
       {/* Header */}
-      <Box component="header" {...(styles.header ? { className: styles.header } : {})} style={{ ...headerStyle, position: 'relative' }}>
+      <Box render={<header />} {...(styles.header ? { className: styles.header } : {})} style={{ ...headerStyle, position: 'relative' }}>
         <InContextEditor
           visible={!!isAdmin && galleryBehaviorSettings.showInContextEditors}
           position="top-right"
@@ -392,7 +392,7 @@ export function CardGallery({
 
             {/* Hidden notice */}
             {showHiddenNotice && (
-              <Alert color="yellow" title={t('cardgal_access_active_title', 'Access mode active')} role="status" aria-live="polite">
+              <Alert tone="warning" title={t('cardgal_access_active_title', 'Access mode active')} role="status" aria-live="polite">
                 {t('cardgal_hidden_notice', '{{count}} campaign hidden by access mode.', { count: hiddenCount })}
               </Alert>
             )}
@@ -433,7 +433,7 @@ export function CardGallery({
 
       {/* Campaign Viewer Modal — always mounted so open/close transitions animate */}
       {displayedCampaign && (
-        <Suspense fallback={<Center py="xl"><Loader /></Center>}>
+        <Suspense fallback={<Center paddingBlock="xl"><Loader /></Center>}>
           <CampaignViewer
             campaign={displayedCampaign}
             opened={!!selectedCampaign}

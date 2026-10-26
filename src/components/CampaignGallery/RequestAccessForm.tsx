@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Box, Button, TextInput, Alert } from '@mantine/core';
+import { Button, TextInput } from '@mantine/core';
 import { IconMail, IconCheck, IconAlertCircle } from '@tabler/icons-react';
 import { Trans, useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Text } from '@/ui';
+import { uiRem, Stack, Text, Box, Alert } from '@/ui';
 
 interface RequestAccessFormProps {
   campaignId: string;
@@ -43,7 +43,7 @@ export function RequestAccessForm({ campaignId, campaignTitle, apiClient }: Requ
   if (submitState === 'success') {
     return (
       <Box
-        p="md"
+        padding="md"
         style={{
           background: 'color-mix(in srgb, var(--mullion-color-surface) 95%, transparent)',
           borderRadius: 8,
@@ -65,9 +65,9 @@ export function RequestAccessForm({ campaignId, campaignTitle, apiClient }: Requ
 
   return (
     <Box
-      component="form"
+      render={<form />}
       onSubmit={handleSubmit}
-      p="md"
+      padding="md"
       style={{
         background: 'color-mix(in srgb, var(--mullion-color-surface) 95%, transparent)',
         borderRadius: 8,
@@ -88,9 +88,9 @@ export function RequestAccessForm({ campaignId, campaignTitle, apiClient }: Requ
         {submitState === 'error' && (
           <Alert
             icon={<IconAlertCircle size={14} />}
-            color="red"
+            tone="danger"
             variant="light"
-            p="xs"
+            padding="xs"
           >
             <Text size="xs">{errorMessage}</Text>
           </Alert>

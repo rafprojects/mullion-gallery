@@ -1,10 +1,8 @@
 import { useMemo } from 'react';
 import {
   Badge,
-  Box,
   Button,
   Card,
-  Center,
   Checkbox,
   Loader,
   Menu,
@@ -20,7 +18,7 @@ import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
 import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center } from '@/ui';
 
 // Returns an i18next key + English default so the caller can translate in render.
 function scheduleLabel(publishAt?: string, unpublishAt?: string): { key: string; text: string; color: string } | null {
@@ -104,7 +102,7 @@ export function CampaignsMobileList({
                 <Text weight={600} size="sm" truncate style={{ flex: 1 }}>{c.title}</Text>
                 {hasCampaignGalleryOverrides(c) && (
                   <Tooltip label={t('admin_custom_gallery', 'Custom gallery: {{summary}}', { summary: galleryOverrideSummary.join(', ') || t('admin_nested_overrides', 'Nested overrides') })} withArrow>
-                    <Box component="span" role="img" aria-label={t('admin_custom_gallery_aria', 'Custom gallery overrides')} style={{ display: 'inline-flex' }}>
+                    <Box render={<span />} role="img" aria-label={t('admin_custom_gallery_aria', 'Custom gallery overrides')} style={{ display: 'inline-flex' }}>
                       <IconLayoutGrid size={13} color="var(--mantine-color-violet-5)" aria-hidden />
                     </Box>
                   </Tooltip>
@@ -194,7 +192,7 @@ export function CampaignsMobileList({
   if (error) return <Text tone="danger" role="alert">{error}</Text>;
 
   if (isLoading) {
-    return <Center py="xl"><Loader size="sm" /></Center>;
+    return <Center paddingBlock="xl"><Loader size="sm" /></Center>;
   }
 
   return (

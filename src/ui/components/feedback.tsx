@@ -9,7 +9,10 @@
  */
 
 import type { ReactNode } from 'react';
-import { renderElement, cx, type UiElementProps, type UiTone } from './element';
+import { renderElement, cx, type UiAttributes, type UiElementProps, type UiTone } from './element';
+// A cycle with ./control (which imports Loader from here), safe because both
+// are read only at render time, never while the modules evaluate.
+import { CloseButton } from './control';
 import { resolveRoleGlyph } from './roleGlyph';
 import {
   customProperties,
@@ -22,7 +25,7 @@ import {
 
 export type UiSurfaceVariant = 'filled' | 'light' | 'outline';
 
-export interface AlertProps extends UiElementProps, UiPaddingProps {
+export interface AlertProps extends UiElementProps, UiPaddingProps, Omit<UiAttributes<HTMLDivElement>, 'title'> {
   title?: ReactNode;
   /**
    * The leading icon. Omitted, a status tone supplies its role glyph; pass
@@ -32,6 +35,10 @@ export interface AlertProps extends UiElementProps, UiPaddingProps {
   icon?: ReactNode | false;
   tone?: UiTone | undefined;
   variant?: UiSurfaceVariant | undefined;
+  /** Shows a close button that calls this. Mantine's `onClose`, which one call site uses. */
+  onClose?: (() => void) | undefined;
+  /** The close button's accessible name; the framework has no strings of its own, so pass a translated one. */
+  closeLabel?: string | undefined;
   children?: ReactNode;
 }
 
@@ -44,6 +51,8 @@ export function Alert({
   icon,
   tone = 'info',
   variant = 'light',
+  onClose,
+  closeLabel,
   ...props
 }: AlertProps) {
   const [pad, rest] = splitPadding(props);
@@ -66,6 +75,9 @@ export function Alert({
             {title ? <div className="mullion-alert-title">{title}</div> : null}
             {children}
           </div>
+          {onClose ? (
+            <CloseButton className="mullion-alert-close" variant="subtle" size="sm" aria-label={closeLabel} onClick={onClose} />
+          ) : null}
         </>
       ),
     },
@@ -73,7 +85,7 @@ export function Alert({
   );
 }
 
-export interface BadgeProps extends UiElementProps {
+export interface BadgeProps extends UiElementProps, UiAttributes<HTMLSpanElement> {
   size?: UiScaleStep | undefined;
   /**
    * The leading icon. Omitted, a status tone supplies its role glyph; pass
@@ -126,7 +138,7 @@ export function Badge({
   );
 }
 
-export interface LoaderProps extends UiElementProps {
+export interface LoaderProps extends UiElementProps, UiAttributes<HTMLSpanElement> {
   size?: UiScaleStep | number | string | undefined;
   tone?: UiTone | undefined;
   /** The accessible name. Omit it only where a visible label already says the same thing. */
@@ -156,7 +168,7 @@ export function Loader({ className, style, render, size = 'md', tone, label, ...
   );
 }
 
-export interface SkeletonProps extends UiElementProps {
+export interface SkeletonProps extends UiElementProps, UiAttributes<HTMLDivElement> {
   width?: number | string | undefined;
   height?: number | string | undefined;
   radius?: UiRadius | undefined;

@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import type { ApiClient } from '@/services/apiClient';
 import type { ListingItem } from '@/components/Galleries/Adapters/GalleryAdapter';
 import { useRecordAnalyticsEvent } from '@/hooks/useRecordAnalyticsEvent';
-import { Box, Center, Loader } from '@mantine/core';
+import { Loader } from '@mantine/core';
 import { IconLayoutDashboard, IconAlertTriangle, IconInfoCircle } from '@tabler/icons-react';
 import type {
   GalleryBehaviorSettings,
@@ -50,7 +50,7 @@ import { useViewportHeight } from '@mullion/shared-utils';
 import { sanitizeCssUrl, toCssOrNumber } from '@mullion/shared-utils';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { resolveAdapterShellStyle, resolveGalleryComponentCommonSettings, resolveGalleryHeading } from '../_shared/runtimeCommon';
-import { uiRem, Stack, Text } from '@/ui';
+import { uiRem, Stack, Text, Box, Center } from '@/ui';
 
 // ── TiltWrapper: applies mouse-reactive 3D tilt to children ──────────────────
 
@@ -479,7 +479,7 @@ export function LayoutBuilderGallery({
 
   if (isLoading) {
     return (
-      <Center py="xl" style={{ minHeight: uiRem(12.5) }}>
+      <Center paddingBlock="xl" style={{ minHeight: uiRem(12.5) }}>
         <Stack align="center" gap="xs">
           <Loader size="md" aria-label={t('layout_loading_aria', 'Loading layout template')} />
           <Text size="sm" tone="muted">{t('layout_loading_text', 'Loading gallery…')}</Text>
@@ -728,7 +728,7 @@ function LayoutBuilderGalleryInner({
       {/* Header */}
       {heading.visible && (
         <Text size="sm" weight={500} render={<div />} align={common.galleryLabelJustification || 'left'}>
-          <Box component="span" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <Box render={<span />} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             {common.showGalleryLabelIcon && <IconLayoutDashboard size={16} />}
             {heading.label}
           </Box>

@@ -7,7 +7,6 @@ import {
   ActionIcon,
   Tooltip,
   Divider,
-  Box,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import {
@@ -29,7 +28,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useGetSettings } from '@/services/settingsQuery';
 import { AdminChromeProvider } from '@/components/Admin/AdminChromeProvider';
 import { adminChromeAttributes, adminChromeClassNames, adminChromeStyles, resolveChromeThemeId } from '@/themes/chromeTheme';
-import { getThemeEntry, Group, Text } from '@/ui';
+import { getThemeEntry, Group, Text, Box } from '@/ui';
 import { useLatestRef } from '@mullion/shared-utils';
 import { DockviewReact, DockviewDefaultTab } from 'dockview';
 import { debugGroup, debugLog, debugGroupEnd } from '@/utils/debug';
@@ -524,8 +523,8 @@ export function LayoutBuilderModal({
       >
         {/* ── Header Bar ── */}
         <Box
-          px="md"
-          py="xs"
+          paddingInline="md"
+          paddingBlock="xs"
           style={{
             borderBottom: '1px solid var(--mullion-builder-border)',
             background: 'var(--mullion-builder-surface)',

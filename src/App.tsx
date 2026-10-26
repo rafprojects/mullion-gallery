@@ -1,7 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Container, Alert, Loader, Center, Modal, Button } from '@mantine/core';
-import { Stack } from '@/ui';
+import { Container, Loader, Modal, Button } from '@mantine/core';
+import { Stack, Alert, Center } from '@/ui';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { CardGallery } from './components/CampaignGallery/CardGallery';
@@ -413,7 +413,7 @@ function AppContent({
         )}
         {actionMessage && (
           <Container {...(appContainerSize !== undefined ? { size: appContainerSize } : {})} fluid={appContainerFluid} py="sm" style={appContainerPaddingStyle}>
-            <Alert color={actionMessage.type === 'error' ? 'red' : 'green'}
+            <Alert tone={actionMessage.type === 'error' ? 'danger' : 'success'}
               role={actionMessage.type === 'error' ? 'alert' : 'status'}
               aria-live={actionMessage.type === 'error' ? 'assertive' : 'polite'}>
               {actionMessage.text}
@@ -422,12 +422,12 @@ function AppContent({
         )}
         {!isOnline && (
           <Container {...(appContainerSize !== undefined ? { size: appContainerSize } : {})} fluid={appContainerFluid} py="sm" style={appContainerPaddingStyle}>
-            <Alert color="orange" role="alert" aria-live="assertive">{t('app_offline', 'You appear to be offline. Some features are unavailable.')}</Alert>
+            <Alert tone="warning" role="alert" aria-live="assertive">{t('app_offline', 'You appear to be offline. Some features are unavailable.')}</Alert>
           </Container>
         )}
         {error && (
           <Container {...(appContainerSize !== undefined ? { size: appContainerSize } : {})} fluid={appContainerFluid} py="sm" style={appContainerPaddingStyle}>
-            <Alert color="red" role="alert" aria-live="assertive">{error}</Alert>
+            <Alert tone="danger" role="alert" aria-live="assertive">{error}</Alert>
           </Container>
         )}
         {isSettingsOpen && (
@@ -451,7 +451,7 @@ function AppContent({
         {isAdminPanelOpen ? (
           <Container {...(adminPanelContainerSize !== undefined ? { size: adminPanelContainerSize } : appContainerSize !== undefined ? { size: appContainerSize } : {})} py="xl" style={appContainerPaddingStyle}>
             <ErrorBoundary onReset={closeAdminPanel} isAdmin={isAdmin}>
-              <Suspense fallback={<Center py={120}><Loader /></Center>}>
+              <Suspense fallback={<Center paddingBlock={120}><Loader /></Center>}>
                 <AdminPanel
                   apiClient={apiClient}
                   onClose={closeAdminPanel}
@@ -466,12 +466,12 @@ function AppContent({
             </ErrorBoundary>
           </Container>
         ) : isLoading ? (
-          <Center py={120}>
+          <Center paddingBlock={120}>
             <Stack align="center">
               <Loader />
               <Stack gap="4xs" align="center">
                 <Container size="sm" px={0}>
-                  <Alert color="blue" variant="light" role="status" aria-live="polite">
+                  <Alert tone="info" variant="light" role="status" aria-live="polite">
                     {/* [P68-D] Only show the page counter when the listing
                         actually spans multiple pages; single-page loads (the
                         common case) just show the spinner + label. */}

@@ -1,12 +1,12 @@
 import { forwardRef, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react';
-import { Card, Image, Box, ActionIcon, Badge } from '@mantine/core';
+import { Card, Image, ActionIcon, Badge } from '@mantine/core';
 import { IconPhoto, IconTrash, IconGripVertical } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
 import { FALLBACK_IMAGE_SRC } from '@/utils/fallback';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import styles from './MediaCard.module.scss';
-import { uiRem, Group, Text } from '@/ui';
+import { uiRem, Group, Text, Box } from '@/ui';
 
 interface MediaCardProps {
   item: MediaItem;

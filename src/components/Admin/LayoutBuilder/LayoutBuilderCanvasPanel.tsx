@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getHotkeyHandler, useElementSize, useMergedRef } from '@mantine/hooks';
 import {
-  Box,
   NumberInput,
   Switch,
   Slider,
@@ -11,7 +10,6 @@ import {
   ActionIcon,
   Tooltip,
   SegmentedControl,
-  Alert,
 } from '@mantine/core';
 import type { ResponsiveBreakpoint } from '@/types';
 import { IconHandGrab, IconArrowsMaximize, IconSeparatorVertical, IconSeparatorHorizontal } from '@tabler/icons-react';
@@ -26,7 +24,7 @@ import { safeLocalStorage, fitRectsIntoBand } from '@mullion/shared-utils';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
 import { showProUpsell } from '@/utils/mullionUpsell';
-import { uiRem, Group, Text } from '@/ui';
+import { uiRem, Group, Text, Box, Alert } from '@/ui';
 
 // ── P30-C: Device preview presets ────────────────────────────────────────────
 
@@ -360,11 +358,10 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
         {/* P58-B: Breakpoint edit mode banner */}
         {!builder.isPreview && builder.activeBreakpoint !== 'desktop' && (
           <Alert
-            color="blue"
+            tone="info"
             variant="light"
-            p="xs"
-            radius={0}
-            style={{ flexShrink: 0, borderBottom: '1px solid var(--mullion-builder-border)' }}
+            padding="xs"
+            style={{ flexShrink: 0, borderRadius: 0, borderBottom: '1px solid var(--mullion-builder-border)' }}
           >
             <Text size="xs" align="center">
               {tr('lb_canvas_editing_pre', 'Editing ')}
@@ -503,8 +500,8 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
         {/* ── Edit-mode footer ─────────────────────────────────── */}
         {!builder.isPreview && (
           <Box
-            px="md"
-            py={6}
+            paddingInline="md"
+            paddingBlock={6}
             style={{
               borderTop: '1px solid var(--mullion-builder-border)',
               background: 'var(--mullion-builder-surface)',
@@ -744,8 +741,8 @@ export function LayoutBuilderCanvasPanel(_props: IDockviewPanelProps) {
         {/* ── P30-C: Preview-mode device preset controls ───────── */}
         {builder.isPreview && (
           <Box
-            px="md"
-            py={6}
+            paddingInline="md"
+            paddingBlock={6}
             data-testid="preview-preset-bar"
             style={{
               borderTop: '1px solid var(--mullion-builder-border)',

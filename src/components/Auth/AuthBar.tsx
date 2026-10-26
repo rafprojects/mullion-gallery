@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Container, Button, Tooltip, ActionIcon, Menu } from '@mantine/core';
-import { Group, Text } from '@/ui';
+import { Container, Button, Tooltip, ActionIcon, Menu } from '@mantine/core';
+import { Group, Text, Box } from '@/ui';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconSettings, IconLogout, IconDashboard, IconDotsVertical } from '@tabler/icons-react';
 import type { GalleryBehaviorSettings } from '@/types';
@@ -211,7 +211,7 @@ function AuthBarFull({
   return (
     <Box
       {...getMullionDebugProps('AuthBar')}
-      component="nav"
+      render={<nav />}
       aria-label={t('auth_user_nav_label', 'User navigation')}
       style={{
         position: 'sticky',
@@ -257,7 +257,7 @@ function AuthBarFull({
                           {t('auth_settings', 'Settings')}
                         </Menu.Item>
                         {instanceId && (
-                          <Box px={8} py={4}>
+                          <Box paddingInline={8} paddingBlock={4}>
                             <SpaceSwitcher
                               activeInstanceId={activeInstanceId ?? instanceId}
                               onSelect={setActiveInstanceId}

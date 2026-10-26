@@ -32,6 +32,7 @@
     --mullion-pad-inline: initial;
     --mullion-container-size: initial;
     --mullion-cols: initial;
+    --mullion-cols-xs: initial;
     --mullion-cols-sm: initial;
     --mullion-cols-md: initial;
     --mullion-cols-lg: initial;
@@ -125,16 +126,23 @@
    * falls back to the one below it, so `cols={{ base: 1, md: 2 }}` holds one
    * column through `sm` without the call site spelling it.
    */
+  /* [P81-A] Mantine's xs breakpoint, which one call site sets. */
+  @media (min-width: 36em) {
+    .mullion-simple-grid {
+      grid-template-columns: repeat(var(--mullion-cols-xs, var(--mullion-cols, 1)), minmax(0, 1fr));
+    }
+  }
+
   @media (min-width: 48em) {
     .mullion-simple-grid {
-      grid-template-columns: repeat(var(--mullion-cols-sm, var(--mullion-cols, 1)), minmax(0, 1fr));
+      grid-template-columns: repeat(var(--mullion-cols-sm, var(--mullion-cols-xs, var(--mullion-cols, 1))), minmax(0, 1fr));
     }
   }
 
   @media (min-width: 62em) {
     .mullion-simple-grid {
       grid-template-columns: repeat(
-        var(--mullion-cols-md, var(--mullion-cols-sm, var(--mullion-cols, 1))),
+        var(--mullion-cols-md, var(--mullion-cols-sm, var(--mullion-cols-xs, var(--mullion-cols, 1)))),
         minmax(0, 1fr)
       );
     }
@@ -143,7 +151,7 @@
   @media (min-width: 75em) {
     .mullion-simple-grid {
       grid-template-columns: repeat(
-        var(--mullion-cols-lg, var(--mullion-cols-md, var(--mullion-cols-sm, var(--mullion-cols, 1)))),
+        var(--mullion-cols-lg, var(--mullion-cols-md, var(--mullion-cols-sm, var(--mullion-cols-xs, var(--mullion-cols, 1))))),
         minmax(0, 1fr)
       );
     }
@@ -154,7 +162,7 @@
       grid-template-columns: repeat(
         var(
           --mullion-cols-xl,
-          var(--mullion-cols-lg, var(--mullion-cols-md, var(--mullion-cols-sm, var(--mullion-cols, 1))))
+          var(--mullion-cols-lg, var(--mullion-cols-md, var(--mullion-cols-sm, var(--mullion-cols-xs, var(--mullion-cols, 1)))))
         ),
         minmax(0, 1fr)
       );

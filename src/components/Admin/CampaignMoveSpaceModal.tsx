@@ -3,13 +3,12 @@ import {
   Modal,
   Button,
   Select,
-  Alert,
 } from '@mantine/core';
 import { IconArrowsExchange, IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { AdminCampaign, SpaceInfo } from '@/services/adminQuery';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text } from '@/ui';
+import { uiRem, Group, Stack, Text, Alert } from '@/ui';
 
 export interface CampaignMoveSpaceModalProps {
   /** Campaign to move; null when modal is closed. */
@@ -88,7 +87,7 @@ export function CampaignMoveSpaceModal({
           data-autofocus
         />
 
-        <Alert icon={<IconInfoCircle size={16} />} color="blue" variant="light">
+        <Alert icon={<IconInfoCircle size={16} />} tone="info" variant="light">
           {t('admin_move_info', 'All analytics, audit history, media references, and access requests move with the campaign. The source space will no longer list it.')}
         </Alert>
 

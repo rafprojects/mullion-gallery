@@ -1,10 +1,10 @@
 
-import { Modal, SimpleGrid, Card, Badge, Box } from '@mantine/core';
+import { Modal, Card, Badge } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { IconLayoutDashboard } from '@tabler/icons-react';
 import { LAYOUT_PRESETS, type LayoutPreset } from '@/data/layoutPresets';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Text } from '@/ui';
+import { uiRem, Group, Text, SimpleGrid, Box } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 

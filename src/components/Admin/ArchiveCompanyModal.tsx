@@ -1,6 +1,6 @@
 
-import { Alert, Box, Checkbox, ScrollArea } from '@mantine/core';
-import { Stack, Text } from '@/ui';
+import { Checkbox, ScrollArea } from '@mantine/core';
+import { Stack, Text, Alert, Box } from '@/ui';
 import { Trans, useTranslation } from 'react-i18next';
 import { ConfirmModal } from '@/components/Common/ConfirmModal';
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
@@ -79,7 +79,7 @@ export function ArchiveCompanyModal({
         onChange={(e) => onArchiveRevokeAccessChange(e.currentTarget.checked)}
       />
 
-      <Alert {...getMullionDebugProps('ArchiveCompanyModal', 'warning')} color="yellow" variant="light">
+      <Alert {...getMullionDebugProps('ArchiveCompanyModal', 'warning')} tone="warning" variant="light">
         <Text size="sm">{t('admin_archco_warning', 'Access grants for individual campaigns will be preserved but become inactive.')}</Text>
       </Alert>
     </ConfirmModal>

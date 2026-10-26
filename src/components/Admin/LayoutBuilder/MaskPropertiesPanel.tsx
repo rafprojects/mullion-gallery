@@ -7,7 +7,6 @@ import {
   FileButton,
   Button,
   Loader,
-  Box,
   Slider,
   ActionIcon,
   Tooltip,
@@ -22,7 +21,7 @@ import { DEFAULT_MASK_LAYER } from '@/types';
 import type { AssetLibraryItem } from './BuilderDockContext';
 import { DesignAssetsGrid } from './DesignAssetsGrid';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Group, Text } from '@/ui';
+import { uiRem, Stack, Group, Text, Box } from '@/ui';
 
 // ── Props ────────────────────────────────────────────────────
 

@@ -48,6 +48,27 @@ function literal(attr) {
 const TEXT_TONES = { dimmed: 'muted', gray: 'muted', red: 'danger', green: 'success', orange: 'warning', yellow: 'warning' };
 const TEXT_TONES_REVIEW = { teal: ['primary', 'teal is primary unless it reports an outcome'], blue: ['info', 'blue on text: info unless it is an action'] };
 
+/** Alerts are states, so the colour table applies as written (designer, 2026-10-25). */
+const ALERT_TONES = { red: 'danger', green: 'success', orange: 'warning', yellow: 'warning', blue: 'info' };
+const alertColour = (attr) => {
+  const v = literal(attr);
+  if (typeof v !== 'string') return { blocked: 'colour is an expression' };
+  if (ALERT_TONES[v]) return { replace: `tone="${ALERT_TONES[v]}"` };
+  if (v === 'teal') return { replace: 'tone="success"', review: 'teal on an alert: success, since an alert reports an outcome' };
+  return { blocked: 'no role for this colour' };
+};
+
+/**
+ * Mantine style props pass 1 left for pass 2. Any still on a flipped element
+ * after its rules ran would reach the DOM as a stray attribute, so it is
+ * reported rather than left (P81-A).
+ */
+const LEFTOVER_STYLE_PROPS = new Set([
+  'm', 'mt', 'mb', 'ml', 'mr', 'mx', 'my', 'p', 'pt', 'pb', 'pl', 'pr', 'px', 'py',
+  'w', 'h', 'miw', 'maw', 'mih', 'mah', 'c', 'bg', 'fw', 'fz', 'ff', 'fs', 'ta', 'tt', 'lh', 'lts',
+  'pos', 'top', 'left', 'right', 'bottom', 'inset', 'display', 'flex', 'opacity',
+]);
+
 /** Text sizes below the smallest token floor to it and are listed (designer, 2026-10-25). */
 const SMALLEST_TEXT_PX = 12;
 
@@ -90,6 +111,25 @@ const RULES = {
       ff: (attr) => (literal(attr) === 'monospace' ? { replace: 'font="mono"' } : { blocked: 'font family other than monospace' }),
       truncate: (attr) => (literal(attr) === 'end' ? { replace: 'truncate' } : null),
     },
+  },
+  Box: { rename: PADDING, unsupported: ['variant', 'mod', 'classNames', 'styles', 'unstyled'] },
+  Center: { rename: PADDING, unsupported: ['mod', 'classNames', 'styles', 'unstyled'] },
+  Grid: { gapProp: 'gap', rename: PADDING, unsupported: ['gutter', 'grow', 'columns', 'overflow', 'breakpoints', 'type', 'rowGap', 'columnGap'] },
+  SimpleGrid: {
+    rename: PADDING,
+    unsupported: ['verticalSpacing', 'type', 'minColWidth', 'autoFlow', 'autoRows'],
+    props: {
+      spacing: (attr) => {
+        const init = attr.initializer;
+        const e = init && ts.isJsxExpression(init) ? init.expression : undefined;
+        return e && ts.isObjectLiteralExpression(e) ? { blocked: 'responsive spacing' } : null;
+      },
+    },
+  },
+  Alert: {
+    rename: PADDING,
+    unsupported: ['radius', 'onClose', 'withCloseButton', 'closeButtonLabel', 'autoContrast', 'classNames', 'styles', 'unstyled'],
+    props: { color: alertColour },
   },
   Title: {
     rename: {},
@@ -136,6 +176,10 @@ for (const file of [...walk('src'), ...walk('packages')]) {
   const uiImport = sf.statements.find(
     (st) => ts.isImportDeclaration(st) && st.moduleSpecifier.text === '@/ui' && !st.importClause?.isTypeOnly,
   );
+  // Every moved name lands in one `@/ui` import, however many Mantine imports
+  // it came from: two edits to the same import range corrupted it.
+  const movedAll = [];
+  let firstMoved;
   for (const st of sf.statements) {
     if (!ts.isImportDeclaration(st)) continue;
     const from = st.moduleSpecifier.text;
@@ -157,15 +201,21 @@ for (const file of [...walk('src'), ...walk('packages')]) {
       continue;
     }
     const kept = nb.elements.filter((el) => !moved.includes(el)).map((el) => el.getText());
-    const movedText = moved.map((m) => m.getText());
     // Keep a multi-line import multi-line, one name per line as it was.
     const multiline = nb.getText().includes('\n');
     const list = (items) => (multiline ? `{\n${items.map((n) => `  ${n},`).join('\n')}\n}` : `{ ${items.join(', ')} }`);
+    movedAll.push(...moved.map((m) => m.getText()));
+    if (!firstMoved) firstMoved = { st, kept, list };
+    else edits.push([st.getFullStart(), st.getEnd(), kept.length > 0 ? `\nimport ${list(kept)} from '@mantine/core';` : '']);
+    report.imports.push(`${file}: ${moved.map((m) => m.getText()).join(', ')}`);
+  }
+  if (firstMoved) {
+    const { st, kept, list } = firstMoved;
     const uiNames = uiImport?.importClause?.namedBindings;
     if (uiNames && ts.isNamedImports(uiNames)) {
       // Join the file's existing `@/ui` import rather than add a second one.
       const uiMultiline = uiNames.getText().includes('\n');
-      const all = [...uiNames.elements.map((el) => el.getText()), ...movedText];
+      const all = [...uiNames.elements.map((el) => el.getText()), ...movedAll];
       edits.push([
         uiNames.getStart(),
         uiNames.getEnd(),
@@ -174,11 +224,10 @@ for (const file of [...walk('src'), ...walk('packages')]) {
       edits.push([st.getFullStart(), st.getEnd(), kept.length > 0 ? `\nimport ${list(kept)} from '@mantine/core';` : '']);
     } else {
       const replacement =
-        (kept.length > 0 ? `import ${list(kept)} from '@mantine/core';\n` : '') +
-        `import ${list(movedText)} from '@/ui';`;
+        (kept.length > 0 ? `import ${list(kept)} from '@mantine/core';\n` : '') + `import ${list(movedAll)} from '@/ui';`;
       edits.push([st.getStart(), st.getEnd(), replacement]);
     }
-    report.imports.push(`${file}: ${moved.map((m) => m.getText()).join(', ')}`);
+    report.imports.push(`${file}: ${movedAll.join(', ')}`);
   }
   if (local.size === 0) continue;
 
@@ -217,6 +266,8 @@ for (const file of [...walk('src'), ...walk('packages')]) {
           edits.push([attr.getStart(), attr.getEnd(), `render={<${init.text} />}`]);
         } else if (name === 'component') {
           report.blocked.push(`${where}  (component is not a literal tag)`);
+        } else if (LEFTOVER_STYLE_PROPS.has(name)) {
+          report.blocked.push(`${where}  (a Mantine style prop with no rule here)`);
         }
       }
     }

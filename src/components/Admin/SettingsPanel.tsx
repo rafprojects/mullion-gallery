@@ -4,11 +4,9 @@ import { useStore } from 'zustand';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Badge,
-  Box,
   Button,
   Drawer,
   Loader,
-  Center,
   NativeScrollArea,
   Tabs,
 } from '@mantine/core';
@@ -36,7 +34,7 @@ import {
   type SettingsData,
   type SettingsDataInput,
 } from '@/contexts/SettingsStore';
-import { uiLayer, Group, Stack, Text, Title } from '@/ui';
+import { uiLayer, Group, Stack, Text, Title, Box, Center } from '@/ui';
 import { SettingTooltip } from './SettingTooltip';
 import type { CustomFontEntry } from '../Common/TypographyEditor';
 import type { UpdateGallerySetting } from '../Settings/GalleryAdapterSettingsSection';
@@ -669,7 +667,7 @@ export function SettingsPanel({ opened, apiClient, onClose, onNotify, onSettings
       })()}
     >
       {isLoading ? (
-        <Center py="xl">
+        <Center paddingBlock="xl">
           <Loader size="lg" />
         </Center>
       ) : (

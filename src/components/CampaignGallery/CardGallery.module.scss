@@ -14,3 +14,13 @@
   padding-top: env(safe-area-inset-top);
 }
 
+// [P81-A] Mantine's responsive `py`, which the framework's layout props do not
+// take: 60px, and 80px from Mantine's md breakpoint.
+.emptyState {
+  padding-block: 3.75rem;
+
+  @media (min-width: 62em) {
+    padding-block: 5rem;
+  }
+}
+

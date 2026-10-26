@@ -21,6 +21,7 @@ import {
   type CSSProperties,
   type HTMLAttributes,
   type ReactElement,
+  type Ref,
 } from 'react';
 
 /**
@@ -52,7 +53,10 @@ export type UiRender = ReactElement | ((props: UiRenderProps) => ReactElement);
 export type UiAttributes<E extends HTMLElement = HTMLElement> = Omit<
   HTMLAttributes<E>,
   'style' | 'className' | 'children' | 'color'
->;
+> & {
+  /** React 19 passes `ref` as a prop, and `renderElement` forwards it to the element. */
+  ref?: Ref<E> | undefined;
+};
 
 export interface UiElementProps {
   className?: string | undefined;

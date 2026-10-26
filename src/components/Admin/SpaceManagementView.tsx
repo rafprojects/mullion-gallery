@@ -5,9 +5,7 @@ import {
   Button,
   TextInput,
   Switch,
-  Alert,
   Loader,
-  Center,
   Table,
   ActionIcon,
   Tooltip,
@@ -27,7 +25,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { SpaceAssetLibrary } from './SpaceAssetLibrary';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import type { FontLibraryEntry } from '@mullion/shared-utils';
-import { uiRem, Stack, Group, Text } from '@/ui';
+import { uiRem, Stack, Group, Text, Alert, Center } from '@/ui';
 
 interface SpaceGrant {
   userId: number;
@@ -314,7 +312,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
       <Tabs.Panel value="spaces" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
         <Stack gap="md">
           {spacesLoading ? (
-            <Center py="md"><Loader size="sm" /></Center>
+            <Center paddingBlock="md"><Loader size="sm" /></Center>
           ) : (
             <Table striped highlightOnHover withTableBorder>
               <Table.Thead>
@@ -396,7 +394,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
                 size="sm"
               />
               {createIsolation && (
-                <Alert icon={<IconAlertCircle size={14} />} color="orange" variant="light" p="xs">
+                <Alert icon={<IconAlertCircle size={14} />} tone="warning" variant="light" padding="xs">
                   {t('admin_space_delegated_alert', 'In delegated mode, WordPress admins without an explicit grant cannot access this space. Make sure to add yourself as an owner before saving.')}
                 </Alert>
               )}
@@ -443,7 +441,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
             <Text size="sm" weight={500}>{t('admin_space_grants_for', 'Access grants for {{name}}', { name: selectedSpace.name })}</Text>
 
             {grantsLoading ? (
-              <Center py="md"><Loader size="sm" /></Center>
+              <Center paddingBlock="md"><Loader size="sm" /></Center>
             ) : grants && grants.length > 0 ? (
               <Table striped withTableBorder>
                 <Table.Thead>
@@ -547,7 +545,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
         {!selectedSpace ? (
           <Text tone="muted" size="sm">{t('admin_space_library_empty', 'Select a space from the Spaces tab to manage its shared library.')}</Text>
         ) : !isDelegated ? (
-          <Alert icon={<IconInfoCircle size={16} />} color="blue" variant="light">
+          <Alert icon={<IconInfoCircle size={16} />} tone="info" variant="light">
             <Text size="sm" weight={500} style={{ marginBottom: uiRem(0.125) }}>{t('admin_space_open_title', '{{name}} is an open space.', { name: selectedSpace.name })}</Text>
             <Text size="sm">
               {t('admin_space_open_desc', 'Open spaces can use every asset in the library — per-space selection only applies to delegated spaces. Switch this space to delegated isolation mode to restrict its assets.')}
@@ -573,7 +571,7 @@ export function SpaceManagementView({ apiClient, onNotify, onSpacesChanged, isSy
             <Stack gap="xs">
               <Text size="sm" weight={500}>{t('admin_space_fonts', 'Fonts')}</Text>
               {fontsLoading || libraryLoading ? (
-                <Center py="xs"><Loader size="sm" /></Center>
+                <Center paddingBlock="xs"><Loader size="sm" /></Center>
               ) : !allFonts?.length ? (
                 <Text size="xs" tone="muted">{t('admin_space_no_fonts', 'No fonts in the global library.')}</Text>
               ) : (

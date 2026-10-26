@@ -2,13 +2,13 @@ import { useState, useRef } from 'react';
 import {
   Modal,
   Button,
-  Alert,
   FileButton,
 } from '@mantine/core';
 import {
   Group,
   Stack,
   Text,
+  Alert,
 } from '@/ui';
 import { IconUpload, IconInfoCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -68,13 +68,13 @@ function CampaignImportModalContent({
       </FileButton>
 
       {parseError && (
-        <Alert color="red" icon={<IconInfoCircle size={16} />}>
+        <Alert tone="danger" icon={<IconInfoCircle size={16} />}>
           {parseError}
         </Alert>
       )}
 
       {parsed && (
-        <Alert color="teal" icon={<IconInfoCircle size={16} />}>
+        <Alert tone="success" icon={<IconInfoCircle size={16} />}>
           {t('admin_import_ready', 'Ready to import:')} <strong>{campaignTitle}</strong>
           {parsed.media_references?.length
             ? t('admin_import_media_refs', ' ({{count}} media reference)', { count: parsed.media_references.length })
@@ -83,7 +83,7 @@ function CampaignImportModalContent({
       )}
 
       {zipFile && (
-        <Alert color="teal" icon={<IconInfoCircle size={16} />}>
+        <Alert tone="success" icon={<IconInfoCircle size={16} />}>
           {t('admin_import_ready', 'Ready to import:')} <strong>{zipFile.name}</strong>
         </Alert>
       )}

@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { IconLock, IconEye } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Card, Image, Badge, Box, UnstyledButton } from '@mantine/core';
+import { Card, Image, Badge, UnstyledButton } from '@mantine/core';
 import type { Campaign, GalleryBehaviorSettings } from '@/types';
 import { DEFAULT_GALLERY_BEHAVIOR_SETTINGS } from '@/types';
 import type { ApiClient } from '@/services/apiClient';
@@ -11,7 +11,7 @@ import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { RequestAccessForm } from './RequestAccessForm';
 import { CompanyLogo } from '@/components/Common/CompanyLogo';
 import styles from './CampaignCard.module.scss';
-import { uiRem, Group, Stack, Text } from '@/ui';
+import { uiRem, Group, Stack, Text, Box } from '@/ui';
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -146,7 +146,7 @@ export const CampaignCard = forwardRef<HTMLButtonElement, CampaignCardProps>(
                   />
                 ) : (
                   <Box
-                    p="lg"
+                    padding="lg"
                     style={{
                       background: 'color-mix(in srgb, var(--mullion-color-surface) 90%, transparent)',
                       borderRadius: '9999px',

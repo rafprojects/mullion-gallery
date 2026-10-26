@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, Box, Badge, Tooltip, Button, Checkbox, Select, Menu } from '@mantine/core';
+import { Table, Badge, Tooltip, Button, Checkbox, Select, Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconEdit, IconCopy, IconDownload, IconFileZip, IconArchive, IconArchiveOff, IconLayoutGrid, IconTrash, IconChevronDown, IconArrowsExchange, IconPhotoPlus } from '@tabler/icons-react';
 import type { AccessSummaryItem, AdminCampaign } from '@/services/adminQuery';
@@ -10,7 +10,7 @@ import type { CampaignActionsHandle } from '@/hooks/useAdminCampaignActions';
 import { describeCampaignGalleryOverrides, hasCampaignGalleryOverrides } from '@/utils/campaignGalleryOverrides';
 import { CompanyCombobox } from '@/components/Common/CompanyCombobox';
 import type { ApiClient } from '@/services/apiClient';
-import { uiRem, Group, Text } from '@/ui';
+import { uiRem, Group, Text, Box } from '@/ui';
 
 function toSlug(name: string): string {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -93,7 +93,7 @@ export function useCampaignsRows({ campaigns, campaignActions, grantSummary, api
                 {hasCampaignGalleryOverrides(c) && (
                   <Tooltip label={t('admin_custom_gallery', 'Custom gallery: {{summary}}', { summary: overrideText })} withArrow>
                     <Box
-                      component="span"
+                      render={<span />}
                       role="img"
                       aria-label={t('admin_camprow_overrides_aria', 'Custom gallery overrides: {{summary}}', { summary: overrideText })}
                       style={{ display: 'inline-flex' }}

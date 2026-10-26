@@ -3,9 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ActionIcon,
   Badge,
-  Box,
   Button,
-  Center,
   Checkbox,
   CopyButton,
   Divider,
@@ -20,6 +18,8 @@ import {
   Group,
   Stack,
   Text,
+  Box,
+  Center,
 } from '@/ui';
 import { IconCopy, IconRefresh, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -63,7 +63,7 @@ function SecretReveal({ secret }: { secret: string }) {
   const { t } = useTranslation('mullion');
   return (
     <Box
-      p="xs"
+      padding="xs"
       style={{
         background: 'var(--mantine-color-dark-6, #102530)',
         borderRadius: 4,
@@ -115,7 +115,7 @@ function EndpointRow({
 
   return (
     <Box
-      p="sm"
+      padding="sm"
       style={{
         border: '1px solid var(--mantine-color-default-border)',
         borderRadius: 6,
@@ -275,7 +275,7 @@ export function WebhookSettingsSection({ apiClient }: Props) {
 
   if (isLoading) {
     return (
-      <Center py="xl">
+      <Center paddingBlock="xl">
         <Loader size="sm" />
       </Center>
     );

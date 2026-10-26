@@ -9,7 +9,6 @@ import {
   Select,
   Divider,
   Loader,
-  Center,
   Textarea,
 } from '@mantine/core';
 import {
@@ -17,6 +16,7 @@ import {
   Group,
   Text,
   Title,
+  Center,
 } from '@/ui';
 import { IconTrash, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -107,7 +107,7 @@ export function TemplatesTab({ apiClient, campaigns, onNotify }: Props) {
       </Group>
 
       {loading ? (
-        <Center py="xl"><Loader size="sm" /></Center>
+        <Center paddingBlock="xl"><Loader size="sm" /></Center>
       ) : (
         <>
           <Text size="sm" weight={500} tone="muted">{t('admin_tmpl_builtin', 'Built-in')}</Text>

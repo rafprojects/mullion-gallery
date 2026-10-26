@@ -1,6 +1,6 @@
 
-import { Accordion, Box, NumberInput, Slider, Switch, TextInput } from '@mantine/core';
-import { Stack, Text } from '@/ui';
+import { Accordion, NumberInput, Slider, Switch, TextInput } from '@mantine/core';
+import { Stack, Text, Box } from '@/ui';
 import { useTranslation } from 'react-i18next';
 
 import { GradientEditor } from '@/components/Common/GradientEditor';

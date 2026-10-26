@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, ActionIcon, Tooltip, ScrollArea, UnstyledButton } from '@mantine/core';
-import { Stack, Group, Text } from '@/ui';
+import { ActionIcon, Tooltip, ScrollArea, UnstyledButton } from '@mantine/core';
+import { Stack, Group, Text, Box } from '@/ui';
 import { IconClockHour4, IconTrash } from '@tabler/icons-react';
 import type { IDockviewPanelProps } from 'dockview';
 import { useBuilderDock } from './BuilderDockContext';
@@ -26,7 +26,7 @@ export function BuilderHistoryPanel(_props: IDockviewPanelProps) {
   if (historyEntries.length === 0) {
     return (
       <Box
-        p="md"
+        padding="md"
         style={{
           height: '100%',
           display: 'flex',
@@ -49,7 +49,7 @@ export function BuilderHistoryPanel(_props: IDockviewPanelProps) {
   }
 
   return (
-    <Box style={{ height: '100%', display: 'flex', flexDirection: 'column' }} p="xs">
+    <Box style={{ height: '100%', display: 'flex', flexDirection: 'column' }} padding="xs">
       {/* Header */}
       <Group justify="space-between" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }} paddingInline={4}>
         <Text size="xs" weight={600} tone="muted" transform="uppercase">

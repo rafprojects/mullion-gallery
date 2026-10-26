@@ -1,11 +1,8 @@
 import type { ReactNode } from 'react';
 import {
-  Alert,
   Badge,
-  Box,
   Button,
   Card,
-  Center,
   Checkbox,
   Combobox,
   ScrollArea,
@@ -24,7 +21,7 @@ import { PendingRequestsPanel } from './PendingRequestsPanel';
 import type { ApiClient } from '@/services/apiClient';
 import type { AdminAccessState } from '@/hooks/useAdminAccessState';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Stack, Text } from '@/ui';
+import { uiRem, Group, Stack, Text, Alert, Box, Center } from '@/ui';
 
 type AccessViewMode = 'campaign' | 'company' | 'all';
 
@@ -174,7 +171,7 @@ export function AccessTab({
                   <Badge variant="light">{selectedCampaign.companyId || t('admin_access_none', 'None')}</Badge>
                 </Group>
                 {selectedCampaign.status === 'archived' && (
-                  <Alert color="yellow" variant="light" p="xs" icon={<IconAlertCircle size={16} />}>
+                  <Alert tone="warning" variant="light" padding="xs" icon={<IconAlertCircle size={16} />}>
                     <Text size="xs">{t('admin_access_archived_inactive', 'Archived campaign - grants inactive')}</Text>
                   </Alert>
                 )}
@@ -216,7 +213,7 @@ export function AccessTab({
       {/* Empty state */}
       {(accessViewMode === 'campaign' && !accessCampaignId) ||
        ((accessViewMode === 'company' || accessViewMode === 'all') && !selectedCompanyId) ? (
-        <Center py="xl">
+        <Center paddingBlock="xl">
           <Stack align="center" gap="xs">
             <Text tone="muted">
               {accessViewMode === 'campaign'

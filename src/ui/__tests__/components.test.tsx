@@ -369,6 +369,31 @@ describe('controls', () => {
 });
 
 describe('feedback and display', () => {
+  // [P81-A] Mantine parity the first flip needed.
+  it('lets an alert be polite: a role the caller gives wins over the default', () => {
+    render(
+      <>
+        <Alert tone="info" role="status">saved</Alert>
+        <Alert tone="danger">failed</Alert>
+      </>,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('saved');
+    expect(screen.getByRole('alert')).toHaveTextContent('failed');
+  });
+
+  it('gives an alert a close button only when it can be closed, named by the caller', () => {
+    const onClose = vi.fn();
+    const { rerender } = render(<Alert tone="danger">failed</Alert>);
+    expect(screen.queryByRole('button')).toBeNull();
+    rerender(
+      <Alert tone="danger" onClose={onClose} closeLabel="Dismiss error">
+        failed
+      </Alert>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss error' }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it('give an alert its role, its tone and its parts', () => {
     render(
       <Alert tone="danger" title="Failed" icon={<span>!</span>}>

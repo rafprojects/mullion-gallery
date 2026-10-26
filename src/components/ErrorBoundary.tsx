@@ -1,7 +1,7 @@
 import { Component, type ReactNode } from 'react';
 import i18n from 'i18next';
-import { Alert, Button } from '@mantine/core';
-import { Stack, Text } from '@/ui';
+import { Button } from '@mantine/core';
+import { Stack, Text, Alert } from '@/ui';
 import { IconAlertTriangle } from '@tabler/icons-react';
 import { isDebugEnabled } from '../utils/debug';
 
@@ -64,7 +64,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <Alert
-          color="red"
+          tone="danger"
           title={i18n.t('eb_error_title', 'Something went wrong')}
           icon={<IconAlertTriangle />}
           role="alert"

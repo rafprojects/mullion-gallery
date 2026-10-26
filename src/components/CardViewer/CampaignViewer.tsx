@@ -1,7 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconCalendar, IconTag } from '@tabler/icons-react';
-import { Modal, Image, Badge, Paper, SimpleGrid, Box, Center, Loader, Switch } from '@mantine/core';
+import { Modal, Image, Badge, Paper, Loader, Switch } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import type { Campaign, GalleryBehaviorSettings, GalleryConfig } from '@/types';
 import type { ApiClient } from '@/services/apiClient';
@@ -27,7 +27,11 @@ import {
 import { getMullionDebugProps, setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { UnifiedGallerySection } from './UnifiedGallerySection';
 import { PerTypeGallerySection } from './PerTypeGallerySection';
-import { uiRem, Group, Stack, Title, Text } from '@/ui';
+import { uiRem, Group, Stack, Title, Text, SimpleGrid, Box, Center } from '@/ui';
+import styles from './CampaignViewer.module.scss';
+
+/** A settings length in the size basis: a number is pixels, as Mantine's `h` read it. */
+const coverLength = (value: string | number): string => (typeof value === 'number' ? uiRem(value / 16) : value);
 
 const LazyGalleryConfigEditorModal = lazy(() =>
   import('@/components/Common/GalleryConfigEditorModal').then((module) => ({
@@ -72,7 +76,16 @@ function CampaignViewerCoverHeader({
 }: CampaignViewerCoverHeaderProps) {
   const { t } = useTranslation('mullion');
   return (
-    <Box style={{ position: 'relative' }} h={coverHeights} component="div">
+    <Box
+      className={styles.cover}
+      style={{
+        position: 'relative',
+        '--cv-cover-h-base': coverLength(coverHeights.base),
+        '--cv-cover-h-sm': coverLength(coverHeights.sm),
+        '--cv-cover-h-md': coverLength(coverHeights.md),
+      }}
+      render={<div />}
+    >
       <InContextEditor
         visible={isAdmin && settings.showInContextEditors}
         position="top-left"
@@ -120,7 +133,7 @@ function CampaignViewerCoverHeader({
         </Badge>
       )}
 
-      <Box style={{ position: 'absolute', bottom: '0', left: '0', right: '0' }} p={{ base: 'md', md: 'lg' }}>
+      <Box className={styles.coverText} style={{ position: 'absolute', bottom: '0', left: '0', right: '0' }}>
         <Title order={2} size={3} style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))', ...campaignTitleStyle }}>
           {displayedCampaign.title}
         </Title>
@@ -192,7 +205,7 @@ function CampaignViewerGalleryContent({
       }}
     >
       <Suspense fallback={
-        <Center py="xl" style={{ minHeight: uiRem(12.5) }}>
+        <Center paddingBlock="xl" style={{ minHeight: uiRem(12.5) }}>
           <Stack align="center" gap="xs">
             <Loader size="md" />
             <Text size="sm" tone="muted">{t('cv_loading', 'Loading gallery…')}</Text>
@@ -230,7 +243,7 @@ function CampaignViewerStatsSection({
 }: CampaignViewerStatsSectionProps) {
   const { t } = useTranslation('mullion');
   return (
-    <Box component="section" role="region" aria-labelledby="campaign-stats-heading" style={{ position: 'relative' }}>
+    <Box render={<section />} role="region" aria-labelledby="campaign-stats-heading" style={{ position: 'relative' }}>
       <InContextEditor
         visible={isAdmin && settings.showInContextEditors}
         position="top-right"
@@ -242,7 +255,7 @@ function CampaignViewerStatsSection({
         </Stack>
       </InContextEditor>
       <Title order={3} size={6} style={{ marginBottom: 'var(--mullion-spacing-sm, var(--mantine-spacing-sm))' }} id="campaign-stats-heading" className="mullion-sr-only">{t('cv_stats_heading', 'Campaign Statistics')}</Title>
-      <SimpleGrid cols={{ base: 2, sm: 4 }} spacing={{ base: 'sm', md: 'md' }} py="sm" style={{ borderTopWidth: 1, borderTopColor: 'var(--mullion-color-border)' }}>
+      <SimpleGrid className={styles.stats} cols={{ base: 2, sm: 4 }} paddingBlock="sm" style={{ borderTopWidth: 1, borderTopColor: 'var(--mullion-color-border)' }}>
         <Paper p="md" radius="md" withBorder style={{ textAlign: 'center' }}>
           <Text size="xl" weight={600} style={campaignStatsValueStyle}>{displayedCampaign.videos.length}</Text>
           <Text size="sm" tone="muted" style={campaignStatsLabelStyle}>{t('cv_videos', 'Videos')}</Text>

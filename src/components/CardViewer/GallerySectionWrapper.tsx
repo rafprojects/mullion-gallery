@@ -6,7 +6,7 @@
  * children through a render-prop pattern.
  */
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { Box } from '@mantine/core';
+import { Box } from '@/ui';
 import type {
   ContainerDimensions,
   GalleryBehaviorSettings,

@@ -1,6 +1,6 @@
 
-import { Badge, Button, Card, Center, Image, Loader, SimpleGrid, TextInput } from '@mantine/core';
-import { Group, Stack, Text } from '@/ui';
+import { Badge, Button, Card, Image, Loader, TextInput } from '@mantine/core';
+import { Group, Stack, Text, Center, SimpleGrid } from '@/ui';
 import { IconPhoto } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { MediaItem } from '@/types';
@@ -52,7 +52,7 @@ export function MediaLibraryPicker({
           onKeyDown={(e) => e.key === 'Enter' && void onLoadLibrary(librarySearch)}
         />
         {libraryLoading ? (
-          <Center py="md"><Loader size="sm" /></Center>
+          <Center paddingBlock="md"><Loader size="sm" /></Center>
         ) : libraryMedia.length === 0 ? (
           <Text size="sm" tone="muted" align="center" style={{ paddingBlock: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
             {t('medialib_empty', 'Click "Load Library" to browse existing media')}

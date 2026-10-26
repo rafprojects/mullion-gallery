@@ -22,25 +22,31 @@
 // ── Layout and typography ──────────────────────────────────────────────────
 export {
   Anchor,
-  Box,
   Card,
-  Center,
   Container,
   Divider,
-  Grid,
   Paper,
-  SimpleGrid,
 } from '@mantine/core';
 
 // [P81-A] Flipped to the framework, with their consumers' props rewritten by
 // scripts/ui-codemod-pass2.mjs in the same commit. Importing the module also
 // registers the component sheets into the style list (P79-B).
 export {
+  Alert,
+  Box,
+  Center,
+  Grid,
   Group,
+  SimpleGrid,
   Stack,
   Text,
   Title,
+  type AlertProps,
+  type BoxProps,
+  type CenterProps,
+  type GridProps,
   type GroupProps,
+  type SimpleGridProps,
   type StackProps,
   type TextProps,
   type TitleProps,
@@ -85,7 +91,6 @@ export {
 
 // ── Feedback and data display ──────────────────────────────────────────────
 export {
-  Alert,
   Badge,
   ColorSwatch,
   Image,

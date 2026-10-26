@@ -10,7 +10,7 @@
  * responsive object form migrate to `className` in Phase 81.
  */
 
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, ReactNode, Ref } from 'react';
 import { renderElement, cx, type UiAttributes, type UiElementProps } from './element';
 import {
   customProperties,
@@ -56,7 +56,9 @@ function flexProps<T extends FlexProps>(
 // Box
 // ---------------------------------------------------------------------------
 
-export interface BoxProps extends UiElementProps, UiPaddingProps, UiDivAttributes {
+export interface BoxProps extends UiElementProps, UiPaddingProps, Omit<UiDivAttributes, 'ref'> {
+  /** Any element: `render` may swap the `<div>` for a `<button>` or a `<nav>`. */
+  ref?: Ref<HTMLElement> | undefined;
   children?: ReactNode;
 }
 
@@ -270,7 +272,7 @@ export const Grid = Object.assign(GridRoot, { Col: GridCol });
  * read a custom property, so the theme's `breakpoints` block could never have
  * reached one; no bundled theme overrides it, and the values here are those.
  */
-export type UiResponsiveCols = number | Partial<Record<'base' | 'sm' | 'md' | 'lg' | 'xl', number>>;
+export type UiResponsiveCols = number | Partial<Record<'base' | 'xs' | 'sm' | 'md' | 'lg' | 'xl', number>>;
 
 export interface SimpleGridProps extends UiElementProps, UiPaddingProps, UiDivAttributes {
   /** A column count, or one per breakpoint. */
@@ -300,6 +302,7 @@ export function SimpleGrid({
           ...pad,
           '--mullion-gap': spacingValue(spacing),
           '--mullion-cols': per.base,
+          '--mullion-cols-xs': per.xs,
           '--mullion-cols-sm': per.sm,
           '--mullion-cols-md': per.md,
           '--mullion-cols-lg': per.lg,

@@ -15,11 +15,10 @@
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Center } from '@mantine/core';
-import { Stack, Text } from '@/ui';
+import { Button } from '@mantine/core';
+import { Stack, Text, Center, Box } from '@/ui';
 import { OverlayArrows } from '@/components/Galleries/Shared/OverlayArrows';
 import { DotNavigator } from '@/components/Galleries/Shared/DotNavigator';
-import { Box } from '@mantine/core';
 import type { Campaign, GalleryBehaviorSettings } from '@/types';
 import type { Breakpoint } from '@/hooks/useBreakpoint';
 import { getMullionDebugProps } from '@/utils/mullionDebug';

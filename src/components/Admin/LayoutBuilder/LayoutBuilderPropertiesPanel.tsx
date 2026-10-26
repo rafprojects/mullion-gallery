@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Box, Button, Divider, SegmentedControl, NumberInput } from '@mantine/core';
+import { Button, Divider, SegmentedControl, NumberInput } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { IDockviewPanelProps } from 'dockview';
@@ -10,7 +10,7 @@ import { MaskPropertiesPanel } from './MaskPropertiesPanel';
 import { BackgroundPropertiesPanel } from './BackgroundPropertiesPanel';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
 import { useMullionLicense } from '@/hooks/useMullionLicense';
-import { uiRem, Stack, Group, Text } from '@/ui';
+import { uiRem, Stack, Group, Text, Box } from '@/ui';
 
 // P62-G: gate the Pro text editor behind the build flag so the free WP.org build
 // dead-code-eliminates TextPropertiesPanel (and its heavyweight TypographyEditor).
@@ -53,7 +53,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
 
   if (builder.isPreview) {
     return (
-      <Box p="sm" style={{ ...panelStyle }}>
+      <Box padding="sm" style={{ ...panelStyle }}>
         <Text size="sm" tone="muted">{t('lb_props_preview_unavailable', 'Properties are unavailable in preview mode.')}</Text>
       </Box>
     );
@@ -62,7 +62,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
   // Background selected — show dedicated background properties
   if (isBackgroundSelected) {
     return (
-      <Box p="sm" style={panelStyle}>
+      <Box padding="sm" style={panelStyle}>
         <Text size="xs" weight={600} tone="muted" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_background', 'BACKGROUND')}</Text>
         <BackgroundPropertiesPanel />
       </Box>
@@ -72,7 +72,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
   // Mask sublayer selected — show dedicated mask properties panel
   if (selectedMaskSlotId && selectedSlot) {
     return (
-      <Box p="sm" style={panelStyle}>
+      <Box padding="sm" style={panelStyle}>
         <Text size="xs" weight={600} tone="muted" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_mask', 'MASK PROPERTIES')}</Text>
         <MaskPropertiesPanel
           slot={selectedSlot}
@@ -86,7 +86,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
 
   if (selectedSlot) {
     return (
-      <Box p="sm" style={panelStyle}>
+      <Box padding="sm" style={panelStyle}>
         <Text size="xs" weight={600} tone="muted" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_slot', 'SLOT PROPERTIES')}</Text>
         <SlotPropertiesPanel
           slot={selectedSlot}
@@ -168,7 +168,7 @@ export function LayoutBuilderPropertiesPanel(_props: IDockviewPanelProps) {
   const recentActions = builder.historyEntries.slice(-5).reverse();
 
   return (
-    <Box p="sm" style={panelStyle}>
+    <Box padding="sm" style={panelStyle}>
       <Text size="xs" weight={600} tone="muted" style={{ marginBottom: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))' }}>{t('lb_props_hdr_canvas', 'CANVAS')}</Text>
       <Stack gap="xs">
         <Box>

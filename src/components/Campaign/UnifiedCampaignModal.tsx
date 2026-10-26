@@ -2,17 +2,14 @@ import { Suspense, lazy, useCallback, useEffect, useState, type ReactElement } f
 import {
   ActionIcon,
   Badge,
-  Box,
   Button,
   Card,
-  Center,
   FileButton,
   Image,
   Loader,
   Modal,
   MultiSelect,
   Progress,
-  SimpleGrid,
   Tabs,
   TagsInput,
   TextInput,
@@ -46,7 +43,7 @@ import {
   setCampaignBreakpointScopeAdapterOverride,
   syncCampaignGalleryOverrideMode,
 } from '@/utils/campaignGalleryOverrides';
-import { uiRem, Group, Stack, Text } from '@/ui';
+import { uiRem, Group, Stack, Text, Box, Center, SimpleGrid } from '@/ui';
 
 
 const LazyGalleryConfigEditorModal = lazy(() =>
@@ -685,7 +682,7 @@ export function UnifiedCampaignModal({
           {isEdit && (
             <Tabs.Panel value="media" style={{ paddingTop: 'var(--mullion-spacing-md, var(--mantine-spacing-md))' }}>
               {mediaLoading ? (
-                <Center py="xl"><Loader /></Center>
+                <Center paddingBlock="xl"><Loader /></Center>
               ) : (
                 <MediaTabContent
                   mediaItems={mediaItems}

@@ -13,8 +13,8 @@
  */
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Chip, Select } from '@mantine/core';
-import { Group, Stack } from '@/ui';
+import { Chip, Select } from '@mantine/core';
+import { Group, Stack, Box } from '@/ui';
 import { IconLayoutGrid, IconPlayerPlay, IconZoomIn } from '@tabler/icons-react';
 import { OVERLAY_BG, OVERLAY_TEXT } from '../_shared/overlayStyles';
 import type {
@@ -228,7 +228,7 @@ export function IsotopeAdapter({ media, settings, runtime }: IsotopeAdapterProps
                   itemRefs.current.delete(item.id);
                 }
               }}
-              component="button"
+              render={<button />}
               onClick={() => openAt(mediaIndex)}
               aria-label={label}
               style={{

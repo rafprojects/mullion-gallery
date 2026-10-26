@@ -10,14 +10,14 @@
  * is presentational + local filter state only.
  */
 import { useMemo, useState } from 'react';
-import { Box, TextInput, Button, Chip, Badge, Center, Loader } from '@mantine/core';
+import { TextInput, Button, Chip, Badge, Loader } from '@mantine/core';
 import { IconSearch, IconCheck } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { AssetLibraryItem } from '@/components/Admin/LayoutBuilder/BuilderDockContext';
 import { CHECKERED_BG } from '@/utils/checkeredBg';
 import { getAssetFileType } from '@/utils/assetFileType';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Group, Text } from '@/ui';
+import { uiRem, Group, Text, Box, Center } from '@/ui';
 
 export interface SpaceAssetLibraryProps {
   assets: AssetLibraryItem[];
@@ -67,7 +67,7 @@ export function SpaceAssetLibrary({
   const allFilteredAssociated = filtered.length > 0 && filtered.every((a) => associated.has(a.id));
 
   if (loading) {
-    return <Center py="md"><Loader size="sm" /></Center>;
+    return <Center paddingBlock="md"><Loader size="sm" /></Center>;
   }
 
   if (!assets.length) {

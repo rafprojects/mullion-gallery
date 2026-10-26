@@ -9,7 +9,6 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActionIcon,
-  Box,
   Popover,
   ScrollArea,
   Tooltip,
@@ -17,7 +16,7 @@ import {
 } from '@mantine/core';
 import { IconClockHour4, IconTrash } from '@tabler/icons-react';
 import { setMullionDebugDisplayName } from '@/utils/mullionDebug';
-import { uiRem, Stack, Text } from '@/ui';
+import { uiRem, Stack, Text, Box } from '@/ui';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -94,7 +93,7 @@ export function BuilderHistoryDropdown({
 
       <Popover.Dropdown style={{ padding: '0' }}>
         {/* Header */}
-        <Box px="sm" style={{ paddingTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))', paddingBottom: uiRem(0.25), borderBottom: '1px solid var(--mantine-color-default-border)' }}>
+        <Box paddingInline="sm" style={{ paddingTop: 'var(--mullion-spacing-xs, var(--mantine-spacing-xs))', paddingBottom: uiRem(0.25), borderBottom: '1px solid var(--mantine-color-default-border)' }}>
           <Text size="xs" weight={600} tone="muted" transform="uppercase">
             {t('lb_hist_title', 'History ({{count}})', { count })}
           </Text>
@@ -102,7 +101,7 @@ export function BuilderHistoryDropdown({
 
         {count === 0 ? (
           /* Empty state */
-          <Box p="md" style={{ textAlign: 'center' }}>
+          <Box padding="md" style={{ textAlign: 'center' }}>
             <IconClockHour4 size={24} style={{ opacity: 0.4, marginBottom: 6 }} />
             <Text size="sm" tone="muted">
               {t('lb_hist_none', 'No history yet.')}

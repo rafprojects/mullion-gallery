@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconPhoto, IconPlayerPlay, IconZoomIn } from '@tabler/icons-react';
-import { ActionIcon, Image, Box } from '@mantine/core';
+import { ActionIcon, Image } from '@mantine/core';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import type { GalleryAdapterProps, ListingItem } from './GalleryAdapter';
@@ -36,7 +36,7 @@ import {
   shouldLoopCarousel,
   shouldUseSyntheticCarouselLoop,
 } from './carouselBehavior';
-import { uiRem, Stack, Text } from '@/ui';
+import { uiRem, Stack, Text, Box } from '@/ui';
 
 type GalleryRuntimeCommonSettings = ReturnType<typeof resolveGalleryComponentCommonSettings>;
 
